@@ -1,25 +1,4 @@
-# Ephemeral Diffie-Hellman Over COSE (EDHOC)
-
-This is the working area for the Individual internet-draft, "Ephemeral Diffie-Hellman Over COSE (EDHOC)".
-
-* [Editor's copy](https://EricssonResearch.github.io/EDHOC/)
-* [Individual Draft] (https://tools.ietf.org/html/draft-selander-ace-cose-ecdhe)
-* [Compare Individual Draft and Editor's copy] (https://tools.ietf.org/rfcdiff?url1=https://tools.ietf.org/id/draft-selander-ace-cose-ecdhe.txt?url2=https://EricssonResearch.github.io/{GITHUB_REPRO}/draft-selander-ace-cose-ecdhe.txt)
-
-
-## Building the Draft
-
-Formatted text and HTML versions of the draft can be built using `make`.
-
-```sh
-$ make
-```
-
-This requires that you have the necessary software installed.  See [the
-instructions](https://github.com/martinthomson/i-d-template/blob/master/doc/SETUP.md).
-
-
-## Contributing
+# Contributing
 
 Before submitting feedback, please familiarize yourself with our current issues
 list and review the [working group
