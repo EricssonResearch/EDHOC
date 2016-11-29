@@ -13,11 +13,13 @@ addons:
 install:
 - gem install kramdown-rfc2629
 - pip install xml2rfc
+- rvm install 2.2.0
+- rvm use 2.2.0
+- ruby --version
 - gem install rake
 - gem install cddl
 
 script:
-- ruby --version
 - kramdown-rfc2629 draft-selander-ace-cose-ecdhe.md > draft-selander-ace-cose-ecdhe.xml
 - rake verify
 - make ghpages
