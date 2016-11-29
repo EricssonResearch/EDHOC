@@ -11,11 +11,11 @@ addons:
      - python-pip
 
 install:
-- gem install kramdown-rfc2629
 - pip install xml2rfc
 - rvm install 2.2.0
 - rvm use 2.2.0
 - ruby --version
+- gem install kramdown-rfc2629
 - gem install rake
 - gem install cddl
 
