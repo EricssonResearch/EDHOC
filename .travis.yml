@@ -20,7 +20,7 @@ install:
 - gem install cddl
 
 script:
-- kramdown-rfc2629 draft-selander-ace-ecdhe.md > draft-selander-ace-cose-ecdhe.xml
+- kramdown-rfc2629 draft-selander-ace-cose-ecdhe.md > draft-selander-ace-cose-ecdhe.xml
 - xml2rfc draft-selander-ace-cose-ecdhe.xml -o ecdhe.xml --exp
 - rake verify
 - make
