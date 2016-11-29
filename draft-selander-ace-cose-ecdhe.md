@@ -1,9 +1,6 @@
 ---
 title:  Ephemeral Diffie-Hellman Over COSE (EDHOC)
-# abbrev: COSE-ECDHE
 docname: draft-selander-ace-cose-ecdhe-latest
-# date: 2016-03-11
-
 
 # stand_alone: true
 
@@ -289,7 +286,7 @@ message_1 is a CBOR map object containing:
 * SIG_arr: an array of proposed Signature algorithms
 * MAC_arr: an array of proposed MAC algorithms
  
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_1 = {
   N_U : bstr,
   E_U : COSE_Key,
@@ -323,7 +320,7 @@ In case of asymmetric keys, message\_2 SHALL have the COSE\_Encrypt structure {{
       * E\_V: COSE\_Key
     + ciphertext: empty
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 nonce-array = [
   N_U: bstr,
   N_V: bstr
@@ -351,7 +348,7 @@ The payload for COSE_Sign1 SHALL have the COSE\_MAC0 structure {{I-D.ietf-cose-m
 * payload: payl_2_rpk (resp. payl_2_cert) as defined below if raw public keys (resp. certificates) are used
 * tag
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 payl_2_rpk = [
   N_U: bstr,
   N_V: bstr,
@@ -360,7 +357,7 @@ payl_2_rpk = [
   ]
 ~~~~~~~~~~~
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 payl_2_cert = [
   N_U: bstr,
   N_V: bstr,
@@ -401,7 +398,7 @@ The payload for COSE_Sign1 SHALL have the COSE\_MAC0 structure {{I-D.ietf-cose-m
 * payload: payl_3_rpk (resp. payl_3_cert) as defined below if raw public keys (resp. certificates) are used
 * tag
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 payl_3_rpk = [
   N_V : bstr,
   N_U : bstr,
@@ -411,7 +408,7 @@ payl_3_rpk = [
   ]
 ~~~~~~~~~~~
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 payl_3_cert = [
   N_V : bstr,
   N_U : bstr,
@@ -633,21 +630,21 @@ message_1 is a CBOR map object containing:
 * AEAD_arr: an array of proposed AEAD algorithms
 * MAC_arr: an array of proposed MAC algorithms
 
-~~~~~~~~~~~
-message_1 = {
+~~~~~~~~~~~ CDDL
+message_1_a = {
   N_U : bstr,
   E_U : COSE_Key,
   KID: bstr,
-  ALG_U : alg_arr
+  ALG_U : alg_arr_a
   }
 
-alg_arr = [
-  ECDH_arr : alg_array, 
-  AEAD_arr : alg_array,
-  MAC_arr : alg_array
+alg_arr_a = [
+  ECDH_arr : alg_array_a, 
+  AEAD_arr : alg_array_a,
+  MAC_arr : alg_array_a
   ]
 
-alg_array = [
+alg_array_a = [
   + alg : bstr/int
   ]
 ~~~~~~~~~~~
@@ -689,7 +686,7 @@ The payload for message\_2 SHALL have the COSE\_MAC0 structure {{I-D.ietf-cose-m
 * payload: payl_2_psk as defined below
 * tag: calculated as in section 6.3 of {{I-D.ietf-cose-msg}}
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 payl_2_psk = [
   N_U: bstr,
   N_V: bstr,
@@ -725,7 +722,7 @@ The payload for message\_3 SHALL have the COSE\_MAC0 structure {{I-D.ietf-cose-m
 * payload: payl_3_psk as defined below
 * tag: calculated as in section 6.3 of {{I-D.ietf-cose-msg}}
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 payl_3_psk = [
   N_V: bstr,
   N_U: bstr,
@@ -980,7 +977,7 @@ An example of COSE encoding for message\_1 is given in {{message1}}, using CBOR'
 
 The message\_1 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 {
   'N_U':h'5598a57b47db7f2c',
   'E_U':h'a120a40102200121582098f50a4ff6c05861c8860d13a638ea56c3f5ad7
@@ -1015,7 +1012,7 @@ An example of COSE encoding for message\_2 is given in {{message2}} using CBOR's
 
 The payload of the COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'7ce4cae9c9698bac', / N_V /
@@ -1041,7 +1038,7 @@ which has a size of 70 bytes. Note that these bytes are not sent in the message.
 
 The COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a10104', / protected : {01:04} /             
@@ -1060,7 +1057,7 @@ which has a size of 87 bytes. Note that these bytes are not sent in the message.
 
 The COSE_Sign1 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a20126474d41432d616c6704', / protected : {1:-7, 'MAC-alg':04} /
@@ -1077,7 +1074,7 @@ Note that by registering the label 'MAC-alg' to unsigned values the size can be 
 
 The COSE_Encrypt is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 [
   h'a1010c', / protected : {1:12} /
   {'nonces':h'82485598a57b47db7f2c487ce4cae9c9698bac'},/unprotected /
@@ -1120,7 +1117,7 @@ An example of COSE encoding for message\_3 is given in {{message3}} using CBOR's
 
 The payload of the COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'7ce4cae9c9698bac', / N_V /
@@ -1145,7 +1142,7 @@ which has a size of 81 bytes. Note that these bytes are not sent in the message.
 
 The COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a10104', / protected : {01:04} /             
@@ -1164,7 +1161,7 @@ which has a size of 98 bytes. Note that these bytes are not sent in the message.
 
 The COSE_Sign1 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a20126474d41432d616c6704', / protected : {1:-7, 'MAC-alg':4} /
@@ -1181,7 +1178,7 @@ Note that by registering the label 'MAC-alg' to unsigned values the size can be 
 
 The COSE_Encrypt0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 [
   h'a1010c', / protected : {01:12} /
   {'nonces':h'82485598a57b47db7f2c487ce4cae9c9698bac'},/unprotected /
@@ -1209,7 +1206,7 @@ An example of COSE encoding for message\_1 is given in {{message1-psk}}, using C
 
 The message\_1 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 {
   'N_U':h'5598a57b47db7f2c',
   'E_U':h'a120a40102200121582098f50a4ff6c05861c8860d13a638ea56c3f5ad7
@@ -1244,7 +1241,7 @@ An example of COSE encoding for message\_2 is given in {{message2-psk}} using CB
 
 The payload of the COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'5598a57b47db7f2c', / N_U /
@@ -1277,7 +1274,7 @@ which has a size of 81 bytes. Note that these bytes are not sent in the message.
 
 The COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a10104', / protected : {01:04} /             
@@ -1296,7 +1293,7 @@ which has a size of 98 bytes. Note that these bytes are not sent in the message.
 
 The COSE_MAC is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a10104', / protected : {01:04} /
@@ -1346,7 +1343,7 @@ An example of COSE encoding for message\_3 is given in {{message3-psk}} using CB
 
 The payload of the COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'5598a57b47db7f2c', / N_U /
@@ -1371,7 +1368,7 @@ which has a size of 84 bytes. Note that these bytes are not sent in the message.
 
 The COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a10104', / protected : {01:04} /             
@@ -1390,7 +1387,7 @@ which has a size of 101 bytes. Note that these bytes are not sent in the message
 
 The COSE_MAC0 is:
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CBORdiag
 
 [
   h'a10104', / protected : {01:04} /
