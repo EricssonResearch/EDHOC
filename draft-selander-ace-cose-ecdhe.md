@@ -1,9 +1,6 @@
 ---
 title:  Ephemeral Diffie-Hellman Over COSE (EDHOC)
-# abbrev: COSE-ECDHE
 docname: draft-selander-ace-cose-ecdhe-latest
-# date: 2016-03-11
-
 
 # stand_alone: true
 
