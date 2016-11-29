@@ -2,7 +2,7 @@ require "rexml/document"
 require "rexml/xpath"
 include REXML
 
-XMLFILE = "ecdhe.xml"
+XMLFILE = "draft-selander-ace-cose-ecdhe.xml"
 CDDLFILE = "ecdhe.cddl"
 
 CDDLFILE_p1 = "ecdhe_extract.cddl"

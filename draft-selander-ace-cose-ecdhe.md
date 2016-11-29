@@ -980,31 +980,26 @@ The message\_1 is:
 ~~~~~~~~~~~ CBORdiag
 {
   'N_U':h'5598a57b47db7f2c',
-  'E_U':h'a120a40102200121582098f50a4ff6c05861c8860d13a638ea56c3f5ad7
-  590bbfbf054e1c7b4d91d628022f5', / COSE_Key E_U { /
-    / ephemeral -1:{ /
-    / kty 1:2, /
-    / crv -1:1, /
-    / x -2:h'98f50a4ff6c05861c8860d13a638ea56c3f5ad7590bbfb /
-    / f054e1c7b4d91d6280', /
-    / y -3:true /
-    / } /
-  / } /
-  'ALG_U' : h'8481381a810c81268104' 
-    / [ /
-      / [ -27 ], ECDH-SS + HKDF-256 /
-      / [ 12 ],  AES-CCM-64-64-128 /
-      / [ -7 ],  ES256 /
-      / [ 4 ]    HMAC 256-64 /
-    / ] /  
+  'E_U':{
+    / kty / 1:2,
+    / crv / -1:1,
+    / x /  -2:h'98f50a4ff6c05861c8860d13a638ea56c3f5ad7590bbfbf054e1c7b4d91d6280',
+    / y / -3:true
+  },
+  'ALG_U' : [
+    [ -27 ], / ECDH-SS + HKDF-256 /
+    [ 12 ],  / AES-CCM-64-64-128 /
+    [ -7 ],  / ES256 /
+    [ 4 ]    / HMAC 256-64 /
+  ]  
 }
 ~~~~~~~~~~~
 {: #message1 title="Example of message_1"} 
 
 The equivalent CBOR encoding of the message_1 is:
-h'a3434e5f55485598a57b47db7f2c43455f55582ca120a40102200121582098f50a4ff6c05861c8860d13a638ea56c3f5ad7590bbfbf054e1c7b4d91d628022f545414c475f554a8481381a810c81268104',
-which has a size of 81 bytes.
-Note that by registering the labels 'N\_U', 'E\_U' and 'ALG\_U' to unsigned values the size can be reduced to 70 bytes.
+h'a3434e5f55485598a57b47db7f2c43455f55a40102200121582098f50a4ff6c05861c8860d13a638ea56c3f5ad7590bbfbf054e1c7b4d91d628022f545414c475f558481381a810c81268104',
+which has a size of 76 bytes.
+Note that by registering the labels 'N\_U', 'E\_U' and 'ALG\_U' to unsigned values the size can be reduced to 68 bytes.
 
 ### Message 2 ## {#ex-rpk2}
 

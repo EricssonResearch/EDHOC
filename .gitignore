@@ -3,6 +3,8 @@
 *.html
 *.pdf
 *~
+#*
+*#
 *.swp
 /*-[0-9][0-9].xml
 .refcache
@@ -11,3 +13,8 @@ venv/
 issues.json
 lib
 draft-selander-ace-cose-ecdhe.md
+draft-selander-ace-cose-ecdhe.xml
+a.bat
+ecdhe.cddl
+ecdhe_extract.cddl
+
