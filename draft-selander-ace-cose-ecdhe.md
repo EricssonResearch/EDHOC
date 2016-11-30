@@ -123,7 +123,7 @@ This document specifies authenticated Diffie-Hellman key exchange with ephemeral
 
 Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}}. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at application layer suitable for constrained devices, is provided by COSE {{I-D.ietf-cose-msg}}), which builds on CBOR {{RFC7049}}. 
 
-In order for a communication session to provide forward secrecy, the communicating parties can run a Diffie-Hellman (DH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies authenticated DH protocols using CBOR and COSE objects. The DH key exchange messages may be authenticated using either pre-shared keys (PSK), raw public keys (RPK) or X.509 certificates (Cert). Authentication is based on credentials established out of band, or from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
+In order for a communication session to provide forward secrecy, the communicating parties can run a Diffie-Hellman (DH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies authenticated DH protocols using CBOR and COSE objects. The DH key exchange messages may be authenticated using either a pre-shared key (PSK), a raw public key (RPK) or an X.509 certificate (Cert). Authentication is based on credentials established out of band, or from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
 
 The DH exchange and the key derviation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}} and HKDF {{RFC5869}}, and make use of the data structures of COSE which are aligned with these standards. 
 
@@ -141,7 +141,7 @@ normative meanings.
 
 This section gives an overview of EDHOC, together with {{mess-proc}} and {{mess-proc-sym}}, which explains how the messages are processed, while {{asym}} and {{sym}} focus on the detailed message formats embedded as CBOR objects, and {{key-der-asym}}, {{key-der-sym}}, and {{final-key-der}} specify the key derivation.
 
-EDHOC is built on the SIGMA family of protocols, with the basic protocol specified in Section 5, here in variant (ii) as in Section 5.4, of {{SIGMA}}, see {{mess-ex0}}.
+EDHOC is built on the SIGMA family of protocols, with the basic protocol specified in Section 5 of {{SIGMA}}. {{mess-ex0}} shows  variant (ii) specified in Section 5.4 of {{SIGMA}}.
 
 ~~~~~~~~~~~
 
@@ -163,7 +163,7 @@ Party U                                                 Party V
 {: artwork-align="center"}
 
 
-The parties exchanging messages are called "U" and "V". U and V exchange identities and ephemeral public keys. They compute the shared secret and derive the keying material. The messages are signed and MAC:ed according to the SIGMA protocol ({{mess-ex0}}):
+The parties exchanging messages are called "U" and "V". U and V exchange identities and ephemeral public keys. They compute the shared secret and derive the keying material. The messages are signed and MAC-ed according to the SIGMA protocol ({{mess-ex0}}):
 
 *  E_U and E_V are the ECDH ephemeral public keys of U and V, respectively.
 * ID_U and ID_V are used to identify U and V, respectively. In case of public key certificate, C_U and C_V are used instead.
@@ -528,7 +528,7 @@ Party U processes the received message\_2 as follows:
 * Party U SHALL verify message_2:
   - COSE\_Encrypt is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with key K\_VE.
   - If the message contains a certificate, party U SHALL verify the certificate using the pre-established trust anchor and the revokation verification policies relevant for party U. If the verification fails the message is discarded.
-  - COSE\_MAC0 is computed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_VM. The result is inserted as payload of the received COSE\_Sign1 (which was sent with detached payload); 
+  - COSE\_MAC0 is re-constructed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_VM. The result is inserted as payload of the received COSE\_Sign1 (which was sent with detached payload); 
   - COSE\_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using the public key of Party V;
   - Note that Party U SHALL verify that the algorithms used in message_2 are taken from the set of proposed algorithms in message\_1, else stop processing the message.
 * If the verification of message_2 fails, the message MUST be discarded and Party U SHALL discontinue the protocol.
@@ -553,7 +553,7 @@ Party V processes the received message\_3 as follows:
 * Party V SHALL verify message_3:
   - COSE\_Encrypt0 is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with key K\_UE.
   - If the message contains a certificate, party V SHALL verify the certificate using the pre-established trust anchor and the revokation verification policies relevant for party U. If the verification fails the message is discarded.
-  - COSE\_MAC0 is computed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_UM. The result is inserted as payload of the received COSE\_Sign1 (which was sent with detached payload); 
+  - COSE\_MAC0 is re-constructed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_UM. The result is inserted as payload of the received COSE\_Sign1 (which was sent with detached payload); 
   - COSE\_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using the public key of Party U;
   - Note that Party V SHALL verify that the set of algorithms sent in message_3 is the same as sent in message\_1, else stop processing the message.
 * If the verification of message_3 fails, the message MUST be discarded and Party V SHALL discontinue the protocol.
@@ -834,7 +834,7 @@ Party U processes the received message\_2 as follows:
 * Party U SHALL verify that the nonce has not been received before. If the verification fails, the message MUST be discarded. Otherwise, Party U SHALL store a representation of the nonce for future verifications.
 * Party U SHALL derive K\_UM, K\_VM, K\_UMP and K\_VMP as defined in {{key-der-sym}}.
 * Party U SHALL verify message_2:
-  - COSE\_MAC0 is computed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_VM. The result is inserted as payload of the received COSE\_MAC (which was sent with detached payload); 
+  - COSE\_MAC0 is re-constructed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_VM. The result is inserted as payload of the received COSE\_MAC (which was sent with detached payload); 
   - COSE\_MAC is verified as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_VMP and algorithm MAC;
   - Note that Party U SHALL verify that the MAC algorithm used and the AEAD algorithm sent in message_2 are taken from the set of proposed algorithms in message\_1, else stop processing the message.
 * If the verification of message_2 fails, the message MUST be discarded and Party U SHALL discontinue the protocol.
@@ -855,7 +855,7 @@ Party V processes the received message\_3 as follows:
 
 * Party V SHALL verify than the received N\_U and N\_V are identical to the saved nonces N\_U and N\_V. If the verification fails, the message MUST be discarded.
 * Party V SHALL verify message_3:
-  - COSE\_MAC0 (containing payl\_3\_psk) is computed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_UM. The result is inserted as payload of the received COSE\_MAC0 (which was sent with detached payload); 
+  - COSE\_MAC0 (containing payl\_3\_psk) is re-constructed as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_UM. The result is inserted as payload of the received COSE\_MAC0 (which was sent with detached payload); 
   - COSE\_MAC0 is verified as defined in section 6.3 of {{I-D.ietf-cose-msg}}, with key K\_UMP and algorithm MAC;
   - Note that by verifying message\_3, Party V ensures that message\_1 was not modified in transit.
 * If the verification of message_3 fails, the message MUST be discarded and Party V SHALL discontinue the protocol.
