@@ -1,7 +1,7 @@
 language: python
 sudo: false
 python:
-- 2.7
+  - 2.7
 rvm:
   - 2.2.0
 addons:
@@ -11,16 +11,15 @@ addons:
      - python-pip
 
 install:
-- gem install kramdown-rfc2629
 - pip install xml2rfc
 - rvm install 2.2.0
 - rvm use 2.2.0
 - ruby --version
+- gem install kramdown-rfc2629
 - gem install rake
 - gem install cddl
 
 script:
-- kramdown-rfc2629 draft-selander-ace-cose-ecdhe.md > draft-selander-ace-cose-ecdhe.xml
-- xml2rfc draft-selander-ace-cose-ecdhe.xml -o ecdhe.xml --exp
+- make draft-selander-ace-cose-ecdhe.xml
 - rake verify
-- make
+- make ghpages
