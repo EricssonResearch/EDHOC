@@ -94,7 +94,7 @@ normative:
 informative:
 
 #        - RFC5869:
-#		     - I-D.ietf-ace-oauth-authz
+#        - I-D.ietf-ace-oauth-authz
 #        - rfc7228
 #        - rfc7252
 #        - I-D.hartke-core-e2e-security-reqs
