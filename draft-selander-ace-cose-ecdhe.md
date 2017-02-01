@@ -204,7 +204,6 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
       +  other = aad_1  / aad_2  / aad_3 /
                  message_1 | message_2 | message_3 | label
 
-
    * ? SuppPrivInfo = PSK
 ~~~~~~~~~~~
 
