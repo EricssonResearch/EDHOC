@@ -18,7 +18,7 @@ author:
         ins: G. Selander
         name: Göran Selander
         org: Ericsson AB
-        street: Färogatan 6
+        street: Färögatan 6
         city: Kista
         code: SE-164 80 Stockholm
         country: Sweden
@@ -27,7 +27,7 @@ author:
         ins: J. Mattsson
         name: John Mattsson
         org: Ericsson AB
-        street: Färogatan 6
+        street: Färögatan 6
         city: Kista
         code: SE-164 80 Stockholm
         country: Sweden
@@ -36,7 +36,7 @@ author:
         ins: F. Palombini
         name: Francesca Palombini
         org: Ericsson AB
-        street: Färogatan 6
+        street: Färögatan 6
         city: Kista
         code: SE-164 80 Stockholm
         country: Sweden
@@ -137,8 +137,9 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 As described in Appendix B of {{SIGMA}}, in order to create a "full-fledge" protocol some additional protocol elements are needed. EDHOC adds:
 
+* Explicit session identifiers S_U, S_V chosen by U and V, respectively.
 
-* Explicit nonces/session identifiers N_U, N_V chosen freshly and anew with each session by U and V, respectively.
+* Explicit nonces N_U, N_V chosen freshly and anew with each session by U and V, respectively.
 
 * Computationally independent keys derived from the ECDH shared secret and used for different directions and operations.
 
@@ -236,22 +237,21 @@ ID_U and ID_V either enable the other party to retrieve the public key (kid, x5t
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
-Party U                                                       Party V
-|                       N_U, E_U, ALG_1, EXT_1                      |
-+------------------------------------------------------------------>|
-|                             message_1                             |
-|                                                                   |
-| N_U, N_V, E_V, ALG_2, Enc(K_2; EXT_2, ID_V, Sig(V; aad_2); aad_2) |
-|<------------------------------------------------------------------+
-|                             message_2                             |
-|                                                                   |
-|      N_V, ALG_3, Enc(K_3; EXT_3, ID_U, Sig(U; aad_3); aad_3)      |
-+------------------------------------------------------------------>|
-|                             message_3                             |
+Party U                                                          Party V
+|                      S_U, N_U, E_U, ALG_1, EXT_1                     |
++--------------------------------------------------------------------->|
+|                               message_1                              |
+|                                                                      |
+|S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; EXT_2, ID_V, Sig(V; aad_2); aad_2)|
+|<---------------------------------------------------------------------+
+|                               message_2                              |
+|                                                                      |
+|        S_V, ALG_3, Enc(K_3; EXT_3, ID_U, Sig(U; aad_3); aad_3)       |
++--------------------------------------------------------------------->|
+|                               message_3                              |
 ~~~~~~~~~~~
 {: #fig-asym title="EDHOC with asymmetric key authentication. "}
 {: artwork-align="center"}
-
 
 ### Mandatory to Implement Algorithms ### {#asym-mti}
 
@@ -266,6 +266,7 @@ message_1 SHALL be a CBOR array as defined below
 ~~~~~~~~~~~
 message_1 = [
   MSG_TYPE : int,
+  S_U : bstr,  
   N_U : bstr,  
   E_U : COSE_Key,
   HKDFs_U : alg_array,
@@ -280,7 +281,8 @@ alg_array = [ + alg : int / tstr ]
 where:
 
 * MSG_TYPE = 1
-* N_U - 64-bit random nonce and session identifier
+* S_U - variable length session identifier
+* N_U - 64-bit random nonce
 * E_U - the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
@@ -293,17 +295,17 @@ Party U SHALL compose message_1 as follows:
 
 * Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_U and store it a session identifier for the length of the protocol.
+* Generate the pseudo-random nonce N_U 
 
-*  Format message_1 as specified in {{asym-msg1-form}}.
+* Chose a session identifier S_U and store it for the length of the protocol.
+
+* Format message_1 as specified in {{asym-msg1-form}}.
 
 ### Party V Processing of Message 1 ### {#asym-msg1-procV}
 
 Party V SHALL process message_1 as follows:
 
 * Verify (OPTIONAL) that N_U has not been received before.
-
-* Store the session identifier N_U for the length of the protocol.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
@@ -325,7 +327,8 @@ message_2 = [
 
 data_2 = (
   MSG_TYPE : int,
-  N_U : bstr,
+  S_U : bstr,
+  S_V : bstr,  
   N_V : bstr,
   E_V : COSE_Key,
   HKDF_V : int / tstr,
@@ -340,7 +343,8 @@ aad_2 = message_1 | [ data_2 ]
 where:
 
 * MSG_TYPE = 2
-* N_V - 64-bit random nonce and session identifier
+* S_V - variable length session identifier
+* N_V - 64-bit random nonce
 * E_V - the ephemeral public key of Party V
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
@@ -371,7 +375,9 @@ Party V SHALL compose message_2 as follows:
 
 * Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_V and store it for the length of the protocol.
+* Generate the pseudo-random nonce N_V
+
+* Chose a session identifier S_V and store it for the length of the protocol.
       
 *  Select HKDF_V, AEAD_V, and SIG_V from the algorithms proposed in HKDFs_U, AEADs_U, and SIGs_U.
 
@@ -385,7 +391,7 @@ Party V SHALL compose message_2 as follows:
 
 Party U SHALL process message_2 as follows:
 
-* Use the session identifier N_U to retrieve the protocol state.
+* Use the session identifier S_U to retrieve the protocol state.
 
 * Verify that HKDF_V, AEAD_V, and SIG_V were proposed in HKDFs_U, AEADs_U, and SIGs_U.
 
@@ -416,6 +422,7 @@ message_3 = [
 
 data_3 = (
   MSG_TYPE : int,
+  S_V : bstr,  
   N_V : bstr,
   SIG_U : int / tstr
 )
@@ -459,7 +466,7 @@ Party U SHALL compose message_3 as follows:
 
 Party V SHALL process message_3 as follows:
 
-* Use the session identifier N_V to retrieve the protocol state.
+* Use the session identifier S_V to retrieve the protocol state.
 
 * Verify that SIG_U was proposed in SIGs_V.
 
@@ -489,15 +496,15 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            KID, N_U, E_U, ALG_1, Enc(K_1; EXT_1; aad_1)           |
+|         KID, S_U, N_U, E_U, ALG_1, Enc(K_1; EXT_1; aad_1)         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|            N_U, N_V, E_V, ALG_2, Enc(K_2; EXT_2; aad_2)           |
+|         S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; EXT_2; aad_2)         |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    N_V, Enc(K_3; EXT_3; aad_3)                    |
+|                    S_V, Enc(K_3; EXT_3; aad_3)                    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -523,6 +530,7 @@ message_1 = [
 data_1 = (
   MSG_TYPE : int,
   KID : bstr,
+  S_U : bstr,  
   N_U : bstr,    
   E_U : COSE_Key,
   HKDFs_U : alg_array,
@@ -538,7 +546,8 @@ where:
 
 * MSG_TYPE = 4
 * KID - identifier of the pre-shared key
-* N_U - 64-bit random nonce and session identifier
+* S_U - variable length session identifier
+* N_U - 64-bit random nonce
 * E_U - the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
@@ -556,7 +565,9 @@ Party U SHALL compose message_1 as follows:
 
 *  Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_U and store it a session identifier for the length of the protocol.
+* Generate the pseudo-random nonce N_U 
+
+* Chose a session identifier S_U and store it for the length of the protocol.
 
 *  Format message_1 as specified in {{sym-msg1-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AES-CCM-64-64-128 (or an AEAD decided by the application), K_1, and IV_1.
 
@@ -566,8 +577,6 @@ Party U SHALL compose message_1 as follows:
 Party V SHALL process message_1 as follows:
 
 * Verify (OPTIONAL) that N_U has not been received before.
-
-* Store the session identifier N_U for the length of the protocol.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
@@ -592,7 +601,8 @@ message_2 = [
 
 data_2 = (
   MSG_TYPE : int,
-  N_U : bstr,
+  S_U : bstr,  
+  S_V : bstr,  
   N_V : bstr,
   E_V : COSE_Key,
   HKDF_V : int / tstr,
@@ -605,7 +615,8 @@ aad_2 = message_1 | [ data_2 ]
 where:
 
 * MSG_TYPE = 5
-* N_V - 64-bit random nonce and session identifier
+* S_V - variable length session identifier
+* N_V - 64-bit random nonce
 * E_V - the ephemeral public key of Party V
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
@@ -624,7 +635,9 @@ Party V SHALL compose message_2 as follows:
 
 * Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_V and store it for the length of the protocol.
+* Generate the pseudo-random nonce N_V
+
+* Chose a session identifier S_V and store it for the length of the protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
@@ -634,7 +647,7 @@ Party V SHALL compose message_2 as follows:
 
 Party U SHALL process message_2 as follows:
 
-* Use the session identifier N_U to retrieve the protocol state.
+* Use the session identifier S_U to retrieve the protocol state.
 
 * Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
 
@@ -656,6 +669,7 @@ message_3 = [
 
 data_3 = (
   MSG_TYPE : int,
+  S_V : bstr,  
   N_V : bstr
 )
 
@@ -684,7 +698,7 @@ Party U SHALL compose message_3 as follows:
 
 Party V SHALL process message_3 as follows:
 
-* Use the session identifier N_V to retrieve the protocol state.
+* Use the session identifier S_V to retrieve the protocol state.
 
 * Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
