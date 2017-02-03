@@ -86,7 +86,7 @@ informative:
 
 --- abstract
 
-This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a secure, compact, and lightweight authenticated Diffie-Hellman key exchange with ephemeral keys that can be used over any layer. EDHOC messages are encoded with CBOR and COSE, allowing reuse of existing libraries.
+This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a compact, and lightweight authenticated Diffie-Hellman key exchange with ephemeral keys that can be used over any layer. EDHOC messages are encoded with CBOR and COSE, allowing reuse of existing libraries.
 
 --- middle
 
