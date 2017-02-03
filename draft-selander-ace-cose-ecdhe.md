@@ -745,14 +745,16 @@ IANA has added the header parameter 'edhoc' to the COSE Header Parameters regist
 | name      | label | value type     | value       | description    |
 |           |       |                | registry    |                |
 +-----------+-------+----------------+-------------+----------------+
-| edhoc     | TDB   | bstr           |             | EDHOC message  |
+| edhoc     | TBD   | bstr           |             | EDHOC message  |
 +-----------+-------+----------------+-------------+----------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
 # Security Considerations # {#sec-cons}
 
-EDHOC build on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The security of the SIGMA-I protocol does not depend on the encryption and SIGMA-I is secure as long as the MAC covers the identity of the signer. EDHOC adds an explicit message type and expands the authentication coverage to additional elements such as algorithms, extensions, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
+EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The encryption algorithm of the SIGMA-I protocol provides identity protection, but the security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
+
+EDHOC adds an explicit message type and expands the authentication coverage to additional elements such as algorithms, extensions, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
 
 Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to EXT_1 and EXT_2 in the asymmetrical case, and KID in the symmetrical case. The communicating parties may therefore anonymize KID.
 
