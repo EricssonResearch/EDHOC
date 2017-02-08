@@ -189,9 +189,11 @@ The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OK
 
 Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-cose-msg] with the following input:
 
+* The PRF SHALL be the HKDF [RFC5869] in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
+
 * The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of [I-D.ietf-cose-msg].
 
-* The PRF SHALL be the HKDF [RFC5869] in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
+* salt = PSK / nil
 
 * The context information SHALL be the serialized COSE_KDF_Context with the following values:
 
@@ -200,15 +202,13 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
   + SuppPubInfo SHALL contain:
 
     + protected SHALL be a zero length bstr
-
+    
 ~~~~~~~~~~~
       +  other = aad_1  / aad_2  / aad_3 /
                  message_1 | message_2 | message_3 | label
-
-   * ? SuppPrivInfo = PSK
 ~~~~~~~~~~~
 
-SuppPrivInfo SHALL only be present in the symmetric case.
+The salt SHALL only be present in the symmetric case.
 
 The symmetric key and IV used to protect message_i is called K_i and IV_i etc., and are derived using byte string aad_i defined for each EDHOC message that make use of a symmetric key.
 
@@ -217,8 +217,6 @@ K_1 and IV_1 are only used in EDHOC with symmetric key authentication and are de
 All other keys are derived with the negotiated PRF and with the secret set to the ECDH shared secret.
 
 Application specific traffic keys and key identifiers are derived using the byte string message_1 \| message_2 \| message_3 \| label, where label is a byte string and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
-
-
 
 
 
@@ -268,12 +266,14 @@ message_1 = [
   MSG_TYPE : int,
   S_U : bstr,  
   N_U : bstr,  
-  E_U : COSE_Key,
+  E_U : serialized_COSE_Key,
   HKDFs_U : alg_array,
   AEADs_U : alg_array,
   SIGs_U : alg_array,
   ? EXT_1 : bstr
 ]
+
+serialized_COSE_Key = bstr .cbor COSE_Key
 
 alg_array = [ + alg : int / tstr ]
 ~~~~~~~~~~~
@@ -330,14 +330,14 @@ data_2 = (
   S_U : bstr,
   S_V : bstr,  
   N_V : bstr,
-  E_V : COSE_Key,
+  E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr,
   SIG_V : int / tstr,
   SIGs_V : alg_array
 )
 
-aad_2 = message_1 | [ data_2 ]
+aad_2 = message_1 | [ data_2 ] | ? Cert_V
 ~~~~~~~~~~~
 
 where:
@@ -367,6 +367,9 @@ where:
 * ID_V - identifier for the public key of Party V
 
 * EXT_2 - application defined extensions
+
+* Cert_V - The end-entity certificate of Party V encoded as a bstr
+
 
 
 ### Party V Processing of Message 2 ### {#asym-msg2-procV}
@@ -427,7 +430,7 @@ data_3 = (
   SIG_U : int / tstr
 )
 
-aad_3 = message_1 | message_2 | [ data_3 ]
+aad_3 = message_1 | message_2 | [ data_3 ] | ? Cert_U
 ~~~~~~~~~~~
 
 where:
@@ -449,6 +452,7 @@ where:
 * xyz - any COSE map label that can identify a public key
 * ID_U - identifier for the public key of Party U
 * EXT_3 - application defined extensions
+* Cert_U - The end-entity certificate of Party U encoded as a bstr
 
 ### Party U Processing of Message 3 ### {#asym-msg3-procU}
 
@@ -532,12 +536,14 @@ data_1 = (
   KID : bstr,
   S_U : bstr,  
   N_U : bstr,    
-  E_U : COSE_Key,
+  E_U : serialized_COSE_Key,
   HKDFs_U : alg_array,
   AEADs_U : alg_array
 )
 
 aad_1 = [ data_1 ]
+
+serialized_COSE_Key = bstr .cbor COSE_Key
 
 alg_array = [ + alg : int / tstr ]
 ~~~~~~~~~~~
@@ -604,7 +610,7 @@ data_2 = (
   S_U : bstr,  
   S_V : bstr,  
   N_V : bstr,
-  E_V : COSE_Key,
+  E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr
 )
