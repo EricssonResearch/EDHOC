@@ -426,7 +426,6 @@ message_3 = [
 data_3 = (
   MSG_TYPE : int,
   S_V : bstr,  
-  N_V : bstr,
   SIG_U : int / tstr
 )
 
@@ -675,8 +674,7 @@ message_3 = [
 
 data_3 = (
   MSG_TYPE : int,
-  S_V : bstr,  
-  N_V : bstr
+  S_V : bstr 
 )
 
 aad_3 = message_1 | message_2 | [ data_3 ]
