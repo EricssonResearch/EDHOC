@@ -333,8 +333,8 @@ data_2 = (
   E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr,
-  SIG_V : int / tstr,
-  SIGs_V : alg_array
+  SIG_U : int / tstr,
+  SIG_V : int / tstr
 )
 
 aad_2 = message_1 | [ data_2 ] | ? Cert_V
@@ -348,8 +348,8 @@ where:
 * E_V - the ephemeral public key of Party V
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
-* SIG_V - an single chosen algorithm from SIGs_U
-* SIGs_V - signature algorithms that Party V supports signing with
+* SIG_U - an single chosen algorithm from SIGs_U
+* SIG_V - a single signature algorithm that Party V signs with
 * COSE_ENC_2 has the following fields and values:
 
    + external_aad = aad_2
