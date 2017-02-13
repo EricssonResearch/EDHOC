@@ -286,7 +286,7 @@ where:
 * E_U - the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
-* SIGs_U - signature algorithms that Party U supports signing with
+* SIGs_U - signature algorithms that Party U supports verifying with
 * EXT_1 - application defined extensions
 
 ### Party U Processing of Message 1 ### {#asym-msg1-procU}
@@ -349,7 +349,7 @@ where:
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
 * SIG_V - an single chosen algorithm from SIGs_U
-* SIGs_V - signature algorithms that Party V supports signing with
+* SIGs_V - signature algorithms that Party V supports verifying with
 * COSE_ENC_2 has the following fields and values:
 
    + external_aad = aad_2
@@ -708,6 +708,9 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
+# Error Handling # {#error}
+
+TODO: One error is e.g. if the ephemeral key is unsupported.
 
 # IANA Considerations # {#iana}
 
@@ -781,6 +784,8 @@ Using the same KID or unprotected extension in several EDHOC sessions allows pas
 Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to EXT_1 in the asymmetrical case, and KID in the symmetrical case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless unless previous nonces are stored.
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in RFC6979 is RECOMMENDED.
+
+Nonces MUST NOT be reused, both parties MUST generate fresh random nonces. Ephemeral keys SHOULD NOT be reused, both parties SHOULD generate fresh random ephemeral key pairs.
 
 The referenced processing instructions in {{SP-800-56a}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed.
 
