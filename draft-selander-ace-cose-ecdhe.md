@@ -269,7 +269,8 @@ message_1 = [
   E_U : serialized_COSE_Key,
   HKDFs_U : alg_array,
   AEADs_U : alg_array,
-  SIGs_U : alg_array,
+  SIGs_V : alg_array,
+  SIGs_U : alg_array,  
   ? EXT_1 : bstr
 ]
 
@@ -286,7 +287,8 @@ where:
 * E_U - the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
-* SIGs_U - signature algorithms that Party U supports verifying with
+* SIGs_V - signature algorithms that Party U supports verifying with
+* SIGs_U - signature algorithms that Party U supports signing with
 * EXT_1 - application defined extensions
 
 ### Party U Processing of Message 1 ### {#asym-msg1-procU}
@@ -334,7 +336,7 @@ data_2 = (
   HKDF_V : int / tstr,
   AEAD_V : int / tstr,
   SIG_V : int / tstr,
-  SIGs_V : alg_array
+  SIG_U : int / tstr
 )
 
 aad_2 = message_1 | [ data_2 ] | ? Cert_V
@@ -348,8 +350,8 @@ where:
 * E_V - the ephemeral public key of Party V
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
-* SIG_V - an single chosen algorithm from SIGs_U
-* SIGs_V - signature algorithms that Party V supports verifying with
+* SIG_V - an single chosen algorithm from SIGs_V that Party V signs with
+* SIG_U - an single chosen algorithm from SIGs_U that Party U signs with
 * COSE_ENC_2 has the following fields and values:
 
    + external_aad = aad_2
@@ -425,8 +427,7 @@ message_3 = [
 
 data_3 = (
   MSG_TYPE : int,
-  S_V : bstr,  
-  SIG_U : int / tstr
+  S_V : bstr
 )
 
 aad_3 = message_1 | message_2 | [ data_3 ] | ? Cert_U
@@ -435,7 +436,6 @@ aad_3 = message_1 | message_2 | [ data_3 ] | ? Cert_U
 where:
 
 * MSG_TYPE = 3
-* SIG_U - an single chosen algorithm from SIGs_V
 * COSE_ENC_3 has the following fields and values:
 
    + external_aad = aad_3
