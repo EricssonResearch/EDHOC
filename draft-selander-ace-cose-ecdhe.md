@@ -41,7 +41,7 @@ author:
         code: SE-164 80 Stockholm
         country: Sweden
         email: francesca.palombini@ericsson.com
-
+        
 normative:
 
   RFC2119:
@@ -94,7 +94,7 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a compact, a
 
 Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}}. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
 
-In order for a communication session to provide forward secrecy, the communicating parties can run a Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated ECDH protocol using CBOR and COSE objects. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authenticated using pre-shared keys (PSK), raw public keys (RPK), and certificates (Cert).  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
+In order for a communication session to provide forward secrecy, the communicating parties can run a Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated ECDH protocol using CBOR and COSE objects. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates (Cert).  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{I-D.ietf-cose-msg}} are used to implement these standards.
 
@@ -141,17 +141,19 @@ As described in Appendix B of {{SIGMA}}, in order to create a "full-fledge" prot
 
 * Explicit nonces N_U, N_V chosen freshly and anew with each session by U and V, respectively.
 
-* Computationally independent keys derived from the ECDH shared secret and used for different directions and operations.
+* Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
 EDHOC also makes the following additions:
 
-* Negotiation of key derivation, AEAD, and signature algorithms:
+* Negotiation of key derivation, encryption, and signature algorithms:
 
-   * U proposes one or more algorithms of each kind.
+   * U proposes one or more algorithms of the following kinds: 
+       * 	HKDF
+       *  AEAD
+       *  Signature verification 
+       *  Signature generation 
 
-   * V selects one algorithm of each kind, and additionally proposes an array of signature algorithms.
-
-   * U selects and uses one signature algorithm.
+   * V selects one algorithm of each kind
 
 * Transmission of application defined extensions.
 
@@ -161,7 +163,7 @@ This paper is organized as follows: {{general}} specifies general properties of 
 
 # EDHOC Overview # {#general}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I. All EDHOC messages consists of an CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may e.g. be protected using the negotiated AEAD algorithm. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may e.g. be protected using the negotiated AEAD algorithm. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -170,7 +172,9 @@ Party U                                                 Party V
    |                                                       |
    | <----------------- EDHOC message_2 ------------------ |
    |                                                       |
-   | ---- Protected Application Data + EDHOC message_3 --> |
+   | ----------------- EDHOC message_3 ------------------> |
+   |                                                       |
+   | <----------- Protected Application Data ------------> |
    |                                                       |
 ~~~~~~~~~~~
 {: #fig-flow title="EDHOC message flow"}
@@ -205,18 +209,18 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
     
 ~~~~~~~~~~~
       +  other = aad_1  / aad_2  / aad_3 /
-                 message_1 | message_2 | message_3 | label
+                 H( H( H(message_1) | message_2 ) | message_3 ) | label
 ~~~~~~~~~~~
 
 The salt SHALL only be present in the symmetric case.
 
-The symmetric key and IV used to protect message_i is called K_i and IV_i etc., and are derived using byte string aad_i defined for each EDHOC message that make use of a symmetric key.
+The symmetric key and IV used to protect message_i  is called K_i and IV_i,  and are derived using byte string aad_i defined for each EDHOC message i = 1, 2 or 3 that make use of a symmetric key.
 
 K_1 and IV_1 are only used in EDHOC with symmetric key authentication and are derived with the exceptions that secret SHALL be empty and the PRF SHALL be HKDF-256 (or a HKDF decided by the application).
 
 All other keys are derived with the negotiated PRF and with the secret set to the ECDH shared secret.
 
-Application specific traffic keys and key identifiers are derived using the byte string message_1 \| message_2 \| message_3 \| label, where label is a byte string and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
+Application specific traffic keys and key identifiers are derived using the byte string message_1 \| message_2 \| message_3 \| label, where H() is the hash function in HKDF_V, label is a byte string, and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
 
 
 
@@ -287,8 +291,8 @@ where:
 * E_U - the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
-* SIGs_V - signature algorithms that Party U supports verifying with
-* SIGs_U - signature algorithms that Party U supports signing with
+* SIGs_V - signature algorithms, with which Party U supports verification
+* SIGs_U - signature algorithms, with which Party U supports signing
 * EXT_1 - application defined extensions
 
 ### Party U Processing of Message 1 ### {#asym-msg1-procU}
@@ -306,7 +310,7 @@ Party U SHALL compose message_1 as follows:
 ### Party V Processing of Message 1 ### {#asym-msg1-procV}
 
 Party V SHALL process message_1 as follows:
-
+ d
 * Verify (OPTIONAL) that N_U has not been received before.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
@@ -339,7 +343,7 @@ data_2 = (
   SIG_U : int / tstr
 )
 
-aad_2 = message_1 | [ data_2 ] | ? Cert_V
+aad_2 = H(message_1) | [ data_2 ] | ? Cert_V
 ~~~~~~~~~~~
 
 where:
@@ -348,10 +352,10 @@ where:
 * S_V - variable length session identifier
 * N_V - 64-bit random nonce
 * E_V - the ephemeral public key of Party V
-* HKDF_V - an single chosen algorithm from HKDFs_U
-* AEAD_V - an single chosen algorithm from AEADs_U
-* SIG_V - an single chosen algorithm from SIGs_V that Party V signs with
-* SIG_U - an single chosen algorithm from SIGs_U that Party U signs with
+* HKDF_V - a single chosen algorithm from HKDFs_U
+* AEAD_V - a single chosen algorithm from AEADs_U
+* SIG_V - a single chosen algorithm from SIGs_V with which Party V signs
+* SIG_U - a single chosen algorithm from SIGs_U with which Party U signs
 * COSE_ENC_2 has the following fields and values:
 
    + external_aad = aad_2
@@ -372,6 +376,7 @@ where:
 
 * Cert_V - The end-entity certificate of Party V encoded as a bstr
 
+* H() - the hash function in HKDF_V
 
 
 ### Party V Processing of Message 2 ### {#asym-msg2-procV}
@@ -384,7 +389,7 @@ Party V SHALL compose message_2 as follows:
 
 * Chose a session identifier S_V and store it for the length of the protocol.
       
-*  Select HKDF_V, AEAD_V, and SIG_V from the algorithms proposed in HKDFs_U, AEADs_U, and SIGs_U.
+*  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
 *  Format message_2 as specified in {{asym-msg2-form}}:
 
@@ -398,9 +403,9 @@ Party U SHALL process message_2 as follows:
 
 * Use the session identifier S_U to retrieve the protocol state.
 
-* Verify that HKDF_V, AEAD_V, and SIG_V were proposed in HKDFs_U, AEADs_U, and SIGs_U.
+* Verify that HKDF_V, AEAD_V, SIG_V, and SIG_U were proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
-* Verify (OPTIONAL) that E_V has not been received before.
+* Verify (OPTIONAL) that N_V has not been received before.
 
 * Verify message_2 as specified in {{asym-msg2-form}}:
 
@@ -430,7 +435,7 @@ data_3 = (
   S_V : bstr
 )
 
-aad_3 = message_1 | message_2 | [ data_3 ] | ? Cert_U
+aad_3 = H( H(message_1) | message_2 ) | [ data_3 ] | ? Cert_U
 ~~~~~~~~~~~
 
 where:
@@ -457,8 +462,6 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-* Select SIG_U from the algorithms proposed in SIGs_V.
-
 * Format message_3 as specified in {{asym-msg3-form}}:
 
    *  COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the private key of Party U.
@@ -470,8 +473,6 @@ Party U SHALL compose message_3 as follows:
 Party V SHALL process message_3 as follows:
 
 * Use the session identifier S_V to retrieve the protocol state.
-
-* Verify that SIG_U was proposed in SIGs_V.
 
 * Verify message_3 as specified in {{asym-msg3-form}}.
 
@@ -491,7 +492,7 @@ If any verification step fails, the message MUST be discarded and the protocol d
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared uniformly random key (PSK) with the requirement that:
 
-* Party V's SHALL be able to uniquely identify the PSK using KID.
+* Party V SHALL be able to uniquely identify the PSK using KID.
 
 KID either enable the other party to retrieve the PSK or contain the PSK (e.g. CBOR Web Token).
 
@@ -499,7 +500,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|         KID, S_U, N_U, E_U, ALG_1, Enc(K_1; EXT_1; aad_1)         |
+|         S_U, N_U, E_U, ALG_1, KID, Enc(K_1; EXT_1; aad_1)         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -536,8 +537,8 @@ data_1 = (
   N_U : bstr,    
   E_U : serialized_COSE_Key,
   HKDFs_U : alg_array,
-  AEADs_U : alg_array
-  KID : bstr,
+  AEADs_U : alg_array,
+  KID : bstr
 )
 
 aad_1 = [ data_1 ]
@@ -550,12 +551,12 @@ alg_array = [ + alg : int / tstr ]
 where:
 
 * MSG_TYPE = 4
-* KID - identifier of the pre-shared key
 * S_U - variable length session identifier
 * N_U - 64-bit random nonce
 * E_U - the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
+* KID - identifier of the pre-shared key
 * COSE_ENC_1 has the following fields and values:
 
    + external_aad = aad_1
@@ -614,7 +615,7 @@ data_2 = (
   AEAD_V : int / tstr
 )
 
-aad_2 = message_1 | [ data_2 ]
+aad_2 = H(message_1) | [ data_2 ]
 ~~~~~~~~~~~
 
 where:
@@ -633,6 +634,8 @@ where:
    + plaintext = ? EXT_2
 
 * EXT_2 - bstr containing application defined extensions
+
+* H() - the hash function in HKDF_V
 
 ### Party V Processing of Message 2 ### {#sym-msg2-procV}
 
@@ -677,7 +680,7 @@ data_3 = (
   S_V : bstr 
 )
 
-aad_3 = message_1 | message_2 | [ data_3 ]
+aad_3 = H( H(message_1) | message_2 ) | [ data_3 ]
 ~~~~~~~~~~~
 
 where:
@@ -757,19 +760,6 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
         Change Controller: IESG
 
-## COSE Header Parameters Registry ##
-
-IANA has added the header parameter 'edhoc' to the COSE Header Parameters registry:
-
-~~~~~~~~~~~
-+-----------+-------+----------------+-------------+----------------+
-| name      | label | value type     | value       | description    |
-|           |       |                | registry    |                |
-+-----------+-------+----------------+-------------+----------------+
-| edhoc     | TBD   | bstr           |             | EDHOC message  |
-+-----------+-------+----------------+-------------+----------------+
-~~~~~~~~~~~
-{: artwork-align="center"}
 
 # Security Considerations # {#sec-cons}
 
@@ -800,7 +790,9 @@ Implementations should provide countermeasures to side-channel attacks such as t
 
 # Acknowledgments #
 
-The authors want to thank Ilari Liusvaara, Jim Schaad, and Ludwig Seitz for reviewing previous versions of the draft. 
+
+
+The authors want to thank Jim Schaad, Ilari Liusvaara and Ludwig Seitz for reviewing previous versions of the draft. 
 
 TODO: This section should be after Appendixes and before Author's address according to RFC7322.
 
@@ -812,86 +804,50 @@ TODO: This section should be after Appendixes and before Author's address accord
 
 TODO: This section needs to be updated.
 
-# Implementing EDHOC with CoAP and OSCOAP # {#app-a}
+# EDHOC with CoAP and OSCOAP # {#app-a}
 
-EDHOC can be implemented as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. Additionally, EDHOC and OSCOAP {{I-D.ietf-core-object-security}} can be run in sequence embedded into a 2-round trip exchange, such that the security context input parameters required for OSCOAP (Section 3 of {{I-D.ietf-core-object-security}}) are obtained from EDHOC. 
+## Transferring EDHOC in CoAP # {#app-a1}
 
-One procedure for running EDHOC over CoAP combined with OSCOAP is presented in this section. The EDHOC protocol is combined with OSCOAP such that EDHOC message_3 is sent together with the OSCOAP request, see {{fig-edhoc-oscoap}}.
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "edhoc".
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Client                                         Server
-   |                                             |
-   | ------------- EDHOC message_1 ------------> |
-   |                                             |
-   | <------------ EDHOC message_2 ------------- |
-   |                                             |
-   | ---- OSCOAP Request + EDHOC message_3 ----> |
-   |                                             |
-   | <------------ OSCOAP Response ------------- |
-   |                                             |
+Client    Server
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "edhoc"
+  |          | Content-Type: application/edhoc
+  |          | Payload: EDHOC message_1
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | Content-Type: application/edhoc
+  |          | Payload: EDHOC message_2
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "edhoc"
+  |          | Content-Type: application/edhoc
+  |          | Payload: EDHOC message_3
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | 
+  |          |
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-edhoc-oscoap title="EDHOC and OSCOAP in two CoAP message exchanges"}
+{: #fig-edhoc-oscoap-det title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-As specified below and illustrated in {{fig-edhoc-oscoap-det}}, EDHOC message_1 and message_2 are transported in the CoAP payload, and EDHOC message_3 is transported as an unprotected header parameter in the OSCOAP request.
+## Deriving an OSCOAP context from EDHOC # {#app-a2}
 
-~~~~~~~~~~~~~~~~~~~~~~~
-Client     Server
-  |           |
-  +---------->| Header: POST (Code=0.02)
-  |   POST    | Uri-Path: "edhoc"
-  |           | Content-Type: application/edhoc
-  |           | Payload: EDHOC message_1
-  |           |
-  |<----------+ Header: 2.04 Changed
-  |   2.04    | Content-Type: application/edhoc
-  |           | Payload: EDHOC message_2
-  |           |
-  +---------->| CoAP request including:
-  |  OSCOAP   | Object-Security option
-  |  request  | COSE_Encrypt0 
-  |           | (protected request and
-  |           | EDHOC message_3)
-  |           |
-  |<----------+ CoAP response including:
-  |  OSCOAP   | Object-Security option
-  |  response | COSE_Encrypt0 
-  |           | (protected response)
-  |           |
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-edhoc-oscoap-det title="CoAP binding of EDHOC combined with OSCOAP"}
-{: artwork-align="center"}
-
-The client makes the following CoAP request:
-
-* The request method is POST
-* Content-Format is "application/edhoc"
-* The Uri-Path is "edhoc"
-* The Payload is EDHOC message_1, computed as defined in this document
-
-The CoAP server processes message_1 as specified in this document. If successful, the server composes message_2 and sends the following CoAP response:
-
-* The response Code is 2.04 (Changed)
-* Content-Format is "application/edhoc"
-* The Payload is EDHOC message_2, computed as defined in this document
-
-The client verifies message_2 as specified in this document. If successful, the client composes EDHOC message_3.
-
-The client also derives the OSCOAP Security Context (Section 3 of {{I-D.ietf-core-object-security}}) from the EDHOC messages:
-
-* The OSCOAP Master Secret (master_secret) and Context Identifier (CID) are derived as specified in {{key-der}} of this document, using:
- 
-   * For OSCOAP master_secret, 'label' is the byte string "OSCOAP_master_secret".
-   * For OSCOAP CID, 'label' is the byte string "OSCOAP_CID".
+When EDHOC is use to derive parameters for OSCOAP {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCOAP.  In case that the CoAP client is party U and the CoAP server is party V:
 
 * The AEAD Algorithm is AEAD_V, as defined in this document
-* The Key Derivation Function is HKDF_V, as defined in this document
-* For the other OSCOAP security context input parameters, the default values are used as specified in section 3.2 of {{I-D.ietf-core-object-security}}.
 
-The client builds the intended CoAP request and protects the request with OSCOAP. The request thus contains the Object-Security option and a COSE_Encrypt0 object as defined in {{I-D.ietf-core-object-security}}. EDHOC message_3 is added as an unprotected header parameter with label 'edhoc' in the COSE_Encrypt0 object 
+* The KDF algorithm is HKDF_V, as defined in this document
 
-The server extracts and verifies EDHOC message_3 from the unprotected part of the COSE_Encrypt0 object in the OSCOAP request. If successful, the server derives the OSCOAP security context parameters as in the same way as the client as decsribed above. The server processes the OSCOAP request as specified in {{I-D.ietf-core-object-security}} and returns the OSCOAP response.
+* The Client's Sender ID is S_V, as defined in this document
 
-EDHOC can also be embedded into CoAP without OSCOAP by simply sending all ECHOC messages as CoAP payloads.
+* The Server's Sender ID is S_U, as defined in this document
+
+* The Master Secret is derived as specified in {{key-der}} of this document, with label = "OSCOAP Master Secret". The length is equal to the key length of AEAD_V.
+
+* The Master Salt is derived as specified in {{key-der}} of this document, with label = "OSCOAP Master Salt". The length is 64 bits.
 
 --- fluff
