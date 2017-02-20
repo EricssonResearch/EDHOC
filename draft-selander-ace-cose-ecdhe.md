@@ -532,12 +532,12 @@ message_1 = [
 
 data_1 = (
   MSG_TYPE : int,
-  KID : bstr,
   S_U : bstr,  
   N_U : bstr,    
   E_U : serialized_COSE_Key,
   HKDFs_U : alg_array,
   AEADs_U : alg_array
+  KID : bstr,
 )
 
 aad_1 = [ data_1 ]
