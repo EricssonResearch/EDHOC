@@ -203,7 +203,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
     + protected SHALL be a zero length bstr
     
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
       +  other = aad_1  / aad_2  / aad_3 /
                  message_1 | message_2 | message_3 | label
 ~~~~~~~~~~~
@@ -261,7 +261,7 @@ For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF
 
 message_1 SHALL be a CBOR array as defined below
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_1 = [
   MSG_TYPE : int,
   S_U : bstr,  
@@ -319,7 +319,7 @@ If any verification step fails, the message MUST be discarded and the protocol d
 
 message_2 SHALL be a CBOR array as defined below
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_2 = [
   data_2,
   COSE_ENC_2 : COSE_Encrypt0
@@ -417,7 +417,7 @@ If any verification step fails, the message MUST be discarded and the protocol d
 
 message_3 SHALL be a CBOR array as defined below
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_3 = [
   data_3,
   COSE_ENC_3 : COSE_Encrypt0
@@ -524,7 +524,7 @@ For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-
 
 message_1 SHALL be a CBOR array as defined below
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_1 = [
   data_1,
   COSE_ENC_1 : COSE_Encrypt0
@@ -598,7 +598,7 @@ If any verification step fails, the message MUST be discarded and the protocol d
 
 message_2 SHALL be a CBOR array as defined below
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_2 = [
   data_2,
   COSE_ENC_2 : COSE_Encrypt0
@@ -666,7 +666,7 @@ If any verification step fails, the message MUST be discarded and the protocol d
 
 message_3 SHALL be a CBOR array as defined below
 
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
 message_3 = [
   data_3,
   COSE_ENC_3 : COSE_Encrypt0
