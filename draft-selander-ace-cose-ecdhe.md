@@ -187,7 +187,7 @@ EDHOC allows application defined extensions (EXT_1, EXT_2, EXT_3) to be sent in 
 
 ## Formatting of the Ephemeral Public Keys ## {#cose_key}
 
-The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{I-D.ietf-cose-msg}}. The curve X25519 is mandatory-to-implement. For Elliptic Curve Keys of type EC2, point compression is mandatory-to-implement.
+The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{I-D.ietf-cose-msg}}. The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, point compression is mandatory to implement.
 
 ## Key Derivation ## {#key-der}
 
@@ -310,7 +310,7 @@ Party U SHALL compose message_1 as follows:
 ### Party V Processing of Message 1 ### {#asym-msg1-procV}
 
 Party V SHALL process message_1 as follows:
- d
+ 
 * Verify (OPTIONAL) that N_U has not been received before.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
@@ -396,6 +396,8 @@ Party V SHALL compose message_2 as follows:
    - COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the private key of Party V.
 
    -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+   
+      * If certificates are used then aad_2 MUST include Cert_V
 
 ### Party U Processing of Message 2 ### {#asym-msg2-procU}
 
@@ -464,9 +466,11 @@ Party U SHALL compose message_3 as follows:
 
 * Format message_3 as specified in {{asym-msg3-form}}:
 
-   *  COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the private key of Party U.
+   -  COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the private key of Party U.
 
-   *  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+
+      * If certificates are used then aad_3 MUST include Cert_U
 
 ### Party V Processing of Message 3 ### {#asym-msg3-procV}
 
