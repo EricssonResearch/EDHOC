@@ -90,7 +90,7 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a compact, a
 
 --- middle
 
-# Introduction #       {#intro}
+# Introduction {#intro}
 
 Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}}. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
 
@@ -98,16 +98,15 @@ In order for a communication session to provide forward secrecy, the communicati
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{I-D.ietf-cose-msg}} are used to implement these standards.
 
-## Terminology #  {#terminology}
+## Terminology {#terminology}
 
 This document use the same informational CBOR Data Definition Language (CDDL) {{I-D.greevenbosch-appsawg-cbor-cddl}} grammar as COSE (see Section 1.3 of {{I-D.ietf-cose-msg}}). A vertical bar \| denotes byte string concatenation.
 
-## Requirements Language ###  {#terminology2}
+## Requirements Language {#terminology2}
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{RFC2119}}. These words may also appear in this document in lowercase, absent their normative meanings.
 
-
-# Protocol Overview # {#protocol}
+# Protocol Overview {#protocol}
 SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection, and like TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an AEAD algorithm is shown in {{fig-sigma}}.
 
 ~~~~~~~~~~~
@@ -161,7 +160,7 @@ EDHOC is designed to encrypt and integrity protect as much information as possib
 
 This paper is organized as follows: {{general}} specifies general properties of EDHOC, including formatting of the ephemeral public keys and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, and {{examples}} provides a wealth of test vectors to ease implementation and ensure interoperability.
 
-# EDHOC Overview # {#general}
+# EDHOC Overview {#general}
 
 EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may e.g. be protected using the negotiated AEAD algorithm. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -185,11 +184,11 @@ differences are that information is only MACed (not signed) and that EDHOC with 
 
 EDHOC allows application defined extensions (EXT_1, EXT_2, EXT_3) to be sent in the respective messages. When EDHOC are used with asymmetric key authentication, EXT_1 is unprotected, EXT_2 is protected (encrypted and integrity protected), but sent to an unauthenticated party, and EXT_3 is protected and mutually authenticated. When EDHOC is used with symmetric key authentication, all extensions are protected and mutually authenticated.
 
-## Formatting of the Ephemeral Public Keys ## {#cose_key}
+## Formatting of the Ephemeral Public Keys {#cose_key}
 
 The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{I-D.ietf-cose-msg}}. The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, point compression is mandatory to implement.
 
-## Key Derivation ## {#key-der}
+## Key Derivation {#key-der}
 
 Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-cose-msg] with the following input:
 
@@ -222,11 +221,9 @@ All other keys are derived with the negotiated PRF and with the secret set to th
 
 Application specific traffic keys and key identifiers are derived using the byte string message_1 \| message_2 \| message_3 \| label, where H() is the hash function in HKDF_V, label is a byte string, and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
 
+# EDHOC Authenticated with Asymmetric Keys {#asym}
 
-
-# EDHOC Authenticated with Asymmetric Keys # {#asym}
-
-## Overview ##
+## Overview
 
 EDHOC supports authentication with raw public keys (RPK) and certificates (Cert) with the requirements that:
 
@@ -255,13 +252,13 @@ Party U                                                          Party V
 {: #fig-asym title="EDHOC with asymmetric key authentication. "}
 {: artwork-align="center"}
 
-### Mandatory to Implement Algorithms ### {#asym-mti}
+### Mandatory to Implement Algorithms {#asym-mti}
 
 For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF-256, AES-CCM-64-64-128, and EdDSA are mandatory to implement.
 
-## EDHOC Message 1 ## {#asym-msg1}
+## EDHOC Message 1 {#asym-msg1}
 
-### Formatting of Message 1 ### {#asym-msg1-form}
+### Formatting of Message 1 {#asym-msg1-form}
 
 message_1 SHALL be a CBOR array as defined below
 
@@ -295,7 +292,7 @@ where:
 * SIGs_U - signature algorithms, with which Party U supports signing
 * EXT_1 - application defined extensions
 
-### Party U Processing of Message 1 ### {#asym-msg1-procU}
+### Party U Processing of Message 1 {#asym-msg1-procU}
 
 Party U SHALL compose message_1 as follows:
 
@@ -307,7 +304,7 @@ Party U SHALL compose message_1 as follows:
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
-### Party V Processing of Message 1 ### {#asym-msg1-procV}
+### Party V Processing of Message 1 {#asym-msg1-procV}
 
 Party V SHALL process message_1 as follows:
  
@@ -317,11 +314,9 @@ Party V SHALL process message_1 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
+## EDHOC Message 2 {#asym-msg2}
 
-
-## EDHOC Message 2 ## {#asym-msg2}
-
-### Formatting of Message 2 ### {#asym-msg2-form}
+### Formatting of Message 2 {#asym-msg2-form}
 
 message_2 SHALL be a CBOR array as defined below
 
@@ -378,8 +373,7 @@ where:
 
 * H() - the hash function in HKDF_V
 
-
-### Party V Processing of Message 2 ### {#asym-msg2-procV}
+### Party V Processing of Message 2 {#asym-msg2-procV}
 
 Party V SHALL compose message_2 as follows:
 
@@ -399,7 +393,7 @@ Party V SHALL compose message_2 as follows:
    
       * If certificates are used then aad_2 MUST include Cert_V
 
-### Party U Processing of Message 2 ### {#asym-msg2-procU}
+### Party U Processing of Message 2 {#asym-msg2-procU}
 
 Party U SHALL process message_2 as follows:
 
@@ -417,12 +411,9 @@ Party U SHALL process message_2 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
+## EDHOC Message 3 {#asym-msg3}
 
-
-
-## EDHOC Message 3 ## {#asym-msg3}
-
-### Formatting of Message 3 ### {#asym-msg3-form}
+### Formatting of Message 3 {#asym-msg3-form}
 
 message_3 SHALL be a CBOR array as defined below
 
@@ -460,7 +451,7 @@ where:
 * EXT_3 - application defined extensions
 * Cert_U - The end-entity certificate of Party U encoded as a bstr
 
-### Party U Processing of Message 3 ### {#asym-msg3-procU}
+### Party U Processing of Message 3 {#asym-msg3-procU}
 
 Party U SHALL compose message_3 as follows:
 
@@ -472,7 +463,7 @@ Party U SHALL compose message_3 as follows:
 
       * If certificates are used then aad_3 MUST include Cert_U
 
-### Party V Processing of Message 3 ### {#asym-msg3-procV}
+### Party V Processing of Message 3 {#asym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
 
@@ -486,13 +477,9 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
+# EDHOC Authenticated with Symmetric Keys {#sym}
 
-
-
-
-# EDHOC Authenticated with Symmetric Keys # {#sym}
-
-## Overview ##
+## Overview
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared uniformly random key (PSK) with the requirement that:
 
@@ -519,13 +506,13 @@ Party U                                                       Party V
 {: #fig-sym title="EDHOC with symmetric key authentication. "}
 {: artwork-align="center"}
 
-### Mandatory to Implement Algorithms ### {#sym-mti}
+### Mandatory to Implement Algorithms {#sym-mti}
 
 For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-256 and AES-CCM-64-64-128 are mandatory to implement.
 
-## EDHOC Message 1 ## {#sym-msg1}
+## EDHOC Message 1 {#sym-msg1}
 
-### Formatting of Message 1 ### {#sym-msg1-form}
+### Formatting of Message 1 {#sym-msg1-form}
 
 message_1 SHALL be a CBOR array as defined below
 
@@ -569,7 +556,7 @@ where:
 
 * EXT_1 - bstr containing application defined extensions
 
-### Party U Processing of Message 1 ### {#sym-msg1-procU}
+### Party U Processing of Message 1 {#sym-msg1-procU}
 
 Party U SHALL compose message_1 as follows:
 
@@ -581,8 +568,7 @@ Party U SHALL compose message_1 as follows:
 
 *  Format message_1 as specified in {{sym-msg1-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AES-CCM-64-64-128 (or an AEAD decided by the application), K_1, and IV_1.
 
-
-### Party V Processing of Message 1 ### {#sym-msg1-procV}
+### Party V Processing of Message 1 {#sym-msg1-procV}
 
 Party V SHALL process message_1 as follows:
 
@@ -594,12 +580,9 @@ Party V SHALL process message_1 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
+## EDHOC Message 2 {#sym-msg2}
 
-
-
-## EDHOC Message 2 ## {#sym-msg2}
-
-### Formatting of Message 2 ### {#sym-msg2-form}
+### Formatting of Message 2 {#sym-msg2-form}
 
 message_2 SHALL be a CBOR array as defined below
 
@@ -641,7 +624,7 @@ where:
 
 * H() - the hash function in HKDF_V
 
-### Party V Processing of Message 2 ### {#sym-msg2-procV}
+### Party V Processing of Message 2 {#sym-msg2-procV}
 
 Party V SHALL compose message_2 as follows:
 
@@ -655,7 +638,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Format message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
    
-### Party U Processing of Message 2 ### {#sym-msg2-procU}
+### Party U Processing of Message 2 {#sym-msg2-procU}
 
 Party U SHALL process message_2 as follows:
 
@@ -665,11 +648,9 @@ Party U SHALL process message_2 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
+## EDHOC Message 3 {#sym-msg3}
 
-
-## EDHOC Message 3 ## {#sym-msg3}
-
-### Formatting of Message 3 ### {#sym-msg3-form}
+### Formatting of Message 3 {#sym-msg3-form}
 
 message_3 SHALL be a CBOR array as defined below
 
@@ -698,14 +679,13 @@ where:
 
 * EXT_3 - bstr containing application defined extensions
 
-
-### Party U Processing of Message 3 ### {#sym-msg3-procU}
+### Party U Processing of Message 3 {#sym-msg3-procU}
 
 Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
-### Party V Processing of Message 3 ### {#sym-msg3-procV}
+### Party V Processing of Message 3 {#sym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
 
@@ -715,13 +695,13 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, the message MUST be discarded and the protocol discontinued.
 
-# Error Handling # {#error}
+# Error Handling {#error}
 
 TODO: One error is e.g. if the ephemeral key is unsupported.
 
-# IANA Considerations # {#iana}
+# IANA Considerations {#iana}
 
-## Media Types Registry ##
+## Media Types Registry
 
 IANA has added the media type 'application/edhoc' to the Media Types registry:
 
@@ -764,8 +744,7 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
         Change Controller: IESG
 
-
-# Security Considerations # {#sec-cons}
+# Security Considerations {#sec-cons}
 
 EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The encryption algorithm of the SIGMA-I protocol provides identity protection, but the security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
@@ -791,16 +770,11 @@ Note that, depending on the application, the keys established through the EDHOC 
 
 Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
-
-# Acknowledgments #
-
-
+# Acknowledgments
 
 The authors want to thank Jim Schaad, Ilari Liusvaara and Ludwig Seitz for reviewing previous versions of the draft. 
 
 TODO: This section should be after Appendixes and before Author's address according to RFC7322.
-
-
 
 --- back
 
@@ -808,9 +782,9 @@ TODO: This section should be after Appendixes and before Author's address accord
 
 TODO: This section needs to be updated.
 
-# EDHOC with CoAP and OSCOAP # {#app-a}
+# EDHOC with CoAP and OSCOAP {#app-a}
 
-## Transferring EDHOC in CoAP # {#app-a1}
+## Transferring EDHOC in CoAP {#app-a1}
 
 EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "edhoc".
 
@@ -838,7 +812,7 @@ Client    Server
 {: #fig-edhoc-oscoap-det title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-## Deriving an OSCOAP context from EDHOC # {#app-a2}
+## Deriving an OSCOAP context from EDHOC {#app-a2}
 
 When EDHOC is use to derive parameters for OSCOAP {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCOAP.  In case that the CoAP client is party U and the CoAP server is party V:
 
