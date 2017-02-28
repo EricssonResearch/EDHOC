@@ -219,7 +219,7 @@ K_1 and IV_1 are only used in EDHOC with symmetric key authentication and are de
 
 All other keys are derived with the negotiated PRF and with the secret set to the ECDH shared secret.
 
-Application specific traffic keys and key identifiers are derived using the byte string message_1 \| message_2 \| message_3 \| label, where H() is the hash function in HKDF_V, label is a byte string, and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
+Application specific traffic keys and key identifiers are derived using the byte string H( H( H(message_1) | message_2 ) | message_3 ) \| label, where H() is the hash function in HKDF_V, label is a byte string, and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
