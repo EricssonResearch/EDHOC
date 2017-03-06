@@ -219,7 +219,7 @@ K_1 and IV_1 are only used in EDHOC with symmetric key authentication and are de
 
 All other keys are derived with the negotiated PRF and with the secret set to the ECDH shared secret.
 
-Application specific traffic keys and key identifiers are derived using the byte string H( H( H(message_1) | message_2 ) | message_3 ) \| label, where H() is the hash function in HKDF_V, label is a byte string, and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
+Application specific traffic keys and key identifiers are derived using the byte string H( H( H(message_1) \| message_2 ) \| message_3 ) \| label, where H() is the hash function in HKDF_V, label is a byte string, and \| denotes byte string concatenation. Each application making use of EDHOC defines its own labels and how they are used.
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
@@ -231,7 +231,7 @@ EDHOC supports authentication with raw public keys (RPK) and certificates (Cert)
 
 * Party V's SHALL be able to uniquely identify Party U's public key using ID_U.
 
-ID_U and ID_V either enable the other party to retrieve the public key (kid, x5t, x5u) or they contain the public key (x5c), see {{I-D.schaad-cose-x509}}.
+ID_U and ID_V either enable the other party to retrieve the public key (kid, x5t, x5u) or they contain the public key (x5c), see {{I-D.schaad-cose-x509}}. Party U uses RPK and party V MAY use different type of credentials, e.g. one uses RPK and the other Cert. Party U and party V MAY use different signature algorithms.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
