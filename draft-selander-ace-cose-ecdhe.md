@@ -824,8 +824,8 @@ When EDHOC is use to derive parameters for OSCOAP {{I-D.ietf-core-object-securit
 
 * The Server's Sender ID is S_U, as defined in this document
 
-* The Master Secret is derived as specified in {{key-der}} of this document, with label = "OSCOAP Master Secret". The length is equal to the key length of AEAD_V.
+* The Master Secret is derived as specified in {{key-der}} of this document, with label = "EDHOC OSCOAP Master Secret". The length is equal to the key length of AEAD_V.
 
-* The Master Salt is derived as specified in {{key-der}} of this document, with label = "OSCOAP Master Salt". The length is 64 bits.
+* The Master Salt is derived as specified in {{key-der}} of this document, with label = "EDHOC OSCOAP Master Salt". The length is 64 bits.
 
 --- fluff
