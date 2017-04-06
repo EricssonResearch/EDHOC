@@ -208,7 +208,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
     
 ~~~~~~~~~~~ CDDL
       +  other = aad_1  / aad_2  / aad_3 /
-                 H( H( H(message_1) | message_2 ) | message_3 ) | label
+                 H( H( message_1 | message_2 ) | message_3 ) | label
 ~~~~~~~~~~~
 
 The salt SHALL only be present in the symmetric case.
@@ -338,7 +338,7 @@ data_2 = (
   SIG_U : int / tstr
 )
 
-aad_2 = H(message_1) | [ data_2 ] | ? Cert_V
+aad_2 = message_1 | [ data_2 ] | ? Cert_V
 ~~~~~~~~~~~
 
 where:
@@ -428,7 +428,7 @@ data_3 = (
   S_V : bstr
 )
 
-aad_3 = H( H(message_1) | message_2 ) | [ data_3 ] | ? Cert_U
+aad_3 = H( message_1 | message_2 ) | [ data_3 ] | ? Cert_U
 ~~~~~~~~~~~
 
 where:
@@ -602,7 +602,7 @@ data_2 = (
   AEAD_V : int / tstr
 )
 
-aad_2 = H(message_1) | [ data_2 ]
+aad_2 = message_1 | [ data_2 ]
 ~~~~~~~~~~~
 
 where:
@@ -665,7 +665,7 @@ data_3 = (
   S_V : bstr 
 )
 
-aad_3 = H( H(message_1) | message_2 ) | [ data_3 ]
+aad_3 = H( message_1 | message_2 ) | [ data_3 ]
 ~~~~~~~~~~~
 
 where:
@@ -824,8 +824,8 @@ When EDHOC is use to derive parameters for OSCOAP {{I-D.ietf-core-object-securit
 
 * The Server's Sender ID is S_U, as defined in this document
 
-* The Master Secret is derived as specified in {{key-der}} of this document, with label = "OSCOAP Master Secret". The length is equal to the key length of AEAD_V.
+* The Master Secret is derived as specified in {{key-der}} of this document, with label = "EDHOC OSCOAP Master Secret". The length is equal to the key length of AEAD_V.
 
-* The Master Salt is derived as specified in {{key-der}} of this document, with label = "OSCOAP Master Salt". The length is 64 bits.
+* The Master Salt is derived as specified in {{key-der}} of this document, with label = "EDHOC OSCOAP Master Salt". The length is 64 bits.
 
 --- fluff

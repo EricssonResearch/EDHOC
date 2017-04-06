@@ -3,8 +3,8 @@
 This is the working area for the Individual internet-draft, "Ephemeral Diffie-Hellman Over COSE (EDHOC)".
 
 * [Editor's copy](https://EricssonResearch.github.io/EDHOC/)
-* [Individual Draft] (https://tools.ietf.org/html/draft-selander-ace-cose-ecdhe)
-* [Compare Individual Draft and Editor's copy] (https://tools.ietf.org/rfcdiff?url1=https://tools.ietf.org/id/draft-selander-ace-cose-ecdhe.txt&url2=https://EricssonResearch.github.io/EDHOC/draft-selander-ace-cose-ecdhe.txt)
+* [Individual Draft](https://tools.ietf.org/html/draft-selander-ace-cose-ecdhe)
+* [Compare Individual Draft and Editor's copy](https://tools.ietf.org/rfcdiff?url1=https://tools.ietf.org/id/draft-selander-ace-cose-ecdhe.txt&url2=https://EricssonResearch.github.io/EDHOC/draft-selander-ace-cose-ecdhe.txt)
 
 
 ## Building the Draft
