@@ -7,7 +7,7 @@ wg: ACE Working Group
 cat: std
 
 coding: utf-8
-pi:    # can use array (if all yes) or hash here
+pi: # can use array (if all yes) or hash here
   toc: yes
   sortrefs: yes
   symrefs: yes
@@ -147,7 +147,7 @@ EDHOC also makes the following additions:
 * Negotiation of key derivation, encryption, and signature algorithms:
 
    * U proposes one or more algorithms of the following kinds: 
-       * 	HKDF
+       *  HKDF
        *  AEAD
        *  Signature verification 
        *  Signature generation 
