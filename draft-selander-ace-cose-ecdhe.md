@@ -207,8 +207,15 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
     + protected SHALL be a zero length bstr
     
 ~~~~~~~~~~~ CDDL
-      +  other = aad_1  / aad_2  / aad_3 /
-                 H( H( message_1 | message_2 ) | message_3 ) | label
+      +  other = aad_1  / aad_2  / aad_3 / exchange
+
+exchange = bstr
+~~~~~~~~~~~
+
+where exchange, in diagnostic non-normative notation, is:
+
+~~~~~~~~~~~
+exchange = H( H( message_1 | message_2 ) | message_3 ) | label
 ~~~~~~~~~~~
 
 The salt SHALL only be present in the symmetric case.
@@ -338,6 +345,12 @@ data_2 = (
   SIG_U : int / tstr
 )
 
+aad_2 = bstr
+~~~~~~~~~~~
+
+where aad\_2, in diagnostic non-normative notation, is:
+
+~~~~~~~~~~~
 aad_2 = message_1 | [ data_2 ] | ? Cert_V
 ~~~~~~~~~~~
 
@@ -428,6 +441,12 @@ data_3 = (
   S_V : bstr
 )
 
+aad_3 = bstr
+~~~~~~~~~~~
+
+where aad\_3, in diagnostic non-normative notation, is:
+
+~~~~~~~~~~~
 aad_3 = H( message_1 | message_2 ) | [ data_3 ] | ? Cert_U
 ~~~~~~~~~~~
 
@@ -601,6 +620,11 @@ data_2 = (
   HKDF_V : int / tstr,
   AEAD_V : int / tstr
 )
+~~~~~~~~~~~
+
+aad\_2, in diagnostic non-normative notation, is:
+
+~~~~~~~~~~~
 
 aad_2 = message_1 | [ data_2 ]
 ~~~~~~~~~~~
@@ -664,7 +688,11 @@ data_3 = (
   MSG_TYPE : int,
   S_V : bstr 
 )
+~~~~~~~~~~~
 
+aad\_3, in diagnostic non-normative notation, is:
+
+~~~~~~~~~~~
 aad_3 = H( message_1 | message_2 ) | [ data_3 ]
 ~~~~~~~~~~~
 
