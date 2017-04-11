@@ -383,7 +383,7 @@ where:
 
 * EXT_2 - application defined extensions
 
-* Cert_V - The end-entity certificate of Party V encoded as a bstr
+* Cert_V - The end-entity certificate of Party V
 
 * H() - the hash function in HKDF_V
 
@@ -469,7 +469,7 @@ where:
 * xyz - any COSE map label that can identify a public key
 * ID_U - identifier for the public key of Party U
 * EXT_3 - application defined extensions
-* Cert_U - The end-entity certificate of Party U encoded as a bstr
+* Cert_U - The end-entity certificate of Party U
 
 ### Party U Processing of Message 3 {#asym-msg3-procU}
 
