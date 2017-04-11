@@ -163,7 +163,7 @@ This paper is organized as follows: {{general}} specifies general properties of 
 
 # EDHOC Overview {#general}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may e.g. be protected using the negotiated AEAD algorithm. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may e.g. be protected using the negotiated AEAD algorithm. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -598,7 +598,7 @@ Party V SHALL process message_1 as follows:
 
 * Verify message_1 as specified in {{sym-msg1-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AES-CCM-64-64-128 (or an AEAD decided by the application), K_1, and IV_1.
 
-If any verification step fails, the message MUST be discarded and the protocol discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 ## EDHOC Message 2 {#sym-msg2}
 
@@ -671,7 +671,7 @@ Party U SHALL process message_2 as follows:
 
 * Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
 
-If any verification step fails, the message MUST be discarded and the protocol discontinued.
+If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 ## EDHOC Message 3 {#sym-msg3}
 
@@ -722,11 +722,29 @@ Party V SHALL process message_3 as follows:
 
 * Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
-If any verification step fails, the message MUST be discarded and the protocol discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 # Error Handling {#error}
 
 TODO: One error is e.g. if the ephemeral key is unsupported.
+
+## Error Message Format {#err-format}
+
+This section defines a message format for an EDHOC error message, used during the protocol. This is an error on EDHOC level and is independent of the transport layer used. An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
+
+error SHALL be a CBOR array as defined below
+
+~~~~~~~~~~~ CDDL
+error = [
+  MSG_TYPE : int,
+  ? ERR_MSG : tstr 
+]
+~~~~~~~~~~~
+
+where:
+
+* MSG_TYPE = 0
+* ERR_MSG is an optional text string containing a the diagnostic payload, as defined in Section 5.5.2 of {{RFC7252}}.
 
 # IANA Considerations {#iana}
 
