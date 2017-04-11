@@ -79,6 +79,7 @@ informative:
   I-D.ietf-core-object-security:
   I-D.seitz-ace-oscoap-profile:
   I-D.greevenbosch-appsawg-cbor-cddl:
+  I-D.ietf-core-resource-directory:
 
   RFC7228:
   RFC7252:
@@ -814,13 +815,13 @@ TODO: This section needs to be updated.
 
 ## Transferring EDHOC in CoAP {#app-a1}
 
-EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "edhoc".
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discorvered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
   |          |
   +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "edhoc"
+  |   POST   | Uri-Path: "/.well-known/edhoc"
   |          | Content-Type: application/edhoc
   |          | Payload: EDHOC message_1
   |          |
@@ -829,7 +830,7 @@ Client    Server
   |          | Payload: EDHOC message_2
   |          |
   +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "edhoc"
+  |   POST   | Uri-Path: "/.well-known/edhoc"
   |          | Content-Type: application/edhoc
   |          | Payload: EDHOC message_3
   |          |
