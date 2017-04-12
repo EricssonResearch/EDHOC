@@ -231,13 +231,13 @@ Application specific traffic keys and key identifiers are derived using the byte
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
-## Overview
+## Overview {#asym-overview}
 
 EDHOC supports authentication with raw public keys (RPK) and certificates (Cert) with the requirements that:
 
-* Party U's SHALL be able to uniquely identify Party V's public key using ID_V.
+* Party U's SHALL be able to identify Party V's public key using ID_V.
 
-* Party V's SHALL be able to uniquely identify Party U's public key using ID_U.
+* Party V's SHALL be able to identify Party U's public key using ID_U.
 
 ID_U and ID_V either enable the other party to retrieve the public key (kid, x5t, x5u) or they contain the public key (x5c), see {{I-D.schaad-cose-x509}}. Party U and party V MAY use different type of credentials, e.g. one uses RPK and the other Cert. Party U and party V MAY use different signature algorithms.
 
@@ -377,7 +377,7 @@ where:
 
    - detached payload = aad_2
 
-* xyz - any COSE map label that can identify a public key
+* xyz - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_V - identifier for the public key of Party V
 
@@ -466,7 +466,7 @@ where:
 
    - detached payload = aad_3
       
-* xyz - any COSE map label that can identify a public key
+* xyz - any COSE map label that can identify a public key, see {{asym-overview}}
 * ID_U - identifier for the public key of Party U
 * APP_3 - bstr containing application data
 * Cert_U - The end-entity certificate of Party U
@@ -503,7 +503,7 @@ If any verification step fails, the message MUST be discarded and the protocol d
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared uniformly random key (PSK) with the requirement that:
 
-* Party V SHALL be able to uniquely identify the PSK using KID.
+* Party V SHALL be able to identify the PSK using KID.
 
 KID either enable the other party to retrieve the PSK or contain the PSK (e.g. CBOR Web Token).
 
