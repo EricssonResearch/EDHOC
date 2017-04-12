@@ -310,7 +310,7 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-* Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
+*  Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
 
 * Generate the pseudo-random nonce N_U 
 
@@ -399,7 +399,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
+* Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
 
 * Generate the pseudo-random nonce N_V
 
@@ -588,7 +588,7 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-*  Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
+* Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
 
 * Generate the pseudo-random nonce N_U 
 
@@ -661,7 +661,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* Generate a fresh ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
+*  Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
 
 * Generate the pseudo-random nonce N_V
 
@@ -798,6 +798,8 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
         Change Controller: IESG
 
 # Security Considerations {#sec-cons}
+
+TODO: specify use of ephemeral keys multiple times
 
 EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The encryption algorithm of the SIGMA-I protocol provides identity protection, but the security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
