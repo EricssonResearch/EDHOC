@@ -308,7 +308,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate the pseudo-random nonce N_U 
 
-* Chose a session identifier S_U and store it for the length of the protocol.
+* Choose a session identifier S_U and store it for the length of the protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -320,7 +320,9 @@ Party V SHALL process message_1 as follows:
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
-If any verification step fails, the message MUST be discarded and the protocol discontinued.
+* Verify that the ephemeral public key type and algorithm is supported.
+
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 ## EDHOC Message 2 {#asym-msg2}
 
@@ -395,7 +397,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate the pseudo-random nonce N_V
 
-* Chose a session identifier S_V and store it for the length of the protocol.
+* Choose a session identifier S_V and store it for the length of the protocol.
       
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
@@ -423,7 +425,7 @@ Party U SHALL process message_2 as follows:
 
    - COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the public key of Party V.
 
-If any verification step fails, the message MUST be discarded and the protocol discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 ## EDHOC Message 3 {#asym-msg3}
 
@@ -495,7 +497,7 @@ Party V SHALL process message_3 as follows:
 
    * COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the public key of Party U;
 
-If any verification step fails, the message MUST be discarded and the protocol discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -584,7 +586,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate the pseudo-random nonce N_U 
 
-* Chose a session identifier S_U and store it for the length of the protocol.
+* Choose a session identifier S_U and store it for the length of the protocol.
 
 *  Format message_1 as specified in {{sym-msg1-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AES-CCM-64-64-128 (or an AEAD decided by the application), K_1, and IV_1.
 
@@ -657,7 +659,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate the pseudo-random nonce N_V
 
-* Chose a session identifier S_V and store it for the length of the protocol.
+* Choose a session identifier S_V and store it for the length of the protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
@@ -725,8 +727,6 @@ Party V SHALL process message_3 as follows:
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 # Error Handling {#error}
-
-TODO: One error is e.g. if the ephemeral key is unsupported.
 
 ## Error Message Format {#err-format}
 
