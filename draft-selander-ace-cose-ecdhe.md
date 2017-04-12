@@ -750,7 +750,7 @@ error = [
 where:
 
 * MSG_TYPE = 0
-* ERR_MSG is an optional text string containing a the diagnostic payload, as defined in Section 5.5.2 of {{RFC7252}}.
+* ERR_MSG is an optional text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}.
 
 # IANA Considerations {#iana}
 
