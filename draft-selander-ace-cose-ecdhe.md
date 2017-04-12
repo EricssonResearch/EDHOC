@@ -155,7 +155,7 @@ EDHOC also makes the following additions:
 
    * V selects one algorithm of each kind
 
-* Transmission of application defined extensions.
+* Transport of opaque application defined data.
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries. EDHOC does not put any requirement on the lower layers and can therefore be also be used e.g. in environments without IP.
 
@@ -183,7 +183,7 @@ Party U                                                 Party V
 The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or certificates (Cert). EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the
 differences are that information is only MACed (not signed) and that EDHOC with symmetric key authentication offers encryption, integrity protection, and key proof-of-possession already in message_1.
 
-EDHOC allows application defined extensions (EXT_1, EXT_2, EXT_3) to be sent in the respective messages. When EDHOC are used with asymmetric key authentication, EXT_1 is unprotected, EXT_2 is protected (encrypted and integrity protected), but sent to an unauthenticated party, and EXT_3 is protected and mutually authenticated. When EDHOC is used with symmetric key authentication, all extensions are protected and mutually authenticated.
+EDHOC allows also application data (APP_1, APP_2, APP_3) to be sent in the respective messages. When EDHOC is used with asymmetric key authentication, APP_1 is unprotected, APP_2 is protected (encrypted and integrity protected), but sent to an unauthenticated party, and APP_3 is protected and mutually authenticated. When EDHOC is used with a symmetric key authentication, all application data is protected and mutually authenticated.
 
 ## Formatting of the Ephemeral Public Keys {#cose_key}
 
@@ -245,15 +245,15 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                          Party V
-|                      S_U, N_U, E_U, ALG_1, EXT_1                     |
+|                      S_U, N_U, E_U, ALG_1, APP_1                     |
 +--------------------------------------------------------------------->|
 |                               message_1                              |
 |                                                                      |
-|S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; EXT_2, ID_V, Sig(V; aad_2); aad_2)|
+|S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; APP_2, ID_V, Sig(V; aad_2); aad_2)|
 |<---------------------------------------------------------------------+
 |                               message_2                              |
 |                                                                      |
-|           S_V, Enc(K_3; EXT_3, ID_U, Sig(U; aad_3); aad_3)           |
+|           S_V, Enc(K_3; APP_3, ID_U, Sig(U; aad_3); aad_3)           |
 +--------------------------------------------------------------------->|
 |                               message_3                              |
 ~~~~~~~~~~~
@@ -280,7 +280,7 @@ message_1 = [
   AEADs_U : alg_array,
   SIGs_V : alg_array,
   SIGs_U : alg_array,  
-  ? EXT_1 : bstr
+  ? APP_1 : bstr
 ]
 
 serialized_COSE_Key = bstr .cbor COSE_Key
@@ -298,7 +298,7 @@ where:
 * AEADs_U - supported AEAD algorithms
 * SIGs_V - signature algorithms, with which Party U supports verification
 * SIGs_U - signature algorithms, with which Party U supports signing
-* EXT_1 - application defined extensions
+* APP_1 - bstr containing application data
 
 ### Party U Processing of Message 1 {#asym-msg1-procU}
 
@@ -369,7 +369,7 @@ where:
 
    + external_aad = aad_2
 
-   + plaintext = \[ COSE_SIG_V, ? EXT_2 \]
+   + plaintext = \[ COSE_SIG_V, ? APP_2 \]
 
 * COSE_SIG_V is a COSE_Sign1 object with the following fields and values:
    
@@ -381,7 +381,7 @@ where:
 
 * ID_V - identifier for the public key of Party V
 
-* EXT_2 - application defined extensions
+* APP_2 - bstr containing application data
 
 * Cert_V - The end-entity certificate of Party V
 
@@ -458,7 +458,7 @@ where:
 
    + external_aad = aad_3
 
-   + plaintext = \[ COSE_SIG_U, ? EXT_3 \]
+   + plaintext = \[ COSE_SIG_U, ? APP_3 \]
    
 * COSE_SIG_U is a COSE_Sign1 object with the following fields and values:
    
@@ -468,7 +468,7 @@ where:
       
 * xyz - any COSE map label that can identify a public key
 * ID_U - identifier for the public key of Party U
-* EXT_3 - application defined extensions
+* APP_3 - bstr containing application data
 * Cert_U - The end-entity certificate of Party U
 
 ### Party U Processing of Message 3 {#asym-msg3-procU}
@@ -511,15 +511,15 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|         S_U, N_U, E_U, ALG_1, KID, Enc(K_1; EXT_1; aad_1)         |
+|         S_U, N_U, E_U, ALG_1, KID, Enc(K_1; APP_1; aad_1)         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|         S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; EXT_2; aad_2)         |
+|         S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; APP_2; aad_2)         |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    S_V, Enc(K_3; EXT_3; aad_3)                    |
+|                    S_V, Enc(K_3; APP_3; aad_3)                    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -572,9 +572,9 @@ where:
 
    + external_aad = aad_1
    
-   + plaintext = ? EXT_1
+   + plaintext = ? APP_1
 
-* EXT_1 - bstr containing application defined extensions
+* APP_1 - bstr containing application data
 
 ### Party U Processing of Message 1 {#sym-msg1-procU}
 
@@ -643,9 +643,9 @@ where:
 
    + external_aad = aad_2
    
-   + plaintext = ? EXT_2
+   + plaintext = ? APP_2
 
-* EXT_2 - bstr containing application defined extensions
+* APP_2 - bstr containing application data
 
 * H() - the hash function in HKDF_V
 
@@ -704,9 +704,9 @@ where:
 
    + external_aad = aad_3
    
-   + plaintext = ? EXT_3
+   + plaintext = ? APP_3
 
-* EXT_3 - bstr containing application defined extensions
+* APP_3 - bstr containing application data
 
 ### Party U Processing of Message 3 {#sym-msg3-procU}
 
@@ -795,13 +795,13 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
 EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The encryption algorithm of the SIGMA-I protocol provides identity protection, but the security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
-EDHOC adds an explicit message type and expands the authentication coverage to additional elements such as algorithms, extensions, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
+EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to EXT_1 and EXT_2 in the asymmetrical case, and KID in the symmetrical case. The communicating parties may therefore anonymize KID.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to APP_1 and APP_2 in the asymmetrical case, and KID in the symmetrical case. The communicating parties may therefore anonymize KID.
 
-Using the same KID or unprotected extension in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
+Using the same KID or unprotected application data in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to EXT_1 in the asymmetrical case, and KID in the symmetrical case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless unless previous nonces are stored.
+Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to APP_1 in the asymmetrical case, and KID in the symmetrical case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless unless previous nonces are stored.
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in RFC6979 is RECOMMENDED.
 
