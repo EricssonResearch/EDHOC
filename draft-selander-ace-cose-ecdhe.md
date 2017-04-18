@@ -799,8 +799,6 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
 # Security Considerations {#sec-cons}
 
-TODO: specify use of ephemeral keys multiple times
-
 EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The encryption algorithm of the SIGMA-I protocol provides identity protection, but the security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
 EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
@@ -813,7 +811,9 @@ Party U and V must make sure that unprotected data does not trigger any harmful 
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in RFC6979 is RECOMMENDED.
 
-Nonces MUST NOT be reused, both parties MUST generate fresh random nonces. Ephemeral keys SHOULD NOT be reused, both parties SHOULD generate fresh random ephemeral key pairs.
+Nonces MUST NOT be reused, both parties MUST generate fresh random nonces. 
+
+Ephemeral keys SHOULD NOT be reused, both parties SHOULD generate fresh random ephemeral key pairs. Party V MAY reuse the ephemeral key to limit the effect of certain DoS attacks. For example, to reduce processing costs in the case of repeated uncompleted protocol runs, party V MAY pre-compute its ephemeral key E_V and reuse it for a small number of concurrent EDHOC executions until one EDHOC protocol instance has been successfully completed, which triggers party V to pre-compute a new ephemeral key E_V to use with new protocol runs.
 
 The referenced processing instructions in {{SP-800-56a}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed.
 
