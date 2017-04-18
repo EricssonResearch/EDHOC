@@ -183,7 +183,7 @@ Party U                                                 Party V
 The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or certificates (Cert). EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the
 differences are that information is only MACed (not signed) and that EDHOC with symmetric key authentication offers encryption, integrity protection, and key proof-of-possession already in message_1.
 
-EDHOC allows also application data (APP_1, APP_2, APP_3) to be sent in the respective messages. When EDHOC is used with asymmetric key authentication, APP_1 is unprotected, APP_2 is protected (encrypted and integrity protected), but sent to an unauthenticated party, and APP_3 is protected and mutually authenticated. When EDHOC is used with a symmetric key authentication, all application data is protected and mutually authenticated.
+EDHOC also allows application data (APP_1, APP_2, APP_3) to be sent in the respective messages. APP_1 is unprotected, APP_2 is protected (encrypted and integrity protected), and APP_3 is protected and mutually authenticated. When EDHOC is used with asymmetric key authentication APP_2 is sent to an unauthenticated party, but with symmetric key authentication APP_2 is mutually authenticated.
 
 ## Formatting of the Ephemeral Public Keys {#cose_key}
 
@@ -519,7 +519,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|         S_U, N_U, E_U, ALG_1, KID, Enc(K_1; APP_1; aad_1)         |
+|                S_U, N_U, E_U, ALG_1, KID, APP_1                   |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -546,8 +546,7 @@ message_1 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = [
-  data_1,
-  COSE_ENC_1 : COSE_Encrypt0
+  data_1
 ]
 
 data_1 = (
@@ -557,10 +556,9 @@ data_1 = (
   E_U : serialized_COSE_Key,
   HKDFs_U : alg_array,
   AEADs_U : alg_array,
-  KID : bstr
+  KID : bstr,
+  ? APP_1 : bstr
 )
-
-aad_1 = [ data_1 ]
 
 serialized_COSE_Key = bstr .cbor COSE_Key
 
@@ -576,12 +574,6 @@ where:
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * KID - identifier of the pre-shared key
-* COSE_ENC_1 has the following fields and values:
-
-   + external_aad = aad_1
-   
-   + plaintext = ? APP_1
-
 * APP_1 - bstr containing application data
 
 ### Party U Processing of Message 1 {#sym-msg1-procU}
@@ -594,7 +586,8 @@ Party U SHALL compose message_1 as follows:
 
 * Choose a session identifier S_U and store it for the length of the protocol.
 
-*  Format message_1 as specified in {{sym-msg1-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AES-CCM-64-64-128 (or an AEAD decided by the application), K_1, and IV_1.
+*  Format message_1 as specified in {{sym-msg1-form}}.
+
 
 ### Party V Processing of Message 1 {#sym-msg1-procV}
 
@@ -604,7 +597,7 @@ Party V SHALL process message_1 as follows:
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
-* Verify message_1 as specified in {{sym-msg1-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AES-CCM-64-64-128 (or an AEAD decided by the application), K_1, and IV_1.
+* Verify that the ephemeral public key type and algorithm is supported.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -803,11 +796,11 @@ EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfec
 
 EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to APP_1 and APP_2 in the asymmetrical case, and KID in the symmetrical case. The communicating parties may therefore anonymize KID.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to APP_1 and APP_2 in the asymmetric case, and APP_1 and KID in the symmetric case. The communicating parties may therefore anonymize KID.
 
 Using the same KID or unprotected application data in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to APP_1 in the asymmetrical case, and KID in the symmetrical case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless unless previous nonces are stored.
+Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to APP_1 in the asymmetric case, and  APP_1 and KID in the symmetric case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless previous nonces are stored.
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in RFC6979 is RECOMMENDED.
 
@@ -827,7 +820,7 @@ Implementations should provide countermeasures to side-channel attacks such as t
 
 # Acknowledgments
 
-The authors want to thank Jim Schaad, Ilari Liusvaara and Ludwig Seitz for reviewing previous versions of the draft. 
+The authors want to thank Jim Schaad for reviewing intermediate versions and for contributing many concrete proposals incorporated in this version. We are also greatful to Ilari Liusvaara and Ludwig Seitz for reviewing previous versions of the draft. 
 
 TODO: This section should be after Appendixes and before Author's address according to RFC7322.
 
