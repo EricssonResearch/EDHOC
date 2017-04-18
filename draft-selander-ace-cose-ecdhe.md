@@ -201,7 +201,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
 * The context information SHALL be the serialized COSE_KDF_Context with the following values:
 
-  + AlgorithmID = tstr label
+  + AlgorithmID = tstr 
 
   + PartyInfo = ( nil, nil, nil )
 
@@ -210,7 +210,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
     + protected SHALL be a zero length bstr
     
 ~~~~~~~~~~~ CDDL
-      +  other = aad_1  / aad_2  / aad_3 / exchange
+      +  other = aad_2  / aad_3 / exchange
 
 exchange = bstr
 ~~~~~~~~~~~
@@ -221,19 +221,14 @@ where exchange, in diagnostic non-normative notation, is:
 exchange = H( H( message_1 | message_2 ) | message_3 ) 
 ~~~~~~~~~~~
 
-where H() is the hash function in HKDF_V,  \| denotes byte string concatenation.
+where H() is the hash function in HKDF_V, and \| denotes byte string concatenation.
 
 The salt SHALL only be present in the symmetric case.
 
-The symmetric key and IV used to protect message_i  is called K_i and IV_i,  and are derived using byte string aad_i defined for each EDHOC message i = 1, 2 or 3 that make use of a symmetric key.
+Symmetric keys and IVs are derived with the negotiated PRF and with the secret set to the ECDH shared secret. The key is derived using the AlgorithmID set to the negotiated AEAD (AEAD_V), and the IV is derived using the algorithm identifier set to "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}. For message_i the derived parameters are called K_i and IV_i, respectively, are derived using the parameter other = aad_i, where i = 2 or 3. 
 
-K_1 and IV_1 are only used in EDHOC with symmetric key authentication and are derived with the exceptions that secret SHALL be empty and the PRF SHALL be HKDF-256 (or a HKDF decided by the application).
+Application specific traffic keys and other data are derived using the parameter other = H( H( message_1 | message_2 ) | message_3 ), and AlgorithmID defined by the application. For an example, see {{app-a2}}.
 
-All other keys are derived with the negotiated PRF and with the secret set to the ECDH shared secret.
-
-Application specific traffic keys and key identifiers are derived using other = exchange and label. Each application making use of EDHOC defines its own labels and how they are used.
-
-TODO: specify label for other = aad_i
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
