@@ -201,24 +201,26 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
 * The context information SHALL be the serialized COSE_KDF_Context with the following values:
 
-  + AlgorithmID = tstr / intd
+  + AlgorithmID = tstr / int
 
   + PartyInfo = ( nil, nil, nil )
 
   + SuppPubInfo SHALL contain:
+    
+    + keyDataLength as specified below
 
     + protected SHALL be a zero length bstr
     
 ~~~~~~~~~~~ CDDL
-      +  other = aad_2  / aad_3 / message_hash
+      +  other = aad_2  / aad_3 / exchange_hash
 
-message_hash = bstr
+exchange_hash = bstr
 ~~~~~~~~~~~
 
-where message_hash, in diagnostic non-normative notation, is:
+where exchange_hash, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-message_hash = H( H( message_1 | message_2 ) | message_3 ) 
+exchange_hash = H( H( message_1 | message_2 ) | message_3 ) 
 ~~~~~~~~~~~
 
 where H() is the hash function in HKDF_V, and \| denotes byte string concatenation.
@@ -227,9 +229,9 @@ The salt SHALL only be present in the symmetric case.
 
 Symmetric keys and IVs SHALL be derived with the negotiated PRF (HKDF_V) and with the secret set to the ECDH shared secret. 
 
-For message_i the key and IV, called K_i and IV_i, SHALL be derived using the parameter other = aad_i, where i = 2 or 3. The key SHALL be derived using the AlgorithmID set to the negotiated AEAD (AEAD_V), and the IV SHALL be derived using the algorithm identifier set to "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}. 
+For message_i the key and IV, called K_i and IV_i, SHALL be derived using the parameter other = aad_i, where i = 2 or 3. The key SHALL be derived using the AlgorithmID set to the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using the algorithm identifier set to "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
 
-Application specific traffic keys and other data SHALL be derived using the parameter other = H( H( message_1 \| message_2 ) \| message_3 ), and AlgorithmID defined by the application. AlgorithmID SHALL be different for different data being derived, an example is given in {{app-a2}}.
+Application specific traffic keys and other data SHALL be derived using the parameter other = exchange_hash. The parameter keyDataLength is specified according to the length of the data being derived. AlgorithmID is defined by the application and SHALL be different for different data being derived, an example is given in {{app-a2}}.
 
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
@@ -722,6 +724,8 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
+
+
 # Error Handling {#error}
 
 ## Error Message Format {#err-format}
@@ -827,6 +831,13 @@ TODO: This section should be after Appendixes and before Author's address accord
 
 TODO: This section needs to be updated.
 
+
+# PSK Chaining
+
+An application using EDHOC with symmetric keys may have a security policy to change the PSK as a result of successfully completing the EDHOC protocol. In this case, the old PSK SHALL be replaced with a new PSK derived using other = exchange_hash, AlgorithmID = "EDHOC PSK Chaining" and keyDataLength equal to the key length of AEAD_V, see {{key-der}}.
+
+
+
 # EDHOC with CoAP and OSCOAP {#app-a}
 
 ## Transferring EDHOC in CoAP {#app-a1}
@@ -869,8 +880,8 @@ When EDHOC is use to derive parameters for OSCOAP {{I-D.ietf-core-object-securit
 
 * The Server's Sender ID is S_U, as defined in this document
 
-* The Master Secret is derived as specified in {{key-der}} of this document, with AlgorithmID = "EDHOC OSCOAP Master Secret". The length is equal to the key length of AEAD_V.
+* The Master Secret is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCOAP Master Secret" and keyDataLength equal to the key length of AEAD_V.
 
-* The Master Salt is derived as specified in {{key-der}} of this document, with AlgorithmID = "EDHOC OSCOAP Master Salt". The length is 64 bits.
+* The Master Salt is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCOAP Master Salt" and keyDataLength equal to 64 bits.
 
 --- fluff
