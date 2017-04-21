@@ -155,6 +155,12 @@ EDHOC also makes the following additions:
 
    * V selects one algorithm of each kind
 
+* ECDH curve bidding down mitigation:
+
+   * U lists supported ECDH curves in order of preference
+   
+   * V verifies that the ECDH curve of the ephemeral key is the most preferred common curve
+
 * Transport of opaque application defined data.
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries. EDHOC does not put any requirement on the lower layers and can therefore be also be used e.g. in environments without IP.
@@ -280,6 +286,7 @@ message_1 = [
   S_U : bstr,  
   N_U : bstr,  
   E_U : serialized_COSE_Key,
+  ECDH-Curves_U : alg_array,
   HKDFs_U : alg_array,
   AEADs_U : alg_array,
   SIGs_V : alg_array,
@@ -298,6 +305,7 @@ where:
 * S_U - variable length session identifier
 * N_U - 64-bit random nonce
 * E_U - the ephemeral public key of Party U
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * SIGs_V - signature algorithms, with which Party U supports verification
@@ -308,8 +316,10 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-*  Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
+* Determine which ECDH curve to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL retrieve an ephemeral from that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
 
+* Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. 
+   
 * Generate the pseudo-random nonce N_U 
 
 * Choose a session identifier S_U and store it for the length of the protocol.
@@ -324,9 +334,9 @@ Party V SHALL process message_1 as follows:
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
-* Verify that the ephemeral public key type and algorithm is supported.
+* Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message SHOULD include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
 
 ## EDHOC Message 2 {#asym-msg2}
 
@@ -552,6 +562,7 @@ data_1 = (
   S_U : bstr,  
   N_U : bstr,    
   E_U : serialized_COSE_Key,
+  ECDH-Curves_U : alg_array,
   HKDFs_U : alg_array,
   AEADs_U : alg_array,
   KID : bstr,
@@ -569,6 +580,7 @@ where:
 * S_U - variable length session identifier
 * N_U - 64-bit random nonce
 * E_U - the ephemeral public key of Party U
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * KID - identifier of the pre-shared key
@@ -578,13 +590,15 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
+* Determine which ECDH curve to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL retrieve an ephemeral from that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
+
 * Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
 
 * Generate the pseudo-random nonce N_U 
 
 * Choose a session identifier S_U and store it for the length of the protocol.
 
-*  Format message_1 as specified in {{sym-msg1-form}}.
+* Format message_1 as specified in {{sym-msg1-form}}.
 
 
 ### Party V Processing of Message 1 {#sym-msg1-procV}
@@ -595,9 +609,9 @@ Party V SHALL process message_1 as follows:
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
-* Verify that the ephemeral public key type and algorithm is supported.
+* Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message SHOULD include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
 
 ## EDHOC Message 2 {#sym-msg2}
 
@@ -796,7 +810,7 @@ EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfec
 
 EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
 
-EDHOC does not include negotiation of parameters related to the ephemeral key. Party U proposes one ephemeral key, and if this is not supported by party V there is an error message. 
+EDHOC does not include negotiation of parameters related to the ephemeral key, but it enables Party V to verify that the ECDH curve used in the protocol is the most preferred curve by U which is supported by both U and V.
 
 Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to APP_1 and APP_2 in the asymmetric case, and APP_1 and KID in the symmetric case. The communicating parties may therefore anonymize KID.
 
