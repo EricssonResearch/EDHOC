@@ -93,9 +93,9 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a compact, a
 
 # Introduction {#intro}
 
-Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}}. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
+Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protocol needs to work on a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
 
-In order for a communication session to provide forward secrecy, the communicating parties can run a Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated ECDH protocol using CBOR and COSE objects. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates (Cert).  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
+In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated ECDH protocol using CBOR and COSE objects. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates (Cert).  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{I-D.ietf-cose-msg}} are used to implement these standards.
 
@@ -180,8 +180,7 @@ Party U                                                 Party V
 {: #fig-flow title="EDHOC message flow"}
 {: artwork-align="center"}
 
-The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or certificates (Cert). EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the
-differences are that information is only MACed (not signed) and that EDHOC with symmetric key authentication offers encryption, integrity protection, and key proof-of-possession already in message_1.
+The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or certificates (Cert). EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the difference being that information is only MACed, not signed.
 
 EDHOC also allows application data (APP_1, APP_2, APP_3) to be sent in the respective messages. APP_1 is unprotected, APP_2 is protected (encrypted and integrity protected), and APP_3 is protected and mutually authenticated. When EDHOC is used with asymmetric key authentication APP_2 is sent to an unauthenticated party, but with symmetric key authentication APP_2 is mutually authenticated.
 
@@ -207,7 +206,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
   + SuppPubInfo SHALL contain:
     
-    + keyDataLength as specified below
+    + keyDataLength int
 
     + protected SHALL be a zero length bstr
     
@@ -229,9 +228,9 @@ The salt SHALL only be present in the symmetric case.
 
 Symmetric keys and IVs SHALL be derived with the negotiated PRF (HKDF_V) and with the secret set to the ECDH shared secret. 
 
-For message_i the key and IV, called K_i and IV_i, SHALL be derived using the parameter other = aad_i, where i = 2 or 3. The key SHALL be derived using the AlgorithmID set to the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using the algorithm identifier set to "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
+For message_i the key and IV, called K_i and IV_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
 
-Application specific traffic keys and other data SHALL be derived using the parameter other = exchange_hash. The parameter keyDataLength is specified according to the length of the data being derived. AlgorithmID is defined by the application and SHALL be different for different data being derived, an example is given in {{app-a2}}.
+Application specific traffic keys and other data SHALL be derived using other = exchange_hash. AlgorithmID is defined by the application and SHALL be different for different data being derived (an example is given in {{app-a2}}). keyDataLength is set to the length of the data being derived.
 
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
@@ -796,6 +795,8 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 EDHOC builds on the SIGMA-I family of theoretical protocols that provides perfect forward secrecy and identity protection with a minimal number of messages. The encryption algorithm of the SIGMA-I protocol provides identity protection, but the security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
 EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
+
+EDHOC does not include negotiation of parameters related to the ephemeral key. Party U proposes one ephemeral key, and if this is not supported by party V there is an error message. 
 
 Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to APP_1 and APP_2 in the asymmetric case, and APP_1 and KID in the symmetric case. The communicating parties may therefore anonymize KID.
 
