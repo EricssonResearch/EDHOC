@@ -336,7 +336,14 @@ Party V SHALL process message_1 as follows:
 
 * Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message SHOULD include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
+
+~~~~~~~~~~~
+ERR_MSG = "Curve not supported; X"
+
+where X is the first curve in ECDH-Curves_U that V supports,
+encoded as in Table 22 of {{I-D.ietf-cose-msg}}.
+~~~~~~~~~~~
 
 ## EDHOC Message 2 {#asym-msg2}
 
