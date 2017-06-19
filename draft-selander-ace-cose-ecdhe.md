@@ -137,7 +137,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 As described in Appendix B of {{SIGMA}}, in order to create a "full-fledge" protocol some additional protocol elements are needed. EDHOC adds:
 
-* Explicit session identifiers S_U, S_V chosen by U and V, respectively.
+* Explicit session identifiers S_U, S_V different from other concurrent EDHOC session identifiers chosen by U and V, respectively. 
 
 * Explicit nonces N_U, N_V chosen freshly and anew with each session by U and V, respectively.
 
@@ -155,7 +155,7 @@ EDHOC also makes the following additions:
 
    * V selects one algorithm of each kind
 
-* ECDH curve bidding down mitigation:
+* Verification of common preferred ECDH curve:
 
    * U lists supported ECDH curves in order of preference
    
@@ -249,7 +249,7 @@ EDHOC supports authentication with raw public keys (RPK) and certificates (Cert)
 
 * Party V's SHALL be able to identify Party U's public key using ID_U.
 
-ID_U and ID_V either enable the other party to retrieve the public key (kid, x5t, x5u) or they contain the public key (x5c), see {{I-D.schaad-cose-x509}}. Party U and party V MAY use different type of credentials, e.g. one uses RPK and the other Cert. Party U and party V MAY use different signature algorithms.
+ID_U and ID_V either contain the credential used for authentication (x5c) or enable the other party to retrieve the credential used for authentication (kid, x5t, x5u), see {{I-D.schaad-cose-x509}}. Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other Cert. Party U and Party V MAY use different signature algorithms.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -322,7 +322,7 @@ Party U SHALL compose message_1 as follows:
    
 * Generate the pseudo-random nonce N_U 
 
-* Choose a session identifier S_U and store it for the length of the protocol.
+* Choose an unused session identifier S_U and store it for the length of the protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -375,7 +375,7 @@ aad_2 = bstr
 where aad\_2, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-aad_2 = message_1 | [ data_2 ] | ? Cert_V
+aad_2 = H( message_1 | [ data_2 ] | ? Cred_V )
 ~~~~~~~~~~~
 
 where:
@@ -404,9 +404,10 @@ where:
 
 * ID_V - identifier for the public key of Party V
 
-* APP_2 - bstr containing application data
+* Cred_V - credential used for authentication of Party V. Any COSE map with value containing either 
+the end-entity certificate of Party V (e.g. x5c) or the raw public key of Party V (e.g. COSE_Key)
 
-* Cert_V - The end-entity certificate of Party V
+* APP_2 - bstr containing application data
 
 * H() - the hash function in HKDF_V
 
@@ -418,7 +419,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate the pseudo-random nonce N_V
 
-* Choose a session identifier S_V and store it for the length of the protocol.
+* Choose an unused session identifier S_V and store it for the length of the protocol.
       
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
@@ -426,9 +427,9 @@ Party V SHALL compose message_2 as follows:
 
    - COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the private key of Party V.
 
-   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
-   
-      * If certificates are used then aad_2 MUST include Cert_V
+   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}
+      
+      * Cred_V is included in the calculation of aad_2 if and only if Cred_V is not contained in ID_V (see {{asym-overview}}). 
 
 ### Party U Processing of Message 2 {#asym-msg2-procU}
 
@@ -471,7 +472,7 @@ aad_3 = bstr
 where aad\_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( message_1 | message_2 ) | [ data_3 ] | ? Cert_U
+aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] | ? Cred_U )
 ~~~~~~~~~~~
 
 where:
@@ -490,9 +491,13 @@ where:
    - detached payload = aad_3
       
 * xyz - any COSE map label that can identify a public key, see {{asym-overview}}
+
 * ID_U - identifier for the public key of Party U
+
+* Cred_U - credential used for authentication of Party U. Any COSE map with value containing either 
+the end-entity certificate of Party U (e.g. x5c) or the raw public key of Party U (e.g. COSE_Key)
+
 * APP_3 - bstr containing application data
-* Cert_U - The end-entity certificate of Party U
 
 ### Party U Processing of Message 3 {#asym-msg3-procU}
 
@@ -504,7 +509,8 @@ Party U SHALL compose message_3 as follows:
 
    -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
 
-      * If certificates are used then aad_3 MUST include Cert_U
+      * Cred_U is included in the calculation of aad_3 if and only if Cred_U is not contained in ID_U (see {{asym-overview}}). 
+         
 
 ### Party V Processing of Message 3 {#asym-msg3-procV}
 
@@ -603,10 +609,9 @@ Party U SHALL compose message_1 as follows:
 
 * Generate the pseudo-random nonce N_U 
 
-* Choose a session identifier S_U and store it for the length of the protocol.
+* Choose an unused session identifier S_U and store it for the length of the protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
-
 
 ### Party V Processing of Message 1 {#sym-msg1-procV}
 
@@ -647,7 +652,7 @@ aad\_2, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
 
-aad_2 = message_1 | [ data_2 ]
+aad_2 = H( message_1 | [ data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -677,7 +682,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate the pseudo-random nonce N_V
 
-* Choose a session identifier S_V and store it for the length of the protocol.
+* Choose an unused session identifier S_V and store it for the length of the protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
@@ -714,7 +719,7 @@ data_3 = (
 aad\_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( message_1 | message_2 ) | [ data_3 ]
+aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
 ~~~~~~~~~~~
 
 where:
