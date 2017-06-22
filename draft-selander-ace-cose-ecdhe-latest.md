@@ -484,13 +484,17 @@ where:
    
 * COSE_SIG_U is a COSE_Sign1 object with the following fields and values:
    
-   - unprotected = { abc : ID_U, xyz : ID_HINT_U }
+   - protected = { abc : ID_U, ? xyz : HINT_ID_U }
 
    - detached payload = aad_3
       
 * abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_U - identifier for the public key of Party U
+
+* xyz - TBD
+
+* HINT_ID_U - TDB
 
 * APP_3 - bstr containing application data
 
