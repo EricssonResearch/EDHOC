@@ -643,7 +643,7 @@ data_2 = (
 )
 ~~~~~~~~~~~
 
-aad\_2, in diagnostic non-normative notation, is:
+aad_2, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
 
@@ -711,7 +711,7 @@ data_3 = (
 )
 ~~~~~~~~~~~
 
-aad\_3, in diagnostic non-normative notation, is:
+aad_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
 aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
