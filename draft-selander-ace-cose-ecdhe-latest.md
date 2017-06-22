@@ -466,15 +466,16 @@ data_3 = (
 aad_3 = bstr
 ~~~~~~~~~~~
 
-where aad\_3, in diagnostic non-normative notation, is:
+where aad_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] | ? Cred_U )
+aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
 ~~~~~~~~~~~
 
 where:
 
 * MSG_TYPE = 3
+
 * COSE_ENC_3 has the following fields and values:
 
    + external_aad = aad_3
@@ -483,16 +484,13 @@ where:
    
 * COSE_SIG_U is a COSE_Sign1 object with the following fields and values:
    
-   - unprotected = { xyz: ID_U }
+   - unprotected = { abc : ID_U, xyz : ID_HINT_U }
 
    - detached payload = aad_3
       
-* xyz - any COSE map label that can identify a public key, see {{asym-overview}}
+* abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_U - identifier for the public key of Party U
-
-* Cred_U - credential used for authentication of Party U. Any COSE map with value containing either 
-the end-entity certificate of Party U (e.g. x5c) or the raw public key of Party U (e.g. COSE_Key)
 
 * APP_3 - bstr containing application data
 
