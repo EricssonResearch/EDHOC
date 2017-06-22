@@ -396,13 +396,17 @@ where:
 
 * COSE_SIG_V is a COSE_Sign1 object with the following fields and values:
    
-   - protected = { abc : ID_V, xyz : ID_HINT_V }
+   - protected = { abc : ID_V, xyz : HINT_ID_V }
 
    - detached payload = aad_2
 
 * abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_V - identifier for the public key of Party V
+
+* xyz - TBD
+
+* HINT_ID_V - TDB
 
 * APP_2 - bstr containing application data
 
