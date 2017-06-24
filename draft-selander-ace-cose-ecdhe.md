@@ -396,7 +396,7 @@ where:
 
 * COSE_SIG_V is a COSE_Sign1 object with the following fields and values:
    
-   - protected = { abc : ID_V, xyz : HINT_ID_V }
+   - protected = { abc : ID_V, ? xyz : HINT_ID_V }
 
    - detached payload = aad_2
 
