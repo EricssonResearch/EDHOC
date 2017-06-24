@@ -118,7 +118,7 @@ Party U                                                 Party V
    |         E_V, Enc(K_2; ID_V, Sig(V; E_U, E_V);)        |
    |<------------------------------------------------------+
    |                                                       |
-   |            Enc(K_3; ID_U, Sig(U; E_V, E_U);)          |
+   |           Enc(K_3; ID_U, Sig(U; E_V, E_U);)           |
    +------------------------------------------------------>|
    |                                                       |
 ~~~~~~~~~~~
@@ -178,7 +178,7 @@ Party U                                                 Party V
    |                                                       |
    | <----------------- EDHOC message_2 ------------------ |
    |                                                       |
-   | ----------------- EDHOC message_3 ------------------> |
+   | ------------------ EDHOC message_3 -----------------> |
    |                                                       |
    | <----------- Protected Application Data ------------> |
    |                                                       |
@@ -372,10 +372,10 @@ data_2 = (
 aad_2 = bstr
 ~~~~~~~~~~~
 
-where aad\_2, in diagnostic non-normative notation, is:
+where aad_2, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( message_1 | [ data_2 ] | ? Cred_V )
+aad_2 = H( message_1 | [ data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -396,16 +396,17 @@ where:
 
 * COSE_SIG_V is a COSE_Sign1 object with the following fields and values:
    
-   - unprotected = { xyz: ID_V }
+   - protected = { abc : ID_V, xyz : HINT_ID_V }
 
    - detached payload = aad_2
 
-* xyz - any COSE map label that can identify a public key, see {{asym-overview}}
+* abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_V - identifier for the public key of Party V
 
-* Cred_V - credential used for authentication of Party V. Any COSE map with value containing either 
-the end-entity certificate of Party V (e.g. x5c) or the raw public key of Party V (e.g. COSE_Key)
+* xyz - TBD
+
+* HINT_ID_V - TDB
 
 * APP_2 - bstr containing application data
 
@@ -469,15 +470,16 @@ data_3 = (
 aad_3 = bstr
 ~~~~~~~~~~~
 
-where aad\_3, in diagnostic non-normative notation, is:
+where aad_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] | ? Cred_U )
+aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
 ~~~~~~~~~~~
 
 where:
 
 * MSG_TYPE = 3
+
 * COSE_ENC_3 has the following fields and values:
 
    + external_aad = aad_3
@@ -486,16 +488,17 @@ where:
    
 * COSE_SIG_U is a COSE_Sign1 object with the following fields and values:
    
-   - unprotected = { xyz: ID_U }
+   - protected = { abc : ID_U, ? xyz : HINT_ID_U }
 
    - detached payload = aad_3
       
-* xyz - any COSE map label that can identify a public key, see {{asym-overview}}
+* abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_U - identifier for the public key of Party U
 
-* Cred_U - credential used for authentication of Party U. Any COSE map with value containing either 
-the end-entity certificate of Party U (e.g. x5c) or the raw public key of Party U (e.g. COSE_Key)
+* xyz - TBD
+
+* HINT_ID_U - TDB
 
 * APP_3 - bstr containing application data
 
@@ -648,7 +651,7 @@ data_2 = (
 )
 ~~~~~~~~~~~
 
-aad\_2, in diagnostic non-normative notation, is:
+aad_2, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
 
@@ -716,7 +719,7 @@ data_3 = (
 )
 ~~~~~~~~~~~
 
-aad\_3, in diagnostic non-normative notation, is:
+aad_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
 aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
@@ -755,7 +758,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ## Error Message Format {#err-format}
 
-This section defines a message format for an EDHOC error message, used during the protocol. This is an error on EDHOC level and is independent of the transport layer used. An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
+This section defines a message format for an EDHOC error message, used during the protocol. This is an error on EDHOC level and is independent of the lower layers used. An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
 error SHALL be a CBOR array as defined below
 
