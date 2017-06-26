@@ -137,7 +137,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 As described in Appendix B of {{SIGMA}}, in order to create a "full-fledge" protocol some additional protocol elements are needed. EDHOC adds:
 
-* Explicit session identifiers S_U, S_V different from other concurrent EDHOC session identifiers chosen by U and V, respectively. 
+* Explicit session identifiers S_U, S_V different from other concurrent session identifiers (EDHOC or other used protocol identifier) chosen by U and V, respectively. 
 
 * Explicit nonces N_U, N_V chosen freshly and anew with each session by U and V, respectively.
 
@@ -245,11 +245,17 @@ Application specific traffic keys and other data SHALL be derived using other = 
 
 EDHOC supports authentication with raw public keys (RPK) and certificates (Cert) with the requirements that:
 
-* Party U's SHALL be able to identify Party V's public key using ID_V.
+* Party U SHALL be able to identify Party V's public key using ID_V.
 
-* Party V's SHALL be able to identify Party U's public key using ID_U.
+* Party V SHALL be able to identify Party U's public key using ID_U.
 
-ID_U and ID_V either contain the credential used for authentication (x5c) or enable the other party to retrieve the credential used for authentication (kid, x5t, x5u), see {{I-D.schaad-cose-x509}}. Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other Cert. Party U and Party V MAY use different signature algorithms.
+ID_U and ID_V SHALL either contain the credential used for authentication (e.g. x5c) or uniquely identify the credential used for authentication (e.g. x5t), see {{I-D.schaad-cose-x509}}. Party U and V MAY retrieve the other party's credential out of band. HINT_ID_U and HINT_ID_V are optional and contain information about how to retrieve the credential of Party U and Party V, respectively (e.g. x5u), see {{I-D.schaad-cose-x509}}.
+
+(TBD: Include HINT_ID_ in figure below)
+
+Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses Cert. Party U and Party V MAY use different signature algorithms.
+
+
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -259,11 +265,11 @@ Party U                                                          Party V
 +--------------------------------------------------------------------->|
 |                               message_1                              |
 |                                                                      |
-|S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; APP_2, ID_V, Sig(V; aad_2); aad_2)|
+|S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; ID_V, Sig(V; aad_2, APP_2); aad_2)|
 |<---------------------------------------------------------------------+
 |                               message_2                              |
 |                                                                      |
-|           S_V, Enc(K_3; APP_3, ID_U, Sig(U; aad_3); aad_3)           |
+|           S_V, Enc(K_3; ID_U, Sig(U; aad_3, APP_3); aad_3)           |
 +--------------------------------------------------------------------->|
 |                               message_3                              |
 ~~~~~~~~~~~
@@ -322,7 +328,7 @@ Party U SHALL compose message_1 as follows:
    
 * Generate the pseudo-random nonce N_U 
 
-* Choose an unused session identifier S_U and store it for the length of the protocol.
+* Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -398,15 +404,15 @@ where:
    
    - protected = { abc : ID_V, ? xyz : HINT_ID_V }
 
-   - detached payload = aad_2
+   - detached payload = aad_2, ? APP_2
 
 * abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_V - identifier for the public key of Party V
 
-* xyz - TBD
+* xyz - any COSE map label for information about how to retrieve the credential of Party V, see {{asym-overview}}
 
-* HINT_ID_V - TDB
+* HINT_ID_V - information about how to retrieve the credential of Party V
 
 * APP_2 - bstr containing application data
 
@@ -420,7 +426,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate the pseudo-random nonce N_V
 
-* Choose an unused session identifier S_V and store it for the length of the protocol.
+* Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
       
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
@@ -430,7 +436,6 @@ Party V SHALL compose message_2 as follows:
 
    -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}
       
-      * Cred_V is included in the calculation of aad_2 if and only if Cred_V is not contained in ID_V (see {{asym-overview}}). 
 
 ### Party U Processing of Message 2 {#asym-msg2-procU}
 
@@ -484,21 +489,21 @@ where:
 
    + external_aad = aad_3
 
-   + plaintext = \[ COSE_SIG_U, ? APP_3 \]
+   + plaintext = \[ COSE_SIG_U, ? APP_3  \]
    
 * COSE_SIG_U is a COSE_Sign1 object with the following fields and values:
    
    - protected = { abc : ID_U, ? xyz : HINT_ID_U }
 
-   - detached payload = aad_3
+   - detached payload = aad_3, ? APP_3 
       
 * abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
 * ID_U - identifier for the public key of Party U
 
-* xyz - TBD
+* xyz - any COSE map label for information about how to retrieve the credential of Party U, see {{asym-overview}}
 
-* HINT_ID_U - TDB
+* HINT_ID_V - information about how to retrieve the credential of Party U
 
 * APP_3 - bstr containing application data
 
@@ -512,7 +517,6 @@ Party U SHALL compose message_3 as follows:
 
    -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
 
-      * Cred_U is included in the calculation of aad_3 if and only if Cred_U is not contained in ID_U (see {{asym-overview}}). 
          
 
 ### Party V Processing of Message 3 {#asym-msg3-procV}
@@ -612,7 +616,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate the pseudo-random nonce N_U 
 
-* Choose an unused session identifier S_U and store it for the length of the protocol.
+* Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
@@ -685,7 +689,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate the pseudo-random nonce N_V
 
-* Choose an unused session identifier S_V and store it for the length of the protocol.
+* Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
