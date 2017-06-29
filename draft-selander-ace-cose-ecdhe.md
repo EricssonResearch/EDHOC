@@ -206,9 +206,9 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
 * The context information SHALL be the serialized COSE_KDF_Context with the following values:
 
-  + AlgorithmID = tstr / int
+  + AlgorithmID = int / tstr
 
-  + PartyInfo = ( nil, nil, nil )
+  + PartyUInfo = PartyVInfo = ( nil, nil, nil )
 
   + SuppPubInfo SHALL contain:
     
