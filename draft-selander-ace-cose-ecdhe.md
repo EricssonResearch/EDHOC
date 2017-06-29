@@ -204,19 +204,17 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and nil when EDHOC is authenticated with asymmetric keys.
 
-* The context information SHALL be the serialized COSE_KDF_Context with the following values:
+* The fields in the context information COSE_KDF_Context SHALL have the following values:
 
-  + AlgorithmID is a tstr or int as defined below
+  + AlgorithmID is a tstr as defined below
 
   + PartyUInfo = PartyVInfo = ( nil, nil, nil )
+  
+  + keyDataLength is a uint as defined below
+  
+  + protected SHALL be a zero length bstr
 
-  + SuppPubInfo SHALL contain:
-    
-    + keyDataLength is a uint as defined below
-
-    + protected SHALL be a zero length bstr
-
-    + other is a bstr SHALL be aad_2, aad_3, or exchange_hash 
+  + other is a bstr SHALL be aad_2, aad_3, or exchange_hash 
 
 where exchange_hash, in diagnostic non-normative notation, is:
 
@@ -224,9 +222,9 @@ exchange_hash = H( H( message_1 | message_2 ) | message_3 )
 
 where H() is the hash function in HKDF_V.
 
-For message_i the key and IV, called K_i and IV_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
+For message_i the key and IV, called K_i and IV_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the name of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
 
-Application specific traffic keys and other data SHALL be derived using other = exchange_hash. AlgorithmID is defined by the application and SHALL be different for different data being derived (an example is given in {{app-a2}}). keyDataLength is set to the length of the data being derived.
+Application specific traffic keys and other data SHALL be derived using other = exchange_hash. AlgorithmID SHALL be a tstr defined by the application and SHALL be different for different data being derived (an example is given in {{app-a2}}). keyDataLength is set to the length of the data being derived.
 
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
