@@ -202,37 +202,27 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
 * The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of [I-D.ietf-cose-msg].
 
-* salt = PSK / nil
+* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and nil when EDHOC is authenticated with asymmetric keys.
 
 * The context information SHALL be the serialized COSE_KDF_Context with the following values:
 
-  + AlgorithmID = int / tstr
+  + AlgorithmID is a tstr or int as defined below
 
   + PartyUInfo = PartyVInfo = ( nil, nil, nil )
 
   + SuppPubInfo SHALL contain:
     
-    + keyDataLength int
+    + keyDataLength is a uint as defined below
 
     + protected SHALL be a zero length bstr
-    
-~~~~~~~~~~~ CDDL
-      +  other = aad_2  / aad_3 / exchange_hash
 
-exchange_hash = bstr
-~~~~~~~~~~~
+    + other is a bstr SHALL be aad_2, aad_3, or exchange_hash 
 
 where exchange_hash, in diagnostic non-normative notation, is:
 
-~~~~~~~~~~~
 exchange_hash = H( H( message_1 | message_2 ) | message_3 ) 
-~~~~~~~~~~~
 
-where H() is the hash function in HKDF_V, and \| denotes byte string concatenation.
-
-The salt SHALL only be present in the symmetric case.
-
-Symmetric keys and IVs SHALL be derived with the negotiated PRF (HKDF_V) and with the secret set to the ECDH shared secret. 
+where H() is the hash function in HKDF_V.
 
 For message_i the key and IV, called K_i and IV_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
 
