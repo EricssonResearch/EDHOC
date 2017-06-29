@@ -375,7 +375,7 @@ data_2 = (
   SIG_U : int / tstr
 )
 
-aad_2 = bstr
+aad_2 : bstr
 ~~~~~~~~~~~
 
 where aad_2, in diagnostic non-normative notation, is:
@@ -472,7 +472,7 @@ data_3 = (
   S_V : bstr
 )
 
-aad_3 = bstr
+aad_3 : bstr
 ~~~~~~~~~~~
 
 where aad_3, in diagnostic non-normative notation, is:
