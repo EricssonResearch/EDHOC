@@ -316,7 +316,7 @@ where:
 * AEADs_U - supported AEAD algorithms
 * SIGs_V - signature algorithms, with which Party U supports verification
 * SIGs_U - signature algorithms, with which Party U supports signing
-* APP_1 - bstr containing application data
+* APP_1 - bstr containing opaque application data
 
 ### Party U Processing of Message 1 {#asym-msg1-procU}
 
@@ -414,7 +414,7 @@ where:
 
 * HINT_ID_V - information about how to retrieve the credential of Party V
 
-* APP_2 - bstr containing application data
+* APP_2 - bstr containing opaque application data
 
 * H() - the hash function in HKDF_V
 
@@ -505,7 +505,7 @@ where:
 
 * HINT_ID_V - information about how to retrieve the credential of Party U
 
-* APP_3 - bstr containing application data
+* APP_3 - bstr containing opaque application data
 
 ### Party U Processing of Message 3 {#asym-msg3-procU}
 
@@ -604,7 +604,7 @@ where:
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * KID - identifier of the pre-shared key
-* APP_1 - bstr containing application data
+* APP_1 - bstr containing opaque application data
 
 ### Party U Processing of Message 1 {#sym-msg1-procU}
 
@@ -677,7 +677,7 @@ where:
    
    + plaintext = ? APP_2
 
-* APP_2 - bstr containing application data
+* APP_2 - bstr containing opaque application data
 
 * H() - the hash function in HKDF_V
 
@@ -738,7 +738,7 @@ where:
    
    + plaintext = ? APP_3
 
-* APP_3 - bstr containing application data
+* APP_3 - bstr containing opaque application data
 
 ### Party U Processing of Message 3 {#sym-msg3-procU}
 
