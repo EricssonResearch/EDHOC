@@ -653,12 +653,13 @@ data_2 = (
   HKDF_V : int / tstr,
   AEAD_V : int / tstr
 )
+
+aad_2 : bstr
 ~~~~~~~~~~~
 
-aad_2, in diagnostic non-normative notation, is:
+where aad_2, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
-
 aad_2 = H( message_1 | [ data_2 ] )
 ~~~~~~~~~~~
 
@@ -721,9 +722,11 @@ data_3 = (
   MSG_TYPE : int,
   S_V : bstr 
 )
+
+aad_3 : bstr
 ~~~~~~~~~~~
 
-aad_3, in diagnostic non-normative notation, is:
+where aad_3, in diagnostic non-normative notation, is:
 
 ~~~~~~~~~~~
 aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
