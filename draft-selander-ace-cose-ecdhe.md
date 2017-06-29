@@ -249,7 +249,7 @@ EDHOC supports authentication with raw public keys (RPK) and certificates (Cert)
 
 * Party V SHALL be able to identify Party U's public key using ID_U.
 
-ID_U and ID_V SHALL either contain the credential used for authentication (e.g. x5c) or uniquely identify the credential used for authentication (e.g. x5t), see {{I-D.schaad-cose-x509}}. Party U and V MAY retrieve the other party's credential out of band. HINT_ID_U and HINT_ID_V are optional and contain information about how to retrieve the credential of Party U and Party V, respectively (e.g. x5u), see {{I-D.schaad-cose-x509}}.
+ID_U and ID_V SHALL either contain the credential used for authentication (e.g. x5bag or x5chain) or uniquely identify the credential used for authentication (e.g. x5t), see {{I-D.schaad-cose-x509}}. Party U and V MAY retrieve the other party's credential out of band. HINT_ID_U and HINT_ID_V are optional and contain information about how to retrieve the credential of Party U and Party V, respectively (e.g. x5u), see {{I-D.schaad-cose-x509}}.
 
 (TBD: Include HINT_ID_ in figure below)
 
