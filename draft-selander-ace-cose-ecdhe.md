@@ -216,7 +216,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-co
 
   + other is a bstr SHALL be aad_2, aad_3, or exchange_hash 
 
-where exchange_hash, in diagnostic non-normative notation, is:
+where exchange_hash, in non-CDDL notation, is:
 
 exchange_hash = H( H( message_1 | message_2 ) | message_3 ) 
 
@@ -237,9 +237,7 @@ EDHOC supports authentication with raw public keys (RPK) and certificates (Cert)
 
 * Party V SHALL be able to identify Party U's public key using ID_U.
 
-ID_U and ID_V SHALL either contain the credential used for authentication (e.g. x5bag or x5chain) or uniquely identify the credential used for authentication (e.g. x5t), see {{I-D.schaad-cose-x509}}. Party U and V MAY retrieve the other party's credential out of band. HINT_ID_U and HINT_ID_V are optional and contain information about how to retrieve the credential of Party U and Party V, respectively (e.g. x5u), see {{I-D.schaad-cose-x509}}.
-
-(TBD: Include HINT_ID_ in figure below)
+ID_U and ID_V SHALL either contain the credential used for authentication (e.g. x5bag or x5chain) or uniquely identify the credential used for authentication (e.g. x5t), see {{I-D.schaad-cose-x509}}. Party U and V MAY retrieve the other party's credential out of band. Optionally, ID_U and ID_V are complemented with the additional parameters HINT_ID_U and HINT_ID_V containing information about how to retrieve the credential of Party U and Party V, respectively (e.g. x5u), see {{I-D.schaad-cose-x509}}.
 
 Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses Cert. Party U and Party V MAY use different signature algorithms.
 
@@ -339,6 +337,8 @@ where X is the first curve in ECDH-Curves_U that V supports,
 encoded as in Table 22 of {{I-D.ietf-cose-msg}}.
 ~~~~~~~~~~~
 
+* Pass APP_1 to the application.
+
 ## EDHOC Message 2 {#asym-msg2}
 
 ### Formatting of Message 2 {#asym-msg2-form}
@@ -366,7 +366,7 @@ data_2 = (
 aad_2 : bstr
 ~~~~~~~~~~~
 
-where aad_2, in diagnostic non-normative notation, is:
+where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
 aad_2 = H( message_1 | [ data_2 ] )
@@ -443,6 +443,8 @@ Party U SHALL process message_2 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
+* Pass APP_2 to the application.
+
 ## EDHOC Message 3 {#asym-msg3}
 
 ### Formatting of Message 3 {#asym-msg3-form}
@@ -463,7 +465,7 @@ data_3 = (
 aad_3 : bstr
 ~~~~~~~~~~~
 
-where aad_3, in diagnostic non-normative notation, is:
+where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
 aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
@@ -521,6 +523,8 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
+* Pass APP_3 to the application.
+
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
 ## Overview
@@ -529,7 +533,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V SHALL be able to identify the PSK using KID.
 
-KID either enable the other party to retrieve the PSK or contain the PSK (e.g. CBOR Web Token).
+KID may optionally contain information about how to retrieve the PSK.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
@@ -620,6 +624,9 @@ Party V SHALL process message_1 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message SHOULD include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
 
+* Pass APP_1 to the application.
+
+
 ## EDHOC Message 2 {#sym-msg2}
 
 ### Formatting of Message 2 {#sym-msg2-form}
@@ -645,7 +652,7 @@ data_2 = (
 aad_2 : bstr
 ~~~~~~~~~~~
 
-where aad_2, in diagnostic non-normative notation, is:
+where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
 aad_2 = H( message_1 | [ data_2 ] )
@@ -694,6 +701,8 @@ Party U SHALL process message_2 as follows:
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
+* Pass APP_2 to the application.
+
 ## EDHOC Message 3 {#sym-msg3}
 
 ### Formatting of Message 3 {#sym-msg3-form}
@@ -714,7 +723,7 @@ data_3 = (
 aad_3 : bstr
 ~~~~~~~~~~~
 
-where aad_3, in diagnostic non-normative notation, is:
+where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
 aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
@@ -746,6 +755,8 @@ Party V SHALL process message_3 as follows:
 * Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+
+* Pass APP_3 to the application.
 
 
 
@@ -826,7 +837,9 @@ Party U and V must make sure that unprotected data and metadata do not reveal an
 
 Using the same KID or unprotected application data in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to APP_1 in the asymmetric case, and  APP_1 and KID in the symmetric case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless previous nonces are stored.
+Party U and V are allowed to select the session identifiers S_U and S_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent traffic protection protocol (e.g. OSCOAP). The choice of session identifier is not security critical but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong session identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
+
+Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to APP_1 in the asymmetric case, and APP_1 and KID in the symmetric case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless previous nonces are stored.
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in RFC6979 is RECOMMENDED.
 
@@ -846,9 +859,9 @@ Implementations should provide countermeasures to side-channel attacks such as t
 
 # Acknowledgments
 
-The authors want to thank Jim Schaad for reviewing intermediate versions and for contributing many concrete proposals incorporated in this version. We are also greatful to Ilari Liusvaara and Ludwig Seitz for reviewing previous versions of the draft. 
+The authors want to thank Jim Schaad and Ilari Liusvaara for reviewing intermediate versions and for contributing many concrete proposals incorporated in this version. We are also greatful to Ludwig Seitz for reviewing previous versions of the draft. 
 
-TODO: This section should be after Appendixes and before Author's address according to RFC7322.
+TODO: This section should be after Appendices and before Authors' addresses according to RFC7322.
 
 --- back
 
