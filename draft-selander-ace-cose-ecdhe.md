@@ -194,7 +194,7 @@ EDHOC also allows opaque application data (APP_1, APP_2, APP_3) to be sent in th
 
 ## Formatting of the Ephemeral Public Keys {#cose_key}
 
-The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{I-D.ietf-cose-msg}}. The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation and compact output as per {{RFC6090}} SHALL be used. The y' parameter SHALL NOT be present in TBD...
+The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{I-D.ietf-cose-msg}}. The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation and compact output as per {{RFC6090}} SHALL be used, i.e. the y' parameter SHALL NOT be present in the The COSE_Key object. COSE {{I-D.ietf-cose-msg}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
