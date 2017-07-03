@@ -316,7 +316,7 @@ Party U SHALL compose message_1 as follows:
 
 * Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. 
    
-* Generate the pseudo-random nonce N_U 
+* Generate the pseudo-random nonce N_U.
 
 * Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
@@ -418,7 +418,7 @@ Party V SHALL compose message_2 as follows:
 
 * Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_V
+* Generate the pseudo-random nonce N_V.
 
 * Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
       
@@ -428,7 +428,7 @@ Party V SHALL compose message_2 as follows:
 
    - COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the private key of Party V.
 
-   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}
+   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
       
 
 ### Party U Processing of Message 2 {#asym-msg2-procU}
@@ -440,6 +440,8 @@ Party U SHALL process message_2 as follows:
 * Verify that HKDF_V, AEAD_V, SIG_V, and SIG_U were proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
 * Verify (OPTIONAL) that N_V has not been received before.
+
+* For EC2 curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 * Verify message_2 as specified in {{asym-msg2-form}}:
 
@@ -513,8 +515,6 @@ Party U SHALL compose message_3 as follows:
 
    -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
 
-         
-
 ### Party V Processing of Message 3 {#asym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
@@ -525,7 +525,7 @@ Party V SHALL process message_3 as follows:
 
    * COSE_Encrypt0 is decrypted as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
-   * COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the public key of Party U;
+   * COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the public key of Party U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
