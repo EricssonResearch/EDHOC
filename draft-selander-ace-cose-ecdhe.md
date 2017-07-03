@@ -135,7 +135,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * Enc(K; P; A) denotes AEAD encryption of plaintext P and additional authenticated data A using the key K derived from the shared secret. The AEAD MUST NOT be replaced by plain encryption, see {{sec-cons}}.
 
-As described in Appendix B of {{SIGMA}}, in order to create a "full-fledge" protocol some additional protocol elements are needed. EDHOC adds:
+As described in Appendix B of {{SIGMA}}, in order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
 * Explicit session identifiers S_U, S_V different from other concurrent session identifiers (EDHOC or other used protocol identifier) chosen by U and V, respectively. 
 
@@ -169,7 +169,7 @@ This paper is organized as follows: {{general}} specifies general properties of 
 
 # EDHOC Overview {#general}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may e.g. be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -222,7 +222,9 @@ exchange_hash = H( H( message_1 | message_2 ) | message_3 )
 
 where H() is the hash function in HKDF_V.
 
-For message_i the key and IV, called K_i and IV_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the name of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
+For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the name of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
+
+If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
 
 Application specific traffic keys and other data SHALL be derived using other = exchange_hash. AlgorithmID SHALL be a tstr defined by the application and SHALL be different for different data being derived (an example is given in {{app-a2}}). keyDataLength is set to the length of the data being derived.
 
@@ -441,7 +443,7 @@ Party U SHALL process message_2 as follows:
 
    - COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the public key of Party V.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 * Pass APP_2 to the application.
 
@@ -859,7 +861,7 @@ Implementations should provide countermeasures to side-channel attacks such as t
 
 # Acknowledgments
 
-The authors want to thank Jim Schaad and Ilari Liusvaara for reviewing intermediate versions and for contributing many concrete proposals incorporated in this version. We are also greatful to Ludwig Seitz for reviewing previous versions of the draft. 
+The authors want to thank Dan Harkins, Ilari Liusvaara, Jim Schaad and Ludwig Seitz for reviewing intermediate versions of the draft and contributing concrete proposals incorporated in this version. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
 
 TODO: This section should be after Appendices and before Authors' addresses according to RFC7322.
 
@@ -880,7 +882,7 @@ An application using EDHOC with symmetric keys may have a security policy to cha
 
 ## Transferring EDHOC in CoAP {#app-a1}
 
-EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discorvered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
 In practice, EDHOC message\_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message\_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message\_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response
 
