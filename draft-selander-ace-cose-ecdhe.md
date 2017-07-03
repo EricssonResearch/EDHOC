@@ -330,7 +330,9 @@ Party V SHALL process message_1 as follows:
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
-* Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported
+* Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported.
+
+* For EC2 curves, validate that E_U us a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
 
