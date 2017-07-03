@@ -332,7 +332,7 @@ Party V SHALL process message_1 as follows:
 
 * Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported.
 
-* For EC2 curves, validate that E_U us a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
+* For EC2 curves, validate that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
 
@@ -612,7 +612,7 @@ Party U SHALL compose message_1 as follows:
 
 * Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_U 
+* Generate the pseudo-random nonce N_U.
 
 * Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
@@ -689,7 +689,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
 
-* Generate the pseudo-random nonce N_V
+* Generate the pseudo-random nonce N_V.
 
 * Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
@@ -702,6 +702,8 @@ Party V SHALL compose message_2 as follows:
 Party U SHALL process message_2 as follows:
 
 * Use the session identifier S_U to retrieve the protocol state.
+
+* For EC2 curves, validate that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 * Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
 
@@ -758,13 +760,13 @@ Party V SHALL process message_3 as follows:
 
 * Use the session identifier S_V to retrieve the protocol state.
 
+* For EC2 curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
+
 * Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 * Pass APP_3 to the application.
-
-
 
 # Error Handling {#error}
 
