@@ -45,6 +45,7 @@ author:
 normative:
 
   RFC2119:
+  RFC6090:  
   RFC7049:
   I-D.ietf-cose-msg:
   I-D.schaad-cose-x509:
@@ -84,6 +85,7 @@ informative:
   RFC7228:
   RFC7252:
   RFC5869:
+  
 
 --- abstract
 
