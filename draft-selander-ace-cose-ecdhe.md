@@ -198,11 +198,11 @@ The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OK
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be done as specified in Section 11.1 of [I-D.ietf-cose-msg] with the following input:
+Key and IV derivation SHALL be done as specified in Section 11.1 of {{I-D.ietf-cose-msg}} with the following input:
 
-* The PRF SHALL be the HKDF [RFC5869] in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
+* The PRF SHALL be the HKDF {{RFC5869}} in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
 
-* The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of [I-D.ietf-cose-msg].
+* The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{I-D.ietf-cose-msg}}.
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and nil when EDHOC is authenticated with asymmetric keys.
 
