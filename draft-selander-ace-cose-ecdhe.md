@@ -521,7 +521,7 @@ Party V SHALL process message_3 as follows:
 
 * Use the session identifier S_V to retrieve the protocol state.
 
-* Verify message_3 as specified in {{asym-msg3-form}}.
+* Verify message_3 as specified in {{asym-msg3-form}}:
 
    * COSE_Encrypt0 is decrypted as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
 
