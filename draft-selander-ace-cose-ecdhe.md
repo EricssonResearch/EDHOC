@@ -332,7 +332,7 @@ Party V SHALL process message_1 as follows:
 
 * Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported.
 
-* For EC2 curves, validate that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
+* For elliptic curves, that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
 
@@ -441,7 +441,7 @@ Party U SHALL process message_2 as follows:
 
 * Verify (OPTIONAL) that N_V has not been received before.
 
-* For EC2 curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
+* For elliptic curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 * Verify message_2 as specified in {{asym-msg2-form}}:
 
@@ -628,7 +628,7 @@ Party V SHALL process message_1 as follows:
 
 * Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported.
 
-* For EC2 curves, validate that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'.
+* For elliptic curves, validate that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message SHOULD include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
 
@@ -704,7 +704,7 @@ Party U SHALL process message_2 as follows:
 
 * Use the session identifier S_U to retrieve the protocol state.
 
-* For EC2 curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
+* For elliptic curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
 * Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
 
