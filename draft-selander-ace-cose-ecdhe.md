@@ -204,7 +204,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of {{I-D.ietf-c
 
 * The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{I-D.ietf-cose-msg}}.
 
-* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and nil when EDHOC is authenticated with asymmetric keys.
+* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and the empty string "" when EDHOC is authenticated with asymmetric keys.
 
 * The fields in the context information COSE_KDF_Context SHALL have the following values:
 
