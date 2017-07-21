@@ -208,7 +208,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of {{I-D.ietf-c
 
 * The fields in the context information COSE_KDF_Context SHALL have the following values:
 
-  + AlgorithmID is a tstr as defined below
+  + AlgorithmID is an int or tstr as defined below
 
   + PartyUInfo = PartyVInfo = ( nil, nil, nil )
   
@@ -224,7 +224,7 @@ exchange_hash = H( H( message_1 | message_2 ) | message_3 )
 
 where H() is the hash function in HKDF_V.
 
-For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the name of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
+For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
 
 If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
 
