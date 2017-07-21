@@ -789,6 +789,18 @@ where:
 
 # IANA Considerations {#iana}
 
+## The Well-Known URI Registry
+
+IANA has added the well-known URI 'edhoc' in the Well-Known URIs registry.
+
+   URI suffix: edhoc
+
+   Change controller: IETF
+
+   Specification document(s): [[this document]]
+
+   Related information: None
+
 ## Media Types Registry
 
 IANA has added the media type 'application/edhoc' to the Media Types registry:
