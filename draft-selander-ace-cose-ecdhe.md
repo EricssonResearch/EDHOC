@@ -18,36 +18,25 @@ author:
         ins: G. Selander
         name: Göran Selander
         org: Ericsson AB
-        street: Färögatan 6
-        city: Kista
-        code: SE-164 80 Stockholm
-        country: Sweden
         email: goran.selander@ericsson.com
       -
         ins: J. Mattsson
         name: John Mattsson
         org: Ericsson AB
-        street: Färögatan 6
-        city: Kista
-        code: SE-164 80 Stockholm
-        country: Sweden
         email: john.mattsson@ericsson.com
       -
         ins: F. Palombini
         name: Francesca Palombini
         org: Ericsson AB
-        street: Färögatan 6
-        city: Kista
-        code: SE-164 80 Stockholm
-        country: Sweden
         email: francesca.palombini@ericsson.com
+
         
 normative:
 
   RFC2119:
   RFC6090:  
   RFC7049:
-  I-D.ietf-cose-msg:
+  RFC8152:
   I-D.schaad-cose-x509:
   SP-800-56a:
     target: http://dx.doi.org/10.6028/NIST.SP.800-56Ar2
@@ -78,8 +67,8 @@ informative:
   I-D.hartke-core-e2e-security-reqs:
   I-D.ietf-ace-oauth-authz:
   I-D.ietf-core-object-security:
-  I-D.seitz-ace-oscoap-profile:
-  I-D.greevenbosch-appsawg-cbor-cddl:
+  I-D.ietf-ace-oscore-profile:
+  I-D.ietf-cbor-cddl:
   I-D.ietf-core-resource-directory:
 
   RFC7228:
@@ -95,15 +84,15 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a compact, a
 
 # Introduction {#intro}
 
-Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protocol needs to work on a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{I-D.ietf-cose-msg}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
+Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protocol needs to work on a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{RFC8152}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
 
-In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated ECDH protocol using CBOR and COSE objects. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates (Cert).  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.seitz-ace-oscoap-profile}}. This document also specifies the derivation of shared key material.
+In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated ECDH protocol using CBOR and COSE objects. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates (Cert).  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}. This document also specifies the derivation of shared key material.
 
-The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{I-D.ietf-cose-msg}} are used to implement these standards.
+The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{RFC8152}} are used to implement these standards.
 
 ## Terminology {#terminology}
 
-This document use the same informational CBOR Data Definition Language (CDDL) {{I-D.greevenbosch-appsawg-cbor-cddl}} grammar as COSE (see Section 1.3 of {{I-D.ietf-cose-msg}}). A vertical bar \| denotes byte string concatenation.
+This document use the same informational CBOR Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} grammar as COSE (see Section 1.3 of {{RFC8152}}). A vertical bar \| denotes byte string concatenation.
 
 ## Requirements Language {#terminology2}
 
@@ -194,15 +183,15 @@ EDHOC also allows opaque application data (APP_1, APP_2, APP_3) to be sent in th
 
 ## Formatting of the Ephemeral Public Keys {#cose_key}
 
-The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{I-D.ietf-cose-msg}}. The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation and compact output as per {{RFC6090}} SHALL be used, i.e. the 'y' parameter SHALL NOT be present in the The COSE_Key object. COSE {{I-D.ietf-cose-msg}} always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public key SHALL be formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of {{RFC8152}}. The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation and compact output as per {{RFC6090}} SHALL be used, i.e. the 'y' parameter SHALL NOT be present in the The COSE_Key object. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be done as specified in Section 11.1 of {{I-D.ietf-cose-msg}} with the following input:
+Key and IV derivation SHALL be done as specified in Section 11.1 of {{RFC8152}} with the following input:
 
 * The PRF SHALL be the HKDF {{RFC5869}} in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
 
-* The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{I-D.ietf-cose-msg}}.
+* The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and the empty string "" when EDHOC is authenticated with asymmetric keys.
 
@@ -226,7 +215,7 @@ where H() is the hash function in HKDF_V.
 
 For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
 
-If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{I-D.ietf-cose-msg}}, and keyDataLength equal to the IV length of AEAD_V.
+If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
 Application specific traffic keys and other data SHALL be derived using other = exchange_hash. AlgorithmID SHALL be a tstr defined by the application and SHALL be different for different data being derived (an example is given in {{app-a2}}). keyDataLength is set to the length of the data being derived.
 
@@ -340,7 +329,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 ERR_MSG = "Curve not supported; X"
 
 where X is the first curve in ECDH-Curves_U that V supports,
-encoded as in Table 22 of {{I-D.ietf-cose-msg}}.
+encoded as in Table 22 of {{RFC8152}}.
 ~~~~~~~~~~~
 
 * Pass APP_1 to the application.
@@ -426,9 +415,9 @@ Party V SHALL compose message_2 as follows:
 
 *  Format message_2 as specified in {{asym-msg2-form}}:
 
-   - COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the private key of Party V.
+   - COSE_Sign1 is computed as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V and the private key of Party V.
 
-   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
       
 
 ### Party U Processing of Message 2 {#asym-msg2-procU}
@@ -445,9 +434,9 @@ Party U SHALL process message_2 as follows:
 
 * Verify message_2 as specified in {{asym-msg2-form}}:
 
-   - COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
+   - COSE_Encrypt0 is decrypted defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
-   - COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_V and the public key of Party V.
+   - COSE_Sign1 is verified as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public key of Party V.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -511,9 +500,9 @@ Party U SHALL compose message_3 as follows:
 
 * Format message_3 as specified in {{asym-msg3-form}}:
 
-   -  COSE_Sign1 is computed as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the private key of Party U.
+   -  COSE_Sign1 is computed as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U and the private key of Party U.
 
-   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+   -  COSE_Encrypt0 is computed as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
 
 ### Party V Processing of Message 3 {#asym-msg3-procV}
 
@@ -523,9 +512,9 @@ Party V SHALL process message_3 as follows:
 
 * Verify message_3 as specified in {{asym-msg3-form}}:
 
-   * COSE_Encrypt0 is decrypted as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
+   * COSE_Encrypt0 is decrypted as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
-   * COSE_Sign1 is verified as defined in section 4.4 of {{I-D.ietf-cose-msg}}, using algorithm SIG_U and the public key of Party U.
+   * COSE_Sign1 is verified as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public key of Party U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -696,7 +685,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
-*  Format message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
+*  Format message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
    
 ### Party U Processing of Message 2 {#sym-msg2-procU}
 
@@ -706,7 +695,7 @@ Party U SHALL process message_2 as follows:
 
 * For elliptic curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
 
-* Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_2, and IV_2.
+* Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -753,7 +742,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-*  Format message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
+*  Format message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 ### Party V Processing of Message 3 {#sym-msg3-procV}
 
@@ -761,7 +750,7 @@ Party V SHALL process message_3 as follows:
 
 * Use the session identifier S_V to retrieve the protocol state.
 
-* Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{I-D.ietf-cose-msg}}, with AEAD_V, K_3, and IV_3.
+* Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -856,7 +845,7 @@ Party U and V must make sure that unprotected data and metadata do not reveal an
 
 Using the same KID or unprotected application data in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V are allowed to select the session identifiers S_U and S_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent traffic protection protocol (e.g. OSCOAP). The choice of session identifier is not security critical but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong session identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
+Party U and V are allowed to select the session identifiers S_U and S_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent traffic protection protocol (e.g. OSCORE {{I-D.ietf-core-object-security}}). The choice of session identifier is not security critical but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong session identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
 
 Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to APP_1 in the asymmetric case, and APP_1 and KID in the symmetric case. Party V should be aware that replays of EDHOC message_1 cannot be detected unless previous nonces are stored.
 
@@ -895,7 +884,7 @@ An application using EDHOC with symmetric keys may have a security policy to cha
 
 
 
-# EDHOC with CoAP and OSCOAP {#app-a}
+# EDHOC with CoAP and OSCORE {#app-a}
 
 ## Transferring EDHOC in CoAP {#app-a1}
 
@@ -903,7 +892,7 @@ EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the C
 
 In practice, EDHOC message\_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message\_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message\_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response
 
-An example of successful EDHOC exchange using CoAP is shown in {{fig-edhoc-oscoap-det}}.
+An example of successful EDHOC exchange using CoAP is shown in {{fig-edhoc-oscore-det}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -926,23 +915,23 @@ Client    Server
   |   2.04   | 
   |          |
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-edhoc-oscoap-det title="Transferring EDHOC in CoAP"}
+{: #fig-edhoc-oscore-det title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-## Deriving an OSCOAP context from EDHOC {#app-a2}
+## Deriving an OSCORE context from EDHOC {#app-a2}
 
-When EDHOC is use to derive parameters for OSCOAP {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCOAP.  In case that the CoAP client is party U and the CoAP server is party V:
+When EDHOC is use to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
 
 * The AEAD Algorithm is AEAD_V, as defined in this document
 
-* The KDF algorithm is HKDF_V, as defined in this document
+* The Key Derivation Function (KDF) is HKDF_V, as defined in this document
 
 * The Client's Sender ID is S_V, as defined in this document
 
 * The Server's Sender ID is S_U, as defined in this document
 
-* The Master Secret is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCOAP Master Secret" and keyDataLength equal to the key length of AEAD_V.
+* The Master Secret is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Secret" and keyDataLength equal to the key length of AEAD_V.
 
-* The Master Salt is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCOAP Master Salt" and keyDataLength equal to 64 bits.
+* The Master Salt is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Salt" and keyDataLength equal to 64 bits.
 
 --- fluff
