@@ -269,7 +269,7 @@ message_1 SHALL be a CBOR array as defined below
 message_1 = [
   MSG_TYPE : int,
   S_U : bstr,  
-  N_U : bstr,  
+  ? N_U : bstr,  
   E_U : serialized_COSE_Key,
   ECDH-Curves_U : alg_array,
   HKDFs_U : alg_array,
@@ -288,7 +288,7 @@ where:
 
 * MSG_TYPE = 1
 * S_U - variable length session identifier
-* N_U - 64-bit random nonce
+* N_U - variable length random nonce
 * E_U - the ephemeral public key of Party U
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
@@ -350,7 +350,7 @@ data_2 = (
   MSG_TYPE : int,
   S_U : bstr,
   S_V : bstr,  
-  N_V : bstr,
+  ? N_V : bstr,
   E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr,
@@ -371,7 +371,7 @@ where:
 
 * MSG_TYPE = 2
 * S_V - variable length session identifier
-* N_V - 64-bit random nonce
+* N_V - variable length random nonce
 * E_V - the ephemeral public key of Party V
 * HKDF_V - a single chosen algorithm from HKDFs_U
 * AEAD_V - a single chosen algorithm from AEADs_U
@@ -567,7 +567,7 @@ message_1 = [
 data_1 = (
   MSG_TYPE : int,
   S_U : bstr,  
-  N_U : bstr,    
+  ? N_U : bstr,    
   E_U : serialized_COSE_Key,
   ECDH-Curves_U : alg_array,
   HKDFs_U : alg_array,
@@ -585,7 +585,7 @@ where:
 
 * MSG_TYPE = 4
 * S_U - variable length session identifier
-* N_U - 64-bit random nonce
+* N_U - variable length random nonce
 * E_U - the ephemeral public key of Party U
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
@@ -639,7 +639,7 @@ data_2 = (
   MSG_TYPE : int,
   S_U : bstr,  
   S_V : bstr,  
-  N_V : bstr,
+  ? N_V : bstr,
   E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr
@@ -658,7 +658,7 @@ where:
 
 * MSG_TYPE = 5
 * S_V - variable length session identifier
-* N_V - 64-bit random nonce
+* N_V - variable length random nonce
 * E_V - the ephemeral public key of Party V
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
