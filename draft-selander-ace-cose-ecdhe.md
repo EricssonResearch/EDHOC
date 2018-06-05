@@ -348,7 +348,7 @@ message_2 = [
 
 data_2 = (
   MSG_TYPE : int,
-  S_U : bstr,
+  ? S_U : bstr,
   S_V : bstr,  
   ? N_V : bstr,
   E_V : serialized_COSE_Key,
@@ -637,7 +637,7 @@ message_2 = [
 
 data_2 = (
   MSG_TYPE : int,
-  S_U : bstr,  
+  ? S_U : bstr,  
   S_V : bstr,  
   ? N_V : bstr,
   E_V : serialized_COSE_Key,
