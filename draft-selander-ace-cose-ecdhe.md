@@ -210,7 +210,7 @@ Key and IV derivation SHALL be done as specified in Section 11.1 of {{RFC8152}} 
 
 where exchange_hash, in non-CDDL notation, is:
 
-exchange_hash = H( H( message_1 | message_2 ) | message_3 ) 
+exchange_hash = H( H( message_1 \| message_2 ) \| message_3 ) 
 
 where H() is the hash function in HKDF_V.
 
@@ -270,7 +270,7 @@ message_1 SHALL be a CBOR array as defined below
 message_1 = [
   MSG_TYPE : int,
   S_U : bstr,  
-  ? N_U : bstr,  
+  N_U : bstr / nil,  
   E_U : serialized_COSE_Key,
   ECDH-Curves_U : alg_array,
   HKDFs_U : alg_array,
@@ -349,9 +349,9 @@ message_2 = [
 
 data_2 = (
   MSG_TYPE : int,
-  ? S_U : bstr,
+  S_U : bstr / nil,
   S_V : bstr,  
-  ? N_V : bstr,
+  N_V : bstr / nil,
   E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr,
@@ -388,7 +388,7 @@ where:
    
    - protected = { abc : ID_V, ? xyz : HINT_ID_V }
 
-   - detached payload = aad_2, ? APP_2
+   - detached payload = \[ aad_2, ? APP_2 \]
 
 * abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
@@ -477,13 +477,13 @@ where:
 
    + external_aad = aad_3
 
-   + plaintext = \[ COSE_SIG_U, ? APP_3  \]
+   + plaintext = \[ COSE_SIG_U, ? APP_3 \]
    
 * COSE_SIG_U is a COSE_Sign1 object with the following fields and values:
    
    - protected = { abc : ID_U, ? xyz : HINT_ID_U }
 
-   - detached payload = aad_3, ? APP_3 
+   - detached payload = \[ aad_3, ? APP_3 \]
       
 * abc - any COSE map label that can identify a public key, see {{asym-overview}}
 
@@ -568,7 +568,7 @@ message_1 = [
 data_1 = (
   MSG_TYPE : int,
   S_U : bstr,  
-  ? N_U : bstr,    
+  N_U : bstr / nil,    
   E_U : serialized_COSE_Key,
   ECDH-Curves_U : alg_array,
   HKDFs_U : alg_array,
@@ -638,9 +638,9 @@ message_2 = [
 
 data_2 = (
   MSG_TYPE : int,
-  ? S_U : bstr,  
+  S_U : bstr / nil,  
   S_V : bstr,  
-  ? N_V : bstr,
+  N_V : bstr / nil,
   E_V : serialized_COSE_Key,
   HKDF_V : int / tstr,
   AEAD_V : int / tstr
