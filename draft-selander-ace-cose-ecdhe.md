@@ -130,8 +130,6 @@ As described in Appendix B of {{SIGMA}}, in order to create a "full-fledged" pro
 
 * Explicit session identifiers S_U, S_V different from other concurrent session identifiers (EDHOC or other used protocol identifier) chosen by U and V, respectively. 
 
-* Explicit nonces N_U, N_V chosen freshly and anew with each session by U and V, respectively.
-
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
 EDHOC also makes the following additions:
