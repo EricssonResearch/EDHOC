@@ -387,7 +387,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr containing the credential containing the public key of Party V, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2 and the following parameters. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2 and the following parameters.
 
    * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_2 \]
 
@@ -456,7 +456,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr containing the credential containing the public key of Party U, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The AEAD algorithm MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. 
 
    * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_3 \]
 
