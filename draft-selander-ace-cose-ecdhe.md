@@ -494,11 +494,11 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                 S_U, N_U, E_U, ALG_1, KID, UAD_1                  |
+|                    S_U, X_U, ALG_1, KID, UAD_1                    |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|         S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; UAD_2; aad_2)         |
+|           S_U, S_V, X_V, ALG_2, Enc(K_2; UAD_2; aad_2)            |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
