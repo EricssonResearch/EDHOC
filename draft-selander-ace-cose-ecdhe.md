@@ -486,7 +486,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ## Overview
 
-EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared uniformly random key (PSK) with the requirement that:
+EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
 * Party V SHALL be able to identify the PSK using KID.
 
@@ -496,15 +496,15 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                S_U, N_U, E_U, ALG_1, KID, APP_1                   |
+|                 S_U, N_U, E_U, ALG_1, KID, UAD_1                  |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|         S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; APP_2; aad_2)         |
+|         S_U, S_V, N_V, E_V, ALG_2, Enc(K_2; UAD_2; aad_2)         |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    S_V, Enc(K_3; APP_3; aad_3)                    |
+|                    S_V, Enc(K_3; PAD_3; aad_3)                    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -528,14 +528,14 @@ message_1 = [
 
 data_1 = (
   MSG_TYPE : int,
-  S_U : bstr,  
-  N_U : bstr / nil,    
-  E_U : serialized_COSE_Key,
+  S_U : bstr,
   ECDH-Curves_U : alg_array,
+  ECDH-Curve_U : uint,
+  X_U : bstr,
   HKDFs_U : alg_array,
   AEADs_U : alg_array,
   KID : bstr,
-  ? APP_1 : bstr
+  ? UAD_1 : bstr
 )
 
 serialized_COSE_Key = bstr .cbor COSE_Key
@@ -547,25 +547,23 @@ where:
 
 * MSG_TYPE = 4
 * S_U - variable length session identifier
-* N_U - variable length random nonce
-* E_U - the ephemeral public key of Party U
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
+* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
+* X_U - the x-coordinate of ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * KID - identifier of the pre-shared key
-* APP_1 - bstr containing opaque application data
+* UAD_1 - bstr containing unprotected opaque application data
 
 ### Party U Processing of Message 1 {#sym-msg1-procU}
 
 Party U SHALL compose message_1 as follows:
 
-* Determine which ECDH curve to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL retrieve an ephemeral from that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
+* Determine which ECDH curve to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL generate an ephemeral from that curve. Otherwise the first curve in ECDH-Curves_U MUST be used. The content of ECDH-Curves_U SHALL be fixed, and SHALL not be changed based on previous error messages. 
 
-* Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
 
-* Generate the pseudo-random nonce N_U.
-
-* Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
@@ -573,17 +571,15 @@ Party U SHALL compose message_1 as follows:
 
 Party V SHALL process message_1 as follows:
 
-* Verify (OPTIONAL) that N_U has not been received before.
-
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
-* Verify that the ECDH curve used in E_U is supported, and that no prior curve in ECDH-Curves_U is supported.
+* Verify that the ECDH curve indicated by ECDH-Curve_U is supported, and that no prior curve in ECDH-Curves_U is supported.
 
-* For elliptic curves, validate that E_U is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'.
+* Validate that there is a solution to the curve definition for the given x-coordinate X_U.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the ECDH curve used in E_U, but supports another ECDH curves in ECDH-Curves_U, then the error message SHOULD include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
 
-* Pass APP_1 to the application.
+* Pass UAD_1 to the application.
 
 ## EDHOC Message 2 {#sym-msg2}
 
@@ -594,17 +590,16 @@ message_2 SHALL be a CBOR array as defined below
 ~~~~~~~~~~~ CDDL
 message_2 = [
   data_2,
-  COSE_ENC_2 : COSE_Encrypt0
+  CIPHERTEXT_2 : bstr
 ]
 
 data_2 = (
   MSG_TYPE : int,
   S_U : bstr / nil,  
   S_V : bstr,  
-  N_V : bstr / nil,
-  E_V : serialized_COSE_Key,
-  HKDF_V : int / tstr,
-  AEAD_V : int / tstr
+  X_V : bstr,
+  HKDF_V : uint,
+  AEAD_V : uint
 )
 
 aad_2 : bstr
@@ -620,48 +615,46 @@ where:
 
 * MSG_TYPE = 5
 * S_V - variable length session identifier
-* N_V - variable length random nonce
-* E_V - the ephemeral public key of Party V
+* X_V - the x-coordinate of ephemeral public key of Party V
 * HKDF_V - an single chosen algorithm from HKDFs_U
 * AEAD_V - an single chosen algorithm from AEADs_U
-
-* COSE_ENC_2 has the following fields and values:
-
-   + external_aad = aad_2
-   
-   + plaintext = ? APP_2
-
-* APP_2 - bstr containing opaque application data
-
 * H() - the hash function in HKDF_V
 
 ### Party V Processing of Message 2 {#sym-msg2-procV}
 
 Party V SHALL compose message_2 as follows:
 
-*  Retrieve an ephemeral ECDH key pair generated as specified in Section 5 of {{SP-800-56a}} using same curve as used in E_U. Format the ephemeral public key E_V as a COSE_key as specified in {{cose_key}}.
-
-* Generate the pseudo-random nonce N_V.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format a ephemeral public key as a COSE_key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
 * Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
-*  Format message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
+* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2 and the following parameters.
+
+   * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_2 \]
+
+   * external_aad = aad_2
+
+   * plaintext = ? UAD_2
+
+   * UAD_2 = bstr containing opaque unprotected application data
+
+*  Format message_2 as specified in {{sym-msg2-form}}
    
 ### Party U Processing of Message 2 {#sym-msg2-procU}
 
 Party U SHALL process message_2 as follows:
 
-* Use the session identifier S_U to retrieve the protocol state.
+* Retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple.
 
-* For elliptic curves, validate that E_V is a valid point by verifying that there is a solution to the curve definition for the given parameter 'x'. 
+* Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Verify message_2 as specified in {{sym-msg2-form}} where COSE_Encrypt0 is decrypted defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
+* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-* Pass APP_2 to the application.
+* Pass UAD_2 to the application.
 
 ## EDHOC Message 3 {#sym-msg3}
 
@@ -672,7 +665,7 @@ message_3 SHALL be a CBOR array as defined below
 ~~~~~~~~~~~ CDDL
 message_3 = [
   data_3,
-  COSE_ENC_3 : COSE_Encrypt0
+  CIPHERTEXT_3 : bstr
 ]
 
 data_3 = (
@@ -692,31 +685,34 @@ aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
 where:
 
 * MSG_TYPE = 6
-* COSE_ENC_3 has the following fields and values:
-
-   + external_aad = aad_3
-   
-   + plaintext = ? APP_3
-
-* APP_3 - bstr containing opaque application data
 
 ### Party U Processing of Message 3 {#sym-msg3-procU}
 
 Party U SHALL compose message_3 as follows:
 
-*  Format message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is computed as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
+* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters.
+
+   * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_3 \]
+
+   * external_aad = aad_3
+
+   * plaintext = ? PAD_3
+
+   * PAD_2 = bstr containing opaque protected application data
+
+*  Format message_3 as specified in {{sym-msg3-form}}
 
 ### Party V Processing of Message 3 {#sym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
 
-* Use the session identifier S_V to retrieve the protocol state.
+* Retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple.
 
-* Verify message_3 as specified in {{sym-msg3-form}} where COSE_Encrypt0 is decrypted and verified as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
+* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-* Pass APP_3 to the application.
+* Pass PAD_3 to the application.
 
 # Error Handling {#error}
 
