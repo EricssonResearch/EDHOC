@@ -886,15 +886,15 @@ This appendix gives an estimate of the message sizes when EDHOC is used with Raw
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message1 = [
-	1,
-	h'c3',
-	[4],
-	0,
-	'abcdefghijklmnopqrstuvwxyz123456',
-	[-27],
-	[10],
-	[-8],
-	[-8]
+  1,
+  h'c3',
+  [4],
+  0,
+  'abcdefghijklmnopqrstuvwxyz123456',
+  [-27],
+  [10],
+  [-8],
+  [-8]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -902,8 +902,8 @@ The size of message_1 is 50 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = [
-	{ 4 : 'abba' },
-	'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456'
+  { 4 : 'abba' },
+  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456'
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -911,14 +911,14 @@ The size of plaintext is 74 bytes so the size of ciphertext is 82 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message2 = [
-	2,
-	null,
-	h'c4',
-	'abcdefghijklmnopqrstuvwxyz123456',
-	0,
-	0,
-	0,
-	0,
+  2,
+  null,
+  h'c4',
+  'abcdefghijklmnopqrstuvwxyz123456',
+  0,
+  0,
+  0,
+  0,
   'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqr'
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -927,8 +927,8 @@ The size of message_2 is 127 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message3 = [
-	3,
-	h'c3',
+  3,
+  h'c3',
   'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqr'
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
