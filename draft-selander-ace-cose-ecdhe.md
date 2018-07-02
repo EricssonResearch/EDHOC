@@ -880,6 +880,62 @@ When EDHOC is use to derive parameters for OSCORE {{I-D.ietf-core-object-securit
 
 * The Master Salt is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Salt" and keyDataLength equal to 64 bits.
 
+# Message Sizes
+
+This appendix gives an estimate of the message sizes when EDHOC is used with Raw Public Keys. Note that the examples in this section and this section are not test vectors, the cryptographic parts are just replaces with strings of the same length. All examples are given in CBOR diagnostic notation.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message1 = [
+	1,
+	h'c3',
+	[4],
+	0,
+	'abcdefghijklmnopqrstuvwxyz123456',
+	[-27],
+	[10],
+	[-8],
+	[-8]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The size of message_1 is 50 bytes
+
+~~~~~~~~~~~~~~~~~~~~~~~
+plaintext = [
+	{ 4 : 'abba' },
+	'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456'
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+plaintext is 74 bytes
+ciphertext is 82 bytes
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message2 = [
+	2,
+	null,
+	h'c4',
+	'abcdefghijklmnopqrstuvwxyz123456',
+	0,
+	0,
+	0,
+	0,
+  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqr'
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+message_2 is 127 bytes
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message3 = [
+	3,
+	h'c3',
+  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqr'
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+message_3 is 88 bytes
+
 # Acknowledgments
 {: numbered="no"}
 
