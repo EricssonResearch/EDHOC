@@ -819,12 +819,6 @@ Note that, depending on the application, the keys established through the EDHOC 
 
 Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
-# Acknowledgments
-
-The authors want to thank Dan Harkins, Ilari Liusvaara, Jim Schaad and Ludwig Seitz for reviewing intermediate versions of the draft and contributing concrete proposals incorporated in this version. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
-
-TODO: This section should be after Appendices and before Authors' addresses according to RFC7322.
-
 --- back
 
 # Test Vectors {#examples}
@@ -835,8 +829,6 @@ TODO: This section needs to be updated.
 # PSK Chaining
 
 An application using EDHOC with symmetric keys may have a security policy to change the PSK as a result of successfully completing the EDHOC protocol. In this case, the old PSK SHALL be replaced with a new PSK derived using other = exchange_hash, AlgorithmID = "EDHOC PSK Chaining" and keyDataLength equal to the key length of AEAD_V, see {{key-der}}.
-
-
 
 # EDHOC with CoAP and OSCORE {#app-a}
 
@@ -887,5 +879,10 @@ When EDHOC is use to derive parameters for OSCORE {{I-D.ietf-core-object-securit
 * The Master Secret is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Secret" and keyDataLength equal to the key length of AEAD_V.
 
 * The Master Salt is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Salt" and keyDataLength equal to 64 bits.
+
+# Acknowledgments
+{: numbered="no"}
+
+The authors want to thank Dan Harkins, Ilari Liusvaara, Jim Schaad and Ludwig Seitz for reviewing intermediate versions of the draft and contributing concrete proposals incorporated in this version. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
 
 --- fluff
