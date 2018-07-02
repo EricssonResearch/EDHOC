@@ -298,7 +298,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
    
-* Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a session identifier S_U and store it for the length of the protocol. Party U needs to be able to retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -371,7 +371,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format a ephemeral public key as a COSE_key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a session identifier S_V and store it for the length of the protocol. Party V needs to be able to retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
@@ -561,7 +561,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
 
-* Choose a session identifier S_U which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other concurrent session identifiers used by Party U. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a session identifier S_U and store it for the length of the protocol. Party U needs to be able to retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
@@ -624,7 +624,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format a ephemeral public key as a COSE_key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a session identifier S_V which is not in use and store it for the length of the protocol. The session identifier SHOULD be different from other relevant concurrent session identifiers used by Party V. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a session identifier S_V and store it for the length of the protocol. Party V needs to be able to retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
