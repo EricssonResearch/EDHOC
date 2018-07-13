@@ -887,7 +887,7 @@ When EDHOC is use to derive parameters for OSCORE {{I-D.ietf-core-object-securit
 This appendix gives an estimate of the message sizes when EDHOC is used with Raw Public Keys. Note that the examples in this section and this section are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message1 = [
+message1 = (
   1,
   h'c3',
   [4],
@@ -897,19 +897,30 @@ message1 = [
   [10],
   [-8],
   [-8]
-]
+)
+
+01 41 C3 81 04 00 58 20 61 62 63 64 65 66 67 68
+69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78
+79 7A 31 32 33 34 35 36 81 38 1A 81 0A 81 27 81
+27
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_1 is 50 bytes
+The size of message_1 is 49 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-plaintext = [
+plaintext = (
   { 4 : 'abba' },
   'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456'
-]
+)
+
+A1 04 44 61 62 62 61 58 40 61 62 63 64 65 66 67
+68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77
+78 79 7A 31 32 33 34 35 36 61 62 63 64 65 66 67
+68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77
+78 79 7A 31 32 33 34 35 36
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of plaintext is 74 bytes so the size of ciphertext is 82 bytes
+The size of plaintext is 73 bytes so the size of ciphertext is 81 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message2 = [
@@ -925,7 +936,7 @@ message2 = [
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_2 is 127 bytes
+The size of message_2 is 125 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message3 = [
