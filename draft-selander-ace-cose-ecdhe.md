@@ -158,7 +158,7 @@ This paper is organized as follows: {{general}} specifies general properties of 
 
 # EDHOC Overview {#general}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a CBOR array where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -261,7 +261,7 @@ For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF
 message_1 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-message_1 = [
+message_1 = (
   MSG_TYPE : int,
   S_U : bstr,  
   ECDH-Curves_U : alg_array,
@@ -272,7 +272,7 @@ message_1 = [
   SIGs_V : alg_array,
   SIGs_U : alg_array,
   ? UAD_1 : bstr
-]
+)
 
 alg_array = [ + alg : int / tstr ]
 ~~~~~~~~~~~
@@ -329,10 +329,10 @@ where Z is the index of the first curve in ECDH-Curves_U that V supports
 message_2 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-message_2 = [
+message_2 = (
   data_2,
   CIPHERTEXT_2 : bstr
-]
+)
 
 data_2 = (
   MSG_TYPE : int,
@@ -351,7 +351,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( message_1 | [ data_2 ] )
+aad_2 = H( message_1 | data_2 )
 ~~~~~~~~~~~
 
 where:
@@ -393,7 +393,7 @@ Party V SHALL compose message_2 as follows:
  
    * external_aad = aad_2
 
-   * plaintext = \[ PROTECTED_2, SIGNATURE_2, ? UAD_2 \]
+   * plaintext = ( PROTECTED_2, SIGNATURE_2, ? UAD_2 )
 
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -420,10 +420,10 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 message_3 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-message_3 = [
+message_3 = (
   data_3,
   CIPHERTEXT_3 : bstr
-]
+)
 
 data_3 = (
   MSG_TYPE : int,
@@ -436,7 +436,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
+aad_3 = H( H( message_1 | message_2 ) | data_3 )
 
 ~~~~~~~~~~~
 
@@ -464,7 +464,7 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = aad_3
 
-   * plaintext = \[ PROTECTED_3, SIGNATURE_3, ? PAD_3 \]
+   * plaintext = ( PROTECTED_3, SIGNATURE_3, ? PAD_3 )
 
    * PAD_3 = bstr containing opaque protected application data
 
@@ -524,9 +524,9 @@ For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-
 message_1 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-message_1 = [
+message_1 = (
   data_1
-]
+)
 
 data_1 = (
   MSG_TYPE : int,
@@ -588,10 +588,10 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 message_2 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-message_2 = [
+message_2 = (
   data_2,
   CIPHERTEXT_2 : bstr
-]
+)
 
 data_2 = (
   MSG_TYPE : int,
@@ -608,7 +608,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( message_1 | [ data_2 ] )
+aad_2 = H( message_1 | data_2 )
 ~~~~~~~~~~~
 
 where:
@@ -663,10 +663,10 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 message_3 SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-message_3 = [
+message_3 = (
   data_3,
   CIPHERTEXT_3 : bstr
-]
+)
 
 data_3 = (
   MSG_TYPE : int,
@@ -679,7 +679,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( H( message_1 | message_2 ) | [ data_3 ] )
+aad_3 = H( H( message_1 | message_2 ) | data_3 )
 ~~~~~~~~~~~
 
 where:
