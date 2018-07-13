@@ -723,10 +723,10 @@ This section defines a message format for an EDHOC error message, used during th
 error SHALL be a CBOR array as defined below
 
 ~~~~~~~~~~~ CDDL
-error = [
+error = (
   MSG_TYPE : int,
   ? ERR_MSG : tstr 
-]
+)
 ~~~~~~~~~~~
 
 where:
