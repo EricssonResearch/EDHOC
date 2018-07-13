@@ -988,6 +988,30 @@ message1 = (
 
 The size of message_1 is 50 bytes
 
+~~~~~~~~~~~~~~~~~~~~~~~
+plaintext = ()
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The size of plaintext is 0 bytes so the size of ciphertext is 8 bytes
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message2 = (
+  5,
+  null,
+  h'c4',
+  'abcdefghijklmnopqrstuvwxyz123456',
+  0,
+  0,
+  'abcdefgh'
+)
+
+05 F6 41 C4 58 20 61 62 63 64 65 66 67 68 69 6A
+6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A
+31 32 33 34 35 36 00 00 48 61 62 63 64 65 66 67
+68
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The size of message_2 is 49 bytes
 
 # Acknowledgments
 {: numbered="no"}
