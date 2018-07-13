@@ -252,7 +252,7 @@ Party U                                                          Party V
 
 ### Mandatory to Implement Algorithms {#asym-mti}
 
-For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF-256, AES-CCM-64-64-128, and EdDSA are mandatory to implement.
+For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF-256, AES-CCM-64-64-128, and Ed25519 are mandatory to implement.
 
 ## EDHOC Message 1 {#asym-msg1}
 
