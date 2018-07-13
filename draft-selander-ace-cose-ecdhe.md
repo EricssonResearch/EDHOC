@@ -377,8 +377,8 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters.
 
-   * COSE_Sign1 = \[ PROTECTED_2, '', \[CRED_V, aad_2\], SIGNATURE_2 \]. The unprotected header SHALL be encoded as a zero-length byte string.
-
+   * COSE_Sign1 = \[ PROTECTED_2, '', \[CRED_V, aad_2\], SIGNATURE_2 \].
+   
    * PROTECTED_2 = { xyz : ID_CRED_V }
 
    * xyz - any COSE map label that can identify a public key, see {{asym-overview}}
@@ -389,7 +389,7 @@ Party V SHALL compose message_2 as follows:
 
 * Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, and IV_2 and the following parameters.
 
-   * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_2 \].  The protected header SHALL be encoded as a zero-length byte string. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+   * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_2 \]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
  
    * external_aad = aad_2
 
@@ -450,8 +450,8 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private key of Party U, and the following parameters.
 
-   * COSE_Sign1 = \[ PROTECTED_3, '', \[CRED_U, aad_3\], SIGNATURE_3 \]. The unprotected header SHALL be encoded as a zero-length byte string.
-
+   * COSE_Sign1 = \[ PROTECTED_3, '', \[CRED_U, aad_3\], SIGNATURE_3 \]
+   
    * PROTECTED_3 = { xyz : ID_CRED_U }
 
    * ID_CRED_U - identifier for the public key of Party U, see {{asym-overview}}
@@ -460,7 +460,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters.
 
-   * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_3 \].  The protected header SHALL be encoded as a zero-length byte string. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+   * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_3 \]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_3
 
@@ -632,7 +632,7 @@ Party V SHALL compose message_2 as follows:
 
 * Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, and IV_2 and the following parameters.
 
-   * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_2 ]. The protected header SHALL be encoded as a zero-length byte string. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+   * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_2 ]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_2
 
@@ -692,7 +692,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters.
 
-   * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_3 ]. The protected header SHALL be encoded as a zero-length byte string. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+   * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_3 ]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_3
 
