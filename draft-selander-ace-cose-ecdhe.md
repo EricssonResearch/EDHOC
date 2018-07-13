@@ -1013,6 +1013,18 @@ message2 = (
 
 The size of message_2 is 49 bytes
 
+~~~~~~~~~~~~~~~~~~~~~~~
+message3 = (
+  6,
+  h'c3',
+  'abcdefgh'
+)
+
+06 41 C3 48 61 62 63 64 65 66 67 68
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The size of message_3 is 12 bytes
+
 # Acknowledgments
 {: numbered="no"}
 
