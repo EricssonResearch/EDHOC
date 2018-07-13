@@ -387,9 +387,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr containing the credential containing the public key of Party V, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2 and the following parameters.
-
-   * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_2 \]
+* Compute CIPHERTEXT_2 as an COSE_Encrypt0 ciphertext as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, and IV_2 and the following parameters.
 
    * plaintext = \[ PROTECTED_2, SIGNATURE_2, ? UAD_2 \]
 
@@ -405,7 +403,7 @@ Party U SHALL process message_2 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Decrypt COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
+* Decrypt and verify CIPHERTEXT_2 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
 * Verify COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public key of Party V.
 
@@ -456,9 +454,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr containing the credential containing the public key of Party U, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. 
-
-   * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_3 \]
+* Compute CIPHERTEXT_3 as an COSE_Encrypt0 ciphertext as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters.
 
    * plaintext = \[ PROTECTED_3, SIGNATURE_3, ? PAD_3 \]
 
@@ -472,7 +468,7 @@ Party V SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple.
 
-* Decrypt COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
+* Decrypt and verify CIPHERTEXT_3 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 * Verify COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public key of Party U.
 
@@ -628,9 +624,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2 and the following parameters.
-
-   * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_2 \]
+* Compute CIPHERTEXT_2 as an COSE_Encrypt0 ciphertext as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, and IV_2 and the following parameters.
 
    * external_aad = aad_2
 
@@ -648,7 +642,7 @@ Party U SHALL process message_2 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
+* Decrypt and verify CIPHERTEXT_2 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -688,15 +682,13 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters.
-
-   * COSE_Encrypt0 = \[ '', '', CIPHERTEXT_3 \]
+* Compute CIPHERTEXT_3 as an COSE_Encrypt0 ciphertext as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters.
 
    * external_aad = aad_3
 
    * plaintext = ? PAD_3
 
-   * PAD_2 = bstr containing opaque protected application data
+   * PAD_3 = bstr containing opaque protected application data
 
 *  Format message_3 as specified in {{sym-msg3-form}}
 
@@ -706,7 +698,7 @@ Party V SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple.
 
-* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
+* Decrypt and verify CIPHERTEXT_3 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
