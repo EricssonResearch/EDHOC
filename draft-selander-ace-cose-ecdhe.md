@@ -223,9 +223,9 @@ Application specific traffic keys and other data SHALL be derived using other = 
 
 EDHOC supports authentication with raw public keys (RPK) and certificates with the requirements that:
 
-* Party U SHALL be able to identify Party V's public key using ID_V.
+* Party U SHALL be able to identify Party V's public key using ID_CRED_V.
 
-* Party V SHALL be able to identify Party U's public key using ID_U.
+* Party V SHALL be able to identify Party U's public key using ID_CRED_U.
 
 Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain the credential used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The full credential (e.g. X.509 certificates or a COSE_Key) are included in CRED_V and CRED_U.
 
