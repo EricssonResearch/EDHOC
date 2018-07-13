@@ -540,8 +540,6 @@ data_1 = (
   ? UAD_1 : bstr
 )
 
-serialized_COSE_Key = bstr .cbor COSE_Key
-
 alg_array = [ + alg : int / tstr ]
 ~~~~~~~~~~~
 
