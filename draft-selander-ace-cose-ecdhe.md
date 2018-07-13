@@ -923,7 +923,7 @@ A1 04 44 61 62 62 61 58 40 61 62 63 64 65 66 67
 The size of plaintext is 73 bytes so the size of ciphertext is 81 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message2 = [
+message2 = (
   2,
   null,
   h'c4',
@@ -932,21 +932,36 @@ message2 = [
   0,
   0,
   0,
-  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqr'
-]
+  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopq'
+)
+
+02 F6 41 C4 58 20 61 62 63 64 65 66 67 68 69 6A
+6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A
+31 32 33 34 35 36 00 00 00 00 58 51 61 62 63 64
+65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74
+75 76 77 78 79 7A 31 32 33 34 35 36 61 62 63 64
+65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74
+75 76 77 78 79 7A 31 32 33 34 35 36 61 62 63 64
+65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The size of message_2 is 125 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message3 = [
+message3 = (
   3,
   h'c3',
-  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqr'
-]
+  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopq'
+)
+03 41 C3 58 51 61 62 63 64 65 66 67 68 69 6A 6B
+6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31
+32 33 34 35 36 61 62 63 64 65 66 67 68 69 6A 6B
+6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31
+32 33 34 35 36 61 62 63 64 65 66 67 68 69 6A 6B
+6C 6D 6E 6F 70 71
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_3 is 88 bytes
+The size of message_3 is 86 bytes
 
 # Acknowledgments
 {: numbered="no"}
