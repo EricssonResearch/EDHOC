@@ -181,7 +181,7 @@ EDHOC also allows opaque application data (UAD and PAD) to be sent. Unprotected 
 
 ## Ephemeral Public Keys {#cose_key}
    
-The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of [RFC8152], but only a subset of the parameters are included in the EDHOC messages.  The curve X25519 is mandatory to implement.  For Elliptic Curve Keys of type EC2, compact representation and compact output as per [RFC6090] MAY be used, i.e. the 'y' parameter is not be present in the The COSE_Key object.  COSE [RFC8152] always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of [RFC8152], but only a subset of the parameters are included in the EDHOC messages.  The curve X25519 is mandatory to implement.  For Elliptic Curve Keys of type EC2, compact representation and compact output as per [RFC6090] MAY be used, i.e. the 'y' parameter is not present in the COSE_Key object.  COSE [RFC8152] always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
