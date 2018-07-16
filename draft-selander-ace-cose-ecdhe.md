@@ -718,7 +718,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ## Error Message Format {#err-format}
 
-This section defines a message format for an EDHOC error message, used during the protocol. This is an error on EDHOC level and is independent of the lower layers used. An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
+This section defines a message format for an EDHOC error message, used during the protocol. This is an error on EDHOC level and is independent of the lower layers used. An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP). An EDHOC error message can be send by both parties as a response to any normal EDHOC message. After sending an error message, the protocol MUST be discontinued.
 
 error SHALL be a sequence of CBOR elements as defined below
 
