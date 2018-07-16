@@ -1028,7 +1028,7 @@ The size of message_3 is 12 bytes
 # Acknowledgments
 {: numbered="no"}
 
-The authors want to thank Dan Harkins, Ilari Liusvaara, Jim Schaad and Ludwig Seitz for reviewing intermediate versions of the draft and contributing concrete proposals incorporated in this version. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
+The authors want to thank Dan Harkins, Ilari Liusvaara, Jim Schaad, and Ludwig Seitz for reviewing intermediate versions of the draft and contributing concrete proposals incorporated in this version. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
 
 We are also grateful to Theis Grønbech Petersen, Thorvald Sahl Jørgensen, Alessandro Bruni and Carsten Schürmann for their work on formal analysis of EDHOC.
 
