@@ -296,7 +296,7 @@ Party U SHALL compose message_1 as follows:
 
 * Determine which ECDH curve to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL generate an ephemeral from that curve. Otherwise the first curve in ECDH-Curves_U MUST be used. The content of ECDH-Curves_U SHALL be fixed, and SHALL not be changed based on previous error messages. 
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
    
 * Choose a session identifier S_U and store it for the length of the protocol. Party U needs to be able to retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
@@ -369,7 +369,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
 * Choose a session identifier S_V and store it for the length of the protocol. Party V needs to be able to retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
@@ -561,7 +561,7 @@ Party U SHALL compose message_1 as follows:
 
 * Determine which ECDH curve to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL generate an ephemeral from that curve. Otherwise the first curve in ECDH-Curves_U MUST be used. The content of ECDH-Curves_U SHALL be fixed, and SHALL not be changed based on previous error messages. 
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} and format the ephemeral public key E_U as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
 
 * Choose a session identifier S_U and store it for the length of the protocol. Party U needs to be able to retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
 
@@ -624,7 +624,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
 * Choose a session identifier S_V and store it for the length of the protocol. Party V needs to be able to retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
 
