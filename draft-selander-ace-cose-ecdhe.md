@@ -922,7 +922,7 @@ A1 04 44 61 62 62 61 58 40 61 62 63 64 65 66 67
 78 79 7A 31 32 33 34 35 36
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of plaintext is 73 bytes so the size of ciphertext is 81 bytes
+The size of plaintext is 73 bytes so assuming a 64-bit MAC value the size of ciphertext is 81 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message2 = (
@@ -992,7 +992,7 @@ The size of message_1 is 50 bytes
 plaintext = ()
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of plaintext is 0 bytes so the size of ciphertext is 8 bytes
+The size of plaintext is 0 bytes so assuming a 64-bit MAC value the size of ciphertext is 8 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message2 = (
