@@ -258,7 +258,7 @@ For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF
 
 ### Formatting of Message 1 {#asym-msg1-form}
 
-message_1 SHALL be a CBOR array as defined below
+message_1 SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
@@ -326,7 +326,7 @@ where Z is the index of the first curve in ECDH-Curves_U that V supports
 
 ### Formatting of Message 2 {#asym-msg2-form}
 
-message_2 SHALL be a CBOR array as defined below
+message_2 SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_2 = (
@@ -417,7 +417,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 ### Formatting of Message 3 {#asym-msg3-form}
 
-message_3 SHALL be a CBOR array as defined below
+message_3 SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_3 = (
@@ -521,7 +521,7 @@ For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-
 
 ### Formatting of Message 1 {#sym-msg1-form}
 
-message_1 SHALL be a CBOR array as defined below
+message_1 SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
@@ -585,7 +585,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ### Formatting of Message 2 {#sym-msg2-form}
 
-message_2 SHALL be a CBOR array as defined below
+message_2 SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_2 = (
@@ -660,7 +660,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 ### Formatting of Message 3 {#sym-msg3-form}
 
-message_3 SHALL be a CBOR array as defined below
+message_3 SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_3 = (
@@ -720,7 +720,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 This section defines a message format for an EDHOC error message, used during the protocol. This is an error on EDHOC level and is independent of the lower layers used. An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
-error SHALL be a CBOR array as defined below
+error SHALL be a sequence CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 error = (
