@@ -616,8 +616,8 @@ where:
 * MSG_TYPE = 5
 * S_V - variable length session identifier
 * X_V - the x-coordinate of ephemeral public key of Party V
-* HKDF_V - an single chosen algorithm from HKDFs_U
-* AEAD_V - an single chosen algorithm from AEADs_U
+* HKDF_V - a single chosen algorithm from HKDFs_U
+* AEAD_V - a single chosen algorithm from AEADs_U
 * H() - the hash function in HKDF_V
 
 ### Party V Processing of Message 2 {#sym-msg2-procV}
@@ -836,7 +836,7 @@ An application using EDHOC with symmetric keys may have a security policy to cha
 
 ## Transferring EDHOC in CoAP {#app-a1}
 
-EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the CoAP client as party U and the CoAP server as party V. By default, EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
 In practice, EDHOC message\_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message\_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message\_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response
 
@@ -868,7 +868,7 @@ Client    Server
 
 ## Deriving an OSCORE context from EDHOC {#app-a2}
 
-When EDHOC is use to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
+When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
 
 * The AEAD Algorithm is AEAD_V, as defined in this document
 
