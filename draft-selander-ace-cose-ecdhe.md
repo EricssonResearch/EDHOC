@@ -283,7 +283,7 @@ where:
 * S_U - variable length session identifier
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
-* X_U - the x-coordinate of ephemeral public key of Party U
+* X_U - the x-coordinate of the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * SIGs_V - signature algorithms, with which Party U supports verification
@@ -358,7 +358,7 @@ where:
 
 * MSG_TYPE = 2
 * S_V - variable length session identifier
-* X_V - the x-coordinate of ephemeral public key of Party V
+* X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - a single chosen algorithm from HKDFs_U
 * AEAD_V - a single chosen algorithm from AEADs_U
 * SIG_V - a single chosen algorithm from SIGs_V with which Party V signs
@@ -545,7 +545,7 @@ where:
 * S_U - variable length session identifier
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
-* X_U - the x-coordinate of ephemeral public key of Party U
+* X_U - the x-coordinate of the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
 * KID - identifier of the pre-shared key
@@ -611,7 +611,7 @@ where:
 
 * MSG_TYPE = 5
 * S_V - variable length session identifier
-* X_V - the x-coordinate of ephemeral public key of Party V
+* X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - a single chosen algorithm from HKDFs_U
 * AEAD_V - a single chosen algorithm from AEADs_U
 * H() - the hash function in HKDF_V
