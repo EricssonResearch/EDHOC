@@ -525,10 +525,6 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  data_1
-)
-
-data_1 = (
   MSG_TYPE : int,
   S_U : bstr,
   ECDH-Curves_U : alg_array,
