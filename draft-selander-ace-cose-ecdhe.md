@@ -880,12 +880,12 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 # Message Sizes
 
-This appendix gives an estimate of the message sizes when EDHOC is used with raw public keys and pre-shared keys. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation.
+This appendix gives an estimate of the message sizes when EDHOC is used with raw public keys and pre-shared keys. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation and hexadecimal.
 
 ## Message Sizes RPK
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message1 = (
+message_1 = (
   1,
   h'c3',
   [4],
@@ -896,32 +896,34 @@ message1 = (
   [-8],
   [-8]
 )
-
-01 41 C3 81 04 00 58 20 61 62 63 64 65 66 67 68
-69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78
-79 7A 31 32 33 34 35 36 81 38 1A 81 0A 81 27 81
-27
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_1 is 49 bytes
+~~~~~~~~~~~~~~~~~~~~~~~
+message_1 (49 bytes):
+01 41 C3 81 04 00 58 20 61 62 63 64 65 66 67 68 69 6A 6B 6C
+6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35 36
+81 38 1A 81 0A 81 27 81 27
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = (
   { 4 : 'abba' },
   'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456'
 )
-
-A1 04 44 61 62 62 61 58 40 61 62 63 64 65 66 67
-68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77
-78 79 7A 31 32 33 34 35 36 61 62 63 64 65 66 67
-68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77
-78 79 7A 31 32 33 34 35 36
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of plaintext is 73 bytes so assuming a 64-bit MAC value the size of ciphertext is 81 bytes
+~~~~~~~~~~~~~~~~~~~~~~~
+plaintext (73 bytes):
+A1 04 44 61 62 62 61 58 40 61 62 63 64 65 66 67 68 69 6A 6B
+6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35
+36 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73
+74 75 76 77 78 79 7A 31 32 33 34 35 36
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The size of plaintext is 73 bytes so assuming a 64-bit MAC value the ciphertext is 81 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message2 = (
+message_2 = (
   2,
   null,
   h'c4',
@@ -932,40 +934,40 @@ message2 = (
   0,
   'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopq'
 )
-
-02 F6 41 C4 58 20 61 62 63 64 65 66 67 68 69 6A
-6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A
-31 32 33 34 35 36 00 00 00 00 58 51 61 62 63 64
-65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74
-75 76 77 78 79 7A 31 32 33 34 35 36 61 62 63 64
-65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74
-75 76 77 78 79 7A 31 32 33 34 35 36 61 62 63 64
-65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_2 is 125 bytes
+~~~~~~~~~~~~~~~~~~~~~~~
+message_2 (125 bytes):
+02 F6 41 C4 58 20 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E
+6F 70 71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35 36 00 00
+00 00 58 51 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F 70
+71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35 36 61 62 63 64
+65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78
+79 7A 31 32 33 34 35 36 61 62 63 64 65 66 67 68 69 6A 6B 6C
+6D 6E 6F 70 71
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message3 = (
+message_3 = (
   3,
   h'c3',
   'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopq'
 )
-
-03 41 C3 58 51 61 62 63 64 65 66 67 68 69 6A 6B
-6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31
-32 33 34 35 36 61 62 63 64 65 66 67 68 69 6A 6B
-6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31
-32 33 34 35 36 61 62 63 64 65 66 67 68 69 6A 6B
-6C 6D 6E 6F 70 71
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_3 is 86 bytes
+~~~~~~~~~~~~~~~~~~~~~~~
+message_3 (86 bytes):
+03 41 C3 58 51 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F
+70 71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35 36 61 62 63
+64 65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77
+78 79 7A 31 32 33 34 35 36 61 62 63 64 65 66 67 68 69 6A 6B
+6C 6D 6E 6F 70 71
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes PSK
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message1 = (
+message_1 = (
   4,
   h'c3',
   [4],
@@ -975,23 +977,17 @@ message1 = (
   [10],
   'acdc'
 )
-
-04 41 C3 81 04 00 58 20 61 62 63 64 65 66 67 68
-69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78
-79 7A 31 32 33 34 35 36 81 38 1A 81 0A 44 61 63
-64 63
+~~~~~~~~~~~~~~~~~~~~~~~
+message_1 (50 bytes):
+04 41 C3 81 04 00 58 20 61 62 63 64 65 66 67 68 69 6A 6B 6C
+6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35 36
+81 38 1A 81 0A 44 61 63 64 63
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_1 is 50 bytes
+Assuming a 0 byte plaintext and a 64-bit MAC value the ciphertext is 8 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-plaintext = ()
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The size of plaintext is 0 bytes so assuming a 64-bit MAC value the size of ciphertext is 8 bytes
-
-~~~~~~~~~~~~~~~~~~~~~~~
-message2 = (
+message_2 = (
   5,
   null,
   h'c4',
@@ -1000,26 +996,27 @@ message2 = (
   0,
   'abcdefgh'
 )
-
-05 F6 41 C4 58 20 61 62 63 64 65 66 67 68 69 6A
-6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A
-31 32 33 34 35 36 00 00 48 61 62 63 64 65 66 67
-68
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_2 is 49 bytes
+~~~~~~~~~~~~~~~~~~~~~~~
+message_2 (49 bytes):
+05 F6 41 C4 58 20 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E
+6F 70 71 72 73 74 75 76 77 78 79 7A 31 32 33 34 35 36 00 00
+48 61 62 63 64 65 66 67 68
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message3 = (
+message_3 = (
   6,
   h'c3',
   'abcdefgh'
 )
-
-06 41 C3 48 61 62 63 64 65 66 67 68
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of message_3 is 12 bytes
+~~~~~~~~~~~~~~~~~~~~~~~
+message_3 (12 bytes):
+06 41 C3 48 61 62 63 64 65 66 67 68
+~~~~~~~~~~~~~~~~~~~~~~~
 
 # Acknowledgments
 {: numbered="no"}
