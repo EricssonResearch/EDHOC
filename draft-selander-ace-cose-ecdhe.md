@@ -215,7 +215,12 @@ For message_i the key, called K_i, SHALL be derived using other = aad_i, where i
 
 If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
-Application specific traffic keys and other data SHALL be derived using other = exchange_hash. AlgorithmID SHALL be a tstr defined by the application and SHALL be different for different data being derived (an example is given in {{app-a2}}). keyDataLength is set to the length of the data being derived.
+Application keys and other application specific data can be derived using the EDHOC-Exporter interface:
+
+EDHOC-Exporter(label, length)
+
+The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exported is given in {{app-a2}}).
+
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
