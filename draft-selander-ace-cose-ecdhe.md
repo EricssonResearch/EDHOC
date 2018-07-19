@@ -387,7 +387,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr containing the credential containing the public key of Party V, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, and IV_2 and the following parameters.
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters.
 
    * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_2 \]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
  
@@ -626,7 +626,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, and IV_2 and the following parameters.
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters.
 
    * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_2 ]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
@@ -686,7 +686,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters.
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, IV_3, and the following parameters.
 
    * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_3 ]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
