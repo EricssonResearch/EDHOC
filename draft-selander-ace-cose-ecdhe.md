@@ -375,11 +375,11 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
-*  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters.
-
-   * COSE_Sign1 = \[ PROTECTED_2, '', \[CRED_V, aad_2\], SIGNATURE_2 \].
+*  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
    
-   * PROTECTED_2 = { xyz : ID_CRED_V }
+   * protected = { xyz : ID_CRED_V }
+
+   * payload = ( CRED_V, aad_2 )
 
    * xyz - any COSE map label that can identify a public key, see {{asym-overview}}
 
@@ -393,6 +393,10 @@ Party V SHALL compose message_2 as follows:
 
    * plaintext = ( PROTECTED_2, SIGNATURE_2, ? UAD_2 )
 
+   * PROTECTED_2 - bstr containing the COSE_Sign1 protected header
+   
+   * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
+  
    * UAD_2 = bstr containing opaque unprotected application data
 
 *  Format message_2 as specified in {{asym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
@@ -446,11 +450,13 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-*  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private key of Party U, and the following parameters.
+*  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
 
-   * COSE_Sign1 = \[ PROTECTED_3, '', \[CRED_U, aad_3\], SIGNATURE_3 \]
+   * protected = { xyz : ID_CRED_U }
+
+   * payload = ( CRED_U, aad_3 )
    
-   * PROTECTED_3 = { xyz : ID_CRED_U }
+   * xyz - any COSE map label that can identify a public key, see {{asym-overview}}
 
    * ID_CRED_U - identifier for the public key of Party U, see {{asym-overview}}
 
@@ -461,6 +467,10 @@ Party U SHALL compose message_3 as follows:
    * external_aad = aad_3
 
    * plaintext = ( PROTECTED_3, SIGNATURE_3, ? PAD_3 )
+   
+   * PROTECTED_3 - bstr containing the COSE_Sign1 protected header
+   
+   * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
    * PAD_3 = bstr containing opaque protected application data
 
