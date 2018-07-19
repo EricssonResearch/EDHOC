@@ -116,7 +116,7 @@ Party U                                                 Party V
 {: #fig-sigma title="AEAD variant of the SIGMA-I protocol"}
 {: artwork-align="center"}
 
-The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive the keying material. The messages are signed, MACed, and encrypted.
+The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive application keys. The messages are signed, MACed, and encrypted.
 
 * E_U and E_V are the ECDH ephemeral public keys of U and V, respectively.
 
@@ -158,7 +158,7 @@ This paper is organized as follows: {{general}} specifies general properties of 
 
 # EDHOC Overview {#general}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive the traffic key (master secret) and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive application keys, and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
