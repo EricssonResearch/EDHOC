@@ -834,10 +834,9 @@ Implementations should provide countermeasures to side-channel attacks such as t
 
 TODO: This section needs to be updated.
 
-
 # PSK Chaining
 
-An application using EDHOC with symmetric keys may have a security policy to change the PSK as a result of successfully completing the EDHOC protocol. In this case, the old PSK SHALL be replaced with a new PSK derived using other = exchange_hash, AlgorithmID = "EDHOC PSK Chaining" and keyDataLength equal to the key length of AEAD_V, see {{key-der}}.
+An application using EDHOC with symmetric keys may have a security policy to change the PSK as a result of successfully completing the EDHOC protocol. In this case, the new PSK SHALL be derived as EDHOC-Exporter("EDHOC Chaining PSK", length), where length is equal to the key length (in bits) of AEAD_V and the new PSK identifier SHALL be derived as KID = EDHOC-Exporter("EDHOC Chaining KID", 32).
 
 # EDHOC with CoAP and OSCORE {#app-a}
 
@@ -885,9 +884,9 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 * The Server's Sender ID is S_U, as defined in this document
 
-* The Master Secret is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Secret" and keyDataLength equal to the key length of AEAD_V.
+* The Master Secret is derived as EDHOC-Exporter("EDHOC OSCORE Master Secret", length), where length is equal to the key length (in bits) of AEAD_V.
 
-* The Master Salt is derived as specified in {{key-der}} of this document, with other = exchange_hash, AlgorithmID = "EDHOC OSCORE Master Salt" and keyDataLength equal to 64 bits.
+* The Master Salt is derived as EDHOC-Exporter("EDHOC OSCORE Master Salt", 64)
 
 # Message Sizes
 
