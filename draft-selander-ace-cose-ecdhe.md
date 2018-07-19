@@ -387,9 +387,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr containing the credential containing the public key of Party V, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters.
-
-   * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_2 \]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
  
    * external_aad = aad_2
 
@@ -397,7 +395,7 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-*  Format message_2 as specified in {{asym-msg2-form}}
+*  Format message_2 as specified in {{asym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
 
 ### Party U Processing of Message 2 {#asym-msg2-procU}
 
@@ -458,9 +456,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr containing the credential containing the public key of Party U, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters.
-
-   * COSE_Encrypt0 = \[ '', { ... }, CIPHERTEXT_3 \]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_3
 
@@ -468,7 +464,7 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-*  Format message_3 as specified in {{asym-msg3-form}}
+*  Format message_3 as specified in {{asym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 * Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
 
@@ -628,9 +624,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters.
-
-   * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_2 ]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_2
 
@@ -638,7 +632,7 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-*  Format message_2 as specified in {{sym-msg2-form}}
+*  Format message_2 as specified in {{sym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
    
 ### Party U Processing of Message 2 {#sym-msg2-procU}
 
@@ -688,9 +682,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, IV_3, and the following parameters.
-
-   * COSE_Encrypt0 = [ '', { ... }, CIPHERTEXT_3 ]. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_3
 
@@ -698,7 +690,7 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-*  Format message_3 as specified in {{sym-msg3-form}}
+*  Format message_3 as specified in {{sym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 * Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
 
