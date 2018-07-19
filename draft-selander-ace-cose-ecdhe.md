@@ -219,7 +219,7 @@ Application keys and other application specific data can be derived using the ED
 
 EDHOC-Exporter(label, length)
 
-The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exported is given in {{app-a2}}).
+The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{app-a2}}).
 
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
@@ -836,7 +836,7 @@ TODO: This section needs to be updated.
 
 # PSK Chaining
 
-An application using EDHOC with symmetric keys may have a security policy to change the PSK as a result of successfully completing the EDHOC protocol. In this case, the new PSK SHALL be derived as EDHOC-Exporter("Chaining PSK", length), where length is equal to the key length (in bits) of AEAD_V and the new PSK identifier SHALL be derived as KID = EDHOC-Exporter("Chaining KID", 32).
+An application using EDHOC with symmetric keys may have a security policy to change the PSK as a result of successfully completing the EDHOC protocol. In this case, the new PSK SHALL be derived as EDHOC-Exporter("Chaining PSK", length), where length is equal to the key length (in bytes) of AEAD_V and the new PSK identifier SHALL be derived as KID = EDHOC-Exporter("Chaining KID", 4).
 
 # EDHOC with CoAP and OSCORE {#app-a}
 
@@ -884,9 +884,9 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 * The Server's Sender ID is S_U, as defined in this document
 
-* The Master Secret is derived as EDHOC-Exporter("OSCORE Master Secret", length), where length is equal to the key length (in bits) of AEAD_V.
+* The Master Secret is derived as EDHOC-Exporter("OSCORE Master Secret", length), where length is equal to the key length (in bytes) of AEAD_V.
 
-* The Master Salt is derived as EDHOC-Exporter("OSCORE Master Salt", 64)
+* The Master Salt is derived as EDHOC-Exporter("OSCORE Master Salt", 8)
 
 # Message Sizes
 
