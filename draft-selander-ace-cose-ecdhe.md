@@ -470,6 +470,8 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{asym-msg3-form}}
 
+* Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
+
 ### Party V Processing of Message 3 {#asym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
@@ -483,6 +485,8 @@ Party V SHALL process message_3 as follows:
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 * Pass PAD_3 to the application.
+
+* Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -698,6 +702,8 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{sym-msg3-form}}
 
+* Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
+
 ### Party V Processing of Message 3 {#sym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
@@ -709,6 +715,8 @@ Party V SHALL process message_3 as follows:
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
 * Pass PAD_3 to the application.
+
+* Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
 
 # Error Handling {#error}
 
