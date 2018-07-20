@@ -900,7 +900,8 @@ message_1 = (
   h'c3',
   [4],
   0,
-  'abcdefghijklmnopqrstuvwxyz123456',
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f',
   [-27],
   [10],
   [-8],
@@ -918,7 +919,10 @@ message_1 (49 bytes):
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = (
   { 4 : 'abba' },
-  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456'
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f
+    202122232425262728292a2b2c2d2e2f
+    303132333435363738393a3b3c3d3e3f',
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -937,7 +941,8 @@ message_2 = (
   2,
   null,
   h'c4',
-  'abcdefghijklmnopqrstuvwxyz123456',
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f',
   0,
   0,
   0,
@@ -982,7 +987,8 @@ message_1 = (
   h'c3',
   [4],
   0,
-  'abcdefghijklmnopqrstuvwxyz123456',
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f',
   [-27],
   [10],
   'acdc'
@@ -1003,7 +1009,8 @@ message_2 = (
   5,
   null,
   h'c4',
-  'abcdefghijklmnopqrstuvwxyz123456',
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f',
   0,
   0,
   'abcdefgh'
@@ -1021,7 +1028,7 @@ message_2 (49 bytes):
 message_3 = (
   6,
   h'c3',
-  'abcdefgh'
+  h'0001020304050607'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
