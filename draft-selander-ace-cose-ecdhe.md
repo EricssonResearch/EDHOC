@@ -947,7 +947,12 @@ message_2 = (
   0,
   0,
   0,
-  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopq'
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f
+    202122232425262728292a2b2c2d2e2f
+    303132333435363738393a3b3c3d3e3f
+    404142434445464748494a4b4c4d4e4f
+    50'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -966,7 +971,12 @@ message_2 (125 bytes):
 message_3 = (
   3,
   h'c3',
-  'abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopqrstuvwxyz123456abcdefghijklmnopq'
+  h'000102030405060708090a0b0c0d0e0f
+    101112131415161718191a1b1c1d1e1f
+    202122232425262728292a2b2c2d2e2f
+    303132333435363738393a3b3c3d3e3f
+    404142434445464748494a4b4c4d4e4f
+    50'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
