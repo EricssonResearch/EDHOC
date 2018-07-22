@@ -33,12 +33,13 @@ author:
         
 normative:
 
+  I-D.schaad-cose-x509:
+
   RFC2119:
   RFC6090:  
   RFC7049:
   RFC8152:
   RFC8174:
-  I-D.schaad-cose-x509:
   
   SP-800-56a:
     target: http://dx.doi.org/10.6028/NIST.SP.800-56Ar2
@@ -64,14 +65,6 @@ normative:
         ins: H. Krawczyk
     date: June 2003
 
-LoRa1:
-    target: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6021899/pdf/sensors-18-01833.pdf
-    title: Enhancing LoRaWAN Security through a Lightweight and Authenticated Key Management Approach
-    author:
-      -
-        ins: R. Sanchez-Iborra
-    date: June 2018
-
 informative:
 
   I-D.hartke-core-e2e-security-reqs:
@@ -86,6 +79,14 @@ informative:
   RFC7228:
   RFC7252:
   RFC5869:
+  
+  LoRa1:
+    target: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6021899/pdf/sensors-18-01833.pdf
+    title: Enhancing LoRaWAN Security through a Lightweight and Authenticated Key Management Approach
+    author:
+      -
+        ins: R. Sanchez-Iborra
+    date: June 2018
 
 --- abstract
 
@@ -99,7 +100,7 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), an authenticated key exchange protocol using CBOR and COSE. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}} and LoRaWAN [][]. Compared to the TLS 1.3 handshake {{I-D.ietf-tls-tls13}}, the number of bytes in EDHOC is approximately 1/3 when PSK authentication is used and 1/2 when RPK authentication is used, see {{app-sizes}}.
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}} and LoRaWAN {{LoRa1}}. Compared to the TLS 1.3 handshake {{I-D.ietf-tls-tls13}}, the number of bytes in EDHOC is approximately 1/3 when PSK authentication is used and 1/2 when RPK authentication is used, see {{app-sizes}}.
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{RFC8152}} are used to implement these standards.
 
