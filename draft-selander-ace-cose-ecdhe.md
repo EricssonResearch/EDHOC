@@ -39,6 +39,7 @@ normative:
   RFC8152:
   RFC8174:
   I-D.schaad-cose-x509:
+  
   SP-800-56a:
     target: http://dx.doi.org/10.6028/NIST.SP.800-56Ar2
     title: Recommendation for Pair-Wise Key Establishment Schemes Using Discrete Logarithm Cryptography
@@ -62,6 +63,14 @@ normative:
       -
         ins: H. Krawczyk
     date: June 2003
+
+LoRa1:
+    target: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6021899/pdf/sensors-18-01833.pdf
+    title: Enhancing LoRaWAN Security through a Lightweight and Authenticated Key Management Approach
+    author:
+      -
+        ins: R. Sanchez-Iborra
+    date: June 2018
 
 informative:
 
