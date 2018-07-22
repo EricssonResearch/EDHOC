@@ -71,6 +71,7 @@ informative:
   I-D.ietf-ace-oscore-profile:
   I-D.ietf-cbor-cddl:
   I-D.ietf-core-resource-directory:
+  I-D.ietf-6tisch-dtsecurity-zerotouch-join:
 
   RFC7228:
   RFC7252:
