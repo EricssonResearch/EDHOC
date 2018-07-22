@@ -908,6 +908,8 @@ This appendix gives an estimate of the message sizes when EDHOC is used with raw
 
 ## Message Sizes RPK
 
+### message_1
+
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
   1,
@@ -929,6 +931,8 @@ message_1 (49 bytes):
 0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
 81 38 1A 81 0A 81 27 81 27
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+### message_2
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = (
@@ -977,6 +981,10 @@ message_2 (125 bytes):
 4C 4D 4E 4F 50
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+### message_3
+
+The plaintext and ciphertext in message_3 are assumed to be of equal sizes as in message_2.
+
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 = (
   3,
@@ -997,6 +1005,8 @@ message_3 (86 bytes):
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes PSK
+
+### message_1
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
@@ -1019,6 +1029,8 @@ message_1 (50 bytes):
 81 38 1A 81 0A 44 61 63 64 63
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+### message_2
+
 Assuming a 0 byte plaintext and a 64-bit MAC value the ciphertext is 8 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1040,6 +1052,10 @@ message_2 (49 bytes):
 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 00 00
 48 61 62 63 64 65 66 67 68
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+### message_3
+
+The plaintext and ciphertext in message_3 are assumed to be of equal sizes as in message_2.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 = (
