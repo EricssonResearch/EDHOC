@@ -86,6 +86,18 @@ informative:
     author:
       -
         ins: R. Sanchez-Iborra
+      -
+        ins: J. Sánchez-Gómez
+      -
+        ins: R. Pérez
+      -
+        ins: PJ. Fernández
+      -
+        ins: J. Santa
+      -
+        ins: JL. Hernández-Ramos
+      -
+        ins: AF. Skarmeta
     date: June 2018
 
 --- abstract
