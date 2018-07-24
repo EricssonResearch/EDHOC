@@ -995,7 +995,7 @@ A1 04 44 61 62 62 61 58 40 00 01 02 03 04 05 06 07 08 09 0A
 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of plaintext is 73 bytes so assuming a 64-bit MAC value the ciphertext is 81 bytes
+The size of the protected header field is 7 bytes. The size of the plaintext is 73 bytes so assuming a 64-bit MAC value the ciphertext is 81 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
@@ -1050,6 +1050,13 @@ message_3 (86 bytes):
 
 ## Message Sizes Certificates
 
+When the certificates are manually distributed and identified with the x5t header and a SHA256/64 hash value, the protected COSE_Sign1 protected header will be 13 bytes instead of 7 bytes.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+protected = { 10 : [8, h'0001020304050607'] }
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When the certificates are identified with the x5chain header, the COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain.
 
 ## Message Sizes PSK
 
