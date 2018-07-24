@@ -1060,7 +1060,7 @@ When the certificates are manually distributed and identified with the x5t heade
 protected = { 10 : [8, h'0001020304050607'] }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When the certificates are identified with the x5chain header, the COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain.
+When the certificates are identified with the x5chain header, the message sizes depends on the size of the certifice chains. The COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain.
 
 ## Message Sizes PSK
 
