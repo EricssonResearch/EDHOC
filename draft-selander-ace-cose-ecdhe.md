@@ -948,7 +948,7 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 # Message Sizes {#app-sizes}
 
-This appendix gives an estimate of the message sizes when EDHOC is used with raw public keys and pre-shared keys. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation and hexadecimal.
+This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation and hexadecimal.
 
 ## Message Sizes RPK
 
@@ -1047,6 +1047,9 @@ message_3 (86 bytes):
 37 38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A
 4B 4C 4D 4E 4F 50
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+## Message Sizes Certificates
+
 
 ## Message Sizes PSK
 
