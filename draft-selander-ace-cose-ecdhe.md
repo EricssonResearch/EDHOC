@@ -882,6 +882,8 @@ Note that, depending on the application, the keys established through the EDHOC 
 
 Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
+An analysis of EDHOC for certificate enrollment was done in {{CertEnr}}.
+
 --- back
 
 # Test Vectors {#examples}
