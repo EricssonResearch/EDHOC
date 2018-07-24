@@ -323,17 +323,19 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 message_1 = (
   MSG_TYPE : int,
   S_U : bstr,  
-  ECDH-Curves_U : alg_array,
+  ECDH-Curves_U : algs
   ECDH-Curve_U : uint,
   X_U : bstr,
-  HKDFs_U : alg_array,
-  AEADs_U : alg_array,
-  SIGs_V : alg_array,
-  SIGs_U : alg_array,
+  HKDFs_U : algs
+  AEADs_U : algs
+  SIGs_V : algs
+  SIGs_U : algs
   ? UAD_1 : bstr
 )
 
-alg_array = [ + alg : int / tstr ]
+alg : int / tstr
+
+algs = alg / [ * alg ]
 ~~~~~~~~~~~
 
 where:
@@ -594,16 +596,18 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 message_1 = (
   MSG_TYPE : int,
   S_U : bstr,
-  ECDH-Curves_U : alg_array,
+  ECDH-Curves_U : algs
   ECDH-Curve_U : uint,
   X_U : bstr,
-  HKDFs_U : alg_array,
-  AEADs_U : alg_array,
+  HKDFs_U : algs
+  AEADs_U : algs
   KID : bstr,
   ? UAD_1 : bstr
 )
 
-alg_array = [ + alg : int / tstr ]
+alg : int / tstr
+
+algs = alg / [ * alg ]
 ~~~~~~~~~~~
 
 where:
@@ -958,22 +962,22 @@ This appendix gives an estimate of the message sizes of EDHOC with different aut
 message_1 = (
   1,
   h'c3',
-  [4],
+  4,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
-  [-27],
-  [10],
-  [-8],
-  [-8]
+  -27,
+  10,
+  -8,
+  -8
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_1 (49 bytes):
-01 41 C3 81 04 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B
-0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
-81 38 1A 81 0A 81 27 81 27
+message_1 (44 bytes):
+01 41 C3 04 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C
+0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
+38 1A 0A 27 27
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_2
@@ -1066,21 +1070,21 @@ When the certificates are identified with the x5chain header, the COSE_Sign1 pro
 message_1 = (
   4,
   h'c3',
-  [4],
+  4,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
-  [-27],
-  [10],
+  -27,
+  10,
   'acdc'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_1 (50 bytes):
-04 41 C3 81 04 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B
-0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
-81 38 1A 81 0A 44 61 63 64 63
+message_1 (47 bytes):
+04 41 C3 04 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C
+0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
+38 1A 0A 44 61 63 64 63
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_2
@@ -1129,11 +1133,11 @@ message_3 (12 bytes):
 ~~~~~~~~~~~~~~~~~~~~~~~
                  PSK     RPK     x5t    x5chain                  
 -----------------------------------------------------------------
-message_1         50      49      49      49                     
+message_1         47      44      44      44                     
 message_2         49     125     131     121 + Certificate chain 
 message_3         12      86      94      82 + Certificate chain 
 -----------------------------------------------------------------
-Total            111     260     272     252 + Certificate chains
+Total            108     255     267     247 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-context title="Typical message sizes in bytes" artwork-align="center"}
 
