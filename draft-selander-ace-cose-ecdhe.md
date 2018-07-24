@@ -1110,6 +1110,19 @@ message_3 (12 bytes):
 06 41 C3 48 00 01 02 03 04 05 06 07
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+## Summary
+
+~~~~~~~~~~~~~~~~~~~~~~~
+                 PSK         RPK
+--------------------------------
+message_1         50          49
+message_2         49         125
+message_3         12          86
+--------------------------------
+Total            111         260
+~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-context title="Example message sizes in bytes" artwork-align="center"}
+
 # Acknowledgments
 {: numbered="no"}
 
