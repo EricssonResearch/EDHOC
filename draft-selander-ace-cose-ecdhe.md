@@ -120,6 +120,14 @@ informative:
         ins: A.F. Skarmeta
     date: June 2018
 
+  CertEnr:
+    target: http://www.nada.kth.se/~ann/exjobb/alexandros_krontiris.pdf
+    title: Evaluation of Certificate Enrollment over Application Layer Security
+    author:
+      -
+        ins: A. Krontiris
+    date: May 2018
+
 --- abstract
 
 This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a very compact, and lightweight authenticated Diffie-Hellman key exchange with ephemeral keys that can be used over any layer. EDHOC uses CBOR and COSE, allowing reuse of existing libraries.
