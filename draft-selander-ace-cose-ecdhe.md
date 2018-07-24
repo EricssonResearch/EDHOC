@@ -1120,15 +1120,15 @@ message_3 (12 bytes):
 ## Summary
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-                 PSK         RPK
---------------------------------
-message_1         50          49
-message_2         49         125
-message_3         12          86
---------------------------------
-Total            111         260
+                 PSK     RPK     x5t    x5chain                  
+-----------------------------------------------------------------
+message_1         50      49      49      49                     
+message_2         49     125     131     121 + Certificate chain 
+message_3         12      86      94      82 + Certificate chain 
+-----------------------------------------------------------------
+Total            111     260     272     252 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-context title="Example message sizes in bytes" artwork-align="center"}
+{: #fig-context title="Typical message sizes in bytes" artwork-align="center"}
 
 # Acknowledgments
 {: numbered="no"}
