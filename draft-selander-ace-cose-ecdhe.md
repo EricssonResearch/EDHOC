@@ -335,7 +335,7 @@ message_1 = (
 
 alg : int / tstr
 
-algs = alg / [ * alg ]
+algs = alg / [ 2* alg ]
 ~~~~~~~~~~~
 
 where:
@@ -607,7 +607,7 @@ message_1 = (
 
 alg : int / tstr
 
-algs = alg / [ * alg ]
+algs = alg / [ 2* alg ]
 ~~~~~~~~~~~
 
 where:
