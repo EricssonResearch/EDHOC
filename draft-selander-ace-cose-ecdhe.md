@@ -323,13 +323,13 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 message_1 = (
   MSG_TYPE : int,
   S_U : bstr,  
-  ECDH-Curves_U : algs
+  ECDH-Curves_U : algs,
   ECDH-Curve_U : uint,
   X_U : bstr,
-  HKDFs_U : algs
-  AEADs_U : algs
-  SIGs_V : algs
-  SIGs_U : algs
+  HKDFs_U : algs,
+  AEADs_U : algs,
+  SIGs_V : algs,
+  SIGs_U : algs,
   ? UAD_1 : bstr
 )
 
@@ -596,11 +596,11 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 message_1 = (
   MSG_TYPE : int,
   S_U : bstr,
-  ECDH-Curves_U : algs
+  ECDH-Curves_U : algs,
   ECDH-Curve_U : uint,
   X_U : bstr,
-  HKDFs_U : algs
-  AEADs_U : algs
+  HKDFs_U : algs,
+  AEADs_U : algs,
   KID : bstr,
   ? UAD_1 : bstr
 )
