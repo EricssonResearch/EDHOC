@@ -537,6 +537,8 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{asym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
+*  Pass the session identifiers (S_U, S_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+
 * Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
 
 ### Party V Processing of Message 3 {#asym-msg3-procV}
@@ -551,7 +553,7 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-* Pass PAD_3, S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
+*  Pass PAD_3, the session identifiers (S_U, S_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -765,7 +767,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{sym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
-* Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
+*  Pass the session identifiers (S_U, S_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 ### Party V Processing of Message 3 {#sym-msg3-procV}
 
@@ -777,7 +779,7 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-* Pass PAD_3, S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
+*  Pass PAD_3, the session identifiers (S_U, S_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # Error Handling {#error}
 
