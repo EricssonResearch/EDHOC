@@ -180,13 +180,11 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * Enc(K; P; A) denotes AEAD encryption of plaintext P and additional authenticated data A using the key K derived from the shared secret. The AEAD MUST NOT be replaced by plain encryption, see {{sec-cons}}.
 
-As described in Appendix B of {{SIGMA}}, in order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
+In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
-* Explicit session identifiers S_U, S_V different from other concurrent session identifiers (EDHOC or other used protocol identifier) chosen by U and V, respectively. 
+* Explicit connection identifiers C_U, C_V chosen by U and V, respectively and enabling the recipient to find the protocol state.
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
-
-EDHOC also makes the following additions:
 
 * Negotiation of key derivation, encryption, and signature algorithms:
 
@@ -212,7 +210,7 @@ This paper is organized as follows: {{general}} specifies general properties of 
 
 # EDHOC Overview {#general}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive application keys, and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit session identifiers S_U and S_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive application keys, and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit connection identifiers C_U and C_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -294,11 +292,11 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                          Party V
-|                        S_U, X_U, ALG_1, UAD_1                        |
+|                        C_U, X_U, ALG_1, UAD_1                        |
 +--------------------------------------------------------------------->|
 |                               message_1                              |
 |                                                                      |
-|    S_U, S_V, X_V, ALG_2, UAD_2, Enc(K_2; Sig(V; CRED_V, aad_2); )    |
+|    C_U, C_V, X_V, ALG_2, UAD_2, Enc(K_2; Sig(V; CRED_V, aad_2); )    |
 |<---------------------------------------------------------------------+
 |                               message_2                              |
 |                                                                      |
@@ -322,7 +320,7 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   MSG_TYPE : int,
-  S_U : bstr,  
+  C_U : bstr,  
   ECDH-Curves_U : algs,
   ECDH-Curve_U : uint,
   X_U : bstr,
@@ -341,7 +339,7 @@ algs = alg / [ 2* alg ]
 where:
 
 * MSG_TYPE = 1
-* S_U - variable length session identifier
+* C_U - variable length connection identifier
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -359,7 +357,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
    
-* Choose a session identifier S_U and store it for the length of the protocol. Party U needs to be able to retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used connection identifiers of that protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -397,8 +395,8 @@ message_2 = (
 
 data_2 = (
   MSG_TYPE : int,
-  S_U : bstr / nil,
-  S_V : bstr,
+  C_U : bstr / nil,
+  C_V : bstr,
   X_V : bstr,
   HKDF_V : uint,
   AEAD_V : uint,
@@ -418,7 +416,7 @@ aad_2 = H( message_1 | data_2 )
 where:
 
 * MSG_TYPE = 2
-* S_V - variable length session identifier
+* C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - a single chosen algorithm from HKDFs_U
 * AEAD_V - a single chosen algorithm from AEADs_U
@@ -432,7 +430,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a session identifier S_V and store it for the length of the protocol. Party V needs to be able to retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used connection identifiers of that protocol.
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
@@ -466,7 +464,7 @@ Party V SHALL compose message_2 as follows:
 
 Party U SHALL process message_2 as follows:
 
-* Retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
@@ -490,7 +488,7 @@ message_3 = (
 
 data_3 = (
   MSG_TYPE : int,
-  S_V : bstr
+  C_V : bstr
 )
 
 aad_3 : bstr
@@ -537,15 +535,13 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{asym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
-*  Pass the session identifiers (S_U, S_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
-
-* Pass S_U, S_V, and the algorithm identified by AEAD_V to the application. The application can now derive application keys.
+*  Pass the connection identifiers (C_U, C_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 ### Party V Processing of Message 3 {#asym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
 
-* Retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple.
 
 * Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
@@ -553,7 +549,7 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-*  Pass PAD_3, the session identifiers (S_U, S_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -569,11 +565,11 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                    S_U, X_U, ALG_1, KID, UAD_1                    |
+|                    C_U, X_U, ALG_1, KID, UAD_1                    |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|           S_U, S_V, X_V, ALG_2, Enc(K_2; UAD_2; aad_2)            |
+|           C_U, C_V, X_V, ALG_2, Enc(K_2; UAD_2; aad_2)            |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -597,7 +593,7 @@ message_1 SHALL be a sequence of CBOR elements as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   MSG_TYPE : int,
-  S_U : bstr,
+  C_U : bstr,
   ECDH-Curves_U : algs,
   ECDH-Curve_U : uint,
   X_U : bstr,
@@ -615,7 +611,7 @@ algs = alg / [ 2* alg ]
 where:
 
 * MSG_TYPE = 4
-* S_U - variable length session identifier
+* C_U - variable length connection identifier
 * ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -632,7 +628,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
 
-* Choose a session identifier S_U and store it for the length of the protocol. Party U needs to be able to retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_U SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used connection identifiers of that protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
@@ -664,8 +660,8 @@ message_2 = (
 
 data_2 = (
   MSG_TYPE : int,
-  S_U : bstr / nil,  
-  S_V : bstr,  
+  C_U : bstr / nil,  
+  C_V : bstr,  
   X_V : bstr,
   HKDF_V : uint,
   AEAD_V : uint
@@ -683,7 +679,7 @@ aad_2 = H( message_1 | data_2 )
 where:
 
 * MSG_TYPE = 5
-* S_V - variable length session identifier
+* C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - a single chosen algorithm from HKDFs_U
 * AEAD_V - a single chosen algorithm from AEADs_U
@@ -695,7 +691,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a session identifier S_V and store it for the length of the protocol. Party V needs to be able to retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple. The session identifier MAY be used with the protocol for which EDHOC establishes traffic keys/master secret, in which case S_V SHALL be different from the concurrently used session identifiers of that protocol.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used connection identifiers of that protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
@@ -713,7 +709,7 @@ Party V SHALL compose message_2 as follows:
 
 Party U SHALL process message_2 as follows:
 
-* Retrieve the protocol state using the session identifier S_U and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
@@ -737,7 +733,7 @@ message_3 = (
 
 data_3 = (
   MSG_TYPE : int,
-  S_V : bstr 
+  C_V : bstr 
 )
 
 aad_3 : bstr
@@ -767,19 +763,19 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as specified in {{sym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
-*  Pass the session identifiers (S_U, S_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass the connection identifiers (C_U, C_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 ### Party V Processing of Message 3 {#sym-msg3-procV}
 
 Party V SHALL process message_3 as follows:
 
-* Retrieve the protocol state using the session identifier S_V and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple.
 
 * Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-*  Pass PAD_3, the session identifiers (S_U, S_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # Error Handling {#error}
 
@@ -872,7 +868,7 @@ Party U and V must make sure that unprotected data and metadata do not reveal an
 
 Using the same KID or unprotected application data in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V are allowed to select the session identifiers S_U and S_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent traffic protection protocol (e.g. OSCORE {{I-D.ietf-core-object-security}}). The choice of session identifier is not security critical but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong session identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
+Party U and V are allowed to select the connection identifiers C_U and C_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent traffic protection protocol (e.g. OSCORE {{I-D.ietf-core-object-security}}). The choice of connection identifier is not security critical but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong connection identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
 
 Party U and V must make sure that unprotected data does not trigger any harmful actions. In particular, this applies to UAD_1 in the asymmetric case, and UAD_1 and KID in the symmetric case. Party V should be aware that spoofed EDHOC message_1 cannot be detected.
 
@@ -938,15 +934,15 @@ Client    Server
 
 ## Deriving an OSCORE context from EDHOC {#app-a2}
 
-When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC session identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
+When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
 
 * The AEAD Algorithm is AEAD_V, as defined in this document
 
 * The Key Derivation Function (KDF) is HKDF_V, as defined in this document
 
-* The Client's Sender ID is S_V, as defined in this document
+* The Client's Sender ID is C_V, as defined in this document
 
-* The Server's Sender ID is S_U, as defined in this document
+* The Server's Sender ID is C_U, as defined in this document
 
 * The Master Secret is derived as EDHOC-Exporter("OSCORE Master Secret", length), where length is equal to the key length (in bytes) of AEAD_V.
 
