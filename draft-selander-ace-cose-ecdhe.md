@@ -234,7 +234,7 @@ EDHOC also allows opaque application data (UAD and PAD) to be sent. Unprotected 
 
 ## Ephemeral Public Keys {#cose_key}
    
-The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to section 13.1 and 13.2 of [RFC8152], but only a subset of the parameters are included in the EDHOC messages.  The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only a subset of the parameters are included in the EDHOC messages.  The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
@@ -449,7 +449,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr containing the credential containing the public key of Party V, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
  
    * external_aad = aad_2
 
@@ -524,7 +524,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr containing the credential containing the public key of Party U, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_3
 
@@ -546,9 +546,9 @@ Party V SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple.
 
-* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
-* Verify COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public key of Party U.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public key of Party U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -698,7 +698,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_2
 
@@ -716,7 +716,7 @@ Party U SHALL process message_2 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -756,7 +756,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-* Compute COSE_Encrypt0 as defined in section 5.3 of [RFC8152], with AEAD_V, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
    * external_aad = aad_3
 
@@ -774,7 +774,7 @@ Party V SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple.
 
-* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
