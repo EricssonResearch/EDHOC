@@ -360,7 +360,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
    
-* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used connection identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -433,7 +433,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used connection identifiers of that protocol.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol.
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
@@ -631,7 +631,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used connection identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
@@ -694,7 +694,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used connection identifiers of that protocol.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol.
 
 *  Select HKDF_V and AEAD_V from the algorithms proposed in HKDFs_U and AEADs_U.
 
