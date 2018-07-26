@@ -266,7 +266,7 @@ where H() is the hash function in HKDF_V.
 
 For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
 
-If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
+If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
 ### EDHOC-Exporter interface
 
@@ -437,7 +437,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
-*  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
    
    * protected = { xyz : ID_CRED_V }
 
@@ -471,9 +471,9 @@ Party U SHALL process message_2 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Decrypt and verify COSE_Encrypt0 as defined in section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
-* Verify COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public key of Party V.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public key of Party V.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
@@ -512,7 +512,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-*  Compute COSE_Sign1 as defined in section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
 
    * protected = { xyz : ID_CRED_U }
 
