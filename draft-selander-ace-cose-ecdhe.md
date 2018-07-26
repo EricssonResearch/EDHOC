@@ -34,7 +34,8 @@ author:
 normative:
 
   I-D.schaad-cose-x509:
-
+  I-D.ietf-core-echo-request-tag
+  
   RFC2119:
   RFC6090:  
   RFC7049:
