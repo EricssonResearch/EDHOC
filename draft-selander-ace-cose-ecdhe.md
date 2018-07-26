@@ -343,8 +343,8 @@ where:
 
 * MSG_TYPE = 1
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
-* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference. If a single algorithm is conveyed, it is placed in a int or text string, if multiple algorithms are conveyed, an array is used.
+* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms
 * AEADs_U - supported AEAD algorithms
