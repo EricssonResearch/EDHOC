@@ -158,13 +158,13 @@ SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of
 
 ~~~~~~~~~~~
 Party U                                                 Party V
-   |                          E_U                          |
+   |                          X_U                          |
    +------------------------------------------------------>|
    |                                                       |
-   |         E_V, Enc(K_2; ID_V, Sig(V; E_U, E_V);)        |
+   |       X_V, Enc(K_2; Sig(V; CRED_V, E_U, E_V); )       |
    |<------------------------------------------------------+
    |                                                       |
-   |           Enc(K_3; ID_U, Sig(U; E_V, E_U);)           |
+   |         Enc(K_3; Sig(U; CRED_U, E_V, E_U); )          |
    +------------------------------------------------------>|
    |                                                       |
 ~~~~~~~~~~~
@@ -173,9 +173,9 @@ Party U                                                 Party V
 
 The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive application keys. The messages are signed, MACed, and encrypted.
 
-* E_U and E_V are the ECDH ephemeral public keys of U and V, respectively.
+* X_U and X_V are the ECDH ephemeral public keys of U and V, respectively.
 
-* ID_U and ID_V are identifiers for the public keys of U and V, respectively.
+* CRED_U and CRED_V are the credentials containing the public keys of U and V, respectively.
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private key of U and V, respectively.
 
