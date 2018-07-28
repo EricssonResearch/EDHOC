@@ -1147,7 +1147,7 @@ message_3 (12 bytes):
 ## Summary
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-              PSK       RPK       x5t   x5chain                  
+              PSK       RPK       x5t     x5chain                  
 --------------------------------------------------------------------
 message_1      47        44        44        44                     
 message_2      49       125       131       121 + Certificate chain 
