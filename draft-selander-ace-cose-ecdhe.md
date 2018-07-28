@@ -1069,7 +1069,7 @@ message_3 (86 bytes):
 When the certificates are manually distributed and identified with the x5t header and a SHA256/64 hash value, the protected COSE_Sign1 protected header will be 13 bytes instead of 7 bytes (assuming one byte labels).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-protected = { TDB1 : [TDB6, h'0001020304050607'] }
+protected = { TDB1 : [ TDB6, h'0001020304050607' ] }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When the certificates are identified with the x5chain header, the message sizes depends on the size of the certifice chains. The COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain.
