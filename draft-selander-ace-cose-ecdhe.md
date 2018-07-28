@@ -903,7 +903,12 @@ TODO: This section needs to be updated.
 
 # PSK Chaining
 
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions. In this case, the new PSK SHALL be derived as EDHOC-Exporter("Chaining PSK", length), where length is equal to the key length (in bytes) of AEAD_V and the new PSK identifier SHALL be derived as KID = EDHOC-Exporter("Chaining KID", 4).
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as
+
+PSK = EDHOC-Exporter("Chaining PSK", length)
+KID = EDHOC-Exporter("Chaining KID", 4)
+
+Where length is equal to the key length (in bytes) of AEAD_V.
 
 # EDHOC with CoAP and OSCORE {#app-a}
 
