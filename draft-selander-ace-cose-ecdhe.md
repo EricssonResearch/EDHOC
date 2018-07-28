@@ -905,8 +905,10 @@ TODO: This section needs to be updated.
 
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as
 
+~~~~~~~~~~~~~~~~~~~~~~~
 PSK = EDHOC-Exporter("Chaining PSK", length)
 KID = EDHOC-Exporter("Chaining KID", 4)
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Where length is equal to the key length (in bytes) of AEAD_V.
 
