@@ -920,7 +920,7 @@ EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages, with the C
 
 In practice, EDHOC message\_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message\_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message\_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response or from the client to the server in the payload of a POST request.
 
-An example of successful EDHOC exchange using CoAP is shown in {{fig-edhoc-oscore-det}}.
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-edhoc-oscore-det}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
