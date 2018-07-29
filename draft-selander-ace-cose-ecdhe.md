@@ -376,7 +376,8 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 ~~~~~~~~~~~
 ERR_MSG = "Curve not supported; Z"
 
-where Z is the index of the first curve in ECDH-Curves_U that V supports.
+where Z is the index of the first curve in ECDH-Curves_U that V
+supports.
 ~~~~~~~~~~~
 
 * Pass UAD_1 to the application.
