@@ -855,6 +855,19 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
         Change Controller: IESG
 
+## CoAP Content-Formats Registry {#content-format}
+
+IANA has added the 'application/edhoc' media type in the "CoAP Content-Formats" registry.
+
+~~~~~~~~~~~
++----------------------+----------+----------+-------------------+
+| Media Type           | Encoding | ID       | Reference         |
++----------------------+----------+----------+-------------------+
+| application/edhoc    |          | TBD1     | [[this document]] |
++----------------------+----------+----------+-------------------+
+~~~~~~~~~~~
+{: artwork-align="center"}
+
 # Security Considerations {#sec-cons}
 EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection.
 
