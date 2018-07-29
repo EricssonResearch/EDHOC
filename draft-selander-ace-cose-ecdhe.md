@@ -906,11 +906,11 @@ TODO: This section needs to be updated.
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PSK = EDHOC-Exporter("Chaining PSK", length)
-KID = EDHOC-Exporter("Chaining KID", 4)
+PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
+KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Where length is equal to the key length (in bytes) of AEAD_V.
+where length is equal to the key length (in bytes) of AEAD_V.
 
 # EDHOC with CoAP and OSCORE {#app-a}
 
@@ -958,9 +958,14 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 * The Server's Sender ID is C_U, as defined in this document
 
-* The Master Secret is derived as EDHOC-Exporter("OSCORE Master Secret", length), where length is equal to the key length (in bytes) of AEAD_V.
+* The Master Secret and Master Salt is derived as
 
-* The Master Salt is derived as EDHOC-Exporter("OSCORE Master Salt", 8)
+~~~~~~~~~~~~~~~~~~~~~~~
+Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
+Master Salt   = EDHOC-Exporter("OSCORE Master Salt", 8)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+where length is equal to the key length (in bytes) of AEAD_V.
 
 # Message Sizes {#app-sizes}
 
