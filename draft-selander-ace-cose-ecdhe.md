@@ -296,7 +296,7 @@ Party U                                                          Party V
 +--------------------------------------------------------------------->|
 |                               message_1                              |
 |                                                                      |
-|    C_U, C_V, X_V, ALG_2, UAD_2, Enc(K_2; Sig(V; CRED_V, aad_2); )    |
+|    C_U, C_V, X_V, ALG_2, Enc(K_2; Sig(V; CRED_V, aad_2), UAD_2; )    |
 |<---------------------------------------------------------------------+
 |                               message_2                              |
 |                                                                      |
@@ -861,11 +861,11 @@ EDHOC with asymmetric authentication offers identity protection of Party U again
 
 The security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to ID_CRED_V, UAD_1, and UAD_2 in the asymmetric case, and UAD_1 and KID in the symmetric case. The communicating parties may therefore anonymize KID.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, and UAD_2 in the asymmetric case, and KID, and UAD_1 in the symmetric case. The communicating parties may therefore anonymize KID.
 
-Using the same KID, ID_CRED_V, or unprotected application data in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
+Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 in the asymmetric case, and UAD_1 and KID in the symmetric case.
+Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 in the asymmetric case, and KID and UAD_1 in the symmetric case.
 
 As described in {{SIGMA}}, peer awareness is provided to Party V, but not to Party U.
 
