@@ -1072,7 +1072,7 @@ When the certificates are manually distributed and identified with the x5t heade
 protected = { TDB1 : [ TDB6, h'0001020304050607' ] }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When the certificates are identified with the x5chain header, the message sizes depends on the size of the certifice chains. The COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain.
+When the certificates are identified with the x5chain header, the message sizes depends on the size of the certificate chains. The COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 protected = { TDB3 : h'0001020304050607...' }
