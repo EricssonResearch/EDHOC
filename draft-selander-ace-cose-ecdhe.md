@@ -1151,7 +1151,7 @@ message_3 (12 bytes):
 --------------------------------------------------------------------
 message_1      47        44        44        44                     
 message_2      49       125       131       121 + Certificate chain 
-message_3      12        86        94        82 + Certificate chain 
+message_3      12        86        92        82 + Certificate chain 
 --------------------------------------------------------------------
 Total         108       255       267       247 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
