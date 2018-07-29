@@ -802,7 +802,7 @@ where:
 
 ## The Well-Known URI Registry
 
-IANA has added the well-known URI 'edhoc' in the Well-Known URIs registry.
+IANA has added the well-known URI 'edhoc' to the Well-Known URIs registry.
 
    URI suffix: edhoc
 
@@ -857,7 +857,7 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
 ## CoAP Content-Formats Registry {#content-format}
 
-IANA has added the 'application/edhoc' media type in the "CoAP Content-Formats" registry.
+IANA has added the media type 'application/edhoc' to the CoAP Content-Formats registry.
 
 ~~~~~~~~~~~
 +----------------------+----------+----------+-------------------+
