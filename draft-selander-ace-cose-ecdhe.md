@@ -927,16 +927,16 @@ Client    Server
   |          |
   +--------->| Header: POST (Code=0.02)
   |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Type: application/edhoc
+  |          | Content-Format: application/edhoc
   |          | Payload: EDHOC message_1
   |          |
   |<---------+ Header: 2.04 Changed
-  |   2.04   | Content-Type: application/edhoc
+  |   2.04   | Content-Format: application/edhoc
   |          | Payload: EDHOC message_2
   |          |
   +--------->| Header: POST (Code=0.02)
   |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Type: application/edhoc
+  |          | Content-Format: application/edhoc
   |          | Payload: EDHOC message_3
   |          |
   |<---------+ Header: 2.04 Changed
