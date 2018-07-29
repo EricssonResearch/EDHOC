@@ -893,7 +893,7 @@ Note that, depending on the application, the application keys established throug
 
 Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
-EDHOC has been analyzed in several other documents. An analysis of EDHOC for certificate enrollment was done in {{CertEnr}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, and the use of EDHOC in 6TiSCH is decribed in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
+EDHOC has been analyzed in several other documents. An analysis of EDHOC for certificate enrollment was done in {{CertEnr}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, and the use of EDHOC in 6TiSCH is described in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
 
 --- back
 
