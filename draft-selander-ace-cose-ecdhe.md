@@ -345,13 +345,13 @@ where:
 
 * MSG_TYPE = 1
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference. If a single algorithm is conveyed, it is placed in a int or text string, if multiple algorithms are conveyed, an array is used.
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in a int or text string, if multiple algorithms are conveyed, an array is used.
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index)
 * X_U - the x-coordinate of the ephemeral public key of Party U
-* HKDFs_U - supported ECDH-SS w/ HKDF algorithms
-* AEADs_U - supported AEAD algorithms
-* SIGs_V - signature algorithms, with which Party U supports verification
-* SIGs_U - signature algorithms, with which Party U supports signing
+* HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
+* AEADs_U - supported AEAD algorithms, in order of decreasing preference
+* SIGs_V - signature algorithms, with which Party U supports verification, in order of decreasing preference.
+* SIGs_U - signature algorithms, with which Party U supports signing, in order of decreasing preference.
 * UAD_1 - bstr containing unprotected opaque application data
 
 ### Party U Processing of Message 1
@@ -424,10 +424,10 @@ where:
 * MSG_TYPE = 2
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
-* HKDF_V - a single chosen algorithm from HKDFs_U
-* AEAD_V - a single chosen algorithm from AEADs_U
-* SIG_V - a single chosen algorithm from SIGs_V with which Party V signs
-* SIG_U - a single chosen algorithm from SIGs_U with which Party U signs
+* HKDF_V - the first supported algorithm from HKDFs_U
+* AEAD_V - the first supported algorithm from AEADs_U
+* SIG_V - the first supported algorithm from SIGs_V with which Party V signs
+* SIG_U - the first supported algorithm from SIGs_U with which Party U signs
 * H() - the hash function in HKDF_V
 
 ### Party V Processing of Message 2
@@ -618,11 +618,11 @@ where:
 
 * MSG_TYPE = 4
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in the order of decreasing preference
-* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (array index with zero-based indexing)
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in a int or text string, if multiple algorithms are conveyed, an array is used.
+* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index)
 * X_U - the x-coordinate of the ephemeral public key of Party U
-* HKDFs_U - supported ECDH-SS w/ HKDF algorithms
-* AEADs_U - supported AEAD algorithms
+* HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
+* AEADs_U - supported AEAD algorithms, in order of decreasing preference
 * KID - identifier of the pre-shared key
 * UAD_1 - bstr containing unprotected opaque application data
 
@@ -687,8 +687,8 @@ where:
 * MSG_TYPE = 5
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
-* HKDF_V - a single chosen algorithm from HKDFs_U
-* AEAD_V - a single chosen algorithm from AEADs_U
+* HKDF_V - the first supported algorithm from HKDFs_U
+* AEAD_V - the first supported algorithm from AEADs_U
 * H() - the hash function in HKDF_V
 
 ### Party V Processing of Message 2
