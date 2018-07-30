@@ -962,15 +962,11 @@ Client    Server
 
 When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
 
-* The AEAD Algorithm is AEAD_V, as defined in this document
+* The Client's Sender ID is C_V and the server's Sender ID is C_U, as defined in this document
 
-* The Key Derivation Function (KDF) is HKDF_V, as defined in this document
+* The AEAD Algorithm is AEAD_V and the Key Derivation Function (KDF) is HKDF_V, as defined in this document
 
-* The Client's Sender ID is C_V, as defined in this document
-
-* The Server's Sender ID is C_U, as defined in this document
-
-* The Master Secret and Master Salt is derived as follows where length is the key length (in bytes) of AEAD_V.
+* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of AEAD_V.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
