@@ -156,7 +156,7 @@ This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-c
 
 # EDHOC Overview {#overview}
 
-## Protocol Overview {#protocol}
+## Protocol Overview
 
 SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection (SIGMA-I), and like TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an AEAD algorithm is shown in {{fig-sigma}}.
 
@@ -211,7 +211,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries. EDHOC does not put any requirement on the lower layers and can therefore also be used e.g. in environments without IP.
 
-# EDHOC Overview {#general}
+# EDHOC Overview
 
 EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive application keys, and protected application data can therefore be sent in parallel with EDHOC message_3. The application data may be protected using the negotiated AEAD algorithm and the explicit connection identifiers C_U and C_V. EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -270,7 +270,7 @@ For message_i the key, called K_i, SHALL be derived using other = aad_i, where i
 
 If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
-### EDHOC-Exporter interface
+### EDHOC-Exporter interface {#exporter}
 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface:
 
