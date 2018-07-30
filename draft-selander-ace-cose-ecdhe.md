@@ -312,11 +312,11 @@ Party U                                                          Party V
 {: #fig-asym title="EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
 
-### Mandatory to Implement Algorithms {#asym-mti}
+### Mandatory to Implement Algorithms
 
 For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF-256, AES-CCM-64-64-128, and Ed25519 are mandatory to implement.
 
-## EDHOC Message 1 {#asym-msg1}
+## EDHOC Message 1
 
 ### Formatting of Message 1 {#asym-msg1-form}
 
@@ -354,7 +354,7 @@ where:
 * SIGs_U - signature algorithms, with which Party U supports signing
 * UAD_1 - bstr containing unprotected opaque application data
 
-### Party U Processing of Message 1 {#asym-msg1-procU}
+### Party U Processing of Message 1
 
 Party U SHALL compose message_1 as follows:
 
@@ -366,7 +366,7 @@ Party U SHALL compose message_1 as follows:
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
-### Party V Processing of Message 1 {#asym-msg1-procV}
+### Party V Processing of Message 1
 
 Party V SHALL process message_1 as follows:
  
@@ -387,7 +387,7 @@ supports.
 
 * Pass UAD_1 to the application.
 
-## EDHOC Message 2 {#asym-msg2}
+## EDHOC Message 2
 
 ### Formatting of Message 2 {#asym-msg2-form}
 
@@ -430,7 +430,7 @@ where:
 * SIG_U - a single chosen algorithm from SIGs_U with which Party U signs
 * H() - the hash function in HKDF_V
 
-### Party V Processing of Message 2 {#asym-msg2-procV}
+### Party V Processing of Message 2
 
 Party V SHALL compose message_2 as follows:
 
@@ -466,7 +466,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Format message_2 as specified in {{asym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
 
-### Party U Processing of Message 2 {#asym-msg2-procU}
+### Party U Processing of Message 2
 
 Party U SHALL process message_2 as follows:
 
@@ -480,7 +480,7 @@ Party U SHALL process message_2 as follows:
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
 
-## EDHOC Message 3 {#asym-msg3}
+## EDHOC Message 3
 
 ### Formatting of Message 3 {#asym-msg3-form}
 
@@ -511,7 +511,7 @@ where:
 
 * MSG_TYPE = 3
 
-### Party U Processing of Message 3 {#asym-msg3-procU}
+### Party U Processing of Message 3
 
 Party U SHALL compose message_3 as follows:
 
@@ -543,7 +543,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Pass the connection identifiers (C_U, C_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
-### Party V Processing of Message 3 {#asym-msg3-procV}
+### Party V Processing of Message 3
 
 Party V SHALL process message_3 as follows:
 
@@ -586,11 +586,11 @@ Party U                                                       Party V
 {: #fig-sym title="EDHOC with symmetric key authentication. "}
 {: artwork-align="center"}
 
-### Mandatory to Implement Algorithms {#sym-mti}
+### Mandatory to Implement Algorithms
 
 For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-256 and AES-CCM-64-64-128 are mandatory to implement.
 
-## EDHOC Message 1 {#sym-msg1}
+## EDHOC Message 1
 
 ### Formatting of Message 1 {#sym-msg1-form}
 
@@ -626,7 +626,7 @@ where:
 * KID - identifier of the pre-shared key
 * UAD_1 - bstr containing unprotected opaque application data
 
-### Party U Processing of Message 1 {#sym-msg1-procU}
+### Party U Processing of Message 1
 
 Party U SHALL compose message_1 as follows:
 
@@ -638,7 +638,7 @@ Party U SHALL compose message_1 as follows:
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
-### Party V Processing of Message 1 {#sym-msg1-procV}
+### Party V Processing of Message 1
 
 Party V SHALL process message_1 as follows:
 
@@ -652,7 +652,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 * Pass UAD_1 to the application.
 
-## EDHOC Message 2 {#sym-msg2}
+## EDHOC Message 2
 
 ### Formatting of Message 2 {#sym-msg2-form}
 
@@ -691,7 +691,7 @@ where:
 * AEAD_V - a single chosen algorithm from AEADs_U
 * H() - the hash function in HKDF_V
 
-### Party V Processing of Message 2 {#sym-msg2-procV}
+### Party V Processing of Message 2
 
 Party V SHALL compose message_2 as follows:
 
@@ -711,7 +711,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Format message_2 as specified in {{sym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
    
-### Party U Processing of Message 2 {#sym-msg2-procU}
+### Party U Processing of Message 2
 
 Party U SHALL process message_2 as follows:
 
@@ -725,7 +725,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 * Pass UAD_2 to the application.
 
-## EDHOC Message 3 {#sym-msg3}
+## EDHOC Message 3
 
 ### Formatting of Message 3 {#sym-msg3-form}
 
@@ -755,7 +755,7 @@ where:
 
 * MSG_TYPE = 6
 
-### Party U Processing of Message 3 {#sym-msg3-procU}
+### Party U Processing of Message 3
 
 Party U SHALL compose message_3 as follows:
 
@@ -771,7 +771,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Pass the connection identifiers (C_U, C_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
-### Party V Processing of Message 3 {#sym-msg3-procV}
+### Party V Processing of Message 3
 
 Party V SHALL process message_3 as follows:
 
