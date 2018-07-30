@@ -145,7 +145,7 @@ EDHOC is designed to work in highly constrained scenarios making it especially s
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{RFC8152}} are used to implement these standards.
 
-This paper is organized as follows: {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{examples}} provides a wealth of test vectors to ease implementation and ensure interoperability.
+This paper is organized as follows: {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
 
 ## Terminology  and Requirements Language
 
@@ -552,7 +552,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
-## Overview
+## Overview {#sym-overview}
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
@@ -915,11 +915,11 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 --- back
 
-# Test Vectors {#examples}
+# Test Vectors {#vectors}
 
 TODO: This section needs to be updated.
 
-# PSK Chaining
+# EDHOC PSK Chaining
 
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of AEAD_V.
 
@@ -928,9 +928,9 @@ PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
 KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# EDHOC with CoAP and OSCORE {#app-a}
+# EDHOC with CoAP and OSCORE
 
-## Transferring EDHOC in CoAP {#app-a1}
+## Transferring EDHOC in CoAP {#coap}
 
 EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
@@ -962,7 +962,7 @@ Client    Server
 {: #fig-edhoc-oscore-det title="Example of transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-## Deriving an OSCORE context from EDHOC {#app-a2}
+## Deriving an OSCORE context from EDHOC {#oscore}
 
 When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique Recipient IDs in OSCORE.  In case that the CoAP client is party U and the CoAP server is party V:
 
@@ -977,7 +977,7 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
    Master Salt   = EDHOC-Exporter("OSCORE Master Salt", 8)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# Message Sizes {#app-sizes}
+# Message Sizes {#sizes}
 
 This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation and hexadecimal.
 
