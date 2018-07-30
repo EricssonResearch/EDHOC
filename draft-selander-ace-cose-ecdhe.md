@@ -355,7 +355,7 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-* Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used. The content of ECDH-Curves_U SHALL be fixed, and SHALL not be changed based on previous error messages.
+* Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve that U supports, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
    
@@ -620,7 +620,7 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-* Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve in ECDH-Curves_U, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used. The content of ECDH-Curves_U SHALL be fixed, and SHALL not be changed based on previous error messages.
+* Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve that U supports, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
 
