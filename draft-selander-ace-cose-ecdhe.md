@@ -154,9 +154,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{RFC7049}}. A vertical bar \| denotes byte string concatenation.
 
 
-# EDHOC Overview {#overview}
+# Overview {#overview}
 
-## Protocol Overview
+## The Use of SIGMA-I in EDHOC
 
 SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection (SIGMA-I), and like TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an AEAD algorithm is shown in {{fig-sigma}}.
 
@@ -193,13 +193,13 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Negotiation of key derivation, encryption, and signature algorithms:
 
-   * U proposes one or more algorithms of the following kinds: 
+   * U proposes one or more algorithms of the following kinds in order of preference: 
        *  HKDF
        *  AEAD
        *  Signature verification 
        *  Signature generation 
 
-   * V selects one algorithm of each kind
+   * V selects the first supported algorithm of each kind
 
 * Verification of common preferred ECDH curve:
 
