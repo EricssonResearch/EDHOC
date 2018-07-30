@@ -202,7 +202,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
    * U lists supported ECDH curves in order of preference
    
-   * V verifies that the ECDH curve of the ephemeral key is the most preferred common curve
+   * V verifies that the ECDH curve of the ephemeral key is the first supported curve
 
 * Transport of opaque application defined data.
 
