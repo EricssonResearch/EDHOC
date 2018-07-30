@@ -874,27 +874,22 @@ IANA has added the media type 'application/edhoc' to the CoAP Content-Formats re
 {: artwork-align="center"}
 
 # Security Considerations {#security}
-EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection.
+
+EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection. As described in {{SIGMA}}, peer awareness is provided to Party V, but not to Party U.
 
 EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically one that is not derivable from routing information in the lower layers.
 
 The security of the protocol requires the MAC to cover the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism.
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, and UAD_2 in the asymmetric case, and KID, and UAD_1 in the symmetric case. The communicating parties may therefore anonymize KID.
-
-Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. Another consideration is that the list of supported algorithms may be used to identify the application.
-
-Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 in the asymmetric case, and KID and UAD_1 in the symmetric case.
-
-As described in {{SIGMA}}, peer awareness is provided to Party V, but not to Party U.
-
-EDHOC itself does not provide countermeasures against Denial-of-Service attacks. By sending a number of new or replayed message_1 an attacker may cause Party V to allocate state, perform cryptographic operations, and amplify messages. To mitigate such attacks, an implementation SHOULD rely on lower layer mechanisms such as the Echo option in CoAP {{I-D.ietf-core-echo-request-tag}} that forces the initiator to demonstrate reachability at their apparent network address.
-
-EDHOC binds massages together by including all previous messages in the additional authenticated data. This protects against an attacker replaying messages or injecting messages from another session.
+Compared to {{SIGMA}}, EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
 
 In EDHOC, the ephemeral keys are used to provide a good amount of randomness to each session. A good amount of randomness is important for the key generation, to provide aliveness, and to protect against interleaving attacks.  For this reason, the ephemeral keys MUST NOT be reused, both parties SHALL generate fresh random ephemeral key pairs.
 
-Compared to {{SIGMA}}, EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. EDHOC uses the same Sign-then-MAC approach as TLS 1.3.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, and UAD_2 in the asymmetric case, and KID, and UAD_1 in the symmetric case. Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize KID. Another consideration is that the list of supported algorithms may be used to identify the application.
+
+Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 in the asymmetric case, and KID and UAD_1 in the symmetric case. Party U and V are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported.
+
+EDHOC itself does not provide countermeasures against Denial-of-Service attacks. By sending a number of new or replayed message_1 an attacker may cause Party V to allocate state, perform cryptographic operations, and amplify messages. To mitigate such attacks, an implementation SHOULD rely on lower layer mechanisms such as the Echo option in CoAP {{I-D.ietf-core-echo-request-tag}} that forces the initiator to demonstrate reachability at their apparent network address.
 
 EDHOC does not include negotiation of parameters related to the ephemeral key, but it enables Party V to verify that the ECDH curve used in the protocol is the most preferred curve by U which is supported by both U and V. 
 
@@ -902,15 +897,9 @@ Party U and V are allowed to select the connection identifiers C_U and C_V, resp
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in RFC6979 is RECOMMENDED.
 
-The referenced processing instructions in {{SP-800-56a}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret.
+The referenced processing instructions in {{SP-800-56a}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
-Party U and V are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported.
-
-The choice of key length used in the different algorithms needs to be harmonized, so that a sufficient security level is maintained for certificates, EDHOC, and the protection of application data. Party U and V should enforce a minimum security level. 
-
-Note that, depending on the application, the application keys established through the EDHOC protocol will need to be renewed, in which case the communicating parties need to run the protocol again. Alternatively derive application keys with other labels.
-
-Implementations should provide countermeasures to side-channel attacks such as timing attacks.
+The choice of key length used in the different algorithms needs to be harmonized, so that a sufficient security level is maintained for certificates, EDHOC, and the protection of application data. Party U and V should enforce a minimum security level.  Note that, depending on the application, the application keys established through the EDHOC protocol will need to be renewed, in which case the communicating parties need to run the protocol again. Alternatively derive application keys with other labels.
 
 EDHOC has been analyzed in several other documents. An analysis of EDHOC for certificate enrollment was done in {{CertEnr}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, and the use of EDHOC in 6TiSCH is described in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
 
