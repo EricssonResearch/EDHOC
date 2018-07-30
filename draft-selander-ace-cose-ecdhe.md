@@ -376,14 +376,7 @@ Party V SHALL process message_1 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_U.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
-
-~~~~~~~~~~~
-ERR_MSG = "Curve not supported; Z"
-
-where Z is the index of the first curve in ECDH-Curves_U that V
-supports.
-~~~~~~~~~~~
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U:
 
 * Pass UAD_1 to the application.
 
