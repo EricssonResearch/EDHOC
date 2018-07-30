@@ -145,7 +145,7 @@ EDHOC is designed to work in highly constrained scenarios making it especially s
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{RFC8152}} are used to implement these standards.
 
-This paper is organized as follows: {{overview}} specifies general properties of EDHOC, including the use of SIGMA-I, message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
+This paper is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
 
 ## Terminology  and Requirements Language
 
@@ -153,10 +153,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{RFC7049}}. A vertical bar \| denotes byte string concatenation.
 
-
-# Overview {#overview}
-
-## The Use of SIGMA-I in EDHOC
+# Background {#background}
 
 SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection (SIGMA-I), and like TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an AEAD algorithm is shown in {{fig-sigma}}.
 
