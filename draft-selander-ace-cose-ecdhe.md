@@ -183,7 +183,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private key of U and V, respectively.
 
-* Enc(K; P; A) denotes AEAD encryption of plaintext P and additional authenticated data A using the key K derived from the shared secret. The AEAD MUST NOT be replaced by plain encryption, see {{sec-cons}}.
+* Enc(K; P; A) denotes AEAD encryption of plaintext P and additional authenticated data A using the key K derived from the shared secret. The AEAD MUST NOT be replaced by plain encryption, see {{security}}.
 
 In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
@@ -860,7 +860,7 @@ IANA has added the media type 'application/edhoc' to the Media Types registry:
 
         Change Controller: IESG
 
-## CoAP Content-Formats Registry {#content-format}
+## CoAP Content-Formats Registry
 
 IANA has added the media type 'application/edhoc' to the CoAP Content-Formats registry.
 
@@ -873,7 +873,7 @@ IANA has added the media type 'application/edhoc' to the CoAP Content-Formats re
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
-# Security Considerations {#sec-cons}
+# Security Considerations {#security}
 EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection.
 
 EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically one that is not derivable from routing information in the lower layers.
@@ -933,7 +933,7 @@ KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 
 ## Transferring EDHOC in CoAP {#app-a1}
 
-EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{sec-cons}}. By default, EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
 In practice, EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response.
 
