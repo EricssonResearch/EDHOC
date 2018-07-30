@@ -428,7 +428,7 @@ Party V SHALL compose message_2 as follows:
 
 * Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. C_U can be set to null if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
-*  Select HKDF_V, AEAD_V, SIG_V, and SIG_U from the algorithms proposed in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
+*  Select HKDF_V, AEAD_V, SIG_V, and SIG_U as the first supported algorithms in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
    
