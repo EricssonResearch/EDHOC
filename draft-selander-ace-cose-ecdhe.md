@@ -376,7 +376,7 @@ Party V SHALL process message_1 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_U.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include the following diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U:
 
 ~~~~~~~~~~~
 ERR_MSG = "Curve not supported; Z"
@@ -478,7 +478,7 @@ Party U SHALL process message_2 as follows:
 
 * Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public key of Party V.
 
-If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
 ## EDHOC Message 3
 
@@ -553,7 +553,7 @@ Party V SHALL process message_3 as follows:
 
 * Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public key of Party U.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
 *  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
@@ -648,7 +648,7 @@ Party V SHALL process message_1 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_U.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then the error message MUST include a diagnostic payload describing the first supported ECDH curve in ECDH-Curves_U.
 
 * Pass UAD_1 to the application.
 
@@ -721,7 +721,7 @@ Party U SHALL process message_2 as follows:
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
-If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
 * Pass UAD_2 to the application.
 
@@ -779,13 +779,13 @@ Party V SHALL process message_3 as follows:
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{err-format}}, and the protocol MUST be discontinued.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
 *  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # Error Handling {#error}
 
-## Error Message Format {#err-format}
+## Error Message Format
 
 This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be send by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are independent of the lower layers and are therefore sent as normal successful messages (e.g. POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
