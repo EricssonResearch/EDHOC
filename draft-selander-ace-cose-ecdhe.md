@@ -932,11 +932,11 @@ KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 
 ## Transferring EDHOC in CoAP {#coap}
 
-EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is sent to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
-In practice, EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response.
+By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 Changed response.
 
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-edhoc-oscore-det}}.
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -959,7 +959,7 @@ Client    Server
   |   2.04   | 
   |          |
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-edhoc-oscore-det title="Example of transferring EDHOC in CoAP"}
+{: #fig-coap title="Example of transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
 ## Deriving an OSCORE context from EDHOC {#oscore}
