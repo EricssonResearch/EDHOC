@@ -342,7 +342,7 @@ where:
 
 * MSG_TYPE = 1
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in a int or text string, if multiple algorithms are conveyed, an array is used.
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in an int or text string, if multiple algorithms are conveyed, an array is used.
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
@@ -610,7 +610,7 @@ where:
 
 * MSG_TYPE = 4
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in a int or text string, if multiple algorithms are conveyed, an array is used.
+* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in an int or text string, if multiple algorithms are conveyed, an array is used.
 * ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
@@ -801,7 +801,7 @@ where:
 
 * MSG_TYPE = 0
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}.
-* ALGs_V - algorithms that V supports that were not included in ECDH-Curve_U, HKDFs_U, EADs_U, SIGs_V, SIGs_U,
+* ALGs_V - algorithms that V supports that were not included in ECDH-Curve_U, HKDFs_U, AEADs_U, SIGs_V, SIGs_U,
 
 # IANA Considerations {#iana}
 
