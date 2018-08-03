@@ -355,7 +355,7 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-* The lists of supported algorithms (ECDH-Curves_U, HKDFs_U, AEADs_U, SIGs_V, SIGs_U) MAY be truncated and the amount of truncation MAY be changed, e.g. based on previous error messages. The algorithm order MUST NOT be changed based on previous error messages.
+* The supported algorithms and the order of preference MUST NOT be changed based on previous error messages. However, the lists sent to Party V (ECDH-Curves_U, HKDFs_U, AEADs_U, SIGs_V, SIGs_U) MAY be truncated and the amount of truncation MAY be changed between sessions, e.g. based on previous error messages.
 
 * Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve that U supports, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
 
@@ -622,7 +622,7 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-* The lists of supported algorithms (ECDH-Curves_U, HKDFs_U, AEADs_U) MAY be truncated and the amount of truncation MAY be changed, e.g. based on previous error messages. The algorithm order MUST NOT be changed based on previous error messages.
+* The supported algorithms and the order of preference MUST NOT be changed based on previous error messages. However, the lists sent to Party V (ECDH-Curves_U, HKDFs_U, AEADs_U) MAY be truncated and the amount of truncation MAY be changed between sessions, e.g. based on previous error messages.
 
 * Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve that U supports, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
 
