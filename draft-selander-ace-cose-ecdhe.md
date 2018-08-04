@@ -331,9 +331,13 @@ message_1 = (
   SIGs_U : algs,
   ? UAD_1 : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 alg : int / tstr
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 algs = alg / [ 2* alg ]
 ~~~~~~~~~~~
 
@@ -389,7 +393,9 @@ message_2 = (
   data_2,
   CIPHERTEXT_2 : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 data_2 = (
   MSG_TYPE : int,
   C_U : bstr / nil,
@@ -400,7 +406,9 @@ data_2 = (
   SIG_V : uint,
   SIG_U : uint
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 aad_2 : bstr
 ~~~~~~~~~~~
 
@@ -482,12 +490,16 @@ message_3 = (
   data_3,
   CIPHERTEXT_3 : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 data_3 = (
   MSG_TYPE : int,
   C_V : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 aad_3 : bstr
 ~~~~~~~~~~~
 
@@ -495,7 +507,6 @@ where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
 aad_3 = H( H( message_1 | message_2 ) | data_3 )
-
 ~~~~~~~~~~~
 
 where:
