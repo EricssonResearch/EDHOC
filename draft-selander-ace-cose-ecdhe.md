@@ -800,7 +800,7 @@ where:
 
 * MSG_TYPE = 0
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
-* ALGs_V - algorithms that V supports that were not included in ECDH-Curve_U, HKDFs_U, AEADs_U, SIGs_V, SIGs_U
+* ALGs_V - algorithms that V supports that were not included in ECDH-Curve_U, HKDFs_U, AEADs_U, SIGs_V, and SIGs_U
 
 # IANA Considerations {#iana}
 
