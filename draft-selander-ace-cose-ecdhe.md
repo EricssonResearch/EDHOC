@@ -835,69 +835,67 @@ where:
 
 IANA has added the well-known URI 'edhoc' to the Well-Known URIs registry.
 
-   URI suffix: edhoc
+- URI suffix: edhoc
 
-   Change controller: IETF
+- Change controller: IETF
 
-   Specification document(s): [[this document]]
+- Specification document(s): [[this document]]
 
-   Related information: None
+- Related information: None
 
 ## Media Types Registry
 
-IANA has added the media type 'application/edhoc' to the Media Types registry:
+IANA has added the media type 'application/edhoc' to the Media Types registry.
 
-        Type name: application
+- Type name: application
 
-        Subtype name: edhoc
+- Subtype name: edhoc
 
-        Required parameters: N/A
+- Required parameters: N/A
 
-        Optional parameters: N/A
+- Optional parameters: N/A
 
-        Encoding considerations: binary
+- Encoding considerations: binary
 
-        Security considerations: See Section 7 of this document.
+- Security considerations: See Section 7 of this document.
 
-        Interoperability considerations: N/A
+- Interoperability considerations: N/A
 
-        Published specification: [[this document]] (this document)
+- Published specification: [[this document]] (this document)
 
-        Applications that use this media type: To be identified
+- Applications that use this media type: To be identified
 
-        Fragment identifier considerations: N/A
+- Fragment identifier considerations: N/A
 
-        Additional information:
+- Additional information:
 
-        * Magic number(s): N/A
+  * Magic number(s): N/A
 
-        * File extension(s): N/A
+  * File extension(s): N/A
+  
+  * Macintosh file type code(s): N/A
 
-        * Macintosh file type code(s): N/A
+- Person & email address to contact for further information: Göran Selander <goran.selander@ericsson.com>
 
-        Person & email address to contact for further information:
-           Göran Selander <goran.selander@ericsson.com>
+- Intended usage: COMMON
 
-        Intended usage: COMMON
+- Restrictions on usage: N/A
 
-        Restrictions on usage: N/A
+- Author: Göran Selander <goran.selander@ericsson.com>
 
-        Author: Göran Selander <goran.selander@ericsson.com>
-
-        Change Controller: IESG
+- Change Controller: IESG
 
 ## CoAP Content-Formats Registry
 
 IANA has added the media type 'application/edhoc' to the CoAP Content-Formats registry.
 
-~~~~~~~~~~~
-+----------------------+----------+----------+-------------------+
-| Media Type           | Encoding | ID       | Reference         |
-+----------------------+----------+----------+-------------------+
-| application/edhoc    |          | TBD1     | [[this document]] |
-+----------------------+----------+----------+-------------------+
-~~~~~~~~~~~
-{: artwork-align="center"}
+-  Media Type: application/edhoc
+
+-  Encoding:
+
+-  ID: TBD1
+
+-  Reference: [[this document]]
 
 # Security Considerations {#security}
 
