@@ -172,7 +172,7 @@ Party U                                                 Party V
 {: #fig-sigma title="AEAD variant of the SIGMA-I protocol"}
 {: artwork-align="center"}
 
-The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive application keys. The messages are signed, MACed, and encrypted.
+The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. The messages are signed, MACed, and encrypted.
 
 * X_U and X_V are the ECDH ephemeral public keys of U and V, respectively.
 
