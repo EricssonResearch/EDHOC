@@ -265,7 +265,7 @@ where H() is the hash function in HKDF_V.
 
 For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
 
-If the AEAD algorithm requires an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
+If the AEAD algorithm uses an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
 ### EDHOC-Exporter interface {#exporter}
 
@@ -274,7 +274,6 @@ Application keys and other application specific data can be derived using the ED
 EDHOC-Exporter(label, length)
 
 The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
-
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
