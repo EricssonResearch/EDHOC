@@ -902,7 +902,7 @@ IANA has added the media type 'application/edhoc' to the CoAP Content-Formats re
 ## Security Properties
 EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection. As described in {{SIGMA}}, peer awareness is provided to Party V, but not to Party U.
 
-EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically one that is not derivable from routing information in the lower layers.
+EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically the one that is not derivable from routing information in the lower layers.
 
 Compared to {{SIGMA}}, EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session.
 
@@ -917,9 +917,9 @@ The choice of key length used in the different algorithms needs to be harmonized
 
 ## Unprotected Data
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, and UAD_2 in the asymmetric case, and KID, and UAD_1 in the symmetric case. Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize KID. Another consideration is that the list of supported algorithms may be used to identify the application.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, UAD_2, and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case. Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize KID. Another consideration is that the list of supported algorithms may be used to identify the application.
 
-Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 in the asymmetric case, and KID and UAD_1 in the symmetric case.
+Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case.
 
 ## Denial-of-Service
 
