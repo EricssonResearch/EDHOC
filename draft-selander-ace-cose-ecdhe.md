@@ -285,7 +285,7 @@ EDHOC supports authentication with raw public keys (RPK) and certificates with t
 
 * Party V SHALL be able to identify Party U's public authentication key using ID_CRED_U.
 
-Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key even if this is recommended as the recipient otherwise may have to try several public keys. 
+Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys.
 
 Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
 
@@ -567,7 +567,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V SHALL be able to identify the PSK using KID.
 
-KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK even if this is recommended as the recipient otherwise may have to try several PSKs. 
+KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
