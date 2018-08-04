@@ -281,11 +281,11 @@ The output of the EDHOC-Exporter function SHALL be derived using other = exchang
 
 EDHOC supports authentication with raw public keys (RPK) and certificates with the requirements that:
 
-* Party U SHALL be able to identify Party V's public key using ID_CRED_V.
+* Party U SHALL be able to identify Party V's public authentication key using ID_CRED_V.
 
-* Party V SHALL be able to identify Party U's public key using ID_CRED_U.
+* Party V SHALL be able to identify Party U's public authentication key using ID_CRED_U.
 
-Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public key even if this is recommended as the recipient otherwise may have to try several public keys. 
+Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key even if this is recommended as the recipient otherwise may have to try several public keys. 
 
 Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
 
