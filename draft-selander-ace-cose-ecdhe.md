@@ -267,7 +267,7 @@ For message_i the key, called K_i, SHALL be derived using other = aad_i, where i
 
 If the AEAD algorithm uses an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
-### EDHOC-Exporter interface {#exporter}
+### EDHOC-Exporter Interface {#exporter}
 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface:
 
