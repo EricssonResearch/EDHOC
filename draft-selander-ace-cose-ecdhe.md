@@ -610,9 +610,13 @@ message_1 = (
   KID : bstr,
   ? UAD_1 : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 alg : int / tstr
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 algs = alg / [ 2* alg ]
 ~~~~~~~~~~~
 
@@ -667,7 +671,9 @@ message_2 = (
   data_2,
   CIPHERTEXT_2 : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 data_2 = (
   MSG_TYPE : int,
   C_U : bstr / nil,  
@@ -676,7 +682,9 @@ data_2 = (
   HKDF_V : uint,
   AEAD_V : uint
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 aad_2 : bstr
 ~~~~~~~~~~~
 
@@ -740,12 +748,16 @@ message_3 = (
   data_3,
   CIPHERTEXT_3 : bstr
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 data_3 = (
   MSG_TYPE : int,
   C_V : bstr 
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 aad_3 : bstr
 ~~~~~~~~~~~
 
@@ -801,9 +813,13 @@ error = (
   ERR_MSG : tstr,
   ? ALGs_V: algs
 )
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 alg : int / tstr
+~~~~~~~~~~~
 
+~~~~~~~~~~~ CDDL
 algs = alg / [ 2* alg ]
 ~~~~~~~~~~~
 
