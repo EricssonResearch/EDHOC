@@ -431,17 +431,17 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U as the first supported algorithms in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
    
    * protected = { xyz : ID_CRED_V }
 
    * payload = ( CRED_V, aad_2 )
 
-   * xyz - any COSE map label that can identify a public key, see {{asym-overview}}
+   * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_V - identifier for the public key of Party V, see {{asym-overview}}
+   * ID_CRED_V - identifier for the public authentication key of Party V, see {{asym-overview}}
 
-   * CRED_V - bstr containing the credential containing the public key of Party V, see {{asym-overview}}
+   * CRED_V - bstr containing the credential containing the public authentication key of Party V, see {{asym-overview}}
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
  
@@ -467,7 +467,7 @@ Party U SHALL process message_2 as follows:
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, and IV_2.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public key of Party V.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V and the public authentication key of Party V.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
@@ -506,17 +506,17 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
 
    * protected = { xyz : ID_CRED_U }
 
    * payload = ( CRED_U, aad_3 )
    
-   * xyz - any COSE map label that can identify a public key, see {{asym-overview}}
+   * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_U - identifier for the public key of Party U, see {{asym-overview}}
+   * ID_CRED_U - identifier for the public authentication key of Party U, see {{asym-overview}}
 
-   * CRED_U - bstr containing the credential containing the public key of Party U, see {{asym-overview}}
+   * CRED_U - bstr containing the credential containing the public authentication key of Party U, see {{asym-overview}}
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
 
@@ -542,7 +542,7 @@ Party V SHALL process message_3 as follows:
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public key of Party U.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U and the public authentication key of Party U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
