@@ -176,9 +176,9 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * X_U and X_V are the ECDH ephemeral public keys of U and V, respectively.
 
-* CRED_U and CRED_V are the credentials containing the public keys of U and V, respectively.
+* CRED_U and CRED_V are the credentials containing the public authentication keys of U and V, respectively.
 
-* Sig(U; . ) and S(V; . ) denote signatures made with the private key of U and V, respectively.
+* Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
 * Enc(K; P; A) denotes AEAD encryption of plaintext P and additional authenticated data A using the key K derived from the shared secret. The AEAD MUST NOT be replaced by plain encryption, see {{security}}.
 
