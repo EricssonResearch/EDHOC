@@ -913,7 +913,9 @@ The security of the SIGMA protocol requires the MAC to be bound to the identity 
 
 In EDHOC, the ephemeral keys are used to provide a good amount of randomness to each session. A good amount of randomness is important for the key generation, to provide aliveness, and to protect against interleaving attacks.  For this reason, the ephemeral keys MUST NOT be reused, both parties SHALL generate fresh random ephemeral key pairs.
 
-The choice of key length used in the different algorithms needs to be harmonized, so that a sufficient security level is maintained for certificates, EDHOC, and the protection of application data. Party U and V should enforce a minimum security level.  Note that, depending on the application, the application keys established through the EDHOC protocol will need to be renewed, in which case the communicating parties need to run the protocol again. Alternatively derive application keys with other labels.
+The choice of key length used in the different algorithms needs to be harmonized, so that a sufficient security level is maintained for certificates, EDHOC, and the protection of application data. Party U and V should enforce a minimum security level.
+
+The data rates in many IoT deployments are very limited. Given that the application keys are protected as well as the long-term authentication keys they can often be used for years or decades before the cryptographic limits are reached. If the application keys established through EDHOC need to be renewed, the communicating parties can derive application keys with other labels or run EDHOC again.
 
 ## Unprotected Data
 
@@ -931,7 +933,7 @@ The availability of a secure pseudorandom number generator and truly random seed
 
 The referenced processing instructions in {{SP-800-56a}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
-Party U and V are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported.
+Party U and V are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported. The authentication keys MUST be kept secret.
 
 Party U and V are allowed to select the connection identifiers C_U and C_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent application protection protocol (e.g. OSCORE {{I-D.ietf-core-object-security}}). The choice of connection identifier is not security critical in EDHOC but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong connection identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
 
