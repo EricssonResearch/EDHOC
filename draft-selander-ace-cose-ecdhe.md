@@ -893,7 +893,7 @@ IANA has added the media type 'application/edhoc' to the CoAP Content-Formats re
 
 -  Encoding:
 
--  ID: TBD1
+-  ID: TBD42
 
 -  Reference: [[this document]]
 
