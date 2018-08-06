@@ -285,7 +285,7 @@ EDHOC supports authentication with raw public keys (RPK) and certificates with t
 
 * Party V SHALL be able to identify Party U's public authentication key using ID_CRED_U.
 
-Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys.
+Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. 
 
 Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
 
@@ -935,7 +935,7 @@ The referenced processing instructions in {{SP-800-56a}} must be complied with, 
 
 Party U and V are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported. The authentication keys MUST be kept secret.
 
-Party U and V are allowed to select the connection identifiers C_U and C_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent application protection protocol (e.g. OSCORE {{I-D.ietf-core-object-security}}). The choice of connection identifier is not security critical in EDHOC but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong connection identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
+Party U and V are allowed to select the connection identifiers C_U and C_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent application protocol (e.g. OSCORE {{I-D.ietf-core-object-security}}). The choice of connection identifier is not security critical in EDHOC but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong connection identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieving the wrong security context (which also terminates the protocol as the message cannot be verified).
 
 ## Other Documents Analyzing EDHOC
 
