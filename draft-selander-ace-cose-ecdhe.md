@@ -292,18 +292,18 @@ Party U and Party V MAY use different type of credentials, e.g. one uses RPK and
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
-Party U                                                          Party V
-|                        C_U, X_U, ALG_1, UAD_1                        |
-+--------------------------------------------------------------------->|
-|                               message_1                              |
-|                                                                      |
-|    C_U, C_V, X_V, ALG_2, Enc(K_2; Sig(V; CRED_V, aad_2), UAD_2; )    |
-|<---------------------------------------------------------------------+
-|                               message_2                              |
-|                                                                      |
-|            S_V, Enc(K_3; Sig(U; CRED_U, aad_3), PAD_3; )             |
-+--------------------------------------------------------------------->|
-|                               message_3                              |
+Party U                                                       Party V
+|                       C_U, X_U, ALG_1, UAD_1                      |
++------------------------------------------------------------------>|
+|                             message_1                             |
+|                                                                   |
+|   C_U, C_V, X_V, ALG_2, Enc(K_2; Sig(V; CRED_V, aad_2), UAD_2; )  |
+|<------------------------------------------------------------------+
+|                             message_2                             |
+|                                                                   |
+|           S_V, Enc(K_3; Sig(U; CRED_U, aad_3), PAD_3; )           |
++------------------------------------------------------------------>|
+|                             message_3                             |
 ~~~~~~~~~~~
 {: #fig-asym title="EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
