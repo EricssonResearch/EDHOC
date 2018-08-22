@@ -140,7 +140,7 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a very compa
 
 Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protocol needs to work on a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{RFC8152}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}.
 
-In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a mutually authenticated key exchange protocol providing perfect forward secrecy and identity protection. EDHOC uses CBOR and COSE, allowing reuse of existing libraries. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
+In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a mutually authenticated key exchange protocol providing perfect forward secrecy and identity protection. EDHOC uses CBOR and COSE, allowing reuse of existing libraries. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
 EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as NB-IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. Compared to the TLS 1.3 handshake with ECDH {{RFC8446}}, the number of bytes in EDHOC is less than 1/3 when PSK authentication is used and less than 1/2 when RPK authentication is used, see {{sizes}}.
 
@@ -165,10 +165,10 @@ Party U                                                 Party V
    |                          X_U                          |
    +------------------------------------------------------>|
    |                                                       |
-   |       X_V, AE( K_2; Sig(V; CRED_V, X_U, X_V) )        |
+   |  X_V, AE( K_2; ID_CRED_V, Sig(V; CRED_V, X_U, X_V) )  |
    |<------------------------------------------------------+
    |                                                       |
-   |         AE( K_3; Sig(U; CRED_U, X_V, X_U) )           | 
+   |    AE( K_3; ID_CRED_U, Sig(U; CRED_U, X_V, X_U) )     | 
    +------------------------------------------------------>|
    |                                                       |
 ~~~~~~~~~~~
@@ -180,6 +180,8 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 * X_U and X_V are the ECDH ephemeral public keys of U and V, respectively.
 
 * CRED_U and CRED_V are the credentials containing the public authentication keys of U and V, respectively.
+
+* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of U and V, respectively
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
@@ -234,7 +236,7 @@ Party U                                                 Party V
 {: #fig-flow title="EDHOC message flow"}
 {: artwork-align="center"}
 
-The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or certificates. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is transported in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the difference being that information is only MACed, not signed.
+The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the difference being that information is only MACed, not signed.
 
 EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2, while Protected Application Data (PAD_3) may be send in message_3. 
 
@@ -290,15 +292,37 @@ The output of the EDHOC-Exporter function SHALL be derived using other = exchang
 
 ## Overview {#asym-overview}
 
-EDHOC supports authentication with raw public keys (RPK) and certificates with the requirements that:
+EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
-* Party U SHALL be able to identify Party V's public authentication key using ID_CRED_V.
+* Party U SHALL be able to retrieve Party V's public authentication key using ID_CRED_V.
 
-* Party V SHALL be able to identify Party U's public authentication key using ID_CRED_U.
+* Party V SHALL be able to retrieve Party U's public authentication key using ID_CRED_U.
 
-Raw public keys are stored as COSE_Key objects and identified with a 'kid' value, see {{RFC8152}}. Certificates can be identified in different ways, ID_CRED_U and ID_CRED_V may contain some of the credentials used for authentication (e.g. x5bag or x5chain) or identify the credential used for authentication (e.g. x5t, x5u), see {{I-D.schaad-cose-x509}}. The actual credential (e.g. a single X.509 certificate or a COSE_Key) are always signed by inclusion in CRED_V and CRED_U. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. 
+Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
-Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
+kid : ID_CRED_x, for x = U or V
+
+Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
+
+* by a hash value
+
+	* x5t : ID_CRED_x, for x = U or V,
+
+* by a URL:
+
+	* x5u: ID_CRED_x, for x = U or V,
+
+* by a certificate chain:
+
+	* x5chain : ID_CRED_x, for x = U or V,
+ 
+* or a bag of certificates:
+
+	* x5bag : ID_CRED_x, for x = U or V.
+
+In the latter two examples, ID_CRED_U and ID_CRED_V contains the credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the protected header of the COSE signature structure, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+
+The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are always signed by party U and V, respectively.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -440,7 +464,7 @@ where:
 * SIG_U - the first supported algorithm from SIGs_U with which Party U signs
 * H() - the hash function in HKDF_V
 
-### Party V Processing of Message 2
+### Party V Processing of Message 2 {#asym-msg2-proc}
 
 Party V SHALL compose message_2 as follows:
 
@@ -524,7 +548,7 @@ where:
 
 * MSG_TYPE = 3
 
-### Party U Processing of Message 3
+### Party U Processing of Message 3 {#asym-msg3-proc}
 
 Party U SHALL compose message_3 as follows:
 
