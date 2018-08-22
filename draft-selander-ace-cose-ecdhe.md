@@ -76,6 +76,7 @@ informative:
   I-D.ietf-core-resource-directory:
   I-D.ietf-6tisch-dtsecurity-zerotouch-join:
 
+  RFC5116:
   RFC5869:
   RFC7228:
   RFC7252:
@@ -141,38 +142,40 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a mutually authenticated key exchange protocol providing perfect forward secrecy and identity protection. EDHOC uses CBOR and COSE, allowing reuse of existing libraries. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as NB-IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. Compared to the TLS 1.3 handshake with ECDH {{RFC8446}}, the number of bytes in EDHOC is approximately 1/3 when PSK authentication is used and approximately 1/2 when RPK authentication is used, see {{sizes}}.
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as NB-IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. Compared to the TLS 1.3 handshake with ECDH {{RFC8446}}, the number of bytes in EDHOC is less than 1/3 when PSK authentication is used and less than 1/2 when RPK authentication is used, see {{sizes}}.
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56a {{SP-800-56a}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{RFC8152}} are used to implement these standards.
 
 This paper is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
 
-## Terminology  and Requirements Language
+## Terminology and Requirements Language
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all capitals, as shown here.
+
+The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
 This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{RFC7049}}. A vertical bar \| denotes byte string concatenation.
 
 # Background {#background}
 
-SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection (SIGMA-I), and like TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an AEAD algorithm is shown in {{fig-sigma}}.
+SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection (SIGMA-I), and like TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an authenticated encryption algorithm is shown in {{fig-sigma}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
    |                          X_U                          |
    +------------------------------------------------------>|
    |                                                       |
-   |       X_V, Enc(K_2; Sig(V; CRED_V, X_U, X_V); )       |
+   |       X_V, AE( K_2; Sig(V; CRED_V, X_U, X_V) )        |
    |<------------------------------------------------------+
    |                                                       |
-   |         Enc(K_3; Sig(U; CRED_U, X_V, X_U); )          |
+   |         AE( K_3; Sig(U; CRED_U, X_V, X_U) )           | 
    +------------------------------------------------------>|
    |                                                       |
 ~~~~~~~~~~~
-{: #fig-sigma title="AEAD variant of the SIGMA-I protocol"}
+{: #fig-sigma title="Authenticated encryption variant of the SIGMA-I protocol."}
 {: artwork-align="center"}
 
-The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. The messages are signed, MACed, and encrypted.
+The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. 
 
 * X_U and X_V are the ECDH ephemeral public keys of U and V, respectively.
 
@@ -180,11 +183,13 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
-* Enc(K; P; A) denotes AEAD encryption of plaintext P and additional authenticated data A using the key K derived from the shared secret. The AEAD MUST NOT be replaced by plain encryption, see {{security}}.
+* AE(K; P) denotes authenticated encryption of plaintext P using the key K derived from the shared secret. The authenticated encryption MUST NOT be replaced by plain encryption, see {{security}}.
 
 In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
 * Explicit connection identifiers C_U, C_V chosen by U and V, respectively and enabling the recipient to find the protocol state.
+
+* An Authenticated Encryption with Additional Data (AEAD) algorithm is used.
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
@@ -293,17 +298,17 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                       C_U, X_U, ALG_1, UAD_1                      |
-+------------------------------------------------------------------>|
-|                             message_1                             |
-|                                                                   |
-|   C_U, C_V, X_V, ALG_2, Enc(K_2; Sig(V; CRED_V, aad_2), UAD_2; )  |
-|<------------------------------------------------------------------+
-|                             message_2                             |
-|                                                                   |
-|           S_V, Enc(K_3; Sig(U; CRED_U, aad_3), PAD_3; )           |
-+------------------------------------------------------------------>|
-|                             message_3                             |
+|                         C_U, X_U, ALG_1, UAD_1                        |
++---------------------------------------------------------------------->|
+|                               message_1                               |
+|                                                                       |
+|  C_U, C_V, X_V, ALG_2, AEAD(K_2; Sig(V; CRED_V, aad_2), UAD_2; aad_2) |
+|<----------------------------------------------------------------------+
+|                               message_2                               |
+|                                                                       |
+|            S_V, AEAD(K_3; Sig(U; CRED_U, aad_3), PAD_3; aad_3)        |
++---------------------------------------------------------------------->|
+|                               message_3                               |
 ~~~~~~~~~~~
 {: #fig-asym title="EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
@@ -577,11 +582,11 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|           C_U, C_V, X_V, ALG_2, Enc(K_2; UAD_2; aad_2)            |
+|           C_U, C_V, X_V, ALG_2, AEAD(K_2; UAD_2; aad_2)           |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    S_V, Enc(K_3; PAD_3; aad_3)                    |
+|                    S_V, AEAD(K_3; PAD_3; aad_3)                   |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
