@@ -187,7 +187,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
-* Explicit connection identifiers C_U, C_V chosen by U and V, respectively and enabling the recipient to find the protocol state.
+* Explicit connection identifiers C_U, C_V chosen by U and V, respectively, enabling the recipient to find the protocol state.
 
 * An Authenticated Encryption with Additional Data (AEAD) algorithm is used.
 
@@ -212,6 +212,8 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 * Transport of opaque application defined data.
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries. EDHOC does not put any requirement on the lower layers and can therefore also be used e.g. in environments without IP.
+
+To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}}.
 
 # EDHOC Overview {#overview}
 
@@ -242,25 +244,25 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be done as specified in Section 11.1 of {{RFC8152}} with the following input:
+Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152}} with the following input:
 
-* The PRF SHALL be the HKDF {{RFC5869}} in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
+* The KDF SHALL be the HKDF {{RFC5869}} in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
 
-* The secret SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
+* The secret (Section 11.1 of {{RFC8152}}) SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
 
-* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys and the empty string "" when EDHOC is authenticated with asymmetric keys.
+* The salt (Section 11.1 of {{RFC8152}}) SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The fields in the context information COSE_KDF_Context SHALL have the following values:
+* The fields in the context information COSE_KDF_Context (Section 11.2 of {{RFC8152}}) SHALL have the following values:
 
-  + AlgorithmID is an int or tstr as defined below
+  + AlgorithmID is an int or tstr, see below
 
   + PartyUInfo = PartyVInfo = ( nil, nil, nil )
   
-  + keyDataLength is a uint as defined below
+  + keyDataLength is a uint, see below
   
   + protected SHALL be a zero length bstr
 
-  + other is a bstr and SHALL be aad_2, aad_3, or exchange_hash 
+  + other is a bstr and SHALL be aad_2, aad_3, or exchange_hash; see below
 
 where exchange_hash, in non-CDDL notation, is:
 
@@ -268,15 +270,19 @@ exchange_hash = H( H( message_1 \| message_2 ) \| message_3 )
 
 where H() is the hash function in HKDF_V.
 
-For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V. 
+We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength and other:
+
+output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
+
+For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V.
 
 If the AEAD algorithm uses an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
 
 ### EDHOC-Exporter Interface {#exporter}
 
-Application keys and other application specific data can be derived using the EDHOC-Exporter interface:
+Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
-EDHOC-Exporter(label, length)
+EDHOC-Exporter(label, length) = EDHOC-Key-Derivation(label, 8 * length, exchange_hash)
 
 The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
 
@@ -947,6 +953,12 @@ Party U and V are allowed to select the connection identifiers C_U and C_V, resp
 EDHOC has been analyzed in several other documents. An analysis of EDHOC for certificate enrollment was done in {{CertEnr}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, and the use of EDHOC in 6TiSCH is described in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
 
 --- back
+
+# Use of CBOR and COSE in EDHOC {#CBORandCOSE}
+
+This Appendix is intended to simplify for implementors not familiar with CBOR and COSE. 
+
+TBD
 
 # Test Vectors {#vectors}
 
