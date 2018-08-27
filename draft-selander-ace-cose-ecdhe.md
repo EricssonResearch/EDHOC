@@ -601,7 +601,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
-* Party V SHALL be able to identify the PSK using KID.
+* Party V SHALL be able to retrieve the PSK using KID.
 
 KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs.
 
