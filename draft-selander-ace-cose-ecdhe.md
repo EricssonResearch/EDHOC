@@ -300,25 +300,25 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
-kid : ID_CRED_x, for x = U or V
+       * kid : ID_CRED_x, for x = U or V
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
 * by a hash value
 
-	* x5t : ID_CRED_x, for x = U or V,
+   * x5t : ID_CRED_x, for x = U or V,
 
 * by a URL:
 
-	* x5u: ID_CRED_x, for x = U or V,
+   * x5u: ID_CRED_x, for x = U or V,
 
 * by a certificate chain:
 
-	* x5chain : ID_CRED_x, for x = U or V,
- 
+   * x5chain : ID_CRED_x, for x = U or V,
+
 * or a bag of certificates:
 
-	* x5bag : ID_CRED_x, for x = U or V.
+   * x5bag : ID_CRED_x, for x = U or V.
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contains the credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the protected header of the COSE signature structure, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
