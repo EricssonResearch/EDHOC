@@ -672,11 +672,11 @@ where:
 
 Party U SHALL compose message_1 as follows:
 
-* The supported algorithms and the order of preference MUST NOT be changed based on previous error messages. However, the lists sent to Party V (ECDH-Curves_U, HKDFs_U, AEADs_U) MAY be truncated and the amount of truncation MAY be changed between sessions, e.g. based on previous error messages.
+* The supported algorithms and the order of preference MUST NOT be changed based on previous error messages. However, the lists sent to Party V (ECDH-Curves_U, HKDFs_U, AEADs_U) MAY be truncated such that curves/algorithms which are the least preferred are omitted. The amount of truncation MAY be changed between sessions, e.g. based on previous error messages (see next bullet), but all curves/algorithms which are more preferred than the least preferred curve in the list MUST be included in the list.
 
-* Determine the curve ECDH-Curve_U to use with Party V. If U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve that U supports, then U SHALL use that curve. Otherwise the first curve in ECDH-Curves_U MUST be used.
+* Determine the curve ECDH-Curve_U to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying an ECDH curve that U supports, then U SHALL use that curve (which implies that ECDH_Curves_U in message_1 SHALL include that curve). Otherwise the first curve in ECDH-Curves_U MUST be used.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_U be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Let X_U be the x-coordinate of the ephemeral public key.
 
 * Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
@@ -692,9 +692,9 @@ Party V SHALL process message_1 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_U.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U.
-
 * Pass UAD_1 to the application.
+
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. If V supports an ECDH curve not in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. 
 
 ## EDHOC Message 2
 
