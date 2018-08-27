@@ -415,8 +415,7 @@ Party V SHALL process message_1 as follows:
 
 * Pass UAD_1 to the application.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. If V supports an ECDH curve not in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. 
-
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. If V does not support any of the algorithms of one kind (ECDH-Curves_U, HKDFs_U, AEADs_U, SIGs_V, or SIGs_U), then ALGs_V MUST include one or more supported algorithms of that kind.
 
 ## EDHOC Message 2
 
@@ -694,7 +693,7 @@ Party V SHALL process message_1 as follows:
 
 * Pass UAD_1 to the application.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. If V supports an ECDH curve not in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. 
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the curve ECDH-Curve_U, but supports another ECDH curves in ECDH-Curves_U, then ALGs_V MUST include the first supported ECDH curve in ECDH-Curves_U. If V does not support any of the algorithms of one kind (ECDH-Curves_U, HKDFs_U, AEADs_U), then ALGs_V MUST include one or more supported algorithms of that kind.
 
 ## EDHOC Message 2
 
