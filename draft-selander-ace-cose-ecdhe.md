@@ -168,7 +168,7 @@ Party U                                                 Party V
    |  X_V, AE( K_2; ID_CRED_V, Sig(V; CRED_V, X_U, X_V) )  |
    |<------------------------------------------------------+
    |                                                       |
-   |    AE( K_3; ID_CRED_U, Sig(U; CRED_U, X_V, X_U) )     | 
+   |    AE( K_3; ID_CRED_U, Sig(U; CRED_U, X_V, X_U) )     |
    +------------------------------------------------------>|
    |                                                       |
 ~~~~~~~~~~~
@@ -327,18 +327,18 @@ The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 cert
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
-Party U                                                       Party V
-|                         C_U, X_U, ALG_1, UAD_1                        |
-+---------------------------------------------------------------------->|
-|                               message_1                               |
-|                                                                       |
-|  C_U, C_V, X_V, ALG_2, AEAD(K_2; Sig(V; CRED_V, aad_2), UAD_2; aad_2) |
-|<----------------------------------------------------------------------+
-|                               message_2                               |
-|                                                                       |
-|            S_V, AEAD(K_3; Sig(U; CRED_U, aad_3), PAD_3; aad_3)        |
-+---------------------------------------------------------------------->|
-|                               message_3                               |
+Party U                                                          Party V
+|                        C_U, X_U, ALG_1, UAD_1                        |
++--------------------------------------------------------------------->|
+|                               message_1                              |
+|                                                                      |
+| C_U, C_V, X_V, ALG_2, AEAD(K_2; Sig(V; CRED_V, aad_2), UAD_2; aad_2) |
+|<---------------------------------------------------------------------+
+|                               message_2                              |
+|                                                                      |
+|          S_V, AEAD(K_3; Sig(U; CRED_U, aad_3), PAD_3; aad_3)         |
++--------------------------------------------------------------------->|
+|                               message_3                              |
 ~~~~~~~~~~~
 {: #fig-asym title="EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
