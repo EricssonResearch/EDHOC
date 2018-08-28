@@ -982,9 +982,11 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 This Appendix is intended to simplify for implementors not familiar with CBOR and COSE. 
 
-TBD
+TODO: This section needs to be updated.
 
 # Test Vectors {#vectors}
+
+This appendix provides a wealth of test vectors to ease implementation and ensure interoperability.
 
 TODO: This section needs to be updated.
 
