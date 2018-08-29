@@ -484,7 +484,7 @@ Party V SHALL compose message_2 as follows:
 
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_V - bstr data enabling the retrieval of the public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - bstr enabling the retrieval of the public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
@@ -565,7 +565,7 @@ Party U SHALL compose message_3 as follows:
    
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_U - bstr data enabling the retrieval of the public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - bstr enabling the retrieval of the public authentication key of Party U, see {{asym-overview}}
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
@@ -669,7 +669,7 @@ where:
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
 * AEADs_U - supported AEAD algorithms, in order of decreasing preference
-* KID - identifier of the pre-shared key
+* KID - bstr enabling the retrieval of the pre-shared key
 * UAD_1 - bstr containing unprotected opaque application data
 
 ### Party U Processing of Message 1
