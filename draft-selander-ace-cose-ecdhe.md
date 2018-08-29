@@ -399,7 +399,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Let X_U be the x-coordinate of the ephemeral public key.
    
-* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
 * Format message_1 as specified in {{asym-msg1-form}}.
 
@@ -468,13 +468,13 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. C_U can be set to null if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U as the first supported algorithms in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
    
    * protected = { xyz : ID_CRED_V }
 
@@ -486,7 +486,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr containing the credential containing the public authentication key of Party V, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
    * external_aad = aad_2
 
@@ -504,7 +504,7 @@ Party V SHALL compose message_2 as follows:
 
 Party U SHALL process message_2 as follows:
 
-* Retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
@@ -552,7 +552,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. alg).
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * protected = { xyz : ID_CRED_U }
 
@@ -564,7 +564,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr containing the credential containing the public authentication key of Party U, see {{asym-overview}}
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_3
 
@@ -584,7 +584,7 @@ Party U SHALL compose message_3 as follows:
 
 Party V SHALL process message_3 as follows:
 
-* Retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple.
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
@@ -677,7 +677,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Let X_U be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
 * Format message_1 as specified in {{sym-msg1-form}}.
 
@@ -744,11 +744,11 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56a}} using the curve indicated by ECDH-Curve_U. Format an ephemeral public key as a COSE_Key as specified in {{cose_key}}. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. C_U can be set to null if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
 *  Select HKDF_V and AEAD_V as the first supported algorithms in HKDFs_U and AEADs_U.
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_2
 
@@ -762,7 +762,7 @@ Party V SHALL compose message_2 as follows:
 
 Party U SHALL process message_2 as follows:
 
-* Retrieve the protocol state using the connection identifier C_U and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
@@ -810,7 +810,7 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. alg, kid, or IV).
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_3
 
@@ -826,7 +826,7 @@ Party U SHALL compose message_3 as follows:
 
 Party V SHALL process message_3 as follows:
 
-* Retrieve the protocol state using the connection identifier C_V and other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple.
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3.
 
