@@ -478,13 +478,16 @@ Party V SHALL compose message_2 as follows:
    
    * protected = { xyz : ID_CRED_V }
 
-   * payload = ( CRED_V, aad_2 )
+   * payload = CRED_V in Sig_structure, but payload = nil in COSE_Sign1  ("detached content, see Section 4.1 of {{RFC8152}})
+
+   * external_aad = aad_2
 
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
    * ID_CRED_V - bstr data enabling the retrieval of the public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
+   
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
@@ -556,7 +559,9 @@ Party U SHALL compose message_3 as follows:
 
    * protected = { xyz : ID_CRED_U }
 
-   * payload = ( CRED_U, aad_3 )
+   * payload = CRED_U in Sig_structure, but payload = nil in COSE_Sign1  ("detached content, see Section 4.1 of {{RFC8152}})
+
+   * external_aad = aad_3 
    
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
