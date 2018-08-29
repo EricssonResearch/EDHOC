@@ -322,7 +322,7 @@ Public key certificates can be identified in different ways, for example (see {{
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contains the credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
-The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, but to reduce message overhead the credentials are not sent in the signature structure, see {{asym-msg2-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
+The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -478,9 +478,7 @@ Party V SHALL compose message_2 as follows:
    
    * protected = { xyz : ID_CRED_V }
 
-   * payload = CRED_V in Sig_structure, but payload = nil in COSE_Sign1  ("detached content, see Section 4.1 of {{RFC8152}})
-
-   * external_aad = aad_2
+   * payload = ( CRED_V, aad_2 )
 
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -488,7 +486,8 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
-
+   * Note that only 'protected' and 'signature' of the COSE_Sign1 structure are used in message_2, see next bullet.
+   
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
    * external_aad = aad_2
@@ -500,6 +499,8 @@ Party V SHALL compose message_2 as follows:
    * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
   
    * UAD_2 = bstr containing opaque unprotected application data
+
+   * Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_2, see next bullet.   
 
 *  Format message_2 as specified in {{asym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
 
@@ -559,15 +560,15 @@ Party U SHALL compose message_3 as follows:
 
    * protected = { xyz : ID_CRED_U }
 
-   * payload = CRED_U in Sig_structure, but payload = nil in COSE_Sign1  ("detached content, see Section 4.1 of {{RFC8152}})
-
-   * external_aad = aad_3 
+   * payload = ( CRED_U, aad_3 )
    
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
    * ID_CRED_U - bstr enabling the retrieval of the public authentication key of Party U, see {{asym-overview}}
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
+
+   * Note that only 'protected' and 'signature' of the COSE_Sign1 structure are used in message_3, see next bullet.
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
@@ -580,6 +581,8 @@ Party U SHALL compose message_3 as follows:
    * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
    * PAD_3 = bstr containing opaque protected application data
+
+   * Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_3, see next bullet.  
 
 *  Format message_3 as specified in {{asym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
