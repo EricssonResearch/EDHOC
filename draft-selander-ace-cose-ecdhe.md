@@ -486,7 +486,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
-   * Note that only 'protected' and 'signature' of the COSE_Sign1 structure are used in message_2, see next bullet.
+   Note that only 'protected' and 'signature' of the COSE_Sign1 structure are used in message_2, see next bullet.
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
@@ -500,7 +500,7 @@ Party V SHALL compose message_2 as follows:
   
    * UAD_2 = bstr containing opaque unprotected application data
 
-   * Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_2, see next bullet.   
+   Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_2, see next bullet.   
 
 *  Format message_2 as specified in {{asym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
 
@@ -568,7 +568,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
-   * Note that only 'protected' and 'signature' of the COSE_Sign1 structure are used in message_3, see next bullet.
+   Note that only 'protected' and 'signature' of the COSE_Sign1 structure are used in message_3, see next bullet.
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
@@ -582,7 +582,7 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-   * Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_3, see next bullet.  
+   Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_3, see next bullet.  
 
 *  Format message_3 as specified in {{asym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
@@ -764,6 +764,8 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
+   Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_2, see next bullet.   
+
 *  Format message_2 as specified in {{sym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
    
 ### Party U Processing of Message 2
@@ -825,6 +827,8 @@ Party U SHALL compose message_3 as follows:
    * plaintext = ? PAD_3
 
    * PAD_3 = bstr containing opaque protected application data
+
+   Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_3, see next bullet.   
 
 *  Format message_3 as specified in {{sym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
