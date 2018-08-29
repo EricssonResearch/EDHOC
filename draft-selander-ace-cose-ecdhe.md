@@ -304,19 +304,19 @@ Raw public keys are most optimally stored as COSE_Key objects and identified wit
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
-* by a hash value
+* by a hash value;
 
    * x5t : ID_CRED_x, for x = U or V,
 
-* by a URL:
+* by a URL;
 
-   * x5u: ID_CRED_x, for x = U or V,
+   * x5u : ID_CRED_x, for x = U or V,
 
-* by a certificate chain:
+* by a certificate chain;
 
    * x5chain : ID_CRED_x, for x = U or V,
 
-* or a bag of certificates:
+* or by a bag of certificates.
 
    * x5bag : ID_CRED_x, for x = U or V.
 
