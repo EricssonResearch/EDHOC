@@ -322,7 +322,7 @@ Public key certificates can be identified in different ways, for example (see {{
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contains the credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
-The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are always signed by party U and V, respectively.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
+The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, but to reduce message overhead the credentials are not sent in the signature structure, see {{asym-msg2-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -482,9 +482,9 @@ Party V SHALL compose message_2 as follows:
 
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_V - identifier for the public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - bstr data enabling the retrieval of the public authentication key of Party V, see {{asym-overview}}
 
-   * CRED_V - bstr containing the credential containing the public authentication key of Party V, see {{asym-overview}}
+   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
@@ -560,9 +560,9 @@ Party U SHALL compose message_3 as follows:
    
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_U - identifier for the public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - bstr data enabling the retrieval of the public authentication key of Party U, see {{asym-overview}}
 
-   * CRED_U - bstr containing the credential containing the public authentication key of Party U, see {{asym-overview}}
+   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
