@@ -1021,11 +1021,11 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 In all encryption operations (both encryption and decryption) the input to the AEAD is a follows:
 
-* The key K and nonce N (IV) are the output EDHOC-Key-Derivation function as defined in {{key-der}}.
+* The key K_i and nonce N (IV_i) are the output EDHOC-Key-Derivation function as defined in {{key-der}}.
 
 * The plaintext P is just the concatenation the included CBOR data items ecnoded as byte strings (but not CBOR byte strings).
 
-* The associated data A is = Enc_structure = [ "Encrypt0", h'', aad_2 ] = 0x8368456E63727970743040 \| aad_i
+* The associated data A is = Enc_structure = [ "Encrypt0", h'', aad_i ] = 0x8368456E63727970743040 \| aad_i
 
 where aad_i is the  concatenation the included CBOR data items ecnoded as byte strings (but not necessarily CBOR byte strings).
 
