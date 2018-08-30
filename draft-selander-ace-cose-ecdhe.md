@@ -994,7 +994,7 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 This Appendix is intended to simplify for implementors not familiar with CBOR {{RFC7049}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}. 
 
-TODO: This section needs to be updated.
+TODO: This section needs to be updated (may be removed in the submitted version).
 
 ## CBOR
 
@@ -1028,6 +1028,12 @@ In all encryption operations (both encryption and decryption) the input to the A
 * The associated data A is = Enc_structure = [ "Encrypt0", h'', aad_i ] = 0x8368456E63727970743040 \| aad_i
 
 where aad_i is the  concatenation the included CBOR data items ecnoded as byte strings (but not necessarily CBOR byte strings).
+
+### Signing and Verification
+
+* The key is the private of public authentication key of U or V.
+
+* The message M =  Sig_structure = [ "Signature1", { xyz : ID_CRED_U }, h'', ( CRED_U, aad_3 ) ] = 0x846A5369676E617475726531a1 \| xyz \| ID_CRED_U \| 40 \| payload
 
 # Test Vectors {#vectors}
 
