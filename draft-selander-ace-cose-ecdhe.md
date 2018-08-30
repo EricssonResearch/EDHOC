@@ -992,7 +992,7 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 # Use of CBOR and COSE in EDHOC {#CBORandCOSE}
 
-This Appendix is intended to simplify for implementors not familiar with CBOR and COSE. 
+This Appendix is intended to simplify for implementors not familiar with CBOR {{RFC7049}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}. 
 
 TODO: This section needs to be updated.
 
