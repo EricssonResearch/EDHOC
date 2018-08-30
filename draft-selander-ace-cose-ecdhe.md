@@ -994,6 +994,23 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 This Appendix is intended to simplify for implementors not familiar with CBOR and COSE. 
 
+## CBOR
+
+The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. In addition to integers and byte strings, CBOR also supports arrays and maps. For a complete specification and more examples, see {{RFC7049}}.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Diagnostic     Encoded
+-----------------------
+1              0x01
+h'c3'          0x41c3
+-27            0x381a
+null           0xf6
+[1, 2]         0x820102
+{4: 2}         0xa10402
+~~~~~~~~~~~~~~~~~~~~~~~
+
+## COSE
+
 TODO: This section needs to be updated.
 
 # Test Vectors {#vectors}
