@@ -1015,8 +1015,19 @@ h'c3'           0x41c3
 
 ## COSE
 
+CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes to make it more suitable for the Internet of Things (IoT). EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
 
-CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
+### Encryption and Decryption
+
+In all encryption operations (both encryption and decryption) the input to the AEAD is a follows:
+
+* The key K and nonce N (IV) are the output EDHOC-Key-Derivation function as defined in {{key-der}}.
+
+* The plaintext P is just the concatenation the included CBOR data items ecnoded as byte strings (but not CBOR byte strings).
+
+* The associated data A is = Enc_structure = [ "Encrypt0", h'', aad_2 ] = 0x8368456E63727970743040 \| aad_i
+
+where aad_i is the  concatenation the included CBOR data items ecnoded as byte strings (but not necessarily CBOR byte strings).
 
 # Test Vectors {#vectors}
 
