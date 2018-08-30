@@ -998,7 +998,7 @@ TODO: This section needs to be updated.
 
 ## CBOR
 
-The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. In addition to integers, simple values (e.g. null), byte strings, and text strings, CBOR also supports arrays [] and maps {} of data items. For a complete specification and more examples, see {{RFC7049}}.
+The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays [] and maps {} of data items. For a complete specification and more examples, see {{RFC7049}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic      Encoded
