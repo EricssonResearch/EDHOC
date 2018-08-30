@@ -994,6 +994,8 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 This Appendix is intended to simplify for implementors not familiar with CBOR and COSE. 
 
+TODO: This section needs to be updated.
+
 ## CBOR
 
 The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. In addition to integers and byte strings, CBOR also supports arrays and maps. For a complete specification and more examples, see {{RFC7049}}.
@@ -1012,7 +1014,8 @@ null          0xf6
 
 ## COSE
 
-TODO: This section needs to be updated.
+
+CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
 
 # Test Vectors {#vectors}
 
