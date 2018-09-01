@@ -219,7 +219,7 @@ To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR elements, where the first element is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the negotiated algorithms (AEAD, HKDF, etc.) and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR encoded data items, where the first data item is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the negotiated algorithms (AEAD, HKDF, etc.) and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -351,7 +351,7 @@ For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF
 
 ### Formatting of Message 1 {#asym-msg1-form}
 
-message_1 SHALL be a sequence of CBOR elements as defined below
+message_1 SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
@@ -401,12 +401,14 @@ Party U SHALL compose message_1 as follows:
    
 * Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
-* Format message_1 as specified in {{asym-msg1-form}}.
+* Format message_1 as specified in {{asym-msg1-form}} and encode it to a byte string, for instance by CBOR encoding the indefinite-length array [_ message_1 ] and then removing the first byte (0x9f) and the last byte (0xff).
 
 ### Party V Processing of Message 1
 
 Party V SHALL process message_1 as follows:
- 
+
+* Decode messagage_1, for instance by wrapping the recieved byte string between the two bytes 0x9f and 0xff and decoding the wrapped byte string as a CBOR encoded indefinite-length array.
+
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
 * Verify that the ECDH curve indicated by ECDH-Curve_U is supported, and that no prior curve in ECDH-Curves_U is supported.
@@ -421,7 +423,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ### Formatting of Message 2 {#asym-msg2-form}
 
-message_2 SHALL be a sequence of CBOR elements as defined below
+message_2 SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 message_2 = (
@@ -502,7 +504,7 @@ Party V SHALL compose message_2 as follows:
 
    Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_2, see next bullet.   
 
-*  Format message_2 as specified in {{asym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
+*  Format message_2 as specified in {{asym-msg2-form}} and encode it to a byte string. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
 ### Party U Processing of Message 2
 
@@ -522,7 +524,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 ### Formatting of Message 3 {#asym-msg3-form}
 
-message_3 SHALL be a sequence of CBOR elements as defined below
+message_3 SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 message_3 = (
@@ -584,7 +586,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_3, see next bullet.  
 
-*  Format message_3 as specified in {{asym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
+*  Format message_3 as specified in {{asym-msg3-form}} and encode it to a byte string. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 *  Pass the connection identifiers (C_U, C_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
@@ -639,7 +641,7 @@ For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-
 
 ### Formatting of Message 1 {#sym-msg1-form}
 
-message_1 SHALL be a sequence of CBOR elements as defined below
+message_1 SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
@@ -687,11 +689,13 @@ Party U SHALL compose message_1 as follows:
 
 * Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
 
-* Format message_1 as specified in {{sym-msg1-form}}.
+* Format message_1 as specified in {{sym-msg1-form}} and encode it to a byte string, for instance by CBOR encoding the indefinite-length array [_ message_1 ] and then removing the first byte (0x9f) and the last byte (0xff).
 
 ### Party V Processing of Message 1
 
 Party V SHALL process message_1 as follows:
+
+* Decode messagage_1, for instance by wrapping the recieved byte string between the two bytes 0x9f and 0xff and decoding the wrapped byte string as a CBOR encoded indefinite-length array.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
@@ -707,7 +711,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ### Formatting of Message 2 {#sym-msg2-form}
 
-message_2 SHALL be a sequence of CBOR elements as defined below
+message_2 SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 message_2 = (
@@ -766,7 +770,7 @@ Party V SHALL compose message_2 as follows:
 
    Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_2, see next bullet.   
 
-*  Format message_2 as specified in {{sym-msg2-form}}, where CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
+*  Format message_2 as specified in {{sym-msg2-form}} and encode it to a byte string. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
    
 ### Party U Processing of Message 2
 
@@ -786,7 +790,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 ### Formatting of Message 3 {#sym-msg3-form}
 
-message_3 SHALL be a sequence of CBOR elements as defined below
+message_3 SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 message_3 = (
@@ -830,7 +834,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that only 'ciphertext' of the COSE_Encrypt0 structure are used in message_3, see next bullet.   
 
-*  Format message_3 as specified in {{sym-msg3-form}}, where CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
+*  Format message_3 as specified in {{sym-msg3-form}} and encode it to a byte string. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 *  Pass the connection identifiers (C_U, C_V) and the negotiated algorithms (AEAD, HDKF, etc.) to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
@@ -852,7 +856,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be send by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
-error SHALL be a sequence of CBOR elements as defined below
+error SHALL be a sequence of CBOR data items as defined below
 
 ~~~~~~~~~~~ CDDL
 error = (
