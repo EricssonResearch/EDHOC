@@ -560,7 +560,9 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = bstr .cbor PROTECTED_3, where PROTECTED_3 = { xyz : ID_CRED_U }
+   * protected = bstr .cbor PROTECTED_3
+   
+   * PROTECTED_3 = { xyz : ID_CRED_U }
    
    * payload = ( CRED_U, aad_3 )
    
