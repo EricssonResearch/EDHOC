@@ -1142,9 +1142,6 @@ plaintext = bstr .cborseq [
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
     3c3d3e3f'
 ]
-= h'a10444616262615840000102030405060708090A0B0C0D0E0F1011121314
-    15161718191a1b1c1d1E1F202122232425262728292a2b2c2d2e2f303132
-    333435363738393a3b3c3d3e3f'
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The size of the protected header field is 7 bytes. The size of the plaintext is 73 bytes so assuming a 64-bit MAC value the size of the ciphertext is 81 bytes.
