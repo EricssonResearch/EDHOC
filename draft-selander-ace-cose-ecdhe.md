@@ -407,7 +407,7 @@ Party U SHALL compose message_1 as follows:
 
 Party V SHALL process message_1 as follows:
 
-* Decode messagage_1, for instance by wrapping the recieved byte string between the two bytes 0x9f and 0xff and decoding the wrapped byte string as a CBOR encoded indefinite-length array.
+* Decode message_1, for instance by wrapping the recieved byte string between the two bytes 0x9f and 0xff and decoding the wrapped byte string as a CBOR encoded indefinite-length array.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
@@ -691,7 +691,7 @@ Party U SHALL compose message_1 as follows:
 
 Party V SHALL process message_1 as follows:
 
-* Decode messagage_1, for instance by wrapping the recieved byte string between the two bytes 0x9f and 0xff and decoding the wrapped byte string as a CBOR encoded indefinite-length array.
+* Decode message_1, for instance by wrapping the recieved byte string between the two bytes 0x9f and 0xff and decoding the wrapped byte string as a CBOR encoded indefinite-length array.
 
 * Verify that at least one of each kind of the proposed algorithms are supported.
 
