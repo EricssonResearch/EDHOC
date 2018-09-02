@@ -268,7 +268,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 
 where exchange_hash, in non-CDDL notation, is:
 
-exchange_hash = H( H( message_1 \| message_2 ) \| message_3 ) 
+exchange_hash = H( aad_3 CIPHERTEXT_3 )
 
 where H() is the hash function in HKDF_V.
 
@@ -452,7 +452,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( message_1 | data_2 )
+aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -464,7 +464,7 @@ where:
 * AEAD_V - the first supported algorithm from AEADs_U
 * SIG_V - the first supported algorithm from SIGs_V with which Party V signs
 * SIG_U - the first supported algorithm from SIGs_U with which Party U signs
-* H() - the hash function in HKDF_V
+* H() - the hash function in HKDF_V. Takes as input a bstr and outputs a bstr.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
 
@@ -547,7 +547,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( H( message_1 | message_2 ) | data_3 )
+aad_3 = H( aad_2 bstr .cborseq [ CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 where:
@@ -738,7 +738,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( message_1 | data_2 )
+aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -748,7 +748,7 @@ where:
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - the first supported algorithm from HKDFs_U
 * AEAD_V - the first supported algorithm from AEADs_U
-* H() - the hash function in HKDF_V
+* H() - the hash function in HKDF_V. Takes as input a bstr and outputs a bstr.
 
 ### Party V Processing of Message 2
 
@@ -813,7 +813,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( H( message_1 | message_2 ) | data_3 )
+aad_3 = H( aad_2 bstr .cborseq [ CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 where:
