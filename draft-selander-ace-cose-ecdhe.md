@@ -1208,13 +1208,13 @@ message_3 (86 bytes):
 When the certificates are distributed out-of-band and identified with the x5t header and a SHA256/64 hash value, the protected COSE_Sign1 protected header will be 13 bytes instead of 7 bytes (assuming labels in the range -24&hellip;23).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-protected = { TDB1 : [ TDB6, h'0001020304050607' ] }
+PROTECTED_i = { TDB1 : [ TDB6, h'0001020304050607' ] }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When the certificates are identified with the x5chain header, the message sizes depends on the size of the (truncated) certificate chains. The COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain (assuming a label in the range -24&hellip;23).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-protected = { TDB3 : h'0001020304050607...' }
+PROTECTED_i = { TDB3 : h'0001020304050607...' }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes PSK
