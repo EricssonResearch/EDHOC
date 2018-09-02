@@ -1144,7 +1144,7 @@ plaintext = bstr .cborseq [
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of the CBOR encoded protected header map is 7 bytes. The length of 'plaintext' is 73 bytes so assuming a 64-bit MAC value the length of 'ciphertext' is 81 bytes.
+The protected header map is 7 bytes. The length of plaintext is 73 bytes so assuming a 64-bit MAC value the length of ciphertext is 81 bytes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
@@ -1199,13 +1199,13 @@ message_3 (86 bytes):
 
 ## Message Sizes Certificates
 
-When the certificates are distributed out-of-band and identified with the x5t header and a SHA256/64 hash value, the protected COSE_Sign1 protected header will be 13 bytes instead of 7 bytes (assuming labels in the range -24&hellip;23).
+When the certificates are distributed out-of-band and identified with the x5t header and a SHA256/64 hash value, the protected header map will be 13 bytes instead of 7 bytes (assuming labels in the range -24&hellip;23).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 PROTECTED_i = { TDB1 : [ TDB6, h'0001020304050607' ] }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When the certificates are identified with the x5chain header, the message sizes depends on the size of the (truncated) certificate chains. The COSE_Sign1 protected header will be 3 bytes + the size of the certificate chain (assuming a label in the range -24&hellip;23).
+When the certificates are identified with the x5chain header, the message sizes depends on the size of the (truncated) certificate chains. The protected header map will be 3 bytes + the size of the certificate chain (assuming a label in the range -24&hellip;23).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 PROTECTED_i = { TDB3 : h'0001020304050607...' }
