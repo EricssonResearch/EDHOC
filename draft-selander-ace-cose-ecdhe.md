@@ -492,7 +492,7 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
-   Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
+   Note that only PROTECTED_2 and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
@@ -574,7 +574,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
-   Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
+   Note that only PROTECTED_3 and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
