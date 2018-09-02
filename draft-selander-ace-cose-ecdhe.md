@@ -496,7 +496,7 @@ Party V SHALL compose message_2 as follows:
  
    * external_aad = aad_2
 
-   * plaintext = ( PROTECTED_2, SIGNATURE_2, ? UAD_2 )
+   * plaintext = bstr .cborseq [ PROTECTED_2, SIGNATURE_2, ? UAD_2 ]
    
    * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
   
@@ -578,7 +578,7 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = aad_3
 
-   * plaintext = ( PROTECTED_3, SIGNATURE_3, ? PAD_3 )
+   * plaintext = bstr .cborseq [ PROTECTED_3, SIGNATURE_3, ? PAD_3 ]
       
    * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
