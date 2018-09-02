@@ -1144,7 +1144,7 @@ plaintext = bstr .cborseq [
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The size of the protected header field is 7 bytes. The size of the plaintext is 73 bytes so assuming a 64-bit MAC value the size of the ciphertext is 81 bytes.
+The size of the CBOR encoded protected header map is 7 bytes. The length of 'plaintext' is 73 bytes so assuming a 64-bit MAC value the length of 'ciphertext' is 81 bytes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
