@@ -1039,17 +1039,28 @@ h'c3'               0x41c3                        byte string
 ## COSE
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes to make it more suitable for the Internet of Things (IoT). EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
-
 ### Encryption and Decryption
 
-In all encryption operations (both encryption and decryption) the input to the AEAD is a follows:
+The input to COSE {{RFC8152}} are constructed as follows:
 
-* The key K_i and nonce N (IV_i) are the output EDHOC-Key-Derivation function as defined in {{key-der}}.
+* The key K_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The plaintext P is just the concatenation the included CBOR data items ecnoded as byte strings (but not CBOR byte strings).
+* The initialization vector IV_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The associated data A = Enc_structure = [ "Encrypt0", h'', aad_i ] =
-<< h'8368456E63727970743040' aad_i >>
+* The plaintext is a CBOR bstr. TODO
+ 
+* The external_aad is a CBOR bstr. It is always set to aad_i.
+
+COSE constructs the input to the AEAD {{RFC5116}} as follows:
+
+* The key K is the value of the key K_i.
+
+* The nonce N is the value of the initialization vector IV_i.
+
+* The plaintext P is the value of the COSE plaintext. E.g. if the COSE plaintext = h'010203', then P = 0x010203.
+
+* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is the equal to the concatenation of 0x8368456E63727970743040 and the CBOR encoding of aad_i. E.g. if aad_i = h'010203' then A = 0x8368456E63727970743040010203 
+
 
 ### Signing and Verification
 
