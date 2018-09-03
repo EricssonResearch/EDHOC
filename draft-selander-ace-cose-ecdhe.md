@@ -490,7 +490,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
    
-   * protected = << PROTECTED_2 >>
+   * protected = &lt;&lt; PROTECTED_2 &gt;&gt;
    
    * payload = CRED_V
 
@@ -508,7 +508,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = << PROTECTED_2, SIGNATURE_2, ? UAD_2 >>
+   * plaintext = &lt;&lt; PROTECTED_2, SIGNATURE_2, ? UAD_2 &gt;&gt;
    
    * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
   
@@ -572,8 +572,8 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = << PROTECTED_3 >> 
-   
+   * protected = &lt;&lt; PROTECTED_3 &gt;&gt; 
+
    * payload = CRED_U
 
    * external_aad = aad_3
@@ -590,8 +590,8 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext = << PROTECTED_3, SIGNATURE_3, ? UAD_3 >>
-      
+   * plaintext = &lt;&lt; PROTECTED_3, SIGNATURE_3, ? UAD_3 &gt;&gt;
+         
    * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
    * PAD_3 = bstr containing opaque protected application data
@@ -776,8 +776,8 @@ Party V SHALL compose message_2 as follows:
 
    * external_aad = aad_2
 
-   * plaintext = UAD_2 / h''
-
+   * plaintext = &lt;&lt; ? UAD_2 &gt;&gt;
+ 
    * UAD_2 = bstr containing opaque unprotected application data
 
    Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
@@ -840,7 +840,7 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = aad_3
 
-   * plaintext = PAD_3 / h''
+   * plaintext = &lt;&lt; ? PAD_3 &gt;&gt;
 
    * PAD_3 = bstr containing opaque protected application data
 
