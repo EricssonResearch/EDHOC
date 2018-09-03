@@ -272,7 +272,7 @@ where exchange_hash, in non-CDDL notation, is:
 
 exchange_hash = H( &lt;&lt; aad_3, CIPHERTEXT_3 &gt;&gt; )
 
-where H() is the hash function in HKDF_V. It takes as input a bstr and outputs a bstr.
+where H() is the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength and other:
 
@@ -466,7 +466,7 @@ where:
 * AEAD_V - the first supported algorithm from AEADs_U
 * SIG_V - the first supported algorithm from SIGs_V with which Party V signs
 * SIG_U - the first supported algorithm from SIGs_U with which Party U signs
-* H() - the hash function in HKDF_V. It takes as input a bstr and outputs a bstr.
+* H() - the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
 
@@ -750,7 +750,7 @@ where:
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - the first supported algorithm from HKDFs_U
 * AEAD_V - the first supported algorithm from AEADs_U
-* H() - the hash function in HKDF_V. It takes as input a bstr and outputs a bstr.
+* H() - the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
 
 ### Party V Processing of Message 2
 
