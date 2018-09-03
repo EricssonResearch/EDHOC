@@ -42,11 +42,11 @@ normative:
   RFC8152:
   RFC8174:
   
-  SP-800-56a:
-    target: http://dx.doi.org/10.6028/NIST.SP.800-56Ar2
-    title: Recommendation for Pair-Wise Key Establishment Schemes Using Discrete Logarithm Cryptography
+  SP-800-56A:
+    target: https://doi.org/10.6028/NIST.SP.800-56Ar3
+    title: Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography
     seriesinfo:
-      "NIST": "Special Publication 800-56A Revision 2"
+      "NIST": "Special Publication 800-56A Revision 3"
     author:
       -
         ins: E. Barker
@@ -55,9 +55,11 @@ normative:
       -
         ins: A. Roginsky
       -
-        ins: M. Smid
-    date: May 2013
-
+        ins: A. Vassilev
+      -
+        ins: R. Davis
+    date: April 2018
+ 
   SIGMA:
     target: http://webee.technion.ac.il/~hugo/sigma-pdf.pdf
     title: SIGMA - The 'SIGn-and-MAc' Approach to Authenticated Diffie-Hellman and Its Use in the IKE-Protocols (Long version)
@@ -123,11 +125,19 @@ informative:
     date: June 2018
 
   CertEnr:
-    target: http://www.nada.kth.se/~ann/exjobb/alexandros_krontiris.pdf
+    target: https://www.nada.kth.se/~ann/exjobb/alexandros_krontiris.pdf
     title: Evaluation of Certificate Enrollment over Application Layer Security
     author:
       -
         ins: A. Krontiris
+    date: May 2018
+
+  CborMe:
+    target: http://cbor.me/
+    title: CBOR Playground
+    author:
+      -
+        ins: C. Bormann
     date: May 2018
 
 --- abstract
