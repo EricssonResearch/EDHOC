@@ -993,28 +993,26 @@ Party U and V are allowed to select the connection identifiers C_U and C_V, resp
 EDHOC has been analyzed in several other documents. An analysis of EDHOC for certificate enrollment was done in {{CertEnr}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, and the use of EDHOC in 6TiSCH is described in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
 
 --- back
+# Use of CBOR, COSE in EDHOC {#CBORandCOSE}
 
-# Use of CBOR and COSE in EDHOC {#CBORandCOSE}
+This Appendix is intended to simplify for implementors not familiar with CBOR {{RFC7049}}, CDDL {{I-D.ietf-cbor-cddl}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}.
 
-This Appendix is intended to simplify for implementors not familiar with CBOR {{RFC7049}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}. 
+## CBOR and CDDL
 
-TODO: This section needs to be updated (may be removed in the submitted version).
-
-## CBOR
-
-The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays [] and maps {} of data items. For a complete specification and more examples, see {{RFC7049}}.
+The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation. CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays [] and maps {} of data items. For a complete specification and more examples, see {{RFC7049}} and {{I-D.ietf-cbor-cddl}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic      Encoded
-------------------------------------------
-1               0x01
--27             0x381a
-null            0xf6
-h'c3'           0x41c3
-"Pickle Rick"   0x6b5069636b6c65205269636b
-[1, 2]          0x820102
-{4: h'c3'}      0xa10441c3
-------------------------------------------
+---------------------------------------------
+1                  0x01
+-27                0x381a
+null               0xf6
+"Pickle Rick"      0x6b5069636b6c65205269636b
+h'c3'              0x41c3
+<< 1, 2, null >>   0x430102f6
+[ 1, 2, null ]     0x830102f6
+{ 4: h'c3' }       0xa10441c3
+---------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## COSE
@@ -1029,15 +1027,46 @@ In all encryption operations (both encryption and decryption) the input to the A
 
 * The plaintext P is just the concatenation the included CBOR data items ecnoded as byte strings (but not CBOR byte strings).
 
-* The associated data A is = Enc_structure = [ "Encrypt0", h'', aad_i ] = 0x8368456E63727970743040 \| aad_i
-
-where aad_i is the  concatenation the included CBOR data items ecnoded as byte strings (but not necessarily CBOR byte strings).
+* The associated data A = Enc_structure = [ "Encrypt0", h'', aad_i ] =
+<< h'8368456E63727970743040' aad_i >>
 
 ### Signing and Verification
 
 * The key is the private of public authentication key of U or V.
 
-* The message M =  Sig_structure = [ "Signature1", { xyz : ID_CRED_U }, h'', ( CRED_U, aad_3 ) ] = 0x846A5369676E617475726531a1 \| xyz \| ID_CRED_U \| 40 \| payload
+* The message M = Sig_structure
+~~~~~~~~~~~~~~~~~~~~~~~
+= [ "Signature1", << { xyz : ID_CRED_U } >>, aad_3, CRED_U ]
+= << h'846A5369676E617475726531a1', xyz, ID_CRED_U, aad_3, CRED_U >>
+~~~~~~~~~~~~~~~~~~~~~~~
+
+where aad_i is the  concatenation the included CBOR data items ecnoded as byte strings (but not necessarily CBOR byte strings).
+
+### Key Derivation
+
+Assuming use of the default algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+
+PRK = HMAC-SHA-256( PSK / '', ECDH shared secret)
+
+and as L is smaller than the hash function output size, the expand
+phase of HKDF consists of a single HMAC invocation, and the Sender
+Key, Recipient Key, and Common IV are therefore the first 16 or 13
+bytes of
+
+output parameter = HMAC-SHA-256(PRK, COSE_KDF_Context | 0x01)
+
+~~~~~~~~~~~~~~~~~~~~~~~
+COSE_KDF_Context = [ 10, [ null, null, null ], [ null, null, null ], [ 128, h'', exchange_hash ] ]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+COSE_KDF_Context = [
+      10,
+      [ null, null, null ],
+      [ null, null, null ],
+      [ 128, h'', exchange_hash ]
+   ]
+~~~~~~~~~~~~~~~~~~~~~~~
 
 # Test Vectors {#vectors}
 
