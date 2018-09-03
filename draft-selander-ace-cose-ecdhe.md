@@ -780,7 +780,7 @@ Party V SHALL compose message_2 as follows:
 
    * external_aad = aad_2
 
-   * plaintext = &lt;&lt; ? UAD_2 &gt;&gt;
+   * plaintext = UAD_2 / h'0'
  
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -844,8 +844,8 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = aad_3
 
-   * plaintext = &lt;&lt; ? PAD_3 &gt;&gt;
-
+   * plaintext = PAD_3 / h'0'
+ 
    * PAD_3 = bstr containing opaque protected application data
 
    Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.   
