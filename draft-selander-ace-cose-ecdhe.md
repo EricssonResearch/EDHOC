@@ -510,6 +510,8 @@ Party V SHALL compose message_2 as follows:
  
    * plaintext = &lt;&lt; PROTECTED_2, SIGNATURE_2, ? UAD_2 &gt;&gt;
    
+   * external_aad = aad_2
+
    * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
   
    * UAD_2 = bstr containing opaque unprotected application data
@@ -592,6 +594,8 @@ Party U SHALL compose message_3 as follows:
 
    * plaintext = &lt;&lt; PROTECTED_3, SIGNATURE_3, ? UAD_3 &gt;&gt;
          
+   * external_aad = aad_2
+
    * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
    * PAD_3 = bstr containing opaque protected application data
