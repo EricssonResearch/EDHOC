@@ -1015,18 +1015,17 @@ This Appendix is intended to simplify for implementors not familiar with CBOR {{
 The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
 
 CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays [] and maps {} of data items. For a complete specification and more examples, see {{RFC7049}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by usging the CBOR playground {{CborMe}}.
-
 ~~~~~~~~~~~~~~~~~~~~~~~
-Diagnostic          Major Type          Encoded
+Diagnostic          Encoded                       Type
 ------------------------------------------------------------------
-1                   unsigned integer    0x01
--27                 negative integer    0x381a
-h'c3'               byte string         0x41c3
-<< 1, 2, null >>    byte string         0x430102f6
-"Pickle Rick"       text string         0x6b5069636b6c65205269636b
-null                simple value        0xf6
-[ 1, 2, null ]      array               0x830102f6
-{ 4: h'c3' }        map                 0xa10441c3
+1                   0x01                          unsigned integer    
+-27                 0x381a                        negative integer    
+h'c3'               0x41c3                        byte string         
+<< 1, 2, null >>    0x430102f6                    byte string         
+"Pickle Rick"       0x6b5069636b6c65205269636b    text string         
+null                0xf6                          simple value        
+[ 1, 2, null ]      0x830102f6                    array               
+{ 4: h'c3' }        0xa10441c3                    map                 
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
