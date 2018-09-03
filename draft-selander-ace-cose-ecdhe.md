@@ -1020,10 +1020,10 @@ Diagnostic          Encoded                       Type
 ------------------------------------------------------------------
 1                   0x01                          unsigned integer    
 -27                 0x381a                        negative integer    
+null                0xf6                          simple value        
 h'c3'               0x41c3                        byte string         
 << 1, 2, null >>    0x430102f6                    byte string         
 "Pickle Rick"       0x6b5069636b6c65205269636b    text string         
-null                0xf6                          simple value        
 [ 1, 2, null ]      0x830102f6                    array               
 { 4: h'c3' }        0xa10441c3                    map                 
 ------------------------------------------------------------------
