@@ -265,6 +265,8 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
   + protected SHALL be a zero length bstr
 
   + other is a bstr and SHALL be aad_2, aad_3, or exchange_hash; see below
+  
+  + SuppPrivInfo is omitted
 
 where exchange_hash, in non-CDDL notation, is:
 
