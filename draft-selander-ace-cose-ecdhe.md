@@ -1059,20 +1059,14 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
 
 * The plaintext P is the value of the COSE plaintext. E.g. if the COSE plaintext = h'010203', then P = 0x010203.
 
-* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is the equal to the concatenation of 0x8368456E63727970743040 and the CBOR encoding of aad_i. E.g. if aad_i = h'010203', the CBOR encoding of aad_i is 0x43010203,  and A = 0x8368456E6372797074304043010203 
+* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. E.g. if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203 
 
 
 ### Signing and Verification
 
 * The key is the private of public authentication key of U or V.
 
-* The message M = Sig_structure
-~~~~~~~~~~~~~~~~~~~~~~~
-= [ "Signature1", << { xyz : ID_CRED_U } >>, aad_3, CRED_U ]
-= << h'846A5369676E617475726531a1', xyz, ID_CRED_U, aad_3, CRED_U >>
-~~~~~~~~~~~~~~~~~~~~~~~
-
-where aad_i is the  concatenation the included CBOR data items ecnoded as byte strings (but not necessarily CBOR byte strings).
+* The message to be signed M is the CBOR encoding of [ "Signature1", << { xyz : ID_CRED_U } >>, aad_i, CRED_x ]. This is equal to the concatenation of 0x846a5369676e617475726531 and the CBOR encodings of << { xyz : ID_CRED_U } >>, aad_i, and CRED_x. E.g. if << { xyz : ID_CRED_U } >> = << { 4 : h'0102' } >> (CBOR encoding 0x45a104420102), ID_CRED_U = h'0102' (CBOR encoding 0x420102), aad_i = h'0304' (CBOR encoding 0x420304), and CRED_x = h'0506' (CBOR encoding 0x420506), then M = 0x846a5369676e61747572653145a104420102420102420304420506.
 
 ### Key Derivation
 
