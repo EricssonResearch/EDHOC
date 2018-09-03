@@ -312,7 +312,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
-* kid : ID_CRED_x, for x = U or V
+* kid : ID_CRED_x, for x = U or V.
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
