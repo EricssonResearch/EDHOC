@@ -34,14 +34,19 @@ author:
 normative:
 
   I-D.schaad-cose-x509:
+  I-D.ietf-cbor-cddl:
   I-D.ietf-core-echo-request-tag:
+  I-D.ietf-core-object-security:
   
   RFC2119:
+  RFC5116:
+  RFC5869:
   RFC6090:  
   RFC7049:
+  RFC7252:
   RFC8152:
   RFC8174:
-  
+
   SP-800-56A:
     target: https://doi.org/10.6028/NIST.SP.800-56Ar3
     title: Recommendation for Pair-Wise Key-Establishment Schemes Using Discrete Logarithm Cryptography
@@ -72,16 +77,11 @@ informative:
 
   I-D.hartke-core-e2e-security-reqs:
   I-D.ietf-ace-oauth-authz:
-  I-D.ietf-core-object-security:
   I-D.ietf-ace-oscore-profile:
-  I-D.ietf-cbor-cddl:
   I-D.ietf-core-resource-directory:
   I-D.ietf-6tisch-dtsecurity-zerotouch-join:
 
-  RFC5116:
-  RFC5869:
   RFC7228:
-  RFC7252:
   RFC8446:
   
   LoRa1:
