@@ -496,7 +496,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = bstr .cborseq [ PROTECTED_2, SIGNATURE_2, ? UAD_2 ]
+   * plaintext = bstr .cbor (PROTECTED_2, SIGNATURE_2, ? UAD_2)
    
    * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
   
@@ -578,7 +578,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext = bstr .cbor (PROTECTED_2, SIGNATURE_2, ? UAD_2)
+   * plaintext = bstr .cbor (PROTECTED_3, SIGNATURE_3, ? UAD_3)
       
    * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
