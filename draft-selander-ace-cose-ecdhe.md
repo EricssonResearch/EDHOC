@@ -258,7 +258,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 
   + AlgorithmID is an int or tstr, see below
 
-  + PartyUInfo = PartyVInfo = ( nil, nil, nil )
+  + PartyUInfo = PartyVInfo = ( null, null, null )
   
   + keyDataLength is a uint, see below
   
