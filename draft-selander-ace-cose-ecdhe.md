@@ -780,7 +780,7 @@ Party V SHALL compose message_2 as follows:
 
    * external_aad = aad_2
 
-   * plaintext = UAD_2 / h'0'
+   * plaintext = UAD_2 / h''
  
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -844,7 +844,7 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = aad_3
 
-   * plaintext = PAD_3 / h'0'
+   * plaintext = PAD_3 / h''
  
    * PAD_3 = bstr containing opaque protected application data
 
