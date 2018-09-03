@@ -478,7 +478,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
    
-   * protected = bstr .cbor PROTECTED_2
+   * protected = << PROTECTED_2 >>
    
    * payload = CRED_V
 
@@ -560,7 +560,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = bstr .cbor PROTECTED_3  
+   * protected = << PROTECTED_3 >> 
    
    * payload = CRED_U
 
@@ -1136,12 +1136,12 @@ message_1 (44 bytes):
 ### message_2
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-plaintext = bstr .cborseq [
+plaintext = <<
   { 4 : 'acdc' },
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
     3c3d3e3f'
-]
+>>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The protected header map is 7 bytes. The length of plaintext is 73 bytes so assuming a 64-bit MAC value the length of ciphertext is 81 bytes.
