@@ -452,7 +452,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
+aad_2 = H( bstr .cbor message_1 bstr .cbor data_2 )
 ~~~~~~~~~~~
 
 where:
@@ -547,7 +547,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( aad_2 bstr .cborseq [ CIPHERTEXT_2, data_3 ] )
+aad_3 = H( aad_2 CIPHERTEXT_2 bstr .cbor message_1 )
 ~~~~~~~~~~~
 
 where:
@@ -738,7 +738,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
+aad_2 = H( bstr .cbor message_1 bstr .cbor data_2 )
 ~~~~~~~~~~~
 
 where:
@@ -813,7 +813,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( aad_2 bstr .cborseq [ CIPHERTEXT_2, data_3 ] )
+aad_3 = H( aad_2 CIPHERTEXT_2 bstr .cbor message_1 )
 ~~~~~~~~~~~
 
 where:
