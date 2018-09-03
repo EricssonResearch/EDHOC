@@ -1017,17 +1017,17 @@ The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format des
 CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays [] and maps {} of data items. For a complete specification and more examples, see {{RFC7049}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by usging the CBOR playground {{CborMe}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Diagnostic         Encoded
----------------------------------------------
-1                  0x01
--27                0x381a
-null               0xf6
-"Pickle Rick"      0x6b5069636b6c65205269636b
-h'c3'              0x41c3
-<< 1, 2, null >>   0x430102f6
-[ 1, 2, null ]     0x830102f6
-{ 4: h'c3' }       0xa10441c3
----------------------------------------------
+Diagnostic          Major Type          Encoded
+------------------------------------------------------------------
+1                   unsigned integer    0x01
+-27                 negative integer    0x381a
+h'c3'               byte string         0x41c3
+<< 1, 2, null >>    byte string         0x430102f6
+"Pickle Rick"       text string         0x6b5069636b6c65205269636b
+null                simple value        0xf6
+[ 1, 2, null ]      array               0x830102f6
+{ 4: h'c3' }        map                 0xa10441c3
+------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## COSE
