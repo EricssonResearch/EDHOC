@@ -452,7 +452,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( bstr .cbor message_1 bstr .cbor data_2 )
+aad_2 = H( <<message_1, data_2>> )
 ~~~~~~~~~~~
 
 where:
@@ -496,7 +496,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = bstr .cbor (PROTECTED_2, SIGNATURE_2, ? UAD_2)
+   * plaintext = << PROTECTED_2, SIGNATURE_2, ? UAD_2 >>
    
    * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
   
@@ -547,7 +547,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( aad_2 CIPHERTEXT_2 bstr .cbor message_1 )
+aad_3 = H( << aad_2, CIPHERTEXT_2, message_1 >> )
 ~~~~~~~~~~~
 
 where:
@@ -578,7 +578,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext = bstr .cbor (PROTECTED_3, SIGNATURE_3, ? UAD_3)
+   * plaintext = << PROTECTED_3, SIGNATURE_3, ? UAD_3 >>
       
    * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
 
@@ -738,7 +738,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( bstr .cbor message_1 bstr .cbor data_2 )
+aad_2 = H( << message_1, data_2 >> )
 ~~~~~~~~~~~
 
 where:
@@ -813,7 +813,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( aad_2 CIPHERTEXT_2 bstr .cbor message_1 )
+aad_3 = H( << aad_2, CIPHERTEXT_2, data_3 >> )
 ~~~~~~~~~~~
 
 where:
