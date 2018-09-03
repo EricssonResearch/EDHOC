@@ -219,7 +219,7 @@ To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR encoded data items, where the first data item is an int specifying the message type (MSG_TYPE). After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the negotiated algorithms (AEAD, HKDF, etc.) and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR encoded data items, where the first data item is an int specifying the message type (MSG_TYPE). EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures,  but only a subset of the parameters are included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the negotiated algorithms (AEAD, HKDF, etc.) and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
