@@ -268,7 +268,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 
 where exchange_hash, in non-CDDL notation, is:
 
-exchange_hash = H( aad_3 CIPHERTEXT_3 )
+exchange_hash = H( << aad_3, CIPHERTEXT_3 >> )
 
 where H() is the hash function in HKDF_V. It takes as input a bstr and outputs a bstr.
 
