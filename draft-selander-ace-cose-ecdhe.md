@@ -284,7 +284,7 @@ exchange_hash = H( &lt;&lt; aad_3, CIPHERTEXT_3 &gt;&gt; )
 
 where H() is the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
 
-We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength and other:
+We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
 output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
 
