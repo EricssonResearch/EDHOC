@@ -164,7 +164,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}.
+This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. In the non-CDDL sections we use the "unwrap" operator "~" also for unwrapping byte strings.
 
 # Background {#background}
 
@@ -490,13 +490,11 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
    
-   * protected = &lt;&lt; PROTECTED_2 &gt;&gt;
+   * protected = &lt;&lt; { xyz : ID_CRED_V } &gt;&gt;
    
    * payload = CRED_V
 
    * external_aad = aad_2
-
-   * PROTECTED_2 = { xyz : ID_CRED_V }
 
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -504,19 +502,17 @@ Party V SHALL compose message_2 as follows:
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
-   Note that only PROTECTED_2 and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
+   Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = &lt;&lt; PROTECTED_2, SIGNATURE_2, ? UAD_2 &gt;&gt;
-   
+   * plaintext = &lt;&lt; ~protected, signature, ? UAD_2 &gt;&gt;
+
    * external_aad = aad_2
 
-   * SIGNATURE_2 - bstr containing the COSE_Sign1 signature
-  
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
+   Note that protected and signature in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
 
 *  Format message_2 as specified in {{asym-msg2-form}} and encode it to a byte string. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -574,13 +570,11 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = &lt;&lt; PROTECTED_3 &gt;&gt; 
-
+   * protected = &lt;&lt; { xyz : ID_CRED_U } &gt;&gt;
+   
    * payload = CRED_U
 
    * external_aad = aad_3
-
-   * PROTECTED_3 = { xyz : ID_CRED_U }
 
    * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -588,19 +582,17 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
-   Note that only PROTECTED_3 and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
+   Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext = &lt;&lt; PROTECTED_3, SIGNATURE_3, ? UAD_3 &gt;&gt;
+   * plaintext = &lt;&lt; ~protected, signature, ? PAD_3 &gt;&gt;
          
    * external_aad = aad_2
 
-   * SIGNATURE_3 - bstr containing the COSE_Sign1 signature
-
    * PAD_3 = bstr containing opaque protected application data
 
-   Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.  
+   Note that protected and signature in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.  
 
 *  Format message_3 as specified in {{asym-msg3-form}} and encode it to a byte string. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
