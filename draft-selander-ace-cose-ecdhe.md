@@ -1008,7 +1008,7 @@ This Appendix is intended to simplify for implementors not familiar with CBOR {{
 
 ## CBOR and CDDL
 
-The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
+The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages and APIs that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
 
 CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays []  of data items and maps {} of pairs of data items. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}.
 
@@ -1019,7 +1019,7 @@ Diagnostic          Encoded                       Type
 -27                 0x381a                        negative integer    
 null                0xf6                          simple value        
 h'c3'               0x41c3                        byte string         
-'lup'               0x436c7570                    byte string
+'abcd'              0x4461626364                  byte string
 << 1, 2, null >>    0x430102f6                    byte string         
 "Pickle Rick"       0x6b5069636b6c65205269636b    text string         
 [ 1, 2, null ]      0x830102f6                    array               
