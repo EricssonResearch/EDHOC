@@ -1098,24 +1098,24 @@ PRK = HMAC-SHA-256( salt, ECDH shared secret )
 where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 or 13 bytes of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-output parameter = HMAC-SHA-256( PRK, info | 0x01 )
+output parameter = HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where the info is the CBOR encoding of 
+where || means byte sting concatenation and info is the CBOR encoding of 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 COSE_KDF_Context = [
   AlgorithmID,
   [ null, null, null ],
   [ null, null, null ],
-  [ keyDataLength, h'', exchange_hash ]
+  [ keyDataLength, h'', aad_i ]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-For AES-CCM-16-64-128, AlgorithmID = 10 and keyDataLength = 128 so if exchange_hash = h'aaaa' then
+For AES-CCM-16-64-128, AlgorithmID = 10 and keyDataLength = 128 so if aad_i = h'aaaa' then
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-output parameter = HMAC-SHA-256( PRK, info = 0x840a83f6f6f683f6f6f68318804042aaaa01 )
+output parameter = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # Test Vectors {#vectors}
