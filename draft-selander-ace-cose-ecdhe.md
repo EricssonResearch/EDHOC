@@ -280,7 +280,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 
 where exchange_hash, in non-CDDL notation, is:
 
-exchange_hash = H( &lt;&lt; aad_3, CIPHERTEXT_3 &gt;&gt; )
+exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 
 where H() is the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
 
@@ -464,7 +464,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( << message_1, data_2 >> )
+aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -490,7 +490,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
    
-   * protected = &lt;&lt; { xyz : ID_CRED_V } &gt;&gt;
+   * protected = bstr cbor. { xyz : ID_CRED_V }
    
    * payload = CRED_V
 
@@ -506,7 +506,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = &lt;&lt; ~protected, signature, ? UAD_2 &gt;&gt;
+   * plaintext = bstr .cborseq [ ~protected, signature, ? UAD_2 ]
 
    * external_aad = aad_2
 
@@ -557,7 +557,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( << aad_2, CIPHERTEXT_2, data_3 >> )
+aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 where:
@@ -570,7 +570,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = &lt;&lt; { xyz : ID_CRED_U } &gt;&gt;
+   * protected = bstr .cbor { xyz : ID_CRED_U }
    
    * payload = CRED_U
 
@@ -586,7 +586,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext = &lt;&lt; ~protected, signature, ? PAD_3 &gt;&gt;
+   * plaintext =  bstr .cborseq [ ~protected, signature, ? PAD_3 ]
          
    * external_aad = aad_2
 
@@ -746,7 +746,7 @@ aad_2 : bstr
 where aad_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( << message_1, data_2 >> )
+aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -821,7 +821,7 @@ aad_3 : bstr
 where aad_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( << aad_2, CIPHERTEXT_2, data_3 >> )
+aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 where:
