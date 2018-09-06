@@ -772,7 +772,7 @@ Party V SHALL compose message_2 as follows:
 
    * external_aad = aad_2
 
-   * plaintext =  bstr .cborseq [ ? UAD_2 ]
+   * plaintext = h'' / UAD_2
    
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -836,7 +836,7 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = aad_3
 
-   * plaintext =  bstr .cborseq [ ? PAD_3 ]
+   * plaintext = h'' / PAD_3
  
    * PAD_3 = bstr containing opaque protected application data
 
