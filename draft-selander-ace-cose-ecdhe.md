@@ -1039,7 +1039,7 @@ The input to COSE {{RFC8152}} are constructed as follows:
 
 * The initialization vector IV_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The plaintext is a CBOR bstr. Assuming the application data is omitted, in the symmetric case the plaintext is the empty byte string h'', and in the asymmetric case the plaintext is &lt;&lt; ~protected, signature &gt;&gt;. For instance, if protected = h'a10140' and signature = h'050607', then plaintext = h'a1014043050607'.
+* The plaintext is a CBOR bstr. Assuming the application data is omitted, in the symmetric case the plaintext is the empty byte string h'', and in the asymmetric case the plaintext is &lt;&lt; ~protected, signature &gt;&gt;. For instance, if protected = h'a10140' and signature = h'050607' CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to aad_i.
 
@@ -1051,7 +1051,7 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
 
 * The plaintext P is the value of the COSE plaintext. E.g. if the COSE plaintext = h'010203', then P = 0x010203.
 
-* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. E.g. if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203 
+* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203 
 
 ### Signing and Verification
 
