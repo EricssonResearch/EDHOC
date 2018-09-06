@@ -1052,10 +1052,12 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
 * The plaintext P is the value of the COSE plaintext. E.g. if the COSE plaintext = h'010203', then P = 0x010203.
 
 * The associated data A is the CBOR encoding of:
-~~~~~~~~~~~
-[ "Encrypt0", h'', aad_i ]
-~~~~~~~~~~~
-  This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
+
+  ~~~~~~~~~~~
+  [ "Encrypt0", h'', aad_i ]
+  ~~~~~~~~~~~
+
+This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
 
 ### Signing and Verification
 
