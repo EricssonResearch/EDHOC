@@ -1033,7 +1033,7 @@ h'c3'               0x41c3                        byte string
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes to make it more suitable for the Internet of Things (IoT). EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
 ### Encryption and Decryption
 
-The input to COSE {{RFC8152}} are constructed as follows:
+The COSE parameters {{RFC8152}} are constructed as follows:
 
 * The key K_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
@@ -1051,17 +1051,25 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
 
 * The plaintext P is the value of the COSE plaintext. E.g. if the COSE plaintext = h'010203', then P = 0x010203.
 
-* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203 
+* The associated data A is the CBOR encoding of [ "Encrypt0", h'', aad_i ]. This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
 
 ### Signing and Verification
 
-The input to COSE {{RFC8152}} are constructed as follows:
+The COSE parameters {{RFC8152}} are constructed as follows:
 
-COSE constructs the input to the AEAD {{RFC5116}} as follows:
+* The key is the private of public authentication key of U or V. This may be stored as a COSE_KEY object or a certificate.
+
+* The protected parameter is a the map { xyz : ID_CRED_x } wrapped in a byte string.
+   
+* The payload is a bstr cointaining a single the CBOR encoding of a COSE_KEY or a single certificate.
+
+* external_aad is a bstr containing the hash aad_2.
+
+COSE constructs the input to the Signature Algorithm as follows:
 
 * The key is the private of public authentication key of U or V.
 
-* The message to be signed M is the CBOR encoding of [ "Signature1", << { xyz : ID_CRED_U } >>, aad_i, CRED_x ]. This is equal to the concatenation of 0x846a5369676e617475726531 and the CBOR encodings of << { xyz : ID_CRED_U } >>, aad_i, and CRED_x. E.g. if << { xyz : ID_CRED_U } >> = << { 4 : h'0102' } >> (CBOR encoding 0x45a104420102), ID_CRED_U = h'0102' (CBOR encoding 0x420102), aad_i = h'0304' (CBOR encoding 0x420304), and CRED_x = h'0506' (CBOR encoding 0x420506), then M = 0x846a5369676e61747572653145a104420102420102420304420506.
+* The message to be signed M is the CBOR encoding of [ "Signature1", << { xyz : ID_CRED_x } >>, aad_i, CRED_x ]. For instance if xyz = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_i = h'222222' (CBOR encoding 0x43222222), and CRED_x = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 
 ### Key Derivation
 
