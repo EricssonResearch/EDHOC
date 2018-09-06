@@ -1058,7 +1058,7 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
   ~~~~~~~~~~~
 
 * This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
-{: style="empty"}
+{: style="numbers"}
 
 ### Signing and Verification
 
