@@ -1053,12 +1053,12 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
 
 * The associated data A is the CBOR encoding of:
 
-  ~~~~~~~~~~~
-  [ "Encrypt0", h'', aad_i ]
-  ~~~~~~~~~~~
+~~~~~~~~~~~
+   [ "Encrypt0", h'', aad_i ]
+~~~~~~~~~~~
 
 * This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
-{: style="numbers"}
+{: style="empty"}
 
 ### Signing and Verification
 
@@ -1079,10 +1079,11 @@ COSE constructs the input to the Signature Algorithm as follows:
 * The message to be signed M is the CBOR encoding of:
 
 ~~~~~~~~~~~
-[ "Signature1", << { xyz : ID_CRED_x } >>, aad_i, CRED_x ]
+   [ "Signature1", << { xyz : ID_CRED_x } >>, aad_i, CRED_x ]
 ~~~~~~~~~~~
 
-For instance if xyz = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_i = h'222222' (CBOR encoding 0x43222222), and CRED_x = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance if xyz = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_i = h'222222' (CBOR encoding 0x43222222), and CRED_x = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+{: style="empty"}
 
 ### Key Derivation
 
