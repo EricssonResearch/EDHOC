@@ -1039,7 +1039,7 @@ The input to COSE {{RFC8152}} are constructed as follows:
 
 * The initialization vector IV_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The plaintext is a CBOR bstr. Assuming the application data is omitted, in hte symmetric case the plaintext is the empty byte string h'', and in the asymmetric case the plaintext is &lt;&lt; ~protected, signature &gt;&gt;. For instance if protected = h'a10140' and signature = h'050607', then plaintext = h'a1014043050607'.
+* The plaintext is a CBOR bstr. Assuming the application data is omitted, in the symmetric case the plaintext is the empty byte string h'', and in the asymmetric case the plaintext is &lt;&lt; ~protected, signature &gt;&gt;. For instance, if protected = h'a10140' and signature = h'050607', then plaintext = h'a1014043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to aad_i.
 
