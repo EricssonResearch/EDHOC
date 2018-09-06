@@ -1031,6 +1031,7 @@ h'c3'               0x41c3                        byte string
 ## COSE
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes to make it more suitable for the Internet of Things (IoT). EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
+
 ### Encryption and Decryption
 
 The COSE parameters {{RFC8152}} are constructed as follows:
@@ -1070,7 +1071,7 @@ The COSE parameters {{RFC8152}} are constructed as follows:
    
 * The payload is a bstr cointaining a single the CBOR encoding of a COSE_KEY or a single certificate.
 
-* external_aad is a bstr containing the hash aad_2.
+* external_aad is a bstr containing the bstr aad_2.
 
 COSE constructs the input to the Signature Algorithm as follows:
 
