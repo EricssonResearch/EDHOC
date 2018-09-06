@@ -1090,26 +1090,31 @@ COSE constructs the input to the Signature Algorithm as follows:
 
 Assuming use of the default algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
 
-PRK = HMAC-SHA-256( PSK / '', ECDH shared secret)
+~~~~~~~~~~~~~~~~~~~~~~~
+PRK = HMAC-SHA-256( salt, ECDH shared secret )
+~~~~~~~~~~~~~~~~~~~~~~~
 
-and as L is smaller than the hash function output size, the expand
-phase of HKDF consists of a single HMAC invocation, and the Sender
-Key, Recipient Key, and Common IV are therefore the first 16 or 13
-bytes of
-
-output parameter = HMAC-SHA-256(PRK, COSE_KDF_Context | 0x01)
+where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and the Sender Key, Recipient Key, and Common IV are therefore the first 16 or 13 bytes of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-COSE_KDF_Context = [ 10, [ null, null, null ], [ null, null, null ], [ 128, h'', exchange_hash ] ]
+output parameter = HMAC-SHA-256( PRK, info | 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+where the info is the CBOR encoding of 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 COSE_KDF_Context = [
-      10,
-      [ null, null, null ],
-      [ null, null, null ],
-      [ 128, h'', exchange_hash ]
-   ]
+  AlgorithmID,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ keyDataLength, h'', exchange_hash ]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For AES-CCM-16-64-128, AlgorithmID = 10 and keyDataLength = 128 so if exchange_hash = h'aaaa' then
+
+~~~~~~~~~~~~~~~~~~~~~~~
+output parameter = HMAC-SHA-256( PRK, info = 0x840a83f6f6f683f6f6f68318804042aaaa01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # Test Vectors {#vectors}
