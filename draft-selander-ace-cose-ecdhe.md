@@ -164,7 +164,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. We use the CDDL unwrap operator "~" also for unwrapping byte strings, i.e. it is used as the opposite of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T.
+This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the opposite of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T.
 
 # Background {#background}
 
@@ -1006,7 +1006,7 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 This Appendix is intended to simplify for implementors not familiar with CBOR {{I-D.ietf-cbor-7049bis}}, CDDL {{I-D.ietf-cbor-cddl}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}.
 
-## CBOR and CDDL
+## CBOR
 
 The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages and APIs that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
 
@@ -1040,7 +1040,8 @@ The COSE parameters {{RFC8152}} are constructed as follows:
 
 * The initialization vector IV_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The plaintext is a CBOR bstr. Assuming the application data is omitted, in the symmetric case the plaintext is the empty byte string h'', and in the asymmetric case the plaintext is &lt;&lt; ~protected, signature &gt;&gt;. For instance, if protected = h'a10140' and signature = h'050607' CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
+* The plaintext is a CBOR bstr. Assuming the application data is omitted, plaintext = h'' in the symmetric case., and
+plaintext = &lt;&lt; ~protectd, signature &gt;&gt; in the asymmetric case. For instance, if protected = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to aad_i.
 
@@ -1069,9 +1070,9 @@ The COSE parameters {{RFC8152}} are constructed as follows:
 
 * The protected parameter is a the map { xyz : ID_CRED_x } wrapped in a byte string.
    
-* The payload is a bstr cointaining a single the CBOR encoding of a COSE_KEY or a single certificate.
+* The payload is a bstr cointaining the CBOR encoding of a COSE_KEY or a single certificate.
 
-* external_aad is a bstr containing the bstr aad_2.
+* external_aad = aad_i.
 
 COSE constructs the input to the Signature Algorithm as follows:
 
@@ -1083,18 +1084,18 @@ COSE constructs the input to the Signature Algorithm as follows:
    [ "Signature1", << { xyz : ID_CRED_x } >>, aad_i, CRED_x ]
 ~~~~~~~~~~~
 
-* For instance if xyz = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_i = h'222222' (CBOR encoding 0x43222222), and CRED_x = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance if xyz = 4 (CBOR encoding 0x04), ID_CRED_x = h'1111' (CBOR encoding 0x421111), aad_i = h'222222' (CBOR encoding 0x43222222), and CRED_x = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
 ### Key Derivation
 
-Assuming use of the default algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+Assuming use of the mandatory-to-implement algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 PRK = HMAC-SHA-256( salt, ECDH shared secret )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and the Sender Key, Recipient Key, and Common IV are therefore the first 16 or 13 bytes of
+where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 or 13 bytes of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 output parameter = HMAC-SHA-256( PRK, info | 0x01 )
