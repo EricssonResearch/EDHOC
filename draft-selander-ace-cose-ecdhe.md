@@ -306,11 +306,13 @@ The output of the EDHOC-Exporter function SHALL be derived using other = exchang
 
 EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
-* Party U SHALL be able to retrieve Party V's public authentication key using ID_CRED_V.
+* Party U SHALL be able to retrieve Party V's public authentication key using ID_CRED_V,
 
-* Party V SHALL be able to retrieve Party U's public authentication key using ID_CRED_U.
+* Party V SHALL be able to retrieve Party U's public authentication key using ID_CRED_U,
 
-ID_CRED_x, for x = U or V, is encoded in a COSE map, see {{COSE}}. In the following we give some examples of possible COSE map labels. Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
+where ID_CRED_x, for x = U or V, is encoded in a COSE map, see {{COSE}}. In the following we give some examples of possible COSE map labels.
+
+Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
 * kid : ID_CRED_x, for x = U or V.
 
