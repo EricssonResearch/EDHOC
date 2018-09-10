@@ -624,7 +624,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs.
 
-EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.  AEAD(K; M; A) denotes the output from an AEAD algorithm using key K on message M and additional authenticated data A, see {{RFC5116}}.
+EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.  AEAD(K; P; A) denotes the output from an AEAD algorithm using key K on plaintext P and additional authenticated data A, see {{RFC5116}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
