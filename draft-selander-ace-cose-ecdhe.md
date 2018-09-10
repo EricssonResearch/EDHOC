@@ -152,7 +152,7 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a mutually authenticated key exchange protocol providing perfect forward secrecy and identity protection. EDHOC uses CBOR and COSE, allowing reuse of existing libraries. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as NB-IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. Compared to the TLS 1.3 handshake with ECDH {{RFC8446}}, the number of bytes in EDHOC is less than 1/3 when PSK authentication is used and less than 1/2 when RPK authentication is used, see {{sizes}}.
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. Compared to the TLS 1.3 handshake with ECDH {{RFC8446}}, the number of bytes in EDHOC is less than 1/3 when PSK authentication is used and less than 1/2 when RPK authentication is used, see {{sizes}}.
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{I-D.ietf-cbor-7049bis}} and COSE {{RFC8152}} are used to implement these standards.
 
@@ -164,7 +164,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the opposite of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T.
+This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T.
 
 # Background {#background}
 
@@ -310,7 +310,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V SHALL be able to retrieve Party U's public authentication key using ID_CRED_U.
 
-Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
+ID_CRED_x, for x = U or V, is encoded in a COSE map, see {{COSE}}. In the following we give some examples of possible COSE map labels. Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
 * kid : ID_CRED_x, for x = U or V.
 
@@ -332,9 +332,9 @@ Public key certificates can be identified in different ways, for example (see {{
 
    * x5bag : ID_CRED_x, for x = U or V.
 
-In the latter two examples, ID_CRED_U and ID_CRED_V contains the credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
-The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificates. Party U and Party V MAY use different signature algorithms.
+The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificate. Party U and Party V MAY use different signature algorithms.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -488,15 +488,15 @@ Party V SHALL compose message_2 as follows:
 
 *  Select HKDF_V, AEAD_V, SIG_V, and SIG_U as the first supported algorithms in HKDFs_U, AEADs_U, SIGs_V, and SIGs_U.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
-   * protected = bstr .cbor { xyz : ID_CRED_V }
+   * protected = bstr .cbor { abc : ID_CRED_V }
    
    * payload = CRED_V
 
    * external_aad = aad_2
 
-   * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
+   * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
    * ID_CRED_V - bstr enabling the retrieval of the public authentication key of Party V, see {{asym-overview}}
 
@@ -504,7 +504,7 @@ Party V SHALL compose message_2 as follows:
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
    * plaintext = bstr .cborseq [ ~protected, signature, ? UAD_2 ]
 
@@ -515,6 +515,8 @@ Party V SHALL compose message_2 as follows:
    Note that protected and signature in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
 
 *  Format message_2 as specified in {{asym-msg2-form}} and encode it to a byte string. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
+
+
 
 ### Party U Processing of Message 2
 
@@ -568,15 +570,15 @@ where:
 
 Party U SHALL compose message_3 as follows:
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = bstr .cbor { xyz : ID_CRED_U }
+   * protected = bstr .cbor { abc : ID_CRED_U }
    
    * payload = CRED_U
 
    * external_aad = aad_3
 
-   * xyz - any COSE map label that can identify a public authentication key, see {{asym-overview}}
+   * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
    * ID_CRED_U - bstr enabling the retrieval of the public authentication key of Party U, see {{asym-overview}}
 
@@ -584,7 +586,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * plaintext =  bstr .cborseq [ ~protected, signature, ? PAD_3 ]
          
@@ -622,7 +624,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs.
 
-EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
+EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.  AEAD(K; M; A) denotes the output from an AEAD algorithm using key K on message M and additional authenticated data A, see {{RFC5116}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -1010,38 +1012,40 @@ This Appendix is intended to simplify for implementors not familiar with CBOR {{
 
 The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages and APIs that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
 
-CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays []  of data items and maps {} of pairs of data items. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}.
+CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain major information about the type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays []  of data items and maps {} of pairs of data items. Some examples are given below. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic          Encoded                       Type
 ------------------------------------------------------------------
 1                   0x01                          unsigned integer    
--27                 0x381a                        negative integer    
+24                  0x1818                        unsigned integer
+-24                 0x37                          negative integer
+-25                 0x3818                        negative integer 
 null                0xf6                          simple value        
-h'c3'               0x41c3                        byte string         
-'abcd'              0x4461626364                  byte string
-<< 1, 2, null >>    0x430102f6                    byte string         
-"Pickle Rick"       0x6b5069636b6c65205269636b    text string         
+h'12cd'             0x4212cd                      byte string
+'12cd'              0x4431326364                  byte string
+"12cd"              0x6431326364                  text string
+<< 1, 2, null >>    0x430102f6                    byte string                 
 [ 1, 2, null ]      0x830102f6                    array               
-{ 4: h'c3' }        0xa10441c3                    map                 
+{ 4: h'cd' }        0xa10441cd                    map                 
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-## COSE
+## COSE {#COSE}
 
-CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE build on JOSE, but makes some design changes to make it more suitable for the Internet of Things (IoT). EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
+CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
 
-### Encryption and Decryption
+### Encryption and Decryption {#COSE-enc-explained}
 
-The COSE parameters {{RFC8152}} are constructed as follows:
+The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "K_i", "IV_i" and "aad_i" is a variable with value i = 2 or 3, depending on whether the calculation is made over message_2 or message_3.
 
-* The key K_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
+* The secret key K_i is a CBOR bstr, generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The initialization vector IV_i is a CBOR bstr. It’s the output of the EDHOC-Key-Derivation function as defined in {{key-der}}.
+* The initialization vector IV_i is a CBOR bstr, also generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The plaintext is a CBOR bstr. Assuming the application data is omitted, plaintext = h'' in the symmetric case., and
-plaintext = &lt;&lt; ~protectd, signature &gt;&gt; in the asymmetric case. For instance, if protected = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
+* The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and
+plaintext = &lt;&lt; ~protected, signature &gt;&gt; in the asymmetric case. For instance, if protected = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to aad_i.
 
@@ -1059,16 +1063,16 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
    [ "Encrypt0", h'', aad_i ]
 ~~~~~~~~~~~
 
-* This is equal to the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_i = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
+* This equals the concatenation of 0x8368456e63727970743040 and the CBOR encoding of aad_i. For instance if aad_2 = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
 {: style="empty"}
 
-### Signing and Verification
+### Signing and Verification {#COSE-sig-explained}
 
-The COSE parameters {{RFC8152}} are constructed as follows:
+The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "aad_i" is a variable with values i = 2 or 3, depending on whether the calculation is made over message_2 or message_3. Note also that "x" in "ID_CRED_x" and "CRED_x" is a variable with values x = U or V, depending on whether it is the credential of U or of V that is used in the relevant protocol message.
 
-* The key is the private of public authentication key of U or V. This may be stored as a COSE_KEY object or a certificate.
+* The key is the private authentication key of U or V. This may be stored as a COSE_KEY object or as a certificate.
 
-* The protected parameter is a the map { xyz : ID_CRED_x } wrapped in a byte string.
+* The protected parameter is a map { abc : ID_CRED_x } wrapped in a byte string.
    
 * The payload is a bstr cointaining the CBOR encoding of a COSE_KEY or a single certificate.
 
@@ -1076,15 +1080,15 @@ The COSE parameters {{RFC8152}} are constructed as follows:
 
 COSE constructs the input to the Signature Algorithm as follows:
 
-* The key is the private of public authentication key of U or V.
+* The key is the private authentication key of U or V.
 
 * The message to be signed M is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << { xyz : ID_CRED_x } >>, aad_i, CRED_x ]
+   [ "Signature1", << { abc : ID_CRED_x } >>, aad_i, CRED_x ]
 ~~~~~~~~~~~
 
-* For instance if xyz = 4 (CBOR encoding 0x04), ID_CRED_x = h'1111' (CBOR encoding 0x421111), aad_i = h'222222' (CBOR encoding 0x43222222), and CRED_x = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
 ### Key Derivation
@@ -1095,13 +1099,13 @@ Assuming use of the mandatory-to-implement algorithms HKDF SHA-256 and AES-CCM-1
 PRK = HMAC-SHA-256( salt, ECDH shared secret )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 or 13 bytes of
+where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 output parameter = HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where || means byte sting concatenation and info is the CBOR encoding of 
+where \| \| means byte string concatenation, and info is the CBOR encoding of 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 COSE_KDF_Context = [
@@ -1112,11 +1116,16 @@ COSE_KDF_Context = [
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-For AES-CCM-16-64-128, AlgorithmID = 10 and keyDataLength = 128 so if aad_i = h'aaaa' then
+If AES-CCM-16-64-128 then AlgorithmID = 10 and keyDataLength = 128 for K_i, and AlgorithmID = "IV-GENERATION" (CBOR encoding 0x6d49562d47454e45524154494f4e) and keyDataLength = 104 for IV_i. Hence, if aad_2 = h'aaaa' then
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-output parameter = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
+K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
+IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
+                                83f6f6f683f6f6f68318804042aaaa01 ) 
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 
 # Test Vectors {#vectors}
 
