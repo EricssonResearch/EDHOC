@@ -1016,11 +1016,11 @@ EDHOC has been analyzed in several other documents. An analysis of EDHOC for cer
 
 --- back
 
-# Use of CBOR, COSE in EDHOC {#CBORandCOSE}
+# Use of CBOR, CDDL and COSE in EDHOC {#CBORandCOSE}
 
 This Appendix is intended to simplify for implementors not familiar with CBOR {{I-D.ietf-cbor-7049bis}}, CDDL {{I-D.ietf-cbor-cddl}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}.
 
-## CBOR {#CBOR}
+## CBOR and CDDL  {#CBOR}
 
 The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages and APIs that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
 
@@ -1046,7 +1046,24 @@ h'12cd'             0x4212cd                      byte string
 {: artwork-align="center"}
 
 
-All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array [_ message_i ] without the first byte (0x9f) and the last byte (0xff), for i = 1,2 and 3. The same applies to the EDHOC error message.
+All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array [_ message_i ] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
+
+Further CDDL examples are given in the following table:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Diagnostic          Encoded                       CDDL Type
+------------------------------------------------------------------
+24                  0x1818                        uint
+h'12cd'             0x4212cd                      bstr
+"12cd"              0x6431326364                  tstr
+{ 4 : h'cd' }       0xa10441cd                    {int => bstr}
+<< 24 >>            0x421818                      bstr .cbor uint
+24                  0x1818                        ~ bstr .cbor uint
+[ 4, h'cd' ]        0x850441cd                    [ uint, bstr ]
+<< 4, h'cd' >>      0x450441cd                    bstr .cborseq [ uint, bstr ]
+------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
+{: artwork-align="center"}
 
 
 ## COSE {#COSE}
