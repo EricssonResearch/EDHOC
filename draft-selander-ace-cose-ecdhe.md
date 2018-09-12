@@ -1057,12 +1057,11 @@ h'12cd'             0x4212cd                      byte string
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-
 All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array [_ message_i ] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
 
-The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different encodings. Some examples are given below.
+The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
-A CBOR encoded integer of type uint may be converted into a CBOR byte string, and back again:
+An type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CDDL Type                       Diagnostic                Encoded
@@ -1074,11 +1073,10 @@ bstr .cbor uint                 << 24 >>                  0x421818
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-
-A CBOR encoded array, say of a uint and a byte string,  may be converted into a CBOR byte string:
+A array, say of an uint and a byte string, may be converted into a byte string (bstr):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CDDL Type                       Diagnostic                Encoded
+CDDL Type                       Diagnostic              Encoded
 --------------------------------------------------------------------
 bstr                            h'cd'                   0x41cd
 [ uint, bstr ]                  [ 24, h'cd' ]           0x82181841cd
@@ -1086,7 +1084,6 @@ bstr .cborseq [ uint, bstr ]    << 24, h'cd' >>         0x44181841cd
 --------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
-
 
 
 ## COSE {#COSE}
