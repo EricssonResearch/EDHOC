@@ -164,7 +164,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T.
+This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T. Examples of CBOR and CDDL are provided in {{CBOR}}.
 
 # Background {#background}
 
@@ -284,7 +284,7 @@ where exchange_hash, in non-CDDL notation, is:
 
 exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 
-where H() is the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
+where H() is the hash function in HKDF_V, which takes a byte string as input and produces a byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
@@ -480,7 +480,7 @@ where:
 * AEAD_V - the first supported algorithm from AEADs_U
 * SIG_V - the first supported algorithm from SIGs_V with which Party V signs
 * SIG_U - the first supported algorithm from SIGs_U with which Party U signs
-* H() - the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
+* H() - the hash function in HKDF_V, which takes a byte string as input and produces a byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
 
@@ -495,6 +495,8 @@ Party V SHALL compose message_2 as follows:
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_V, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor { abc : ID_CRED_V }
+
+       * The use of .cbor is exemplified in {{CBOR}}.
    
    * payload = CRED_V
 
@@ -511,6 +513,8 @@ Party V SHALL compose message_2 as follows:
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_2, IV_2, and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
    * plaintext = bstr .cborseq [ ~protected, signature, ? UAD_2 ]
+
+      * The use of '.cborseq' and '~' is exemplified in {{CBOR}}.
 
    * external_aad = aad_2
 
@@ -572,6 +576,8 @@ where:
 
 * MSG_TYPE = 3
 
+* The use of '.cborseq' is exemplified in {{CBOR}}.
+
 ### Party U Processing of Message 3 {#asym-msg3-proc}
 
 Party U SHALL compose message_3 as follows:
@@ -579,6 +585,8 @@ Party U SHALL compose message_3 as follows:
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using algorithm SIG_U, the private authentication key of Party U, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor { abc : ID_CRED_U }
+
+      * The use of .cbor is exemplified in {{CBOR}}.
    
    * payload = CRED_U
 
@@ -595,6 +603,8 @@ Party U SHALL compose message_3 as follows:
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with AEAD_V, K_3, and IV_3 and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * plaintext =  bstr .cborseq [ ~protected, signature, ? PAD_3 ]
+
+      * The use of '.cborseq' and '~' is exemplified in {{CBOR}}.
          
    * external_aad = aad_2
 
@@ -766,7 +776,7 @@ where:
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - the first supported algorithm from HKDFs_U
 * AEAD_V - the first supported algorithm from AEADs_U
-* H() - the hash function in HKDF_V. It takes a bstr as input and outputs a bstr.
+* H() - the hash function in HKDF_V, which takes a byte string as input and produces a byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2
 
@@ -839,6 +849,8 @@ aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 where:
 
 * MSG_TYPE = 6
+
+*  The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party U Processing of Message 3
 
@@ -1028,7 +1040,7 @@ CBOR data items are encoded to or decoded from byte strings using a type-length-
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic          Encoded                       Type
-------------------------------------------------------------------
+---------------------------------------------------------------------------
 1                   0x01                          unsigned integer    
 24                  0x1818                        unsigned integer
 -24                 0x37                          negative integer
@@ -1041,29 +1053,40 @@ h'12cd'             0x4212cd                      byte string
 [ 1, 2, null ]      0x830102f6                    array      
 [_ 1, 2, null ]     0x9f0102f6ff                  array (indefinite-length)
 { 4: h'cd' }        0xa10441cd                    map                 
-------------------------------------------------------------------
+---------------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
 
 All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array [_ message_i ] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
 
-Further CDDL examples are given in the following table:
+The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different encodings. Some examples are given below.
+
+A CBOR encoded integer of type uint may be converted into a CBOR byte string, and back again:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Diagnostic          Encoded                       CDDL Type
+CDDL Type                       Diagnostic                Encoded
 ------------------------------------------------------------------
-24                  0x1818                        uint
-h'12cd'             0x4212cd                      bstr
-"12cd"              0x6431326364                  tstr
-{ 4 : h'cd' }       0xa10441cd                    {int => bstr}
-<< 24 >>            0x421818                      bstr .cbor uint
-24                  0x1818                        ~ bstr .cbor uint
-[ 4, h'cd' ]        0x850441cd                    [ uint, bstr ]
-<< 4, h'cd' >>      0x450441cd                    bstr .cborseq [ uint, bstr ]
+uint                            24                        0x1818
+bstr .cbor uint                 << 24 >>                  0x421818                      
+~ bstr .cbor uint               24                        0x1818                        
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
+
+
+A CBOR encoded array, say of a uint and a byte string,  may be converted into a CBOR byte string:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+CDDL Type                       Diagnostic                Encoded
+--------------------------------------------------------------------
+bstr                            h'cd'                   0x41cd
+[ uint, bstr ]                  [ 24, h'cd' ]           0x82181841cd
+bstr .cborseq [ uint, bstr ]    << 24, h'cd' >>         0x44181841cd
+--------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
+{: artwork-align="center"}
+
 
 
 ## COSE {#COSE}
