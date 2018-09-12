@@ -284,7 +284,7 @@ where exchange_hash, in non-CDDL notation, is:
 
 exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 
-where H() is the hash function in HKDF_V, which takes a byte string as input and produces a byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+where H() is the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
@@ -480,7 +480,7 @@ where:
 * AEAD_V - the first supported algorithm from AEADs_U
 * SIG_V - the first supported algorithm from SIGs_V with which Party V signs
 * SIG_U - the first supported algorithm from SIGs_U with which Party U signs
-* H() - the hash function in HKDF_V, which takes a byte string as input and produces a byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+* H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
 
@@ -776,7 +776,7 @@ where:
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * HKDF_V - the first supported algorithm from HKDFs_U
 * AEAD_V - the first supported algorithm from AEADs_U
-* H() - the hash function in HKDF_V, which takes a byte string as input and produces a byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+* H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2
 
