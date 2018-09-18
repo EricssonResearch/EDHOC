@@ -1040,20 +1040,21 @@ CBOR data items are encoded to or decoded from byte strings using a type-length-
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic          Encoded                       Type
----------------------------------------------------------------------------
-1                   0x01                          unsigned integer    
-24                  0x1818                        unsigned integer
--24                 0x37                          negative integer
--25                 0x3818                        negative integer 
-null                0xf6                          simple value        
-h'12cd'             0x4212cd                      byte string
-'12cd'              0x4431326364                  byte string
-"12cd"              0x6431326364                  text string
-<< 1, 2, null >>    0x430102f6                    byte string                 
-[ 1, 2, null ]      0x830102f6                    array      
-[_ 1, 2, null ]     0x9f0102f6ff                  array (indefinite-length)
-{ 4: h'cd' }        0xa10441cd                    map                 
----------------------------------------------------------------------------
+----------------------------------------------------------------------
+1                   0x01                     unsigned integer    
+24                  0x1818                   unsigned integer
+-24                 0x37                     negative integer
+-25                 0x3818                   negative integer 
+null                0xf6                     simple value        
+h'12cd'             0x4212cd                 byte string
+'12cd'              0x4431326364             byte string
+"12cd"              0x6431326364             text string
+<< 1, 2, null >>    0x430102f6               byte string                 
+[ 1, 2, null ]      0x830102f6               array      
+[_ 1, 2, null ]     0x9f0102f6ff             array (indefinite-length)
+( 1, 2, null )      0x0102f6                 group      
+{ 4: h'cd' }        0xa10441cd               map                 
+----------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
