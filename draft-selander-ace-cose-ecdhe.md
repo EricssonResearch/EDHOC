@@ -1068,8 +1068,8 @@ An type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
 CDDL Type                       Diagnostic                Encoded
 ------------------------------------------------------------------
 uint                            24                        0x1818
-bstr .cbor uint                 << 24 >>                  0x421818                      
-~ bstr .cbor uint               24                        0x1818                        
+bstr .cbor uint                 << 24 >>                  0x421818
+~ bstr .cbor uint               24                        0x1818
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
