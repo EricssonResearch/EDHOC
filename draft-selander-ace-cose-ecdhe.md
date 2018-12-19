@@ -38,6 +38,7 @@ normative:
   I-D.ietf-cbor-cddl:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-core-object-security:
+  I-D.ietf-core-oscore-groupcomm:
   
   RFC2119:
   RFC5116:
@@ -150,13 +151,27 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a very compa
 
 Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protocol needs to work on a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{RFC8152}}), which builds on the Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}}.
 
-In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a mutually authenticated key exchange protocol providing perfect forward secrecy and identity protection. EDHOC uses CBOR and COSE, allowing reuse of existing libraries. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
+In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a lightweight key exchange protocol providing perfect forward secrecy and identity protection. EDHOC uses CBOR and COSE, allowing reuse of existing libraries. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface.  Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
 EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. Compared to the TLS 1.3 handshake with ECDH {{RFC8446}}, the number of bytes in EDHOC is less than 1/3 when PSK authentication is used and less than 1/2 when RPK authentication is used, see {{sizes}}.
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{I-D.ietf-cbor-7049bis}} and COSE {{RFC8152}} are used to implement these standards.
 
-This paper is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
+This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
+
+## Rationale for EDHOC
+
+EDHOC is optimized for small message overhead. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment. For example, in a network bootstrapping setting a large number of devices are turned on in a short period of time resulting in large latencies caused by the parallel key exchanges. Requirements on network formation time can in constrained environments be translated into key exchange overhead. 
+
+Power consumption for wireless devices is highly dependent on message transmission and reception. For devices that only send a few bytes and sleep for the rest of the day, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange protocol may need to be executed repeatedly, e.g. due to a device losing power, or rebooting for other reason.
+
+EDHOC is adapted to primitives and protocols designed for the Internet of Things: EDHOC is built on CBOR and COSE which enables small message overhead and efficient parsing in constrained devices. Since EDHOC is not bound to a particular transport layer, the protocol messages can e.g. be carried as CoAP payload. By reusing already existing IoT primitives in the device (CBOR, CoAP and COSE encryption and signature formats) the additional code footprint can be kept very low.
+
+EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{I-D.ietf-core-object-security}} providing the necessary input parameters with required properties. Since EDHOC builds on the same IoT primitives and protocols as OSCORE (CBOR, COAP, COSE encryption and signature formats) the device footprint for EDHOC + OSCORE can be also be kept very low. The use of native encoding formats reduces the need for a general purpose compression algorithm with associated footprint.
+
+
+NOTE: Unicast OSCORE uses only the COSE encryption format, but multicast OSCORE {I-D.ietf-core-oscore-groupcomm} uses also the COSE signature format, and it is expected that OSCORE will be widely deployed with multicast support.
+
 
 ## Terminology and Requirements Language
 
