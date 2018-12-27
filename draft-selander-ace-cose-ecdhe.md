@@ -392,11 +392,11 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                          Party V
-|                        C_U, X_U, ALG_1, UAD_1                        |
+|                    C_U, X_U, CIPHER_SUITE_U, UAD_1                   |
 +--------------------------------------------------------------------->|
 |                               message_1                              |
 |                                                                      |
-|C_U, C_V, X_V, ALG_2, AE(K_2; ID_CRED_V, Sig(V; CRED_V, aad_2), UAD_2)|
+|    C_U, C_V, X_V, AE(K_2; ID_CRED_V, Sig(V; CRED_V, aad_2), UAD_2)   |
 |<---------------------------------------------------------------------+
 |                               message_2                              |
 |                                                                      |
@@ -674,11 +674,11 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.  AEAD(K; 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                    C_U, X_U, ALG_1, KID, UAD_1                    |
+|                C_U, X_U, CIPHER_SUITE_U, KID, UAD_1               |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|           C_U, C_V, X_V, ALG_2, AEAD(K_2; UAD_2; aad_2)           |
+|               C_U, C_V, X_V, AEAD(K_2; UAD_2; aad_2)              |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
