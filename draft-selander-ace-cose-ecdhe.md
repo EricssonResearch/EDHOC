@@ -134,6 +134,38 @@ informative:
         ins: A. Krontiris
     date: May 2018
 
+  Formal:
+    target: https://www.springerprofessional.de/en/formal-verification-of-ephemeral-diffie-hellman-over-cose-edhoc/16284348
+    title: Formal Verification of Ephemeral Diffie-Hellman Over COSE (EDHOC)
+    author:
+      -
+        ins: A. Bruni
+      -
+        ins: T. Sahl Jørgensen
+      -
+        ins: T. Grønbech Petersen
+      -
+        ins: C. Schürmann
+    date: November 2018
+
+  Bootstrap:
+    target: http://www.anastacia-h2020.eu/publications/Architecture_of_security_association_establishment_based_on_bootstrapping_technologies_for_enabling_critical_IoT_infrastructures.pdf
+    title: Architecture of security association establishment based on bootstrapping technologies for enabling critical IoT infrastructures
+    author:
+      -
+        ins: S. Pérez
+      -
+        ins: D. Garcia-Carrillo
+      -
+        ins: R. Marín-López
+      -
+        ins: J. Hernández-Ramos
+      -
+        ins: R. Marín-Pérez
+      -
+        ins: A. Skarmeta
+    date: October 2018
+    
   CborMe:
     target: http://cbor.me/
     title: CBOR Playground
