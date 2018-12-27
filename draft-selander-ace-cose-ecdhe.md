@@ -388,7 +388,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   MSG_TYPE : int,
   C_U : bstr,  
-  CIPHER_SUITEs_U : algs,
+  CIPHER_SUITEs_U : suites,
   CIPHER_SUITE_U : uint,
   X_U : bstr,
   ? UAD_1 : bstr,
@@ -396,11 +396,7 @@ message_1 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-alg : int / tstr
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-algs = alg / [ 2* alg ]
+suites : int / [ 2* int ]
 ~~~~~~~~~~~
 
 where:
@@ -674,7 +670,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   MSG_TYPE : int,
   C_U : bstr,
-  CIPHER_SUITEs_U : algs,
+  CIPHER_SUITEs_U : suites,
   CIPHER_SUITE_U : uint,
   X_U : bstr,
   KID : bstr,
@@ -683,11 +679,7 @@ message_1 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-alg : int / tstr
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-algs = alg / [ 2* alg ]
+suites : int / [ 2* int ]
 ~~~~~~~~~~~
 
 where:
@@ -889,16 +881,12 @@ error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 error = (
   MSG_TYPE : int,
   ERR_MSG : tstr,
-  ? ALGs_V: algs,
+  ? ALGs_V: suites,
 )
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-alg : int / tstr
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-algs = alg / [ 2* alg ]
+suites : int / [ 2* int ]
 ~~~~~~~~~~~
 
 where:
