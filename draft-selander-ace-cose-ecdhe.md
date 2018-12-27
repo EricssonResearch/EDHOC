@@ -203,7 +203,7 @@ EDHOC is adapted to primitives and protocols designed for the Internet of Things
 EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{I-D.ietf-core-object-security}} providing the necessary input parameters with required properties. Since EDHOC builds on the same IoT primitives and protocols as OSCORE (CBOR, COAP, COSE encryption and signature formats) the device footprint for EDHOC + OSCORE can be also be kept very low. The use of native encoding formats reduces the need for a general purpose compression algorithm with associated footprint.
 
 
-NOTE: Unicast OSCORE uses only the COSE encryption format, but multicast OSCORE {I-D.ietf-core-oscore-groupcomm} uses also the COSE signature format, and it is expected that OSCORE will be widely deployed with multicast support.
+NOTE: Unicast OSCORE uses only the COSE encryption format, but multicast OSCORE {{I-D.ietf-core-oscore-groupcomm}} uses also the COSE signature format, and it is expected that OSCORE will be widely deployed with multicast support.
 
 
 ## Terminology and Requirements Language
