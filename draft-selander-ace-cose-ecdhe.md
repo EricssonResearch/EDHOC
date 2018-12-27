@@ -436,8 +436,8 @@ where:
 
 * MSG_TYPE = 1
 * C_U - variable length connection identifier
-* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, it is placed in an int or text string, if multiple cipher suites are conveyed, an array is used.
-* CIPHER_SUITE_U - a single chosen algorithm from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
+* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
+* CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * UAD_1 - bstr containing unprotected opaque application data
 
@@ -719,8 +719,8 @@ where:
 
 * MSG_TYPE = 4
 * C_U - variable length connection identifier
-* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, it is placed in an int or text string, if multiple cipher suites are conveyed, an array is used.
-* CIPHER_SUITE_U - a single chosen algorithm from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
+* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
+* CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * KID - bstr enabling the retrieval of the pre-shared key
 * UAD_1 - bstr containing unprotected opaque application data
@@ -792,8 +792,6 @@ where:
 * MSG_TYPE = 5
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
-* HKDF_V - the first supported algorithm from HKDFs_U
-* AEAD_V - the first supported algorithm from AEADs_U
 * H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2
@@ -914,7 +912,7 @@ error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 error = (
   MSG_TYPE : int,
   ERR_MSG : tstr,
-  ? ALGs_V: suites,
+  ? CIPHER_SUITEs_V : suites,
 )
 ~~~~~~~~~~~
 
@@ -926,7 +924,7 @@ where:
 
 * MSG_TYPE = 0
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
-* ALGs_V - algorithms that V supports that were not included in ECDH-Curve_U, HKDFs_U, AEADs_U, SIGs_V, and SIGs_U. Note that ALG_V contatins the values from the COSE Algorithms registry and not indexes.
+* CIPHER_SUITEs_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contatins the values from the EDHOC cipher suites registry and not indexes.
 
 # IANA Considerations {#iana}
 
