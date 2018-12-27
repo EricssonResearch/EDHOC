@@ -388,14 +388,10 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   MSG_TYPE : int,
   C_U : bstr,  
-  ECDH-Curves_U : algs,
-  ECDH-Curve_U : uint,
+  CIPHER_SUITEs_U : algs,
+  CIPHER_SUITE_U : uint,
   X_U : bstr,
-  HKDFs_U : algs,
-  AEADs_U : algs,
-  SIGs_V : algs,
-  SIGs_U : algs,
-  ? UAD_1 : bstr
+  ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
 
@@ -411,13 +407,9 @@ where:
 
 * MSG_TYPE = 1
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in an int or text string, if multiple algorithms are conveyed, an array is used.
-* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
+* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, it is placed in an int or text string, if multiple cipher suites are conveyed, an array is used.
+* CIPHER_SUITE_U - a single chosen algorithm from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
-* HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
-* AEADs_U - supported AEAD algorithms, in order of decreasing preference
-* SIGs_V - signature algorithms, with which Party U supports verification, in order of decreasing preference.
-* SIGs_U - signature algorithms, with which Party U supports signing, in order of decreasing preference.
 * UAD_1 - bstr containing unprotected opaque application data
 
 ### Party U Processing of Message 1
@@ -459,7 +451,7 @@ message_2 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_2 = (
   data_2,
-  CIPHERTEXT_2 : bstr
+  CIPHERTEXT_2 : bstr,
 )
 ~~~~~~~~~~~
 
@@ -469,10 +461,6 @@ data_2 = (
   C_U : bstr / nil,
   C_V : bstr,
   X_V : bstr,
-  HKDF_V : uint,
-  AEAD_V : uint,
-  SIG_V : uint,
-  SIG_U : uint
 )
 ~~~~~~~~~~~
 
@@ -491,10 +479,6 @@ where:
 * MSG_TYPE = 2
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
-* HKDF_V - the first supported algorithm from HKDFs_U
-* AEAD_V - the first supported algorithm from AEADs_U
-* SIG_V - the first supported algorithm from SIGs_V with which Party V signs
-* SIG_U - the first supported algorithm from SIGs_U with which Party U signs
 * H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
@@ -566,14 +550,14 @@ message_3 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_3 = (
   data_3,
-  CIPHERTEXT_3 : bstr
+  CIPHERTEXT_3 : bstr,
 )
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
   MSG_TYPE : int,
-  C_V : bstr
+  C_V : bstr,
 )
 ~~~~~~~~~~~
 
@@ -690,13 +674,11 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   MSG_TYPE : int,
   C_U : bstr,
-  ECDH-Curves_U : algs,
-  ECDH-Curve_U : uint,
+  CIPHER_SUITEs_U : algs,
+  CIPHER_SUITE_U : uint,
   X_U : bstr,
-  HKDFs_U : algs,
-  AEADs_U : algs,
   KID : bstr,
-  ? UAD_1 : bstr
+  ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
 
@@ -712,11 +694,9 @@ where:
 
 * MSG_TYPE = 4
 * C_U - variable length connection identifier
-* ECDH-Curves_U - EC curves for ECDH which Party U supports, in order of decreasing preference. If a single algorithm is conveyed, it is placed in an int or text string, if multiple algorithms are conveyed, an array is used.
-* ECDH-Curve_U - a single chosen algorithm from ECDH-Curves_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
+* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, it is placed in an int or text string, if multiple cipher suites are conveyed, an array is used.
+* CIPHER_SUITE_U - a single chosen algorithm from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
-* HKDFs_U - supported ECDH-SS w/ HKDF algorithms, in order of decreasing preference
-* AEADs_U - supported AEAD algorithms, in order of decreasing preference
 * KID - bstr enabling the retrieval of the pre-shared key
 * UAD_1 - bstr containing unprotected opaque application data
 
@@ -759,7 +739,7 @@ message_2 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_2 = (
   data_2,
-  CIPHERTEXT_2 : bstr
+  CIPHERTEXT_2 : bstr,
 )
 ~~~~~~~~~~~
 
@@ -769,8 +749,6 @@ data_2 = (
   C_U : bstr / nil,  
   C_V : bstr,  
   X_V : bstr,
-  HKDF_V : uint,
-  AEAD_V : uint
 )
 ~~~~~~~~~~~
 
@@ -840,14 +818,14 @@ message_3 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_3 = (
   data_3,
-  CIPHERTEXT_3 : bstr
+  CIPHERTEXT_3 : bstr,
 )
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
   MSG_TYPE : int,
-  C_V : bstr 
+  C_V : bstr,
 )
 ~~~~~~~~~~~
 
@@ -911,7 +889,7 @@ error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 error = (
   MSG_TYPE : int,
   ERR_MSG : tstr,
-  ? ALGs_V: algs
+  ? ALGs_V: algs,
 )
 ~~~~~~~~~~~
 
