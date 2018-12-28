@@ -253,21 +253,13 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
-* Negotiation of key derivation, encryption, and signature algorithms:
+* Message types, error messages, and error handling.
 
-   * U proposes one or more algorithms of the following kinds in order of preference: 
-       *  HKDF
-       *  AEAD
-       *  Signature verification 
-       *  Signature generation 
+* Verification of common preferred cipher suite (ECDH curve, HKDF, AEAD, Signature algorithm):
 
-   * V selects the first supported algorithm of each kind
-
-* Verification of common preferred ECDH curve:
-
-   * U lists supported ECDH curves in order of preference
+   * U lists supported cipher suite in order of preference
    
-   * V verifies that the ECDH curve of the ephemeral key is the first supported curve
+   * V verifies that the used cipher suite is the first supported cipher suite
 
 * Transport of opaque application defined data.
 
