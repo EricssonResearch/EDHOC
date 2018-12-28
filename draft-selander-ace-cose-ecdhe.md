@@ -392,7 +392,7 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                          Party V
-|                    C_U, X_U, CIPHER_SUITE_U, UAD_1                   |
+|           C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, UAD_1           |
 +--------------------------------------------------------------------->|
 |                               message_1                              |
 |                                                                      |
@@ -436,7 +436,7 @@ where:
 
 * MSG_TYPE = 1
 * C_U - variable length connection identifier
-* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
+* CIPHER_SUITEs_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * UAD_1 - bstr containing unprotected opaque application data
@@ -660,7 +660,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. AEAD(K; P
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                C_U, X_U, CIPHER_SUITE_U, KID, UAD_1               |
+|       C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, KID, UAD_1       |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -705,7 +705,7 @@ where:
 
 * MSG_TYPE = 4
 * C_U - variable length connection identifier
-* CIPHER_SUITEs_U - Cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
+* CIPHER_SUITEs_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * KID - bstr enabling the retrieval of the pre-shared key
