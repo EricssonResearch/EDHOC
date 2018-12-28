@@ -1152,7 +1152,7 @@ where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As 
 output parameter = HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where \| \| means byte string concatenation, and info is the CBOR encoding of 
+where \|\| means byte string concatenation, and info is the CBOR encoding of 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 COSE_KDF_Context = [
