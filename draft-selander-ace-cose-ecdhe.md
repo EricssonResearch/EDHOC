@@ -194,15 +194,13 @@ This document is organized as follows: {{background}} describes how EDHOC builds
 
 ## Rationale for EDHOC
 
-EDHOC is optimized for small message overhead. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment. For example, in a network bootstrapping setting a large number of devices are turned on in a short period of time resulting in large latencies caused by the parallel key exchanges. Requirements on network formation time can in constrained environments be translated into key exchange overhead. 
+EDHOC is optimized for small message overhead. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time can in constrained environments be translated into key exchange overhead. 
 
-Power consumption for wireless devices is highly dependent on message transmission and reception. For devices that only send a few bytes and sleep for the rest of the day, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange protocol may need to be executed repeatedly, e.g. due to a device losing power, or rebooting for other reason.
+Power consumption for wireless devices is highly dependent on message transmission and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reason.
 
 EDHOC is adapted to primitives and protocols designed for the Internet of Things: EDHOC is built on CBOR and COSE which enables small message overhead and efficient parsing in constrained devices. Since EDHOC is not bound to a particular transport layer, the protocol messages can e.g. be carried as CoAP payload. By reusing already existing IoT primitives in the device (CBOR, CoAP and COSE encryption and signature formats) the additional code footprint can be kept very low.
 
-EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{I-D.ietf-core-object-security}} providing the necessary input parameters with required properties. Since EDHOC builds on the same IoT primitives and protocols as OSCORE (CBOR, COAP, COSE encryption and signature formats) the device footprint for EDHOC + OSCORE can be also be kept very low. The use of native encoding formats reduces the need for a general purpose compression algorithm with associated footprint.
-
-NOTE: Unicast OSCORE uses only the COSE encryption format, but multicast OSCORE {{I-D.ietf-core-oscore-groupcomm}} uses also the COSE signature format, and it is expected that OSCORE will be widely deployed with multicast support.
+EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{I-D.ietf-core-object-security}} providing the necessary input parameters with required properties. Since EDHOC builds on the same IoT primitives and protocols as OSCORE (CBOR, COAP, COSE encryption and signature formats) the device footprint for EDHOC + OSCORE can be kept very low. The use of compact native encoding formats reduces the need for a general purpose compression algorithm with associated footprint.
 
 
 ## Terminology and Requirements Language
