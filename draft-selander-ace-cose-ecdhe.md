@@ -657,9 +657,7 @@ Party U                                                       Party V
 {: #fig-sym title="EDHOC with symmetric key authentication. "}
 {: artwork-align="center"}
 
-### Mandatory to Implement Algorithms
-
-For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-256 and AES-CCM-64-64-128 are mandatory to implement.
+EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, in the following subsections, only differences compared to EDHOC with asymmetric key authentication are mentioned.
 
 ## EDHOC Message 1
 
@@ -679,182 +677,40 @@ message_1 = (
 )
 ~~~~~~~~~~~
 
-~~~~~~~~~~~ CDDL
-suites : int / [ 2* int ]
-~~~~~~~~~~~
-
 where:
 
 * MSG_TYPE = 2
-* C_U - variable length connection identifier
-* CIPHER_SUITEs_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
-* CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
-* X_U - the x-coordinate of the ephemeral public key of Party U
 * KID - bstr enabling the retrieval of the pre-shared key
-* UAD_1 - bstr containing unprotected opaque application data
-
-### Party U Processing of Message 1
-
-Party U SHALL compose message_1 as follows:
-
-* The supported cipher suites and the order of preference MUST NOT be changed based on previous error messages. However, the list CIPHER_SUITEs_U sent to Party V MAY be truncated such that cipher suites which are the least preferred are omitted. The amount of truncation MAY be changed between sessions, e.g. based on previous error messages (see next bullet), but all cipher suites which are more preferred than the least preferred cipher suite in the list MUST be included in the list.
-
-* Determine the cipher suite CIPHER_SUITE_U to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying an cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in CIPHER_SUITEs_U MUST be used.
-
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite CIPHER_SUITE_U. Let X_U be the x-coordinate of the ephemeral public key.
-
-* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
-
-* Format message_1 as the sequence of CBOR data items specified in {{sym-msg1-form}} and encode it to a byte string (see {{CBOR}}).
-
-### Party V Processing of Message 1
-
-Party V SHALL process message_1 as follows:
-
-* Decode message_1 (see {{CBOR}}).
-
-* Verify that the cipher suite CIPHER_SUITE_U is supported and that no prior cipher suites in CIPHER_SUITEs_U are supported.
-
-* Validate that there is a solution to the curve definition for the given x-coordinate X_U.
-
-* Pass UAD_1 to the application.
-
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the cipher suite CIPHER_SUITE_U, then CIPHER_SUITEs_V MUST include one ore more supported cipher suites. If V does not support the cipher suite CIPHER_SUITE_U, but supports another cipher suite in CIPHER_SUITEs_U, then CIPHER_SUITEs_V MUST include the first supported cipher suite in CIPHER_SUITEs_U.
 
 ## EDHOC Message 2
 
-### Formatting of Message 2 {#sym-msg2-form}
+### Processing of Message 2
 
-message_2 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
+*  COSE_Sign1 is not used.
 
-~~~~~~~~~~~ CDDL
-message_2 = (
-  data_2,
-  CIPHERTEXT_2 : bstr,
-)
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-data_2 = (
-  C_U : bstr / nil,  
-  C_V : bstr,  
-  X_V : bstr,
-)
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-aad_2 : bstr
-~~~~~~~~~~~
-
-where aad_2, in non-CDDL notation, is:
-
-~~~~~~~~~~~
-aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
-~~~~~~~~~~~
-
-where:
-
-* C_V - variable length connection identifier
-* X_V - the x-coordinate of the ephemeral public key of Party V
-* H() - the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
-
-### Party V Processing of Message 2
-
-Party V SHALL compose message_2 as follows:
-
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite CIPHER_SUITE_U. Let X_V be the x-coordinate of the ephemeral public key.
-
-* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
-
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_2
 
    * plaintext = h'' / UAD_2
    
    * UAD_2 = bstr containing opaque unprotected application data
-
-   Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
-
-*  Format message_2 as the sequence of CBOR data items specified in {{sym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext.
    
-### Party U Processing of Message 2
-
-Party U SHALL process message_2 as follows:
-
-* Decode message_2 (see {{CBOR}}).
-
-* Retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple.
-
-* Validate that there is a solution to the curve definition for the given x-coordinate X_V.
-
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_2, and IV_2.
-
-If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
-
-* Pass UAD_2 to the application.
-
 ## EDHOC Message 3
 
-### Formatting of Message 3 {#sym-msg3-form}
+### Processing of Message 3
 
-message_3 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
+*  COSE_Sign1 is not used.
 
-~~~~~~~~~~~ CDDL
-message_3 = (
-  data_3,
-  CIPHERTEXT_3 : bstr,
-)
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-data_3 = (
-  C_V : bstr,
-)
-~~~~~~~~~~~
-
-~~~~~~~~~~~ CDDL
-aad_3 : bstr
-~~~~~~~~~~~
-
-where aad_3, in non-CDDL notation, is:
-
-~~~~~~~~~~~
-aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
-~~~~~~~~~~~
-
-### Party U Processing of Message 3
-
-Party U SHALL compose message_3 as follows:
-
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_3
 
    * plaintext = h'' / PAD_3
  
    * PAD_3 = bstr containing opaque protected application data
-
-   Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.   
-
-*  Format message_3 as the sequence of CBOR data items specified in {{sym-msg3-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
-
-*  Pass the connection identifiers (C_U, C_V) and the negotiated ciphersuite CIPHER_SUITE_U to the application. The application can now derive application keys using the EDHOC-Exporter interface.
-
-### Party V Processing of Message 3
-
-Party V SHALL process message_3 as follows:
-
-* Decode message_3 (see {{CBOR}}).
-
-* Retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple.
-
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3.
-
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
-
-*  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated ciphersuite CIPHER_SUITE_U to the application. The application can now derive application keys using the EDHOC-Exporter interface.
-
+   
+   
 # Error Handling {#error}
 
 ## EDHOC Error Message
