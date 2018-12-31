@@ -250,7 +250,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
-* Verification of common preferred cipher suite (ECDH curve, HKDF, AEAD, Signature algorithm):
+* Verification of a common preferred cipher suite (ECDH curve, HKDF, AEAD, Signature algorithm):
 
    * U lists supported cipher suite in order of preference
    
