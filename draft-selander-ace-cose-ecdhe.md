@@ -297,7 +297,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152}} with the following input:
 
-* The KDF SHALL be the HKDF {{RFC5869}} in the ECDH-SS w/ HKDF negotiated during the message exchange (HKDF_V).
+* The KDF SHALL be the HKDF {{RFC5869}} in the in the selected cipher suite (CIPHER_SUITE_U).
 
 * The secret (Section 11.1 of {{RFC8152}}) SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
 
@@ -321,15 +321,15 @@ where exchange_hash, in non-CDDL notation, is:
 
 exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 
-where H() is the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
 output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
 
-For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the negotiated AEAD (AEAD_V), and keyDataLength equal to the key length of AEAD_V.
+For message_i the key, called K_i, SHALL be derived using other = aad_i, where i = 2 or 3. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (CIPHER_SUITE_U), and keyDataLength equal to the key length of the AEAD.
 
-If the AEAD algorithm uses an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of AEAD_V.
+If the AEAD algorithm uses an IV, then IV_i for message_i SHALL be derived using other = aad_i, where i = 2 or 3. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
 ### EDHOC-Exporter Interface {#exporter}
 
