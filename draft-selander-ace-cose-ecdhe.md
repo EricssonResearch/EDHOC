@@ -473,7 +473,6 @@ message_2 = (
 
 ~~~~~~~~~~~ CDDL
 data_2 = (
-  MSG_TYPE : int,
   C_U : bstr / nil,
   C_V : bstr,
   X_V : bstr,
@@ -492,7 +491,6 @@ aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
 
 where:
 
-* MSG_TYPE = 2
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
@@ -566,7 +564,6 @@ message_3 = (
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
-  MSG_TYPE : int,
   C_V : bstr,
 )
 ~~~~~~~~~~~
@@ -580,10 +577,6 @@ where aad_3, in non-CDDL notation, is:
 ~~~~~~~~~~~
 aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
-
-where:
-
-* MSG_TYPE = 3
 
 ### Party U Processing of Message 3 {#asym-msg3-proc}
 
@@ -692,7 +685,7 @@ suites : int / [ 2* int ]
 
 where:
 
-* MSG_TYPE = 4
+* MSG_TYPE = 2
 * C_U - variable length connection identifier
 * CIPHER_SUITEs_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
@@ -743,7 +736,6 @@ message_2 = (
 
 ~~~~~~~~~~~ CDDL
 data_2 = (
-  MSG_TYPE : int,
   C_U : bstr / nil,  
   C_V : bstr,  
   X_V : bstr,
@@ -762,7 +754,6 @@ aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
 
 where:
 
-* MSG_TYPE = 5
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
 * H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
@@ -818,7 +809,6 @@ message_3 = (
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
-  MSG_TYPE : int,
   C_V : bstr,
 )
 ~~~~~~~~~~~
@@ -832,10 +822,6 @@ where aad_3, in non-CDDL notation, is:
 ~~~~~~~~~~~
 aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
-
-where:
-
-* MSG_TYPE = 6
 
 ### Party U Processing of Message 3
 
@@ -1267,7 +1253,6 @@ The protected header map is 7 bytes. The length of plaintext is 73 bytes so assu
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
-  2,
   null,
   h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
@@ -1279,14 +1264,13 @@ message_2 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (121 bytes):
-02 F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D
-0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51
-00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13
-14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27
-28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B
-3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F
-50
+message_2 (120 bytes):
+F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
+0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00
+01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14
+15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28
+29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C
+3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_3
@@ -1295,7 +1279,6 @@ The plaintext and ciphertext in message_3 are assumed to be of equal sizes as in
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 = (
-  3,
   h'c3',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
@@ -1304,12 +1287,12 @@ message_3 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_3 (86 bytes):
-03 41 C3 58 51 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
-0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22
-23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36
-37 38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A
-4B 4C 4D 4E 4F 50
+message_3 (85 bytes):
+41 C3 58 51 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23
+24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37
+38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
+4C 4D 4E 4F 50
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes Certificates
@@ -1332,7 +1315,7 @@ protected = << { TDB3 : h'0001020304050607...' } >>
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
-  4,
+  2,
   h'c3',
   0,
   0,
@@ -1344,7 +1327,7 @@ message_1 = (
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 (44 bytes):
-04 41 C3 00 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C
+02 41 C3 00 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C
 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
 44 61 63 64 63
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1355,7 +1338,6 @@ Assuming a 0 byte plaintext and a 64-bit MAC value the ciphertext is 8 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
-  5,
   null,
   h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
@@ -1365,10 +1347,10 @@ message_2 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (47 bytes):
-05 F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D
-0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 48 61
-62 63 64 65 66 67 68
+message_2 (46 bytes):
+F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
+0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 48 61 62
+63 64 65 66 67 68
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_3
@@ -1377,15 +1359,14 @@ The plaintext and ciphertext in message_3 are assumed to be of equal sizes as in
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 = (
-  6,
   h'c3',
   h'0001020304050607'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_3 (12 bytes):
-06 41 C3 48 00 01 02 03 04 05 06 07
+message_3 (11 bytes):
+41 C3 48 00 01 02 03 04 05 06 07
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Summary
@@ -1394,10 +1375,10 @@ message_3 (12 bytes):
               PSK       RPK       x5t     x5chain                  
 --------------------------------------------------------------------
 message_1      44        39        39        39                     
-message_2      47       121       127       117 + Certificate chain 
-message_3      12        86        92        82 + Certificate chain 
+message_2      46       120       126       116 + Certificate chain 
+message_3      11        85        91        81 + Certificate chain 
 --------------------------------------------------------------------
-Total         103       246       258       238 + Certificate chains
+Total         101       244       256       236 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-context title="Typical message sizes in bytes" artwork-align="center"}
 
