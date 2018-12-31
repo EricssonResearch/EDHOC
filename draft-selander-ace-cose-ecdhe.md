@@ -1204,9 +1204,9 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 * The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
 
-* The AEAD Algorithm is AEAD_V and the HMAC-based Key Derivation Function (HKDF) is HKDF_V, as defined in this document
+* The AEAD Algorithm and the HMAC-based Key Derivation Function (HKDF) are the AEAD and HKDF algorithms in the cipher suite CIPHER_SUITE_U.
 
-* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of AEAD_V.
+* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
