@@ -493,7 +493,7 @@ where:
 
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
-* H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+* H() - the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
 
@@ -756,7 +756,7 @@ where:
 
 * C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
-* H() - the hash function in HKDF_V, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+* H() - the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2
 
@@ -1157,7 +1157,7 @@ TODO: This section needs to be updated.
 
 # EDHOC PSK Chaining
 
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of AEAD_V.
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
