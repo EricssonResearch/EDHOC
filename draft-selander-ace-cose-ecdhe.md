@@ -252,7 +252,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Verification of a common preferred cipher suite (ECDH curve, HKDF, AEAD, Signature algorithm):
 
-   * U lists supported cipher suite in order of preference
+   * U lists supported cipher suites in order of preference
    
    * V verifies that the selected cipher suite is the first supported cipher suite
 
