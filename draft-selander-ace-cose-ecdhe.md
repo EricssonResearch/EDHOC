@@ -125,7 +125,7 @@ informative:
         ins: A.F. Skarmeta
     date: June 2018
 
-  CertEnr:
+  Kron18:
     target: https://www.nada.kth.se/~ann/exjobb/alexandros_krontiris.pdf
     title: Evaluation of Certificate Enrollment over Application Layer Security
     author:
@@ -133,7 +133,7 @@ informative:
         ins: A. Krontiris
     date: May 2018
 
-  Formal:
+  SSR18:
     target: https://www.springerprofessional.de/en/formal-verification-of-ephemeral-diffie-hellman-over-cose-edhoc/16284348
     title: Formal Verification of Ephemeral Diffie-Hellman Over COSE (EDHOC)
     author:
@@ -147,7 +147,7 @@ informative:
         ins: C. Schürmann
     date: November 2018
 
-  Bootstrap:
+  Perez18:
     target: http://www.anastacia-h2020.eu/publications/Architecture_of_security_association_establishment_based_on_bootstrapping_technologies_for_enabling_critical_IoT_infrastructures.pdf
     title: Architecture of security association establishment based on bootstrapping technologies for enabling critical IoT infrastructures
     author:
@@ -249,7 +249,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
-* Verification of a common preferred cipher suite (ECDH curve, HKDF, AEAD, Signature algorithm):
+* Verification of a common preferred cipher suite (AEAD algorithm, ECDH algorithm, ECDH curve, signature algorithm):
 
    * U lists supported cipher suites in order of preference
    
@@ -290,7 +290,7 @@ EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messa
 
 ## Cipher Suites
 
-EDHOC cipher suites consists of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm, an ECDH curve, and a signature algorithm. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer value.
+EDHOC cipher suites consists of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm, an ECDH curve (including HKDF algorithm), and a signature algorithm. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer value.
 
 1. AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, and Ed25519
 2. AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, and ES256
@@ -401,7 +401,7 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
-{: #fig-asym title="EDHOC with asymmetric key authentication."}
+{: #fig-asym title="Overview of EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
 
 ## EDHOC Message 1
@@ -642,7 +642,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs.
 
-EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. AEAD(K; P; A) denotes the output from an AEAD algorithm using key K on plaintext P and additional authenticated data A, see {{RFC5116}}.
+EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -650,18 +650,18 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_U, C_V, X_V, AEAD(K_2; UAD_2; aad_2)              |
+|                    C_U, C_V, X_V, AE(K_2; UAD_2)                  |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    C_V, AEAD(K_3; PAD_3; aad_3)                   |
+|                         C_V, AE(K_3; PAD_3)                       |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
-{: #fig-sym title="EDHOC with symmetric key authentication. "}
+{: #fig-sym title="Overview of EDHOC with symmetric key authentication."}
 {: artwork-align="center"}
 
-EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, in the following subsections, only differences compared to EDHOC with asymmetric key authentication are mentioned.
+EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication. In the following subsections the differences compared to EDHOC with asymmetric key authentication are described.
 
 ## EDHOC Message 1
 
@@ -718,7 +718,7 @@ where:
 
 ## EDHOC Error Message
 
-This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be send by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
+This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be send by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. CoAP POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
 error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 
@@ -813,7 +813,7 @@ IANA has added the media type 'application/edhoc' to the CoAP Content-Formats re
 ## Security Properties
 EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection. As described in {{SIGMA}}, peer awareness is provided to Party V, but not to Party U.
 
-EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically the one that is not derivable from routing information in the lower layers.
+EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically that which is not possible to infer from routing information in the lower layers.
 
 Compared to {{SIGMA}}, EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session.
 
@@ -834,7 +834,7 @@ Cipher suite number 1 (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, Ed25519) i
 
 ## Unprotected Data
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, UAD_2, and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case. Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize KID. Another consideration is that the list of supported algorithms may be used to identify the application.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, UAD_2, and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case. Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize KID. Another consideration is that the list of supported cipher suites may be used to identify the application.
 
 Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case.
 
@@ -854,7 +854,7 @@ Party U and V are allowed to select the connection identifiers C_U and C_V, resp
 
 ## Other Documents Referencing EDHOC
 
-EDHOC has been analyzed in several other documents. A formal verification of EDHOC was done in {{Formal}}, an analysis of EDHOC for certificate enrollment was done in {{CertEnr}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, the use of EDHOC in IoT bootstrapping is analyzed in {{Bootstrap}}, and the use of EDHOC in 6TiSCH is described in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
+EDHOC has been analyzed in several other documents. A formal verification of EDHOC was done in {{SSR18}}, an analysis of EDHOC for certificate enrollment was done in {{Kron18}}, the use of EDHOC in LoRaWAN is analyzed in {{LoRa1}} and {{LoRa2}}, the use of EDHOC in IoT bootstrapping is analyzed in {{Perez18}}, and the use of EDHOC in 6TiSCH is described in {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}. 
 
 --- back
 
@@ -1288,8 +1288,7 @@ EDHOC PSK + ECDHE                  44         45        10         98
 # Acknowledgments
 {: numbered="no"}
 
-The authors want to thank Dan Harkins, Ilari Liusvaara, Jim Schaad, Klaus Hartke, and Ludwig Seitz for reviewing intermediate versions of the draft and contributing concrete proposals incorporated in this version. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
+The authors want to thank Alessandro Bruni, Theis Grønbech Petersen, Dan Harkins, Klaus Hartke,  Alexandros Krontiris, Ilari Liusvaara, Salvador Pérez, Michael Richardson, Thorvald Sahl Jørgensen, Jim Schaad, Carsten Schürmann, and Ludwig Seitz for reviewing intermediate versions of the draft. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
 
-We are also grateful to Theis Grønbech Petersen, Thorvald Sahl Jørgensen, Alessandro Bruni, and Carsten Schürmann for their work on formal analysis of EDHOC.
 
 --- fluff
