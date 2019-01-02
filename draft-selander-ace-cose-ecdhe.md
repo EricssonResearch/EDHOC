@@ -291,7 +291,7 @@ EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messa
 
 ## Cipher Suites
 
-The cipher suites for EDHOC consists of a set of COSE algorithms, an ECDH algorithm, a AEAD algortihm, an ECDH curve, and a signature algorithm. The same ciphersuites are used for EDHOC Authenticated with asymmetric keys and EDHOC authenticated with symmetric keys with the difference that the signature algorithm is not used when  EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer. 
+The cipher suites for EDHOC consists of a set of COSE algorithms, an ECDH algorithm, an AEAD algorithm, an ECDH curve, and a signature algorithm. The same cipher suites are used for EDHOC Authenticated with asymmetric keys and EDHOC authenticated with symmetric keys with the difference that the signature algorithm is not used when  EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer. 
 
 1. ECDH-SS + HKDF-256, AES-CCM-64-64-128, X25519, and Ed25519
 2. ECDH-SS + HKDF-256, AES-CCM-64-64-128, P-256, and ES256
@@ -441,7 +441,7 @@ Party U SHALL compose message_1 as follows:
 
 * The supported cipher suites and the order of preference MUST NOT be changed based on previous error messages. However, the list CIPHER_SUITEs_U sent to Party V MAY be truncated such that cipher suites which are the least preferred are omitted. The amount of truncation MAY be changed between sessions, e.g. based on previous error messages (see next bullet), but all cipher suites which are more preferred than the least preferred cipher suite in the list MUST be included in the list.
 
-* Determine the cipher suite CIPHER_SUITE_U to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying an cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in CIPHER_SUITEs_U MUST be used.
+* Determine the cipher suite CIPHER_SUITE_U to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying a cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in CIPHER_SUITEs_U MUST be used.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite CIPHER_SUITE_U. Let X_U be the x-coordinate of the ephemeral public key.
    
@@ -461,7 +461,7 @@ Party V SHALL process message_1 as follows:
 
 * Pass UAD_1 to the application.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the cipher suite CIPHER_SUITE_U, then CIPHER_SUITEs_V MUST include one ore more supported cipher suites. If V does not support the cipher suite CIPHER_SUITE_U, but supports another cipher suite in CIPHER_SUITEs_U, then CIPHER_SUITEs_V MUST include the first supported cipher suite in CIPHER_SUITEs_U.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the cipher suite CIPHER_SUITE_U, then CIPHER_SUITEs_V MUST include one or more supported cipher suites. If V does not support the cipher suite CIPHER_SUITE_U, but supports another cipher suite in CIPHER_SUITEs_U, then CIPHER_SUITEs_V MUST include the first supported cipher suite in CIPHER_SUITEs_U.
 
 ## EDHOC Message 2
 
@@ -508,7 +508,7 @@ Party V SHALL compose message_2 as follows:
 
 * Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algortihm in the cipher suite CIPHER_SUITE_U, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite CIPHER_SUITE_U, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor { abc : ID_CRED_V }
    
@@ -524,7 +524,7 @@ Party V SHALL compose message_2 as follows:
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
    * plaintext = bstr .cborseq [ ~protected, signature, ? UAD_2 ]
 
@@ -548,9 +548,9 @@ Party U SHALL process message_2 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_2, and IV_2.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_2, and IV_2.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algortihm in the cipher suite CIPHER_SUITE_U and the public authentication key of Party V.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite CIPHER_SUITE_U and the public authentication key of Party V.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
@@ -587,7 +587,7 @@ aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 
 Party U SHALL compose message_3 as follows:
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algortihm in the cipher suite CIPHER_SUITE_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite CIPHER_SUITE_U, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor { abc : ID_CRED_U }
    
@@ -603,7 +603,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * plaintext =  bstr .cborseq [ ~protected, signature, ? PAD_3 ]
          
@@ -615,7 +615,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Format message_3 as the sequence of CBOR data items specified in {{asym-msg3-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
-*  Pass the connection identifiers (C_U, C_V) and the negotiated ciphersuite CIPHER_SUITE_U to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass the connection identifiers (C_U, C_V) and the negotiated cipher suite CIPHER_SUITE_U to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 ### Party V Processing of Message 3
 
@@ -625,13 +625,13 @@ Party V SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple.
 
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algortihm in the cipher suite CIPHER_SUITE_U and the public authentication key of Party U.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite CIPHER_SUITE_U and the public authentication key of Party U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
-*  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated ciphersuite CIPHER_SUITE_U to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated cipher suite CIPHER_SUITE_U to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -693,7 +693,7 @@ where:
 
 *  COSE_Sign1 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_2
 
@@ -707,7 +707,7 @@ where:
 
 *  COSE_Sign1 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algortihm in the cipher suite CIPHER_SUITE_U, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = aad_3
 
@@ -739,7 +739,7 @@ where:
 
 * MSG_TYPE = 0
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
-* CIPHER_SUITEs_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contatins the values from the EDHOC cipher suites registry and not indexes.
+* CIPHER_SUITEs_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
 
 # IANA Considerations {#iana}
 
@@ -889,7 +889,7 @@ All EDHOC messages consist of a sequence of CBOR encoded data items. While an ED
 
 The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
-An type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
+A type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CDDL Type                       Diagnostic                Encoded
@@ -956,7 +956,7 @@ The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are cons
 
 * The protected parameter is a map { abc : ID_CRED_x } wrapped in a byte string.
    
-* The payload is a bstr cointaining the CBOR encoding of a COSE_KEY or a single certificate.
+* The payload is a bstr containing the CBOR encoding of a COSE_KEY or a single certificate.
 
 * external_aad = aad_i.
 
