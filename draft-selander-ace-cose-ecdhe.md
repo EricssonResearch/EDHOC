@@ -289,9 +289,18 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2, while Protected Application Data (PAD_3) may be send in message_3. 
 
+## Cipher Suites
+
+The cipher suites for EDHOC consists of a set of COSE algorithms, an ECDH algorithm, an ECDH curve, and AEAD algortihm, and a signature algorithm. The same ciphersuites are used for EDHOC Authenticated with asymmetric keys and EDHOC authenticated with symmetric keys with the difference that the signature algorithm is not used when  EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer. 
+
+1. ECDH-SS + HKDF-256, X25519, AES-CCM-64-64-128, and Ed25519
+2. ECDH-SS + HKDF-256, P-256, AES-CCM-64-64-128, and ES256
+3. Application defined.
+4. Application defined.
+
 ## Ephemeral Public Keys {#cose_key}
    
-The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only a subset of the parameters are included in the EDHOC messages.  The curve X25519 is mandatory to implement. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only a subset of the parameters are included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
@@ -395,10 +404,6 @@ Party U                                                          Party V
 ~~~~~~~~~~~
 {: #fig-asym title="EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
-
-### Mandatory to Implement Algorithms
-
-For EDHOC authenticated with asymmetric keys, the COSE algorithms ECDH-SS + HKDF-256, AES-CCM-64-64-128, and Ed25519 are mandatory to implement.
 
 ## EDHOC Message 1
 
@@ -656,10 +661,6 @@ Party U                                                       Party V
 ~~~~~~~~~~~
 {: #fig-sym title="EDHOC with symmetric key authentication. "}
 {: artwork-align="center"}
-
-### Mandatory to Implement Algorithms
-
-For EDHOC authenticated with symmetric keys, the COSE algorithms ECDH-SS + HKDF-256 and AES-CCM-64-64-128 are mandatory to implement.
 
 ## EDHOC Message 1
 
