@@ -291,10 +291,10 @@ EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messa
 
 ## Cipher Suites
 
-The cipher suites for EDHOC consists of a set of COSE algorithms, an ECDH algorithm, an ECDH curve, and AEAD algortihm, and a signature algorithm. The same ciphersuites are used for EDHOC Authenticated with asymmetric keys and EDHOC authenticated with symmetric keys with the difference that the signature algorithm is not used when  EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer. 
+The cipher suites for EDHOC consists of a set of COSE algorithms, an ECDH algorithm, a AEAD algortihm, an ECDH curve, and a signature algorithm. The same ciphersuites are used for EDHOC Authenticated with asymmetric keys and EDHOC authenticated with symmetric keys with the difference that the signature algorithm is not used when  EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer. 
 
-1. ECDH-SS + HKDF-256, X25519, AES-CCM-64-64-128, and Ed25519
-2. ECDH-SS + HKDF-256, P-256, AES-CCM-64-64-128, and ES256
+1. ECDH-SS + HKDF-256, AES-CCM-64-64-128, X25519, and Ed25519
+2. ECDH-SS + HKDF-256, AES-CCM-64-64-128, P-256, and ES256
 3. Application defined.
 4. Application defined.
 
