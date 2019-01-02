@@ -1,6 +1,6 @@
 ---
 title: Ephemeral Diffie-Hellman Over COSE (EDHOC)
-docname: draft-selander-ace-cose-ecdhe-latest
+docname: draft-selander-ace-cose-ecdhe-11
 
 ipr: trust200902
 wg: ACE Working Group
@@ -327,7 +327,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 
 where exchange_hash, in non-CDDL notation, is:
 
-exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
+exchange_hash = H( bstr .cborseq \[ aad_3, CIPHERTEXT_3 \] )
 
 where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
@@ -525,7 +525,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = bstr .cborseq [ ~protected, signature, ? UAD_2 ]
+   * plaintext = bstr .cborseq \[ ~protected, signature, ? UAD_2 \]
 
    * external_aad = aad_2
 
@@ -604,7 +604,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite CIPHER_SUITE_U, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext =  bstr .cborseq [ ~protected, signature, ? PAD_3 ]
+   * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
          
    * external_aad = aad_2
 
@@ -750,7 +750,7 @@ IANA has added the well-known URI 'edhoc' to the Well-Known URIs registry.
 
 - Change controller: IETF
 
-- Specification document(s): [[this document]]
+- Specification document(s): \[\[this document\]\]
 
 - Related information: None
 
@@ -772,7 +772,7 @@ IANA has added the media type 'application/edhoc' to the Media Types registry.
 
 - Interoperability considerations: N/A
 
-- Published specification: [[this document]] (this document)
+- Published specification: \[\[this document\]\] (this document)
 
 - Applications that use this media type: To be identified
 
@@ -786,13 +786,13 @@ IANA has added the media type 'application/edhoc' to the Media Types registry.
   
   * Macintosh file type code(s): N/A
 
-- Person & email address to contact for further information: Göran Selander <goran.selander@ericsson.com>
+- Person & email address to contact for further information: See "Authors' Addresses" section.
 
 - Intended usage: COMMON
 
 - Restrictions on usage: N/A
 
-- Author: Göran Selander <goran.selander@ericsson.com>
+- Author: See "Authors' Addresses" section.
 
 - Change Controller: IESG
 
@@ -806,7 +806,7 @@ IANA has added the media type 'application/edhoc' to the CoAP Content-Formats re
 
 -  ID: TBD42
 
--  Reference: [[this document]]
+-  Reference: \[\[this document\]\]
 
 # Security Considerations {#security}
 
@@ -866,7 +866,7 @@ This Appendix is intended to simplify for implementors not familiar with CBOR {{
 
 The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-cddl}} provides a way to express structures for protocol messages and APIs that use CBOR. {{I-D.ietf-cbor-cddl}} also extends the diagnostic notation.
 
-CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain information about the major type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays []  of data items and maps {} of pairs of data items. Some examples are given below. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}. 
+CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain information about the major type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays \[\]  of data items and maps {} of pairs of data items. Some examples are given below. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{I-D.ietf-cbor-cddl}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic          Encoded              Type
@@ -888,7 +888,7 @@ h'12cd'             0x4212cd             byte string
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array [_ message_i ] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
+All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array \[_ message_i \] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
 
 The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
