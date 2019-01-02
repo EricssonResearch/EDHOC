@@ -38,7 +38,6 @@ normative:
   I-D.ietf-cbor-cddl:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-core-object-security:
-  I-D.ietf-core-oscore-groupcomm:
   
   RFC2119:
   RFC5116:
