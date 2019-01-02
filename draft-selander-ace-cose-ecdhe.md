@@ -1235,6 +1235,8 @@ message_3 (11 bytes):
 
 ## Summary
 
+The previous estimates of typical message sizes are summarized in {{fig-summary}}.
+
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
                 PSK       RPK       x5t     x5chain                  
@@ -1246,7 +1248,7 @@ message_3       11        85        91        81 + Certificate chain
 Total          101       244       256       236 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-context title="Typical message sizes in bytes" artwork-align="center"}
+{: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
@@ -1260,7 +1262,7 @@ EDHOC RPK + ECDHE                  39        120        85        244
 EDHOC PSK + ECDHE                  44         46        11        101
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-context2 title="Typical message sizes in bytes with Connection ID" artwork-align="center"}
+{: #fig-compare1 title="Comparison of message sizes in bytes with Connection ID" artwork-align="center"}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
@@ -1278,7 +1280,7 @@ EDHOC RPK + ECDHE                  38        119        84        241
 EDHOC PSK + ECDHE                  44         45        10         98
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-context3 title="Typical message sizes in bytes without Connection ID" artwork-align="center"}
+{: #fig-compare2 title="Comparison of message sizes in bytes without Connection ID" artwork-align="center"}
 
 # Acknowledgments
 {: numbered="no"}
