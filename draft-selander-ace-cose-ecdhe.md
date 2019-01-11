@@ -1030,8 +1030,8 @@ TODO: This section needs to be updated.
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
-   KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
+PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
+KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # EDHOC with CoAP and OSCORE
