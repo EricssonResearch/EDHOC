@@ -347,7 +347,10 @@ If the AEAD algorithm uses an IV, then IV_i for message_i SHALL be derived using
 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
-EDHOC-Exporter(label, length) = EDHOC-Key-Derivation(label, 8 * length, exchange_hash)
+~~~~~~~~~~~
+   EDHOC-Exporter(label, length) =
+      EDHOC-Key-Derivation(label, 8 * length, exchange_hash)
+~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
 
@@ -1027,8 +1030,8 @@ TODO: This section needs to be updated.
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
-KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
+   PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
+   KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # EDHOC with CoAP and OSCORE
