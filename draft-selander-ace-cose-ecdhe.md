@@ -747,6 +747,44 @@ where:
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
 * CIPHER_SUITEs_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
 
+### Example Use of EDHOC Error Message with CIPHER_SUITEs_V
+
+Assuming that Party U supports the five cipher suites \{0,1,2,3,4\} in decreasing order of preference, {{fig-error1}} and {{fig-error2}} show examples of how Party U can truncate CIPHER_SUITEs_U and how CIPHER_SUITEs_V are used by Party V to give Party U information about the cipher suites that Party V supports. Party V only accepts message_1 if the selected cipher suite CIPHER_SUITE_U is the first cipher suite in CIPHER_SUITEs_U that Party V supports, this procedure guarantees that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. In {{fig-error1}}, Party V supports cipher suite 1 but not cipher suite 0. In {{fig-error2}}, Party V supports cipher suite 2 but not cipher suites 0 and 1.
+
+~~~~~~~~~~~
+Party U                                                       Party V
+|    C_U, CIPHER_SUITEs_U {0,1,2}, CIPHER_SUITE_U {0}, X_U, UAD_1   |
++------------------------------------------------------------------>|
+|                             message_1                             |
+|                                                                   |
+|                    ERR_MSG, CIPHER_SUITEs_V {1}                   |
+|<------------------------------------------------------------------+
+|                               error                               |
+|                                                                   |
+|     C_U, CIPHER_SUITEs_U {0,1}, CIPHER_SUITE_U {1}, X_U, UAD_1    |
++------------------------------------------------------------------>|
+|                             message_1                             |
+~~~~~~~~~~~
+{: #fig-error1 title="Example use of error message with CIPHER_SUITEs_V."}
+{: artwork-align="center"}
+
+~~~~~~~~~~~
+Party U                                                       Party V
+|    C_U, CIPHER_SUITEs_U {0,1}, CIPHER_SUITE_U {0}, X_U, UAD_1   |
++------------------------------------------------------------------>|
+|                             message_1                             |
+|                                                                   |
+|                   ERR_MSG, CIPHER_SUITEs_V {2,4}                  |
+|<------------------------------------------------------------------+
+|                               error                               |
+|                                                                   |
+|    C_U, CIPHER_SUITEs_U {0,1,2}, CIPHER_SUITE_U {2}, X_U, UAD_1   |
++------------------------------------------------------------------>|
+|                             message_1                             |
+~~~~~~~~~~~
+{: #fig-error2 title="Example use of error message with CIPHER_SUITEs_V."}
+{: artwork-align="center"}
+
 # IANA Considerations {#iana}
 
 ## The Well-Known URI Registry
