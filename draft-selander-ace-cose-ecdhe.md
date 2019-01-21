@@ -787,6 +787,18 @@ Party U                                                       Party V
 
 # IANA Considerations {#iana}
 
+## EDHOC Cipher Suites Registry
+
+IANA has created a new registry titled "EDHOC Cipher Suites".
+
+TODO
+
+## EDHOC Message Type Registry
+
+IANA has created a new registry titled "EDHOC Message Type".
+
+TODO
+
 ## The Well-Known URI Registry
 
 IANA has added the well-known URI 'edhoc' to the Well-Known URIs registry.
