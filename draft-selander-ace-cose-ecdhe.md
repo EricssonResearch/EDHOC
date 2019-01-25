@@ -1,6 +1,6 @@
 ---
 title: Ephemeral Diffie-Hellman Over COSE (EDHOC)
-docname: draft-selander-ace-cose-ecdhe-11
+docname: draft-selander-ace-cose-ecdhe-latest
 
 ipr: trust200902
 wg: ACE Working Group
