@@ -756,7 +756,7 @@ where:
 
 ### Example Use of EDHOC Error Message with CIPHER_SUITEs_V
 
-Assuming that Party U supports the five cipher suites \{0,1,2,3,4\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate CIPHER_SUITEs_U and how CIPHER_SUITEs_V is used by Party V to give Party U information about the cipher suites that Party V supports. Party V only accepts message_1 if the selected cipher suite CIPHER_SUITE_U is the first cipher suite in CIPHER_SUITEs_U that Party V supports. This procedure guarantees that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. In {{fig-error1}}, Party V supports cipher suite 1 but not cipher suite 0. In {{fig-error2}}, Party V supports cipher suite 2 but not cipher suites 0 and 1.
+Assuming that Party U supports the five cipher suites \{0,1,2,3,4\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate CIPHER_SUITEs_U and how CIPHER_SUITEs_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 1 but not cipher suite 0. 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -775,6 +775,8 @@ Party U                                                       Party V
 {: #fig-error1 title="Example use of error message with CIPHER_SUITEs_V."}
 {: artwork-align="center"}
 
+In {{fig-error2}}, Party V supports cipher suite 2 but not cipher suites 0 and 1.
+
 ~~~~~~~~~~~
 Party U                                                       Party V
 |     C_U, CIPHER_SUITEs_U {0,1}, CIPHER_SUITE_U {0}, X_U, UAD_1    |
@@ -792,6 +794,8 @@ Party U                                                       Party V
 {: #fig-error2 title="Example use of error message with CIPHER_SUITEs_V."}
 {: artwork-align="center"}
 
+As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite CIPHER_SUITE_U is the first cipher suite in CIPHER_SUITEs_U that Party V supports, the parties can verifify the selected cipher suite CIPHER_SUITE_U is the s the most preferred (by Party U) cipher suite supported by both parties. If CIPHER_SUITE_U is not the first cipher suite in CIPHER_SUITEs_U that Party V supports, Party V will discontinue the protocol. 
+   
 # IANA Considerations {#iana}
 
 ## EDHOC Cipher Suites Registry
