@@ -531,7 +531,7 @@ Party V SHALL compose message_2 as follows:
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_V - bstr enabling the retrieval of the public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - a CBOR type that can be used with the COSE map label. Enables the retrieval of the public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
@@ -610,7 +610,7 @@ Party U SHALL compose message_3 as follows:
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
-   * ID_CRED_U - bstr enabling the retrieval of the public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - a CBOR type that can be used with the COSE map label. Enables the retrieval of the public authentication key of Party U, see {{asym-overview}}
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
