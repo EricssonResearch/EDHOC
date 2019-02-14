@@ -335,7 +335,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 where exchange_hash, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-   exchange_hash = H( bstr .cborseq \[ aad_3, CIPHERTEXT_3 \] )
+   exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
 where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
