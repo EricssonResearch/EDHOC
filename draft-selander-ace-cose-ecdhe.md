@@ -193,9 +193,9 @@ This document is organized as follows: {{background}} describes how EDHOC builds
 
 ## Rationale for EDHOC
 
-EDHOC is optimized for small message overhead. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time can in constrained environments be translated into key exchange overhead. 
+EDHOC is optimized for small message sizes and can therefore be send over a small number of radio frames. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment, especially in noisy environments. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time can in constrained environments be translated into key exchange overhead.
 
-Power consumption for wireless devices is highly dependent on message transmission and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reason.
+Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reasons.
 
 EDHOC is adapted to primitives and protocols designed for the Internet of Things: EDHOC is built on CBOR and COSE which enables small message overhead and efficient parsing in constrained devices. Since EDHOC is not bound to a particular transport layer, the protocol messages can e.g. be carried as CoAP payload. By reusing already existing IoT primitives in the device (CBOR, CoAP and COSE encryption and signature formats) the additional code footprint can be kept very low.
 
