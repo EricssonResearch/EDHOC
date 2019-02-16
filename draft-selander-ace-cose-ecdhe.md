@@ -193,6 +193,8 @@ This document is organized as follows: {{background}} describes how EDHOC builds
 
 ## Rationale for EDHOC
 
+Even contrained IoT systems often deals with personal information, valuable business data, and actuators interacting with the physical world. Not only do such systems need security and privacy, they need end-to-end security with source authentication and perfect-forward secrecy.
+
 EDHOC is optimized for small message sizes and can therefore be send over a small number of radio frames. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment, especially in noisy environments. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time can in constrained environments be translated into key exchange overhead.
 
 Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reasons.
