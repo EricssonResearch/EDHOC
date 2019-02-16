@@ -83,6 +83,7 @@ informative:
   I-D.ietf-tls-dtls13:
 
   RFC7228:
+  RFC7258:
   RFC8446:
   
   LoRa1:
@@ -887,7 +888,9 @@ EDHOC with asymmetric authentication offers identity protection of Party U again
 
 Compared to {{SIGMA}}, EDHOC adds an explicit message type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session.
 
-EDHOC also adds negotiation of connection identifiers and downgrade protected negotiation of cryptographic parameters, i.e. an attacker cannot affect the negotiated parameters. A single session of EDHOC does not include negotiation of cipher suites, but it enables Party V to verify that the selected cipher suite is the most preferred cipher suite by U which is supported by both U and V. 
+EDHOC also adds negotiation of connection identifiers and downgrade protected negotiation of cryptographic parameters, i.e. an attacker cannot affect the negotiated parameters. A single session of EDHOC does not include negotiation of cipher suites, but it enables Party V to verify that the selected cipher suite is the most preferred cipher suite by U which is supported by both U and V.
+
+As required by {{RFC7258}}, IETF protocols need to mitigate pervasive monitoring when possible. One way to mitigate pervasive monitoring is to use a key exchange that provides perfect forward secrecy. EDHOC therefore only supports modes with perfect forward secrecy. To limit the effect of breaches, it is important to limit the use of symmetrical group keys, EDHOC therefore strives to make the overhead cost of raw-public keys and self-signed certificates as small as possible. Raw-public keys and self-signed certificates is not a replacement for a public key infrastuctre, but SHOULD be used instead of symmetrical group keys.
 
 ## Cryptographic Considerations
 The security of the SIGMA protocol requires the MAC to be bound to the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism. EDHOC implements SIGMA-I using the same Sign-then-MAC approach as TLS 1.3.
