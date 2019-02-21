@@ -407,7 +407,7 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|          C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, UAD_1         |
+|       TYPE, C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, UAD_1      |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -432,7 +432,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   TYPE : int,
   C_U : bstr,  
-  CIPHER_SUITEs_U : suites,
+  CIPHER_SUITES_U : suites,
   CIPHER_SUITE_U : uint,
   X_U : bstr,
   ? UAD_1 : bstr,
@@ -664,15 +664,15 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|       C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, KID, UAD_1       |
+|    TYPE, C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, KID, UAD_1    |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                   C_U, C_V, X_V, AEAD(K_2; UAD_2)                 |
+|               C_U, C_V, X_V, AEAD(K_2; UAD_2, aad_2)              |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                        C_V, AEAD(K_3; PAD_3)                      |
+|                   C_V, AEAD(K_3; PAD_3, aad_3)                    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
