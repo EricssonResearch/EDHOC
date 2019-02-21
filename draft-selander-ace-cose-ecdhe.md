@@ -624,7 +624,7 @@ Party U SHALL compose message_3 as follows:
 
    * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
          
-   * external_aad = aad_2
+   * external_aad = aad_3
 
    * PAD_3 = bstr containing opaque protected application data
 
