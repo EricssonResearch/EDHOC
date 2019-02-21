@@ -218,16 +218,16 @@ This document uses the Concise Data Definition Language (CDDL) {{I-D.ietf-cbor-c
 SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and (D)TLS 1.3, EDHOC is built on a variant of the SIGMA protocol which provide identity protection of the initiator (SIGMA-I), and like (D)TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an authenticated encryption algorithm is shown in {{fig-sigma}}.
 
 ~~~~~~~~~~~
-Party U                                                 Party V
-   |                          X_U                          |
-   +------------------------------------------------------>|
-   |                                                       |
-   |  X_V, AE( K_2; ID_CRED_V, Sig(V; CRED_V, X_U, X_V) )  |
-   |<------------------------------------------------------+
-   |                                                       |
-   |    AE( K_3; ID_CRED_U, Sig(U; CRED_U, X_V, X_U) )     |
-   +------------------------------------------------------>|
-   |                                                       |
+Party U                                                   Party V
+   |                          X_U                            |
+   +-------------------------------------------------------->|
+   |                                                         |
+   |  X_V, AEAD( K_2; ID_CRED_V, Sig(V; CRED_V, X_U, X_V) )  |
+   |<--------------------------------------------------------+
+   |                                                         |
+   |     AEAD( K_3; ID_CRED_U, Sig(U; CRED_U, X_V, X_U) )    |
+   +-------------------------------------------------------->|
+   |                                                         |
 ~~~~~~~~~~~
 {: #fig-sigma title="Authenticated encryption variant of the SIGMA-I protocol."}
 {: artwork-align="center"}
@@ -242,7 +242,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
-* AE(K; P) denotes authenticated encryption of plaintext P using the key K derived from the shared secret. The authenticated encryption MUST NOT be replaced by plain encryption, see {{security}}.
+* AEAD(K; . ) denotes authenticated encryption with additional data using the key K derived from the shared secret. The authenticated encryption MUST NOT be replaced by plain encryption, see {{security}}.
 
 In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
@@ -411,11 +411,11 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|  C_U, C_V, X_V, AE(K_2; ID_CRED_V, Sig(V; CRED_V, aad_2), UAD_2)  |
+| C_U, C_V, X_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, aad_2), UAD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|       C_V, AE(K_3; ID_CRED_U, Sig(U; CRED_U, aad_3), PAD_3)       |
+|      C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, aad_3), PAD_3)      |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -668,11 +668,11 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                    C_U, C_V, X_V, AE(K_2; UAD_2)                  |
+|                   C_U, C_V, X_V, AEAD(K_2; UAD_2)                 |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                         C_V, AE(K_3; PAD_3)                       |
+|                        C_V, AEAD(K_3; PAD_3)                      |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
