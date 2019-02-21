@@ -268,7 +268,7 @@ To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR encoded data items, where the first data item of message_1 is an int specifying the message type (MSG_TYPE). The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR encoded data items, where the first data item of message_1 is an int specifying the method type (asymmetric, symmetric, error). The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters are included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HKDF, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -398,7 +398,8 @@ Public key certificates can be identified in different ways, for example (see {{
 
    * x5bag : ID_CRED_x, for x = U or V.
 
-In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-
+2-proc}} and {{asym-msg3-proc}}.
 
 The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificate. Party U and Party V MAY use different signature algorithms.
 
@@ -429,7 +430,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  MSG_TYPE : int,
+  TYPE : int,
   C_U : bstr,  
   CIPHER_SUITEs_U : suites,
   CIPHER_SUITE_U : uint,
@@ -444,7 +445,7 @@ suites : int / [ 2* int ]
 
 where:
 
-* MSG_TYPE = 1
+* TYPE = 1
 * C_U - variable length connection identifier
 * CIPHER_SUITEs_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * CIPHER_SUITE_U - a single chosen cipher suite from CIPHER_SUITEs_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
@@ -688,7 +689,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  MSG_TYPE : int,
+  TYPE : int,
   C_U : bstr,
   CIPHER_SUITEs_U : suites,
   CIPHER_SUITE_U : uint,
@@ -700,7 +701,7 @@ message_1 = (
 
 where:
 
-* MSG_TYPE = 2
+* TYPE = 2
 * KID - bstr enabling the retrieval of the pre-shared key
 
 ## EDHOC Message 2
@@ -741,7 +742,7 @@ error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 error = (
-  MSG_TYPE : int,
+  TYPE : int,
   ERR_MSG : tstr,
   ? CIPHER_SUITEs_V : suites,
 )
@@ -753,7 +754,7 @@ suites : int / [ 2* int ]
 
 where:
 
-* MSG_TYPE = 0
+* TYPE = 0
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
 * CIPHER_SUITEs_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
 
@@ -1361,7 +1362,7 @@ EDHOC PSK + ECDHE                  44         45        10         98
 # Acknowledgments
 {: numbered="no"}
 
-The authors want to thank Alessandro Bruni, Theis Grønbech Petersen, Dan Harkins, Klaus Hartke,  Alexandros Krontiris, Ilari Liusvaara, Salvador Pérez, Michael Richardson, Thorvald Sahl Jørgensen, Jim Schaad, Carsten Schürmann, and Ludwig Seitz for reviewing intermediate versions of the draft. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
+The authors want to thank Alessandro Bruni, Theis Grønbech Petersen, Dan Harkins, Klaus Hartke,  Alexandros Krontiris, Ilari Liusvaara, Karl, Norrman, Salvador Pérez, Michael Richardson, Thorvald Sahl Jørgensen, Jim Schaad, Carsten Schürmann, and Ludwig Seitz for reviewing intermediate versions of the draft. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
 
 
 --- fluff
