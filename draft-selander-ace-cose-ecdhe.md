@@ -407,7 +407,7 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|       TYPE, C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, UAD_1      |
+|             TYPE, C_U, SUITES_U, SUITE_U, X_U, UAD_1              |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -432,8 +432,8 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   TYPE : int,
   C_U : bstr,  
-  CIPHER_SUITES_U : suites,
-  CIPHER_SUITE_U : uint,
+  SUITES_U : suites,
+  SUITE_U : uint,
   X_U : bstr,
   ? UAD_1 : bstr,
 )
@@ -664,7 +664,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|    TYPE, C_U, CIPHER_SUITEs_U, CIPHER_SUITE_U, X_U, KID, UAD_1    |
+|           TYPE, C_U, SUITES_U, SUITE_U, X_U, KID, UAD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -691,8 +691,8 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 message_1 = (
   TYPE : int,
   C_U : bstr,
-  CIPHER_SUITEs_U : suites,
-  CIPHER_SUITE_U : uint,
+  SUITES_U : suites,
+  SUITE_U : uint,
   X_U : bstr,
   KID : bstr,
   ? UAD_1 : bstr,
@@ -744,7 +744,7 @@ error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 error = (
   TYPE : int,
   ERR_MSG : tstr,
-  ? CIPHER_SUITEs_V : suites,
+  ? SUITES_V : suites,
 )
 ~~~~~~~~~~~
 
@@ -756,7 +756,7 @@ where:
 
 * TYPE = 0
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
-* CIPHER_SUITEs_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
+* SUITES_V - cipher suites from CIPHER_SUITEs_U or the EDHOC cipher suites registry that V supports. Note that CIPHER_SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
 
 ### Example Use of EDHOC Error Message with CIPHER_SUITEs_V
 
@@ -764,15 +764,15 @@ Assuming that Party U supports the five cipher suites \{0,1,2,3,4\} in decreasin
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|    C_U, CIPHER_SUITEs_U {0,1,2}, CIPHER_SUITE_U {0}, X_U, UAD_1   |
+|       TYPE, C_U, SUITES_U {0, 1, 2}, SUITE_U {0}, X_U, UAD_1      |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                    ERR_MSG, CIPHER_SUITEs_V {1}                   |
+|                    TYPE, ERR_MSG, SUITES_V {1}                    |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|     C_U, CIPHER_SUITEs_U {0,1}, CIPHER_SUITE_U {1}, X_U, UAD_1    |
+|        TYPE, C_U, SUITES_U {0, 1}, SUITE_U {1}, X_U, UAD_1        |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -783,15 +783,15 @@ In {{fig-error2}}, Party V supports cipher suite 2 but not cipher suites 0 and 1
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|     C_U, CIPHER_SUITEs_U {0,1}, CIPHER_SUITE_U {0}, X_U, UAD_1    |
+|        TYPE, C_U, SUITES_U {0, 1}, SUITE_U {0}, X_U, UAD_1        |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                   ERR_MSG, CIPHER_SUITEs_V {2,4}                  |
+|                   TYPE, ERR_MSG, SUITES_V {2, 4}                  |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|    C_U, CIPHER_SUITEs_U {0,1,2}, CIPHER_SUITE_U {2}, X_U, UAD_1   |
+|       TYPE, C_U, SUITES_U {0, 1, 2}, SUITE_U {2}, X_U, UAD_1      |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
