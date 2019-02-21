@@ -462,7 +462,7 @@ Party U SHALL compose message_1 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE_U. Let X_U be the x-coordinate of the ephemeral public key.
    
-* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL be different from the concurrently used identifiers of that protocol.
+* Choose a connection identifier C_U and store it for the length of the protocol. Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL adhere to the requirements for the protocol.
 
 * Format message_1 as the sequence of CBOR data items specified in {{asym-msg1-form}} and encode it to a byte string (see {{CBOR}}).
 
@@ -523,7 +523,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE_U. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_V SHALL be different from the concurrently used identifiers of that protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
+* Choose a connection identifier C_V and store it for the length of the protocol. Party V MUST be able to retrieve the protocol state using the connection identifier C_V and optionally other information such as the 5-tuple. The connection identifier MAY be used with protocols for which EDHOC establishes application keys, in which case C_U SHALL adhere to the requirements for the protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE_U, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
@@ -1137,7 +1137,7 @@ Client    Server
 
 ## Deriving an OSCORE context from EDHOC {#oscore}
 
-When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U.  In case that the CoAP client is party U and the CoAP server is party V:
+When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoaP client and server MUST be able to retrieve the OCORE protocol state using its choosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
 
 * The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
 
