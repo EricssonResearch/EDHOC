@@ -770,7 +770,7 @@ where:
 
 ### Example Use of EDHOC Error Message with SUITES_V
 
-Assuming that Party U supports the five cipher suites \{0,1,2,3,4\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 1 but not cipher suite 0. 
+Assuming that Party U supports the five cipher suites \{0, 1, 2, 3, 4\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 1 but not cipher suite 0. 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
