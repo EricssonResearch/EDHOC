@@ -799,6 +799,55 @@ Party U                                                       Party V
 {: artwork-align="center"}
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE_U is the first cipher suite in SUITES_U that Party V supports, the parties can verifify the selected cipher suite SUITE_U is the s the most preferred (by Party U) cipher suite supported by both parties. If SUITE_U is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
+
+# EDHOC with CoAP and OSCORE
+
+## Transferring EDHOC in CoAP {#coap}
+
+EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
+
+By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
+
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap}}.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Client    Server
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "/.well-known/edhoc"
+  |          | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_1
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_2
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "/.well-known/edhoc"
+  |          | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_3
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | 
+  |          |
+~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-coap title="Example of transferring EDHOC in CoAP"}
+{: artwork-align="center"}
+
+## Deriving an OSCORE context from EDHOC {#oscore}
+
+When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoaP client and server MUST be able to retrieve the OCORE protocol state using its choosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
+
+* The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
+
+* The AEAD Algorithm and the HMAC-based Key Derivation Function (HKDF) are the AEAD and HKDF algorithms in the cipher suite SUITE_U.
+
+* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+   Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
+   Master Salt   = EDHOC-Exporter("OSCORE Master Salt", 8)
+~~~~~~~~~~~~~~~~~~~~~~~
    
 # IANA Considerations {#iana}
 
@@ -1101,54 +1150,6 @@ PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
 KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# EDHOC with CoAP and OSCORE
-
-## Transferring EDHOC in CoAP {#coap}
-
-EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
-
-By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
-
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap}}.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-Client    Server
-  |          |
-  +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_1
-  |          |
-  |<---------+ Header: 2.04 Changed
-  |   2.04   | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_2
-  |          |
-  +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_3
-  |          |
-  |<---------+ Header: 2.04 Changed
-  |   2.04   | 
-  |          |
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-coap title="Example of transferring EDHOC in CoAP"}
-{: artwork-align="center"}
-
-## Deriving an OSCORE context from EDHOC {#oscore}
-
-When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoaP client and server MUST be able to retrieve the OCORE protocol state using its choosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
-
-* The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
-
-* The AEAD Algorithm and the HMAC-based Key Derivation Function (HKDF) are the AEAD and HKDF algorithms in the cipher suite SUITE_U.
-
-* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-   Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
-   Master Salt   = EDHOC-Exporter("OSCORE Master Salt", 8)
-~~~~~~~~~~~~~~~~~~~~~~~
 
 # Message Sizes {#sizes}
 
