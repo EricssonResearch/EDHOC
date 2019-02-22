@@ -1316,7 +1316,7 @@ The previous estimates of typical message sizes are summarized in {{fig-summary}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
-                PSK       RPK       x5t     x5chain                  
+               PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
 message_1       44        39        39        39                     
 message_2       46       120       126       116 + Certificate chain 
