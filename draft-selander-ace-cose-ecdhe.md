@@ -845,7 +845,7 @@ Client    Server
 {: #fig-coap title="Example of transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-### Deriving an OSCORE context from EDHOC {#oscore}
+### Deriving an OSCORE Context from EDHOC {#oscore}
 
 When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoAP client and server MUST be able to retrieve the OCORE protocol state using its choosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
 
