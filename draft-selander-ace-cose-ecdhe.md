@@ -800,9 +800,9 @@ Party U                                                       Party V
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verifify the selected cipher suite SUITE is the s the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
-# EDHOC with CoAP and OSCORE
+# Transporting EDHOC and Deriving Keys
 
-## Transferring EDHOC in CoAP {#coap}
+## Transferring EDHOC over CoAP {#coap}
 
 EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
@@ -834,7 +834,7 @@ Client    Server
 {: #fig-coap title="Example of transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-## Deriving an OSCORE context from EDHOC {#oscore}
+### Deriving an OSCORE context from EDHOC {#oscore}
 
 When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-security}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoaP client and server MUST be able to retrieve the OCORE protocol state using its choosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
 
@@ -848,7 +848,18 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
    Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
    Master Salt   = EDHOC-Exporter("OSCORE Master Salt", 8)
 ~~~~~~~~~~~~~~~~~~~~~~~
-   
+
+## Transferring EDHOC over Other Protocols {#non-coap}
+
+## EDHOC PSK Chaining
+
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
+KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
+~~~~~~~~~~~~~~~~~~~~~~~
+
 # IANA Considerations {#iana}
 
 ## EDHOC Cipher Suites Registry
@@ -1140,15 +1151,6 @@ IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
 This appendix provides a wealth of test vectors to ease implementation and ensure interoperability.
 
 TODO: This section needs to be updated.
-
-# EDHOC PSK Chaining
-
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
-KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
-~~~~~~~~~~~~~~~~~~~~~~~
 
 
 # Message Sizes {#sizes}
