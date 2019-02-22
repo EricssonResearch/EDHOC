@@ -176,8 +176,7 @@ informative:
 
 --- abstract
 
-This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a very compact, and lightweight authenticated Diffie-Hellman key exchange with ephemeral keys. EDHOC provides mutual authentication, perfect forward secrecy, and identity protection. A main use case for EDHOC is to establish an OSCORE security context. EDHOC relies on
-CoAP, CBOR, and COSE, allowing reuse of existing libraries.
+This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a very compact, and lightweight authenticated Diffie-Hellman key exchange with ephemeral keys. EDHOC provides mutual authentication, perfect forward secrecy, and identity protection. A main use case for EDHOC is to establish an OSCORE security context. EDHOC can reuse existing  CBOR, COSE, and CoAP libraries, keeping the additional code footprint very low.
 
 --- middle
 
