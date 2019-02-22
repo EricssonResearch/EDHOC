@@ -190,7 +190,7 @@ EDHOC is designed to work in highly constrained scenarios making it especially s
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{I-D.ietf-cbor-7049bis}} and COSE {{RFC8152}} are used to implement these standards. The use of COSE allows code reuse and enables use of future COSE algorithms and headers designed for constrained IoT.
 
-This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{vectors}} provides a wealth of test vectors to ease implementation and ensure interoperability.
+This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{transfer}} provides a wealth of test vectors to ease implementation and ensure interoperability.
 
 ## Rationale for EDHOC
 
@@ -809,7 +809,7 @@ Party U                                                       Party V
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verifify the selected cipher suite SUITE is the s the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
-# Transferring EDHOC and Deriving Application Keys
+# Transferring EDHOC and Deriving Application Keys {#transfer}
 
 ## Transferring EDHOC in CoAP {#coap}
 
