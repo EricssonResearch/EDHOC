@@ -808,9 +808,9 @@ IANA has created a new registry titled "EDHOC Cipher Suites".
 
 TODO
 
-## EDHOC Message Type Registry
+## EDHOC Method Type Registry
 
-IANA has created a new registry titled "EDHOC Message Type".
+IANA has created a new registry titled "EDHOC Method Type".
 
 TODO
 
