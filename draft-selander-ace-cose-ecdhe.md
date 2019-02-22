@@ -259,7 +259,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
    
    * V verifies that the selected cipher suite is the first supported cipher suite
 
-* Message types and error handling.
+* Method types and error handling.
 
 * Transport of opaque application defined data.
 
