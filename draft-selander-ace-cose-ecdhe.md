@@ -211,7 +211,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-Readers are expected to be familiar with the terms and concepts described in CBOR {{RFC7049}}, COSE {{RFC8152}}, and CDDL {{I-D.ietf-cbor-cddl}}. This document uses the Concise Data Definition Language (CDDL) to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T. Examples of CBOR and CDDL are provided in {{CBOR}}.
+Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}}, COSE {{RFC8152}}, and CDDL {{I-D.ietf-cbor-cddl}}. This document uses the Concise Data Definition Language (CDDL) to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T. Examples of CBOR and CDDL are provided in {{CBOR}}.
 
 # Background {#background}
 
