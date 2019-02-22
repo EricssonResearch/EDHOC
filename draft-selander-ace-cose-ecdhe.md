@@ -818,6 +818,8 @@ EDHOC can be transferred as an exchange of CoAP {{RFC7252}} messages. By default
 
 By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
 
+To protect against denial-of-service attacks, the CoAP server respond to the first POST request with a 4.01 (Unauthorized) containing an Echo option {{I-D.ietf-core-echo-request-tag}}.
+
 An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
