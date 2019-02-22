@@ -365,6 +365,15 @@ Application keys and other application specific data can be derived using the ED
 
 The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
 
+### EDHOC PSK Chaining
+
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
+KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
+~~~~~~~~~~~~~~~~~~~~~~~
+
 # EDHOC Authenticated with Asymmetric Keys {#asym}
 
 ## Overview {#asym-overview}
@@ -852,14 +861,7 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 ## Transferring EDHOC over Other Protocols {#non-coap}
 
-## EDHOC PSK Chaining
-
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC sessions.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
-KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
-~~~~~~~~~~~~~~~~~~~~~~~
+TODO
 
 # IANA Considerations {#iana}
 
@@ -1143,8 +1145,6 @@ K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
 IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
                                 83f6f6f683f6f6f68318804042aaaa01 ) 
 ~~~~~~~~~~~~~~~~~~~~~~~
-
-
 
 
 # Test Vectors {#vectors}
