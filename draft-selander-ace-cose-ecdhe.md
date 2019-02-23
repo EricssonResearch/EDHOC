@@ -202,7 +202,7 @@ Power consumption for wireless devices is highly dependent on message transmissi
 
 EDHOC is adapted to primitives and protocols designed for the Internet of Things: EDHOC is built on CBOR and COSE which enables small message overhead and efficient parsing in constrained devices. EDHOC is not bound to a particular transport layer, but it is recommended is to transport the EDHOC message in CoAP payloads. By reusing already existing IoT primitives in the device (CBOR, CoAP and COSE encryption and signature formats) the additional code footprint can be kept very low.
 
-EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{I-D.ietf-core-object-security}} providing the necessary input parameters with required properties. Since EDHOC builds on the same IoT primitives and protocols as OSCORE (CBOR, COAP, COSE encryption and signature formats) the device footprint for EDHOC + OSCORE can be kept very low. The use of compact native encoding formats reduces the need for a general-purpose compression algorithm with associated footprint.
+EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{I-D.ietf-core-object-security}} providing the necessary input parameters with required properties. Since EDHOC builds on the same IoT primitives and protocols as OSCORE (CoAP, CBOR, COSE encryption and signature formats) the device footprint for EDHOC + OSCORE can be kept very low. The use of compact native encoding formats reduces the need for a general-purpose compression algorithm with associated footprint.
 
 
 ## Terminology and Requirements Language
