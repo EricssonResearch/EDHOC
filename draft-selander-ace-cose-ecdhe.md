@@ -300,7 +300,7 @@ EDHOC cipher suites consists of a set of COSE algorithms: an AEAD algorithm, an 
    1. AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, and ES256
 ~~~~~~~~~~~
 
-Two additional numbers are registered for application defined cipher suites.
+Two additional numbers are registered for application defined cipher suites. Application defined cipher suites MUST only use algorithms specified for COSE, are not interoperable with other deployments and can therefore only be used in local networks.
 
 ~~~~~~~~~~~
    -24. First application defined cipher suite.
