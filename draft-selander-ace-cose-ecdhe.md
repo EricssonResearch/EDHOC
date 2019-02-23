@@ -303,8 +303,8 @@ EDHOC cipher suites consists of a set of COSE algorithms: an AEAD algorithm, an 
 Two additional numbers are registered for application defined cipher suites.
 
 ~~~~~~~~~~~
-   -24. Application defined.
-   -23. Application defined.
+   -24. First application defined cipher suite.
+   -23. Second application defined cipher suite.
 ~~~~~~~~~~~
 
 ## Ephemeral Public Keys {#cose_key}
