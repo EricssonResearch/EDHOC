@@ -341,7 +341,7 @@ where exchange_hash, in non-CDDL notation, is:
    exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
-where aad_2 and aad_3 are hashes of previous messages and data, defined in Sections {#asym-msg2-form}{: format="counter"} and {#asym-msg3-form}{: format="counter"}. H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+and where aad_2 and aad_3 are hashes of previous messages and data, defined in Sections {#asym-msg2-form}{: format="counter"} and {#asym-msg3-form}{: format="counter"}. H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
@@ -807,7 +807,7 @@ Party U                                                       Party V
 {: #fig-error2 title="Example use of error message with SUITES_V."}
 {: artwork-align="center"}
 
-As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verifify the selected cipher suite SUITE is the s the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
+As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verifify the selected cipher suite SUITE is the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
 # Transferring EDHOC and Deriving Application Keys {#transfer}
 
