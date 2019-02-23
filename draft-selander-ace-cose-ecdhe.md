@@ -1328,7 +1328,7 @@ Total          101       244       256       236 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
-{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/ cipher suites, 4 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and SubjectPublicKeyInfo with point compression (even if that is not typically supported).
+{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 4 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and SubjectPublicKeyInfo with point compression (even if that is not typically supported).
 
 In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission and packet ordering. The overhead of fragmentation is linear to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear funtion of the flight sizes.
 
