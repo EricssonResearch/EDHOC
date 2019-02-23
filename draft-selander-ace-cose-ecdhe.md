@@ -1157,7 +1157,7 @@ TODO: This section needs to be updated.
 
 # Message Sizes {#sizes}
 
-This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length. All examples are given in CBOR diagnostic notation and hexadecimal.
+This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
 
 ## Message Sizes RPK
 
@@ -1330,7 +1330,7 @@ Total          101       244       256       236 + Certificate chains
 
 {{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 4 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
 
-In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission and packet ordering. The overhead of fragmentation is proportional to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear funtion of the flight sizes.
+In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission and packet ordering. The overhead of fragmentation is proportional to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear function of the flight sizes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
