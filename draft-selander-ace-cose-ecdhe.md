@@ -262,7 +262,9 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Transport of opaque application defined data.
 
-EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries. EDHOC does not put any requirement on the lower layers and can therefore also be used e.g. in environments without IP.
+EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries.
+
+EDHOC does not put any requirement on the lower layers and can therefore also be used e.g. in environments without IP.
 
 To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}}.
 
