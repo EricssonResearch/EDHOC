@@ -867,7 +867,7 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 ## Transferring EDHOC over Other Protocols {#non-coap}
 
-TODO
+EDHOC may be transported over a different transport that CoAP. In this case the lower layers need to handle message loss, reordering, fragmentation, and denial of service protection.
 
 # IANA Considerations {#iana}
 
