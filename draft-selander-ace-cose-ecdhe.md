@@ -268,7 +268,8 @@ EDHOC is designed to encrypt and integrity protect as much information as possib
 
 Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended is to transport the EDHOC message in CoAP payloads, see {{transfer}}.
 
-To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}}.
+To simplify for implementors, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}} and example messages in CBOR diagnostic notation is given in {{sizes}}.
+
 
 # EDHOC Overview {#overview}
 
@@ -1153,14 +1154,7 @@ IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
-# Test Vectors {#vectors}
-
-This appendix provides a wealth of test vectors to ease implementation and ensure interoperability.
-
-TODO: This section needs to be updated.
-
-
-# Message Sizes {#sizes}
+# Example Messages and Sizes {#sizes}
 
 This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
 
@@ -1370,6 +1364,12 @@ EDHOC PSK + ECDHE                  44         45        10         98
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare2 title="Comparison of message sizes in bytes without Connection ID" artwork-align="center"}
+
+# Test Vectors {#vectors}
+
+This appendix provides a wealth of test vectors to ease implementation and ensure interoperability.
+
+TODO: This section needs to be updated.
 
 # Acknowledgments
 {: numbered="no"}
