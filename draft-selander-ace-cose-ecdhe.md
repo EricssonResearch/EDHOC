@@ -265,7 +265,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR and COSE libraries.
 
-EDHOC does not put any requirement on the lower layers and can therefore also be used e.g. in environments without IP.
+Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended is to transport the EDHOC message in CoAP payloads, see {{transfer}}.
 
 To simplify implementation, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}}.
 
