@@ -294,7 +294,7 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected application data (PAD_3) may be used to transfer any application data in message_3.
 
-Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended is to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party.
+Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended is to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party V.
 
 ## Cipher Suites
 
@@ -988,7 +988,7 @@ Compared to {{SIGMA}}, EDHOC adds an explicit method type and expands the messag
 
 EDHOC also adds negotiation of connection identifiers and downgrade protected negotiation of cryptographic parameters, i.e. an attacker cannot affect the negotiated parameters. A single session of EDHOC does not include negotiation of cipher suites, but it enables Party V to verify that the selected cipher suite is the most preferred cipher suite by U which is supported by both U and V.
 
-As required by {{RFC7258}}, IETF protocols need to mitigate pervasive monitoring when possible. One way to mitigate pervasive monitoring is to use a key exchange that provides perfect forward secrecy. EDHOC therefore only supports modes with perfect forward secrecy. To limit the effect of breaches, it is important to limit the use of symmetrical group keys, EDHOC therefore strives to make the additional cost of using raw-public keys and self-signed certificates as small as possible. Raw-public keys and self-signed certificates are not a replacement for a public key infrastructre, but SHOULD be used instead of symmetrical group keys for bootstrapping.
+As required by {{RFC7258}}, IETF protocols need to mitigate pervasive monitoring when possible. One way to mitigate pervasive monitoring is to use a key exchange that provides perfect forward secrecy. EDHOC therefore only supports methods with perfect forward secrecy. To limit the effect of breaches, it is important to limit the use of symmetrical group keys, EDHOC therefore strives to make the additional cost of using raw-public keys and self-signed certificates as small as possible. Raw-public keys and self-signed certificates are not a replacement for a public key infrastructre, but SHOULD be used instead of symmetrical group keys for bootstrapping.
 
 ## Cryptographic Considerations
 The security of the SIGMA protocol requires the MAC to be bound to the identity of the signer. Hence the message authenticating functionality of the authenticated encryption in EDHOC is critical: authenticated encryption MUST NOT be replaced by plain encryption only, even if authentication is provided at another level or through a different mechanism. EDHOC implements SIGMA-I using the same Sign-then-MAC approach as TLS 1.3.
