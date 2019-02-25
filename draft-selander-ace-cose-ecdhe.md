@@ -599,7 +599,7 @@ message_3 = (
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
-  C_V : bstr,
+  C_V : bstr / nil,
 )
 ~~~~~~~~~~~
 
@@ -616,6 +616,8 @@ aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
 ### Party U Processing of Message 3 {#asym-msg3-proc}
 
 Party U SHALL compose message_3 as follows:
+
+* To reduce message overhead, party U can set the message field C_V in message_3 to null (still storing the actual value of C_V) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party V to correlate message_2 and message_3.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
