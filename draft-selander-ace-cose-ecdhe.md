@@ -1075,7 +1075,7 @@ bstr .cbor uint                 << 24 >>                  0x421818
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-A array, say of an uint and a byte string, may be converted into a byte string (bstr):
+An array, say of an uint and a byte string, may be converted into a byte string (bstr):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CDDL Type                       Diagnostic              Encoded
@@ -1144,7 +1144,7 @@ COSE constructs the input to the Signature Algorithm as follows:
    [ "Signature1", << { abc : ID_CRED_x } >>, aad_i, CRED_x ]
 ~~~~~~~~~~~
 
-* For instance if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance, if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), aad_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
 ### Key Derivation
