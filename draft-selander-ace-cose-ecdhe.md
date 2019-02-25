@@ -823,8 +823,6 @@ By default, the CoAP client is Party U and the CoAP server is Party V, but the r
 
 By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
 
-To protect against denial-of-service attacks, the CoAP server MAY respond to the first POST request with a 4.01 (Unauthorized) containing an Echo option {{I-D.ietf-core-echo-request-tag}}. This forces the initiator to demonstrate its reachability at its apparent network address. If message fragmentation is needed, the EDHOC messages may be fragmented using the CoAP Block-Wise Transfer mechanism {{RFC7959}}.
-
 An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -850,6 +848,8 @@ Client    Server
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-coap title="Example of transferring EDHOC in CoAP"}
 {: artwork-align="center"}
+
+To protect against denial-of-service attacks, the CoAP server MAY respond to the first POST request with a 4.01 (Unauthorized) containing an Echo option {{I-D.ietf-core-echo-request-tag}}. This forces the initiator to demonstrate its reachability at its apparent network address. If message fragmentation is needed, the EDHOC messages may be fragmented using the CoAP Block-Wise Transfer mechanism {{RFC7959}}.
 
 ### Deriving an OSCORE Context from EDHOC {#oscore}
 
