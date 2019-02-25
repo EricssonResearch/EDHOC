@@ -849,7 +849,7 @@ Client    Server
 {: #fig-coap1 title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap2}}.
+The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
