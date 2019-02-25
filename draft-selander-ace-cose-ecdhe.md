@@ -1372,7 +1372,7 @@ EDHOC PSK + ECDHE                  44         46        11        101
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare1 title="Comparison of message sizes in bytes with Connection ID" artwork-align="center"}
 
-In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission and packet ordering. The overhead of fragmentation is proportional to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear function of the flight sizes.
+In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission and packet ordering. The overhead of fragmentation is typically proportional to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear function of the flight sizes.
 
 Connection ID is not supported with TLS 1.3. {{fig-compare2}} compares of message sizes of EDHOC with the DTLS 1.3 {{I-D.ietf-tls-dtls13}} and TLS 1.3 {{RFC8446}} handshakes without connection ID.
 
