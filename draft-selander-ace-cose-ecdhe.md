@@ -346,7 +346,7 @@ where exchange_hash, in non-CDDL notation, is:
    exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
-and where aad_2 and aad_3 are hashes of previous messages and data, defined in Sections {#asym-msg2-form}{: format="counter"} and {#asym-msg3-form}{: format="counter"}. H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+and where aad_2 and aad_3 are hashes of previous messages and data, defined in Sections {{asym-msg2-form}}{: format="counter"} and {{asym-msg3-form}}{: format="counter"}. H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
