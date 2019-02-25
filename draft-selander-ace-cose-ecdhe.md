@@ -813,7 +813,7 @@ Party U                                                       Party V
 {: #fig-error2 title="Example use of error message with SUITES_V."}
 {: artwork-align="center"}
 
-As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verifify the selected cipher suite SUITE is the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
+As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite SUITE is the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
 # Transferring EDHOC and Deriving Application Keys {#transfer}
 
