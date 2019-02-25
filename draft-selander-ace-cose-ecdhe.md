@@ -266,8 +266,6 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR, COSE, and CoAP libraries.
 
-Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended is to transport the EDHOC message in CoAP payloads, see {{transfer}}.
-
 To simplify for implementors, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}} and example messages in CBOR diagnostic notation is given in {{sizes}}.
 
 
@@ -295,6 +293,8 @@ Party U                                                 Party V
 The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the difference being that information is only MACed, not signed.
 
 EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected application data (PAD_3) may be used to transfer any application data in message_3.
+
+Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended is to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party.
 
 ## Cipher Suites
 
