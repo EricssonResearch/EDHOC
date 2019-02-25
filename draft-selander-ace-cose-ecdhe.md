@@ -817,7 +817,7 @@ As Party U's list of supported cipher suites and order of preference is fixed, a
 
 ## Transferring EDHOC in CoAP {#coap}
 
-It is recommended is to transport EDHOC as an exchange of CoAP {{RFC7252}} messages. CoAP is a reliable transport that can preserve packet ordering. CoAP can also perform fragmentation and protect against denial of service attacks. It is recommended to send the EDHOC flights as Confirmable, especially if fragmentation is used.
+It is recommended is to transport EDHOC as an exchange of CoAP {{RFC7252}} messages. CoAP is a reliable transport that can preserve packet ordering. CoAP can also perform fragmentation and protect against denial of service attacks. It is recommended to carry the EDHOC flights in Confirmable messages, especially if fragmentation is used.
 
 By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
