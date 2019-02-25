@@ -1354,7 +1354,7 @@ Total          101       244       256       236 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
-In practice, most devices have few keys, so in deployments where assignment of key identifiers (KID, ID_CRED_V, ID_CRED_U) can be coordinated, the key identifiers can typically be much smaller (e.g. 1 byte).
+In practice, most devices only have a few keys, so in deployments where assignment of key identifiers (KID, ID_CRED_V, ID_CRED_U) can be coordinated, the key identifiers can typically be much smaller (e.g. 1 byte).
 
 {{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 4 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
 
