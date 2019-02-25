@@ -1403,7 +1403,7 @@ TODO: This section needs to be updated.
 # Acknowledgments
 {: numbered="no"}
 
-The authors want to thank Alessandro Bruni, Theis Grønbech Petersen, Dan Harkins, Klaus Hartke,  Alexandros Krontiris, Ilari Liusvaara, Karl Norrman, Salvador Pérez, Michael Richardson, Thorvald Sahl Jørgensen, Jim Schaad, Carsten Schürmann, and Ludwig Seitz for reviewing intermediate versions of the draft. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
+The authors want to thank Alessandro Bruni, Theis Grønbech Petersen, Dan Harkins, Klaus Hartke,  Alexandros Krontiris, Ilari Liusvaara, Karl Norrman, Salvador Pérez, Michael Richardson, Thorvald Sahl Jørgensen, Jim Schaad, Carsten Schürmann, Ludwig Seitz, Valery Smyslov, and Rene Struik for reviewing intermediate versions of the draft. We are especially indebted to Jim Schaad for his continuous reviewing and implementation of different versions of the draft.
 
 
 --- fluff
