@@ -250,8 +250,6 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Explicit connection identifiers C_U, C_V chosen by U and V, respectively, enabling the recipient to find the protocol state.
 
-* An Authenticated Encryption with Additional Data (AEAD) algorithm is used.
-
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
 * Verification of a common preferred cipher suite (AEAD algorithm, ECDH algorithm, ECDH curve, signature algorithm):
