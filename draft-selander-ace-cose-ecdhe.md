@@ -1007,7 +1007,7 @@ The data rates in many IoT deployments are very limited. Given that the applicat
 
 ## Mandatory to Implement Cipher Suite
 
-Cipher suite number 1 (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, Ed25519) is mandatory to implement. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments. 
+Cipher suite number 0 (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, Ed25519) is mandatory to implement. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments. 
 
 ## Unprotected Data
 
