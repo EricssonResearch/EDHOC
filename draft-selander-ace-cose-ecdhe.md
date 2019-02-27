@@ -384,9 +384,9 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 *	Only Party V has access to the private authentication key of Party V,
 
-* Party U SHALL be able to retrieve Party V's public authentication key using ID_CRED_V,
-
 *	Only Party U has access to the private authentication key of Party U,
+
+* Party U SHALL be able to retrieve Party V's public authentication key using ID_CRED_V,
 
 * Party V SHALL be able to retrieve Party U's public authentication key using ID_CRED_U,
 
