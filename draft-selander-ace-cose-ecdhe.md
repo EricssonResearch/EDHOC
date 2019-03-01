@@ -271,7 +271,7 @@ To simplify for implementors, the use of CBOR and COSE in EDHOC is summarized in
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consists of a sequence of CBOR encoded data items, where the first data item of message_1 is an int specifying the method type (asymmetric, symmetric, error). The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consist of a sequence of CBOR encoded data items, where the first data item of message_1 is an int specifying the method type (asymmetric, symmetric, error). The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HKDF, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -298,7 +298,7 @@ Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is 
 
 ## Cipher Suites
 
-EDHOC cipher suites consists of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, and a signature algorithm. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer value. Currently two cipher suites are defined.
+EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, and a signature algorithm. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer value. Currently two cipher suites are defined.
 
 ~~~~~~~~~~~
    0. AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, and Ed25519
@@ -320,7 +320,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152}} with the following input:
 
-* The KDF SHALL be the HKDF {{RFC5869}} in the in the selected cipher suite (SUITE).
+* The KDF SHALL be the HKDF {{RFC5869}} in the selected cipher suite (SUITE).
 
 * The secret (Section 11.1 of {{RFC8152}}) SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
 
