@@ -1159,7 +1159,7 @@ Assuming use of the mandatory-to-implement algorithms HKDF SHA-256 and AES-CCM-1
 PRK = HMAC-SHA-256( salt, ECDH shared secret )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where salt = 0x in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
+where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 output parameter = HMAC-SHA-256( PRK, info || 0x01 )
