@@ -418,6 +418,8 @@ In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credenti
 
 The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificate.
 
+The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC beyond enabling retrieval of the protocol state and may be very short.
+
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
