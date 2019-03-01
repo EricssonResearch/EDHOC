@@ -334,14 +334,14 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
   
   + protected SHALL be a zero length bstr
 
-  + other is a bstr and SHALL be aad_2, aad_3, or exchange_hash, i.e. hashes of previous messages and data as defined below and in Sections {{asym-msg2-form}}{: format="counter"} and {{asym-msg3-form}}{: format="counter"}. 
+  + other is a bstr and SHALL be exchange_hash_2, exchange_hash_4, or exchange_hash_4, i.e. hashes of previous messages and data as defined below and in Sections {{asym-msg2-form}}{: format="counter"} and {{asym-msg3-form}}{: format="counter"}. 
  
   + SuppPrivInfo is omitted
 
 where exchange_hash, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-   exchange_hash = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
+   exchange_hash_4 = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
 where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
@@ -352,9 +352,9 @@ We define EDHOC-Key-Derivation to be the function which produces the output as d
    output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
 ~~~~~~~~~~~
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to aad_2 and aad_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to exchange_hash_2 and exchange_hash_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to aad_2 and aad_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
+If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to exchange_hash_2 and exchange_hash_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
 ### EDHOC-Exporter Interface {#exporter}
 
@@ -517,13 +517,13 @@ data_2 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-aad_2 : bstr
+exchange_hash_2 : bstr
 ~~~~~~~~~~~
 
-where aad_2, in non-CDDL notation, is:
+where exchange_hash_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_2 = H( bstr .cborseq [ message_1, data_2 ] )
+exchange_hash_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -546,7 +546,7 @@ Party V SHALL compose message_2 as follows:
    
    * payload = CRED_V
 
-   * external_aad = aad_2
+   * external_aad = exchange_hash_2
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -560,7 +560,7 @@ Party V SHALL compose message_2 as follows:
  
    * plaintext = bstr .cborseq \[ ~protected, signature, ? UAD_2 \]
 
-   * external_aad = aad_2
+   * external_aad = exchange_hash_2
 
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -606,13 +606,13 @@ data_3 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-aad_3 : bstr
+exchange_hash_3 : bstr
 ~~~~~~~~~~~
 
-where aad_3, in non-CDDL notation, is:
+where exchange_hash_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-aad_3 = H( bstr .cborseq [ aad_2, CIPHERTEXT_2, data_3 ] )
+exchange_hash_3 = H( bstr .cborseq [ exchange_hash_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 ### Party U Processing of Message 3 {#asym-msg3-proc}
@@ -627,7 +627,7 @@ Party U SHALL compose message_3 as follows:
    
    * payload = CRED_U
 
-   * external_aad = aad_3
+   * external_aad = exchange_hash_3
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -641,7 +641,7 @@ Party U SHALL compose message_3 as follows:
 
    * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
          
-   * external_aad = aad_3
+   * external_aad = exchange_hash_3
 
    * PAD_3 = bstr containing opaque protected application data
 
@@ -731,7 +731,7 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * external_aad = aad_2
+   * external_aad = exchange_hash_2
 
    * plaintext = h'' / UAD_2
    
@@ -745,7 +745,7 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * external_aad = aad_3
+   * external_aad = exchange_hash_3
 
    * plaintext = h'' / PAD_3
  
