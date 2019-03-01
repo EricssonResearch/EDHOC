@@ -420,10 +420,6 @@ The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 cert
 
 The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC beyond enabling retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol.
 
-Party U MUST be able to retrieve the protocol state using the connection identifier C_U and optionally other information such as the 5-tuple.
-
-
-
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
