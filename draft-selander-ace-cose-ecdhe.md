@@ -359,16 +359,13 @@ Application keys and other application specific data can be derived using the ED
       EDHOC-Key-Derivation(label, 8 * length, TH_4)
 ~~~~~~~~~~~
 
-where the transcript hash TR_4, in non-CDDL notation, is:
+The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TR_4, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
    TH_4 = H( bstr .cborseq [ TH_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
-and where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
-
-The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
-
+where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}. An example use of the EDHOC-Exporter is given in {{oscore}}).
 
 ### EDHOC PSK Chaining
 
@@ -547,9 +544,9 @@ Party V SHALL compose message_2 as follows:
    
    * protected = bstr .cbor { abc : ID_CRED_V }
 
-   * external_aad = TH_2
-
    * payload = CRED_V
+
+   * external_aad = TH_2
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -628,9 +625,9 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor { abc : ID_CRED_U }
 
-   * external_aad = TH_3
-
    * payload = CRED_U
+
+   * external_aad = TH_3
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
