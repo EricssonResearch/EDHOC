@@ -334,14 +334,14 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
   
   + protected SHALL be a zero length bstr
 
-  + other is a bstr and SHALL be exchange_hash_2, exchange_hash_4, or exchange_hash_4, i.e. hashes of previous messages and data as defined below and in Sections {{asym-msg2-form}}{: format="counter"} and {{asym-msg3-form}}{: format="counter"}. 
+  + other is a bstr and SHALL be transcript_hash_2, transcript_hash_3, or transcript_hash_4, i.e. hashes of previous messages and data as defined below and in Sections {{asym-msg2-form}}{: format="counter"} and {{asym-msg3-form}}{: format="counter"}. 
  
   + SuppPrivInfo is omitted
 
 where exchange_hash, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-   exchange_hash_4 = H( bstr .cborseq [ exchange_hash_3 , CIPHERTEXT_3 ] )
+   transcript_hash_4 = H( bstr .cborseq [ transcript_hash_3 , CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
 where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
@@ -352,9 +352,9 @@ We define EDHOC-Key-Derivation to be the function which produces the output as d
    output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
 ~~~~~~~~~~~
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to exchange_hash_2 and exchange_hash_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to transcript_hash_2 and transcript_hash_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to exchange_hash_2 and exchange_hash_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
+If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to transcript_hash_2 and transcript_hash_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
 ### EDHOC-Exporter Interface {#exporter}
 
@@ -362,7 +362,7 @@ Application keys and other application specific data can be derived using the ED
 
 ~~~~~~~~~~~
    EDHOC-Exporter(label, length) =
-      EDHOC-Key-Derivation(label, 8 * length, exchange_hash_4)
+      EDHOC-Key-Derivation(label, 8 * length, transcript_hash_4)
 ~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
@@ -382,9 +382,9 @@ KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 
 EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
-*	Only Party V has access to the private authentication key of Party V,
+*	Only Party V SHALL have access to the private authentication key of Party V,
 
-*	Only Party U has access to the private authentication key of Party U,
+*	Only Party U SHALL have access to the private authentication key of Party U,
 
 * Party U is able to retrieve Party V's public authentication key using ID_CRED_V,
 
@@ -673,7 +673,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
-*	Only Party U and Party V have access to the PSK,
+*	Only Party U and Party V SHALL have access to the PSK,
 
 * Party V is able to retrieve the PSK using KID.
 
