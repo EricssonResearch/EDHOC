@@ -338,7 +338,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
  
   + SuppPrivInfo is omitted
 
-where exchange_hash, in non-CDDL notation, is:
+where transcript_hash_4, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
    transcript_hash_4 = H( bstr .cborseq [ transcript_hash_3 , CIPHERTEXT_3 ] )
@@ -365,7 +365,7 @@ Application keys and other application specific data can be derived using the ED
       EDHOC-Key-Derivation(label, 8 * length, transcript_hash_4)
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
+The output of the EDHOC-Exporter function SHALL be derived using other = transcript_hash_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
 
 ### EDHOC PSK Chaining
 
@@ -517,13 +517,13 @@ data_2 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-exchange_hash_2 : bstr
+transcript_hash_2 : bstr
 ~~~~~~~~~~~
 
-where exchange_hash_2, in non-CDDL notation, is:
+where transcript_hash_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-exchange_hash_2 = H( bstr .cborseq [ message_1, data_2 ] )
+transcript_hash_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -546,7 +546,7 @@ Party V SHALL compose message_2 as follows:
    
    * payload = CRED_V
 
-   * external_aad = exchange_hash_2
+   * external_aad = transcript_hash_2
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -560,7 +560,7 @@ Party V SHALL compose message_2 as follows:
  
    * plaintext = bstr .cborseq \[ ~protected, signature, ? UAD_2 \]
 
-   * external_aad = exchange_hash_2
+   * external_aad = transcript_hash_2
 
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -606,13 +606,13 @@ data_3 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-exchange_hash_3 : bstr
+transcript_hash_3 : bstr
 ~~~~~~~~~~~
 
-where exchange_hash_3, in non-CDDL notation, is:
+where transcript_hash_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-exchange_hash_3 = H( bstr .cborseq [ exchange_hash_2, CIPHERTEXT_2, data_3 ] )
+transcript_hash_3 = H( bstr .cborseq [ transcript_hash_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 ### Party U Processing of Message 3 {#asym-msg3-proc}
@@ -627,7 +627,7 @@ Party U SHALL compose message_3 as follows:
    
    * payload = CRED_U
 
-   * external_aad = exchange_hash_3
+   * external_aad = transcript_hash_3
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -641,7 +641,7 @@ Party U SHALL compose message_3 as follows:
 
    * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
          
-   * external_aad = exchange_hash_3
+   * external_aad = transcript_hash_3
 
    * PAD_3 = bstr containing opaque protected application data
 
@@ -731,7 +731,7 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * external_aad = exchange_hash_2
+   * external_aad = transcript_hash_2
 
    * plaintext = h'' / UAD_2
    
@@ -745,7 +745,7 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * external_aad = exchange_hash_3
+   * external_aad = transcript_hash_3
 
    * plaintext = h'' / PAD_3
  
