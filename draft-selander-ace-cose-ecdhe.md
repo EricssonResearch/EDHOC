@@ -416,9 +416,9 @@ Public key certificates can be identified in different ways, for example (see {{
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not have any cryptographic purpose beyond enabling retrieval of the public authentication key and when they do not contain the actual credential, they may be very short. They do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public authentication keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
-The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificate.
+The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificate.
 
-The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC beyond enabling retrieval of the protocol state and may be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol.
+The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC beyond enabling retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
