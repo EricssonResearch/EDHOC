@@ -677,7 +677,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V is able to retrieve the PSK using KID.
 
-KID may optionally contain information about how to retrieve the PSK. KID does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs. KID may be very short.
+KID may optionally contain information about how to retrieve the PSK. KID does not have any cryptographic purpose beyond enabling retrieval of the PSK and may be very short. It does not need to uniquely identify the PSK, but doing so is recommended as the recipient may otherwise have to try several PSKs.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
