@@ -566,7 +566,7 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that protected and signature in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
 
 *  Format message_2 as the sequence of CBOR data items specified in {{asym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -647,7 +647,7 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-   Note that protected and signature in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.  
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.  
 
 *  Format message_3 as the sequence of CBOR data items specified in {{asym-msg3-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
