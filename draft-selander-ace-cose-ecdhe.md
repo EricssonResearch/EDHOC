@@ -250,7 +250,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Explicit connection identifiers C_U, C_V chosen by U and V, respectively, enabling the recipient to find the protocol state.
 
-* Transcript hashes TR_2, TR_3, TR_4 used for key derivation and as additional authenticated data.
+* Transcript hashes TH_2, TH_3, TH_4 used for key derivation and as additional authenticated data.
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
@@ -336,17 +336,9 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
   
   + protected SHALL be a zero length bstr
 
-  + other is a bstr and SHALL be transcript_hash_2, transcript_hash_3, or transcript_hash_4, i.e. hashes of previous messages and data as defined below and in Sections {{asym-msg2-form}}{: format="counter"} and {{asym-msg3-form}}{: format="counter"}. 
+  + other is a bstr and SHALL be one of the transcript hashes TH_2, TH_3 or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
  
   + SuppPrivInfo is omitted
-
-where transcript_hash_4, in non-CDDL notation, is:
-
-~~~~~~~~~~~
-   transcript_hash_4 = H( bstr .cborseq [ transcript_hash_3 , CIPHERTEXT_3 ] )
-~~~~~~~~~~~
-
-where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
 
@@ -354,20 +346,28 @@ We define EDHOC-Key-Derivation to be the function which produces the output as d
    output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
 ~~~~~~~~~~~
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to transcript_hash_2 and transcript_hash_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to transcript_hash_2 and transcript_hash_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
+If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
 ### EDHOC-Exporter Interface {#exporter}
 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) =
-      EDHOC-Key-Derivation(label, 8 * length, transcript_hash_4)
+   EDHOC-Exporter(label, length) = EDHOC-Key-Derivation(label, 8 * length, TH_4)
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = transcript_hash_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
+where the transcript hash TR_4, in non-CDDL notation, is:
+
+~~~~~~~~~~~
+   TH_4 = H( bstr .cborseq [ TH_3 , CIPHERTEXT_3 ] )
+~~~~~~~~~~~
+
+and where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
+
+The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
+
 
 ### EDHOC PSK Chaining
 
@@ -428,11 +428,11 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-| C_U, C_V, X_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, aad_2), UAD_2) |
+|  C_U, C_V, X_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), UAD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|      C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, aad_3), PAD_3)      |
+|       C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, TH_3), PAD_3)      |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -519,13 +519,13 @@ data_2 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-transcript_hash_2 : bstr
+TH_2 : bstr
 ~~~~~~~~~~~
 
-where transcript_hash_2, in non-CDDL notation, is:
+where the transcript hash TH_2, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-transcript_hash_2 = H( bstr .cborseq [ message_1, data_2 ] )
+TH_2 = H( bstr .cborseq [ message_1, data_2 ] )
 ~~~~~~~~~~~
 
 where:
@@ -546,7 +546,7 @@ Party V SHALL compose message_2 as follows:
    
    * protected = bstr .cbor { abc : ID_CRED_V }
 
-   * external_aad = transcript_hash_2
+   * external_aad = TH_2
 
    * payload = CRED_V
 
@@ -562,7 +562,7 @@ Party V SHALL compose message_2 as follows:
  
    * plaintext = bstr .cborseq \[ ~protected, signature, ? UAD_2 \]
 
-   * external_aad = transcript_hash_2
+   * external_aad = TH_2
 
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -608,13 +608,13 @@ data_3 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-transcript_hash_3 : bstr
+TH_3 : bstr
 ~~~~~~~~~~~
 
-where transcript_hash_3, in non-CDDL notation, is:
+where transcript hash TH_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-transcript_hash_3 = H( bstr .cborseq [ transcript_hash_2, CIPHERTEXT_2, data_3 ] )
+TH_3 = H( bstr .cborseq [ TH_2, CIPHERTEXT_2, data_3 ] )
 ~~~~~~~~~~~
 
 ### Party U Processing of Message 3 {#asym-msg3-proc}
@@ -627,7 +627,7 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor { abc : ID_CRED_U }
 
-   * external_aad = transcript_hash_3
+   * external_aad = TH_3
 
    * payload = CRED_U
 
@@ -643,7 +643,7 @@ Party U SHALL compose message_3 as follows:
 
    * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
          
-   * external_aad = transcript_hash_3
+   * external_aad = TH_3
 
    * PAD_3 = bstr containing opaque protected application data
 
@@ -689,11 +689,11 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|         C_U, C_V, X_V, AEAD(K_2; transcript_hash_2, UAD_2)        |
+|               C_U, C_V, X_V, AEAD(K_2; TH_2, UAD_2)               |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|              C_V, AEAD(K_3; transcript_hash_3, PAD_3)             |
+|                    C_V, AEAD(K_3; TH_3, PAD_3)                    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -733,7 +733,7 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * external_aad = transcript_hash_2
+   * external_aad = TH_2
 
    * plaintext = h'' / UAD_2
    
@@ -747,7 +747,7 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * external_aad = transcript_hash_3
+   * external_aad = TH_3
 
    * plaintext = h'' / PAD_3
  
