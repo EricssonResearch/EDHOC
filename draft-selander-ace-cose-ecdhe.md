@@ -392,7 +392,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where ID_CRED_U and ID_CRED_V are encoded in a COSE maps, see {{COSE}}. In the following we give some examples of possible COSE map labels.
+where ID_CRED_U and ID_CRED_V are encoded in COSE maps, see {{COSE}}. In the following we give some examples of possible COSE map labels.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
