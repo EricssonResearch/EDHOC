@@ -611,7 +611,7 @@ data_3 = (
 TH_3 : bstr
 ~~~~~~~~~~~
 
-where transcript hash TH_3, in non-CDDL notation, is:
+where the transcript hash TH_3, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
 TH_3 = H( bstr .cborseq [ TH_2, CIPHERTEXT_2, data_3 ] )
