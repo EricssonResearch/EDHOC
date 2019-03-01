@@ -355,7 +355,8 @@ If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = EDHOC-Key-Derivation(label, 8 * length, TH_4)
+   EDHOC-Exporter(label, length) = 
+      EDHOC-Key-Derivation(label, 8 * length, TH_4)
 ~~~~~~~~~~~
 
 where the transcript hash TR_4, in non-CDDL notation, is:
