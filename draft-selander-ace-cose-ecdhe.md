@@ -543,10 +543,10 @@ Party V SHALL compose message_2 as follows:
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor { abc : ID_CRED_V }
-   
-   * payload = CRED_V
 
    * external_aad = transcript_hash_2
+
+   * payload = CRED_V
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
@@ -624,10 +624,10 @@ Party U SHALL compose message_3 as follows:
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor { abc : ID_CRED_U }
-   
-   * payload = CRED_U
 
    * external_aad = transcript_hash_3
+
+   * payload = CRED_U
 
    * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
 
