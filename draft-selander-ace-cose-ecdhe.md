@@ -414,7 +414,7 @@ Public key certificates can be identified in different ways, for example (see {{
 
    * x5bag : ID_CRED_x, for x = U or V.
 
-In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not have any cryptographic purpose beyond enabling retrieval of the public authentication key and when they do not contain the actual credential, they may be very short. They do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+In the latter two examples, ID_CRED_U and ID_CRED_V contains the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not have any cryptographic purpose beyond enabling retrieval of the public authentication key and when they do not contain the actual credential, they may be very short. They do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public authentication keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
 The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}.  Party U and Party V MAY use different type of credentials, e.g. one uses RPK and the other uses certificate.
 
