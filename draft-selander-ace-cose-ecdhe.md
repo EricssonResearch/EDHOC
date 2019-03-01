@@ -767,10 +767,6 @@ error = (
 )
 ~~~~~~~~~~~
 
-~~~~~~~~~~~ CDDL
-suites : int / [ 2* int ]
-~~~~~~~~~~~
-
 where:
 
 * TYPE = 0
