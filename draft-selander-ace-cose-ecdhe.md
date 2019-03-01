@@ -1098,7 +1098,7 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 ### Encryption and Decryption {#COSE-enc-explained}
 
-The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "K_i", "IV_i" and "transcript_hash_i" is a variable with value i = 2 or 3, depending on whether the calculation is made over message_2 or message_3.
+The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "K_i", "IV_i" and "TH_i" is a variable with value i = 2 or 3, depending on whether the calculation is made over message_2 or message_3.
 
 * The secret key K_i is a CBOR bstr, generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
@@ -1107,7 +1107,7 @@ The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are c
 * The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and
 plaintext = &lt;&lt; ~protected, signature &gt;&gt; in the asymmetric case. For instance, if protected = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
  
-* The external_aad is a CBOR bstr. It is always set to transcript_hash_i.
+* The external_aad is a CBOR bstr. It is always set to the transcript hash TH_i.
 
 COSE constructs the input to the AEAD {{RFC5116}} as follows:
 
@@ -1120,15 +1120,15 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
 * The associated data A is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Encrypt0", h'', transcript_hash_i ]
+   [ "Encrypt0", h'', TH_i ]
 ~~~~~~~~~~~
 
-* This equals the concatenation of 0x8368456e63727970743040 and the CBOR encoding of transcript_hash_i. For instance if transcript_hash_2 = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
+* This equals the concatenation of 0x8368456e63727970743040 and the CBOR encoding of TH_i. For instance if TH_2 = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
 {: style="empty"}
 
 ### Signing and Verification {#COSE-sig-explained}
 
-The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "transcript_hash_i" is a variable with values i = 2 or 3, depending on whether the calculation is made over message_2 or message_3. Note also that "x" in "ID_CRED_x" and "CRED_x" is a variable with values x = U or V, depending on whether it is the credential of U or of V that is used in the relevant protocol message.
+The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "TH_i" is a variable with values i = 2 or 3, depending on whether the calculation is made over message_2 or message_3. Note also that "x" in "ID_CRED_x" and "CRED_x" is a variable with values x = U or V, depending on whether it is the credential of U or of V that is used in the relevant protocol message.
 
 * The key is the private authentication key of U or V. This may be stored as a COSE_KEY object or as a certificate.
 
@@ -1136,7 +1136,7 @@ The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are cons
    
 * The payload is a bstr containing the CBOR encoding of a COSE_KEY or a single certificate.
 
-* external_aad = transcript_hash_i.
+* external_aad = TH_i.
 
 COSE constructs the input to the Signature Algorithm as follows:
 
@@ -1145,10 +1145,10 @@ COSE constructs the input to the Signature Algorithm as follows:
 * The message to be signed M is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << { abc : ID_CRED_x } >>, transcript_hash_i, CRED_x ]
+   [ "Signature1", << { abc : ID_CRED_x } >>, TH_i, CRED_x ]
 ~~~~~~~~~~~
 
-* For instance, if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), transcript_hash_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance, if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
 ### Key Derivation
@@ -1172,11 +1172,11 @@ COSE_KDF_Context = [
   AlgorithmID,
   [ null, null, null ],
   [ null, null, null ],
-  [ keyDataLength, h'', transcript_hash_i ]
+  [ keyDataLength, h'',TH_i ]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-If AES-CCM-16-64-128 then AlgorithmID = 10 and keyDataLength = 128 for K_i, and AlgorithmID = "IV-GENERATION" (CBOR encoding 0x6d49562d47454e45524154494f4e) and keyDataLength = 104 for IV_i. Hence, if transcript_hash_2 = h'aaaa' then
+If AES-CCM-16-64-128 then AlgorithmID = 10 and keyDataLength = 128 for K_i, and AlgorithmID = "IV-GENERATION" (CBOR encoding 0x6d49562d47454e45524154494f4e) and keyDataLength = 104 for IV_i. Hence, if TH_2 = h'aaaa' then
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
