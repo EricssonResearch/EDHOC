@@ -336,7 +336,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
   
   + protected SHALL be a zero length bstr
 
-  + other is a bstr and SHALL be one of the transcript hashes TH_2, TH_3 or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
+  + other is a bstr and SHALL be one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
  
   + SuppPrivInfo is omitted
 
@@ -361,7 +361,7 @@ Application keys and other application specific data can be derived using the ED
 where the transcript hash TR_4, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-   TH_4 = H( bstr .cborseq [ TH_3 , CIPHERTEXT_3 ] )
+   TH_4 = H( bstr .cborseq [ TH_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
 and where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
@@ -1172,7 +1172,7 @@ COSE_KDF_Context = [
   AlgorithmID,
   [ null, null, null ],
   [ null, null, null ],
-  [ keyDataLength, h'',TH_i ]
+  [ keyDataLength, h'', TH_i ]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
