@@ -341,7 +341,7 @@ Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152
 where exchange_hash, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
-   exchange_hash_4 = H( bstr .cborseq [ aad_3, CIPHERTEXT_3 ] )
+   exchange_hash_4 = H( bstr .cborseq [ exchange_hash_3 , CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
 where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
@@ -362,10 +362,10 @@ Application keys and other application specific data can be derived using the ED
 
 ~~~~~~~~~~~
    EDHOC-Exporter(label, length) =
-      EDHOC-Key-Derivation(label, 8 * length, exchange_hash)
+      EDHOC-Key-Derivation(label, 8 * length, exchange_hash_4)
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
+The output of the EDHOC-Exporter function SHALL be derived using other = exchange_hash_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. An example use of the EDHOC-Exporter is given in {{oscore}}).
 
 ### EDHOC PSK Chaining
 
