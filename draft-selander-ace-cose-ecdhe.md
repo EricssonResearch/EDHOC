@@ -544,7 +544,7 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. 
+* Choose a connection identifier C_V and store it for the length of the protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
@@ -582,7 +582,7 @@ Party U SHALL process message_2 as follows:
 
 * Decode message_2 (see {{CBOR}}).
 
-* Retrieve the protocol state using the connection identifier C_U, the CoAP Tokan, and/or other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_U and/or other information such as the CoAP Token and the 5-tuple.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
@@ -663,7 +663,7 @@ Party V SHALL process message_3 as follows:
 
 * Decode message_3 (see {{CBOR}}).
 
-* Retrieve the protocol state using the connection identifier C_V, the CoAP Tokan, and/or other information such as the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_V and/or other information such as the CoAP Token and the 5-tuple.
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3.
 
