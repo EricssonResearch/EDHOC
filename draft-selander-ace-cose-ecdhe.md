@@ -414,7 +414,7 @@ Public key certificates can be identified in different ways, for example (see {{
 
    * x5bag : ID_CRED_x, for x = U or V.
 
-In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. ID_CRED_U and ID_CRED_V do not have any cryptographic purpose beyond enabling retrieval of the public authentication key and when they do not contain the actual credential, they may be very short. They do not need to uniquely identify the public authentication key, but doing so is recommended as the recipient may otherwise have to try several public authentication keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they identify a single public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
 The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate.
 
@@ -679,7 +679,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V is able to retrieve the PSK using KID.
 
-KID may optionally contain information to facilitate retrieval of the PSK and may be short. It is RECOMMENDED that the KID identify a single PSK as the recipient may otherwise have to try several PSKs.
+The purpose of KID is to facilitate retrieval of the PSK and it may be vert short. It is RECOMMENDED that the KID identify a single PSK as the recipient may otherwise have to try several keys.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
