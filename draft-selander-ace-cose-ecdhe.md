@@ -211,7 +211,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}}, COSE {{RFC8152}}, and CDDL {{I-D.ietf-cbor-cddl}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T. Examples of CBOR and CDDL are provided in {{CBOR}}.
+Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}}, COSE {{RFC8152}}, and CDDL {{I-D.ietf-cbor-cddl}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. Examples of CBOR and CDDL are provided in {{CBOR}}.
 
 # Background {#background}
 
@@ -1066,7 +1066,7 @@ h'12cd'             0x4212cd             byte string
 
 All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array \[_ message_i \] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
 
-The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
+The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
 A type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
 
@@ -1075,7 +1075,6 @@ CDDL Type                       Diagnostic                Encoded
 ------------------------------------------------------------------
 uint                            24                        0x1818
 bstr .cbor uint                 << 24 >>                  0x421818
-~ bstr .cbor uint               24                        0x1818
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
@@ -1106,7 +1105,7 @@ The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are c
 * The initialization vector IV_i is a CBOR bstr, also generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
 * The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and
-plaintext = &lt;&lt; ~protected, signature &gt;&gt; in the asymmetric case. For instance, if protected = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
+plaintext = &lt;&lt; ID_CRED_x, signature &gt;&gt; in the asymmetric case. For instance, if ID_CRED_x = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to the transcript hash TH_i.
 
