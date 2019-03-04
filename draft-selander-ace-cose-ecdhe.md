@@ -464,7 +464,6 @@ message_1 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-suite = int / [ 5*5 int / tstr ]
 suites = suite / [ 2* suite ]
 ~~~~~~~~~~~
 
