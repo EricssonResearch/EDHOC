@@ -388,29 +388,29 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where ID_CRED_U and ID_CRED_V are encoded in COSE maps, see {{COSE}}. In the following we give some examples of possible COSE map labels.
+where ID_CRED_U and ID_CRED_V are COSE header maps (header_map), see {{COSE}}. In the following we give some examples of possible COSE header parameters.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
 
-* kid : ID_CRED_x, for x = U or V.
+* ID_CRED_x = { "kid" : bstr }, for x = U or V.
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
 * by a hash value;
 
-   * x5t : ID_CRED_x, for x = U or V,
+   * ID_CRED_x = { "x5t" : COSE_CertHash }, for x = U or V,
 
 * by a URL;
 
-   * x5u : ID_CRED_x, for x = U or V,
+   * ID_CRED_x = { "x5u" : uri }, for x = U or V,
 
 * by a certificate chain;
 
-   * x5chain : ID_CRED_x, for x = U or V,
+   * ID_CRED_x = { "x5chain" : COSE_X509 }, for x = U or V,
 
 * or by a bag of certificates.
 
-   * x5bag : ID_CRED_x, for x = U or V.
+   * ID_CRED_x = { "x5bag" : COSE_X509 }, for x = U or V.
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
@@ -542,7 +542,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
    
-   * protected = bstr .cbor { abc : ID_CRED_V }
+   * protected = bstr .cbor ID_CRED_V
 
    * payload = CRED_V
 
@@ -558,7 +558,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
  
-   * plaintext = bstr .cborseq \[ ~protected, signature, ? UAD_2 \]
+   * plaintext = bstr .cborseq \[ ID_CRED_V, signature, ? UAD_2 \]
 
    * external_aad = TH_2
 
@@ -623,7 +623,7 @@ Party U SHALL compose message_3 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * protected = bstr .cbor { abc : ID_CRED_U }
+   * protected = bstr .cbor ID_CRED_U
 
    * payload = CRED_U
 
@@ -639,7 +639,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
-   * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
+   * plaintext =  bstr .cborseq \[ ID_CRED_U, signature, ? PAD_3 \]
          
    * external_aad = TH_3
 
@@ -683,7 +683,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            TYPE, C_U, SUITES_U, SUITE, X_U, KID, UAD_1            |
+|           TYPE, C_U, SUITES_U, SUITE, X_U, ID_PSK, UAD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -713,7 +713,7 @@ message_1 = (
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
-  KID : bstr,
+  ID_PSK : bstr / header_map,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -721,7 +721,7 @@ message_1 = (
 where:
 
 * TYPE = 2
-* KID - bstr enabling the retrieval of the pre-shared key
+* ID_PSK - bstr enabling the retrieval of the pre-shared key
 
 ## EDHOC Message 2
 
