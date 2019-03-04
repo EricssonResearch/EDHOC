@@ -1350,10 +1350,10 @@ The previous estimates of typical message sizes are summarized in {{fig-summary}
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
 message_1       44        39        39        39                     
-message_2       46       120       126       116 + Certificate chain 
-message_3       11        85        91        81 + Certificate chain 
+message_2       46       118       126       116 + Certificate chain 
+message_3       11        83        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total          101       244       256       236 + Certificate chains
+Total          101       240       256       236 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
@@ -1370,7 +1370,7 @@ DTLS 1.3 RPK + ECDHE              150        373       213        736
 DTLS 1.3 PSK + ECDHE              187        190        57        434
 DTLS 1.3 PSK                      137        150        57        344
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  39        120        85        244
+EDHOC RPK + ECDHE                  39        118        83        240
 EDHOC PSK + ECDHE                  44         46        11        101
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1392,7 +1392,7 @@ TLS 1.3  RPK + ECDHE              129        322       194        645
 TLS 1.3  PSK + ECDHE              166        157        50        373
 TLS 1.3  PSK                      116        117        50        283
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  38        119        84        241
+EDHOC RPK + ECDHE                  38        117        82        237
 EDHOC PSK + ECDHE                  44         45        10         98
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
