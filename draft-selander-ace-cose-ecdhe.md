@@ -676,9 +676,9 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 *	Only Party U and Party V SHALL have access to the PSK,
 
-* Party V is able to retrieve the PSK using KID.
+* Party V is able to retrieve the PSK using ID_PSK.
 
-The purpose of KID is to facilitate retrieval of the PSK and it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
+The purpose of ID_PSK is to facilitate retrieval of the PSK and it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
@@ -714,7 +714,7 @@ message_1 = (
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
-  ID_PSK : bstr / header_map,
+  ID_PSK : identifier,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -722,7 +722,7 @@ message_1 = (
 where:
 
 * TYPE = 2
-* ID_PSK - bstr enabling the retrieval of the pre-shared key
+* ID_PSK - identifier enabling the retrieval of the pre-shared key
 
 ## EDHOC Message 2
 
