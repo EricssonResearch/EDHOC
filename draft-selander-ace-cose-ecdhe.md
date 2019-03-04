@@ -455,7 +455,8 @@ message_1 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-suites : int / [ 2* int ]
+suite = int / [ 5*5 int / tstr ]
+suites = suite / [ 2* suite ]
 ~~~~~~~~~~~
 
 where:
