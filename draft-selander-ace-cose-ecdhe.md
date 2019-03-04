@@ -397,29 +397,35 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where ID_CRED_U and ID_CRED_V are COSE header maps (header_map), see {{COSE}}. In the following we give some examples of possible COSE header parameters.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps { label : values }, see {{COSE}}. If the label is 'kid', only the bstr value is used.
 
-Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
+~~~~~~~~~~~
+identifier = bstr / { int / tstr => any }
+~~~~~~~~~~~
 
-* ID_CRED_x = { "kid" : bstr }, for x = U or V.
+In the following we give some examples of possible COSE header parameters.
+
+Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+
+* ID_CRED_x = bstr, for x = U or V.
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
-* by a hash value;
+* by a hash value with the 'x5t' parameter;
 
-   * ID_CRED_x = { "x5t" : COSE_CertHash }, for x = U or V,
+   * ID_CRED_x = { label : COSE_CertHash }, for x = U or V,
 
-* by a URL;
+* by a URL with the 'x5u' parameter;
 
-   * ID_CRED_x = { "x5u" : uri }, for x = U or V,
+   * ID_CRED_x = { label : uri }, for x = U or V,
 
-* by a certificate chain;
+* by a certificate chain with the 'x5chain' parameter;
 
-   * ID_CRED_x = { "x5chain" : COSE_X509 }, for x = U or V,
+   * ID_CRED_x = { label : COSE_X509 }, for x = U or V,
 
-* or by a bag of certificates.
+* or by a bag of certificates with the 'x5bag' parameter;
 
-   * ID_CRED_x = { "x5bag" : COSE_X509 }, for x = U or V.
+   * ID_CRED_x = { label : COSE_X509 }, for x = U or V.
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
@@ -557,9 +563,7 @@ Party V SHALL compose message_2 as follows:
 
    * external_aad = TH_2
 
-   * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
-
-   * ID_CRED_V - a CBOR type that can be used with the COSE map label. Enables the retrieval of the public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - identifier to facilitate retrieval of a public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
@@ -638,9 +642,7 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = TH_3
 
-   * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
-
-   * ID_CRED_U - a CBOR type that can be used with the COSE map label. Enables the retrieval of the public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - identifier to facilitate retrieval of a public authentication key of Party U, see {{asym-overview}}
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
