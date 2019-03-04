@@ -397,7 +397,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps { label : values }, see {{COSE}}. If the label is 'kid', only the bstr value is used.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing any COSE header parameter that can identify a public authentication key, see {{COSE}}. If the label is 'kid', only the bstr value is used.
 
 ~~~~~~~~~~~
 identifier = bstr / { int / tstr => any }
