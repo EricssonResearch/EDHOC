@@ -296,11 +296,20 @@ Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is 
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, and a signature algorithm. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer value. Currently two cipher suites are defined.
+EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int or with an array of labels and values from the COSE Algorithms and Elliptic Curves regitries.
 
 ~~~~~~~~~~~
-   0. AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, and Ed25519
-   1. AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, and ES256
+suite = int / [ 4*4 int / tstr, ? any ]
+~~~~~~~~~~~
+
+Currently there are two pre-defined cipher suites.
+
+~~~~~~~~~~~
+(AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519)
+   0. [ 12, -27, 4, -8, 6 ]
+
+(AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, ES256)
+   1. [ 12, -27, 1, -7 ]
 ~~~~~~~~~~~
 
 Two additional numbers are registered for application defined cipher suites. Application defined cipher suites MUST only use algorithms specified for COSE, are not interoperable with other deployments and can therefore only be used in local networks.
