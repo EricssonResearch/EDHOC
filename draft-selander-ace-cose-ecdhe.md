@@ -1214,14 +1214,14 @@ message_1 (39 bytes):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = <<
-  { 4 : 'acdc' },
+  'acdc',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
     3c3d3e3f'
 >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The protected header map is 7 bytes. The length of plaintext is 73 bytes so assuming a 64-bit MAC value the length of ciphertext is 81 bytes.
+The protected header map is 5 bytes. The length of plaintext is 71 bytes so assuming a 64-bit MAC value the length of ciphertext is 79 bytes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
@@ -1231,18 +1231,18 @@ message_2 = (
     1e1f',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
-    3c3d3e3f404142434445464748494a4b4c4d4e4f50'
+    3c3d3e3f404142434445464748494a4b4c4d4e'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (120 bytes):
+message_2 (118 bytes):
 F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00
 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14
 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28
 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C
-3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50
+3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_3
@@ -1254,17 +1254,17 @@ message_3 = (
   h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
-    3c3d3e3f404142434445464748494a4b4c4d4e4f50'
+    3c3d3e3f404142434445464748494a4b4c4d4e'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_3 (85 bytes):
+message_3 (83 bytes):
 41 C4 58 51 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23
 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37
 38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
-4C 4D 4E 4F 50
+4C 4D 4E
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes Certificates
