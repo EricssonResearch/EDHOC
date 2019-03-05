@@ -400,7 +400,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing any COSE header parameter that can identify a public authentication key, see {{COSE}}. If the label is 'kid', only the bstr value is used.
 
 ~~~~~~~~~~~
-identifier = ( int / tstr => any )
+identifier = { int / tstr => any }
 ~~~~~~~~~~~
 
 In the following we give some examples of possible COSE header parameters.
