@@ -1199,7 +1199,7 @@ IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
 
 # Example Messages and Sizes {#sizes}
 
-This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
+This appendix gives an examples of EDHOC message sizes with different authentication methods. The examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios. In cases where a node only have one connection or key, the identifiers may even be the empty byte string. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
 
 ## Message Sizes RPK
 
