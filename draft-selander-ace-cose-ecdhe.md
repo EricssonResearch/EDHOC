@@ -299,7 +299,7 @@ Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is 
 EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int or with an array of labels and values from the COSE Algorithms and Elliptic Curves regitries.
 
 ~~~~~~~~~~~
-suite = int / [ 4*4 int / tstr, ? any ]
+   suite = int / [ 4*4 int / tstr, ? any ]
 ~~~~~~~~~~~
 
 Currently there are two pre-defined cipher suites.
