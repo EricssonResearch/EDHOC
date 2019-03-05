@@ -1226,14 +1226,14 @@ message_1 (39 bytes):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = <<
-  'acdc',
+  h'a1',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
     3c3d3e3f'
 >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The protected header map is 5 bytes. The length of plaintext is 71 bytes so assuming a 64-bit MAC value the length of ciphertext is 79 bytes.
+The protected header map is 2 bytes. The length of plaintext is 68 bytes so assuming a 64-bit MAC value the length of ciphertext is 76 bytes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
@@ -1243,18 +1243,18 @@ message_2 = (
     1e1f',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
-    3c3d3e3f404142434445464748494a4b4c4d4e'
+    3c3d3e3f404142434445464748494a4b'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (118 bytes):
+message_2 (115 bytes):
 F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00
 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14
 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28
 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C
-3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E
+3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_3
@@ -1266,17 +1266,16 @@ message_3 = (
   h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
-    3c3d3e3f404142434445464748494a4b4c4d4e'
+    3c3d3e3f404142434445464748494a4b'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_3 (83 bytes):
+message_3 (80 bytes):
 41 C4 58 51 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23
 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37
 38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
-4C 4D 4E
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes Certificates
@@ -1305,15 +1304,15 @@ message_1 = (
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
-  'abba'
+  h'a2'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_1 (44 bytes):
+message_1 (41 bytes):
 02 41 C3 00 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C
 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
-44 61 63 64 63
+41 A2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_2
@@ -1361,29 +1360,29 @@ The previous estimates of typical message sizes are summarized in {{fig-summary}
 =====================================================================
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
-message_1       44        39        39        39                     
-message_2       46       118       126       116 + Certificate chain 
-message_3       11        83        91        81 + Certificate chain 
+message_1       41        39        39        39                     
+message_2       46       115       126       116 + Certificate chain 
+message_3       11        80        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total          101       240       256       236 + Certificate chains
+Total           98       234       256       236 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
 In practice, most devices only have a few keys, so in deployments where assignment of key identifiers (KID, ID_CRED_V, ID_CRED_U) can be coordinated, the key identifiers can typically be much smaller (e.g. 1 byte).
 
-{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 4 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
+{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 1 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
 Flight                             #1         #2        #3      Total
 ---------------------------------------------------------------------
 DTLS 1.3 RPK + ECDHE              150        373       213        736
-DTLS 1.3 PSK + ECDHE              187        190        57        434
-DTLS 1.3 PSK                      137        150        57        344
+DTLS 1.3 PSK + ECDHE              184        190        57        431
+DTLS 1.3 PSK                      134        150        57        341
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  39        118        83        240
-EDHOC PSK + ECDHE                  44         46        11        101
+EDHOC RPK + ECDHE                  39        115        80        234
+EDHOC PSK + ECDHE                  41         46        11         98
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare1 title="Comparison of message sizes in bytes with Connection ID" artwork-align="center"}
@@ -1397,15 +1396,15 @@ Connection ID is not supported with TLS 1.3. {{fig-compare2}} compares the messa
 Flight                             #1         #2        #3      Total
 ---------------------------------------------------------------------
 DTLS 1.3 RPK + ECDHE              144        364       212        722
-DTLS 1.3 PSK + ECDHE              181        183        56        420
-DTLS 1.3 PSK                      131        143        56        330
+DTLS 1.3 PSK + ECDHE              178        183        56        417
+DTLS 1.3 PSK                      128        143        56        327
 ---------------------------------------------------------------------
 TLS 1.3  RPK + ECDHE              129        322       194        645
-TLS 1.3  PSK + ECDHE              166        157        50        373
-TLS 1.3  PSK                      116        117        50        283
+TLS 1.3  PSK + ECDHE              163        157        50        370
+TLS 1.3  PSK                      113        117        50        280
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  38        117        82        237
-EDHOC PSK + ECDHE                  44         45        10         98
+EDHOC RPK + ECDHE                  38        114        79        231
+EDHOC PSK + ECDHE                  41         45        10         95
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare2 title="Comparison of message sizes in bytes without Connection ID" artwork-align="center"}
