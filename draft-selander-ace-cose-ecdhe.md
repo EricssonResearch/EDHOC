@@ -400,32 +400,32 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing any COSE header parameter that can identify a public authentication key, see {{COSE}}. If the label is 'kid', only the bstr value is used.
 
 ~~~~~~~~~~~
-identifier = bstr / { int / tstr => any }
+identifier = ( int / tstr => any )
 ~~~~~~~~~~~
 
 In the following we give some examples of possible COSE header parameters.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
-* ID_CRED_x = bstr, for x = U or V.
+* ID_CRED_x = { 4 : bstr }, for x = U or V.
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
 * by a hash value with the 'x5t' parameter;
 
-   * ID_CRED_x = { label : COSE_CertHash }, for x = U or V,
+   * ID_CRED_x = { TBD1 : COSE_CertHash }, for x = U or V,
 
 * by a URL with the 'x5u' parameter;
 
-   * ID_CRED_x = { label : uri }, for x = U or V,
-
-* by a certificate chain with the 'x5chain' parameter;
-
-   * ID_CRED_x = { label : COSE_X509 }, for x = U or V,
+   * ID_CRED_x = { TBD2 : uri }, for x = U or V,
 
 * or by a bag of certificates with the 'x5bag' parameter;
 
-   * ID_CRED_x = { label : COSE_X509 }, for x = U or V.
+   * ID_CRED_x = { TBD3 : COSE_X509 }, for x = U or V.
+
+* by a certificate chain with the 'x5chain' parameter;
+
+   * ID_CRED_x = { TBD4 : COSE_X509 }, for x = U or V,
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
