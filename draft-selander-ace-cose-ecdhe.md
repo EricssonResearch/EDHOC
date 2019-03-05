@@ -305,11 +305,11 @@ suite = int / [ 4*4 int / tstr, ? any ]
 Currently there are two pre-defined cipher suites.
 
 ~~~~~~~~~~~
-(AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519)
    0. [ 12, -27, 4, -8, 6 ]
+      (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519)
 
-(AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, ES256)
    1. [ 12, -27, 1, -7 ]
+      (AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, ES256)
 ~~~~~~~~~~~
 
 Two additional numbers are registered for application defined cipher suites. Application defined cipher suites MUST only use algorithms specified for COSE, are not interoperable with other deployments and can therefore only be used in local networks.
