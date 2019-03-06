@@ -1236,7 +1236,7 @@ plaintext = <<
 >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The protected header map is 2 bytes. The length of plaintext is 68 bytes so assuming a 64-bit MAC value the length of ciphertext is 76 bytes.
+The encoding of the header map takes 2 bytes. The length of plaintext is 68 bytes so assuming a 64-bit MAC value the length of ciphertext is 76 bytes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
@@ -1251,8 +1251,8 @@ message_2 = (
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 (114 bytes):
-41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00 01
+58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11
+12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 41 C4 58 51 00 01
 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15
 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28 29
 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D
@@ -1282,7 +1282,7 @@ message_3 (80 bytes):
 
 ## Message Sizes Certificates
 
-When the certificates are distributed out-of-band and identified with the x5t header and a SHA256/64 hash value, the protected header map will be 13 bytes instead of 7 bytes (assuming labels in the range -24&hellip;23).
+When the certificates are distributed out-of-band and identified with the x5t header and a SHA256/64 hash value, the protected header map will be 13 bytes instead of 2 bytes (assuming labels in the range -24&hellip;23).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 protected = << { TDB1 : [ TDB6, h'0001020304050607' ] } >>
@@ -1390,7 +1390,7 @@ EDHOC PSK + ECDHE                  41         45        11         97
 
 In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission, and packet ordering. The overhead of fragmentation is roughly proportional to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear function of the flight sizes.
 
-Connection ID is not supported with TLS 1.3. {{fig-compare2}} compares the message sizes of EDHOC with the DTLS 1.3 {{I-D.ietf-tls-dtls13}} and TLS 1.3 {{RFC8446}} handshakes without connection ID.
+Connection ID is not supported with TLS 1.3. {{fig-compare2}} compares the message sizes of the DTLS 1.3 {{I-D.ietf-tls-dtls13}} and TLS 1.3 {{RFC8446}} handshakes without connection ID.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
@@ -1403,9 +1403,6 @@ DTLS 1.3 PSK                      128        143        56        327
 TLS 1.3  RPK + ECDHE              129        322       194        645
 TLS 1.3  PSK + ECDHE              163        157        50        370
 TLS 1.3  PSK                      113        117        50        280
----------------------------------------------------------------------
-EDHOC RPK + ECDHE                  38        114        79        231
-EDHOC PSK + ECDHE                  41         45        10         95
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare2 title="Comparison of message sizes in bytes without Connection ID" artwork-align="center"}
