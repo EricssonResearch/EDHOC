@@ -469,7 +469,8 @@ suites = suite / [ 2* suite ]
 
 where:
 
-* TYPE = 1, 2, or 3
+* TYPE = 1 + CORR
+* CORR = 0, 1, or 2 is chosen based on the transport and determines if a connection identifier is omitted. 0 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. 1 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. 2 is used when there is no external correlation mechanism.
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -545,9 +546,11 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
+* If TYPE mod 3 = 1, C_U is omitted, otherwise C_U is not omitted.
+
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_V be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
+* Choose a connection identifier C_V and store it for the length of the protocol.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
@@ -630,7 +633,7 @@ TH_3 = H( bstr .cborseq [ TH_2, CIPHERTEXT_2, data_3 ] )
 
 Party U SHALL compose message_3 as follows:
 
-* To reduce message overhead, party U can set the message field C_V in message_3 to null (still storing the actual value of C_V) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party V to correlate message_2 and message_3.
+* If TYPE mod 3 = 2, C_V is omitted, otherwise C_V is not omitted.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
@@ -733,7 +736,7 @@ message_1 = (
 
 where:
 
-* TYPE = 4, 5, or 6
+* TYPE = 4 + CORR
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
@@ -792,7 +795,7 @@ Assuming that Party U supports the five cipher suites \{0, 1, 2, 3, 4\} in decre
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|        TYPE, C_U, SUITES_U {0, 1, 2}, SUITE {0}, X_U, UAD_1       |
+|        TYPE, SUITES_U {0, 1, 2}, SUITE {0}, X_U, C_U, UAD_1       |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -800,7 +803,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|         TYPE, C_U, SUITES_U {0, 1}, SUITE {1}, X_U, UAD_1         |
+|         TYPE, SUITES_U {0, 1}, SUITE {1}, X_U, C_U, UAD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -811,7 +814,7 @@ In {{fig-error2}}, Party V supports cipher suite 2 but not cipher suites 0 and 1
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|         TYPE, C_U, SUITES_U {0, 1}, SUITE {0}, X_U, UAD_1         |
+|         TYPE, SUITES_U {0, 1}, SUITE {0}, X_U, C_U, UAD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -819,7 +822,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|        TYPE, C_U, SUITES_U {0, 1, 2}, SUITE {2}, X_U, UAD_1       |
+|        TYPE, SUITES_U {0, 1, 2}, SUITE {2}, X_U, C_U, UAD_1       |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -1208,11 +1211,11 @@ This appendix gives an examples of EDHOC message sizes with different authentica
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
   1,
-  h'c3',
   0,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
-    1e1f'
+    1e1f',
+  h'c3'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1237,10 +1240,9 @@ The protected header map is 2 bytes. The length of plaintext is 68 bytes so assu
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
-  null,
-  h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
+  h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
     3c3d3e3f404142434445464748494a4b'
@@ -1248,13 +1250,13 @@ message_2 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (115 bytes):
-F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
-0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00
-01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14
-15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28
-29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C
-3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
+message_2 (114 bytes):
+41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00 01
+02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15
+16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28 29
+2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D
+3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_3
@@ -1298,13 +1300,14 @@ protected = << { TDB3 : h'0001020304050607...' } >>
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
-  2,
-  h'c3',
+  4,
   0,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
-  h'a2'
+  h'a2',
+  h'c3'
+
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1321,7 +1324,6 @@ Assuming a 0 byte plaintext and a 64-bit MAC value the ciphertext is 8 bytes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
-  null,
   h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
@@ -1330,7 +1332,7 @@ message_2 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (46 bytes):
+message_2 (45 bytes):
 F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 48 61 62
 63 64 65 66 67 68
@@ -1361,10 +1363,10 @@ The previous estimates of typical message sizes are summarized in {{fig-summary}
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
 message_1       41        39        39        39                     
-message_2       46       115       126       116 + Certificate chain 
+message_2       45       114       126       116 + Certificate chain 
 message_3       11        80        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total           98       234       256       236 + Certificate chains
+Total           97       233       256       236 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
@@ -1381,8 +1383,8 @@ DTLS 1.3 RPK + ECDHE              150        373       213        736
 DTLS 1.3 PSK + ECDHE              184        190        57        431
 DTLS 1.3 PSK                      134        150        57        341
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  39        115        80        234
-EDHOC PSK + ECDHE                  41         46        11         98
+EDHOC RPK + ECDHE                  39        114        80        233
+EDHOC PSK + ECDHE                  41         45        11         97
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare1 title="Comparison of message sizes in bytes with Connection ID" artwork-align="center"}
