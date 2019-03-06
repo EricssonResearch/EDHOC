@@ -682,9 +682,13 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V is able to retrieve the PSK using ID_PSK.
 
-where the identifiers ID_PSK is a COSE header maps containing any COSE header parameter that can identify a pre-shared key. If the label is 'kid', only the bstr value is used.
+where the identifiers ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key.
 
-The purpose of ID_PSK is to facilitate retrieval of the PSK and it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
+Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+
+* ID_PSK = { 4 : bstr }
+
+The purpose of ID_PSK is to facilitate retrieval of the PSK and in the case a 'kid' parameter is used it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
