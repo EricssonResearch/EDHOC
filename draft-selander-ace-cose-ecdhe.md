@@ -455,10 +455,10 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  C_U : bstr,  
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
+  C_U : bstr,  
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -470,10 +470,10 @@ suites = suite / [ 2* suite ]
 where:
 
 * TYPE = 1
-* C_U - variable length connection identifier
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
+* C_U - variable length connection identifier
 * UAD_1 - bstr containing unprotected opaque application data
 
 ### Party U Processing of Message 1
@@ -520,8 +520,8 @@ message_2 = (
 ~~~~~~~~~~~ CDDL
 data_2 = (
   C_U : bstr / nil,
-  C_V : bstr,
   X_V : bstr,
+  C_V : bstr,
 )
 ~~~~~~~~~~~
 
@@ -722,11 +722,11 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  C_U : bstr,
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
   ID_PSK : bstr / header_map,
+  C_U : bstr,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
