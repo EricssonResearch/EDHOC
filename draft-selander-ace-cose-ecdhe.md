@@ -211,7 +211,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
 
-Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}}, COSE {{RFC8152}}, and CDDL {{I-D.ietf-cbor-cddl}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. The use of the CDDL unwrap operator "~" is extended to unwrapping of byte strings. It is the inverse of "bstr .cbor" that wraps a data item in a bstr, i.e. ~ bstr .cbor T = T. Examples of CBOR and CDDL are provided in {{CBOR}}.
+Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}}, COSE {{RFC8152}}, and CDDL {{I-D.ietf-cbor-cddl}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. Examples of CBOR and CDDL are provided in {{CBOR}}.
 
 # Background {#background}
 
@@ -296,11 +296,20 @@ Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is 
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, and a signature algorithm. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is associated with an integer value. Currently two cipher suites are defined.
+EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int or with an array of labels and values from the COSE Algorithms and Elliptic Curves regitries.
 
 ~~~~~~~~~~~
-   0. AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, and Ed25519
-   1. AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, and ES256
+   suite = int / [ 4*4 int / tstr, ? any ]
+~~~~~~~~~~~
+
+Currently there are two pre-defined cipher suites.
+
+~~~~~~~~~~~
+   0. [ 12, -27, 4, -8, 6 ]
+      (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519)
+
+   1. [ 12, -27, 1, -7 ]
+      (AES-CCM-64-64-128, ECDH-SS + HKDF-256, P-256, ES256)
 ~~~~~~~~~~~
 
 Two additional numbers are registered for application defined cipher suites. Application defined cipher suites MUST only use algorithms specified for COSE, are not interoperable with other deployments and can therefore only be used in local networks.
@@ -388,29 +397,29 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where ID_CRED_U and ID_CRED_V are encoded in COSE maps, see {{COSE}}. In the following we give some examples of possible COSE map labels.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing COSE header parameter that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
 
-Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' value (see {{RFC8152}}):
+Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
-* kid : ID_CRED_x, for x = U or V.
+* ID_CRED_x = { 4 : bstr }, for x = U or V.
 
 Public key certificates can be identified in different ways, for example (see {{I-D.schaad-cose-x509}}):
 
-* by a hash value;
+* by a hash value with the 'x5t' parameter;
 
-   * x5t : ID_CRED_x, for x = U or V,
+   * ID_CRED_x = { TBD1 : COSE_CertHash }, for x = U or V,
 
-* by a URL;
+* by a URL with the 'x5u' parameter;
 
-   * x5u : ID_CRED_x, for x = U or V,
+   * ID_CRED_x = { TBD2 : uri }, for x = U or V,
 
-* by a certificate chain;
+* or by a bag of certificates with the 'x5bag' parameter;
 
-   * x5chain : ID_CRED_x, for x = U or V,
+   * ID_CRED_x = { TBD3 : COSE_X509 }, for x = U or V.
 
-* or by a bag of certificates.
+* by a certificate chain with the 'x5chain' parameter;
 
-   * x5bag : ID_CRED_x, for x = U or V.
+   * ID_CRED_x = { TBD4 : COSE_X509 }, for x = U or V,
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
@@ -455,7 +464,7 @@ message_1 = (
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~ CDDL
-suites : int / [ 2* int ]
+suites = suite / [ 2* suite ]
 ~~~~~~~~~~~
 
 where:
@@ -540,31 +549,33 @@ Party V SHALL compose message_2 as follows:
 
 * Choose a connection identifier C_V and store it for the length of the protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
-   * protected = bstr .cbor { abc : ID_CRED_V }
+   * protected = bstr .cbor ID_CRED_V
 
    * payload = CRED_V
 
    * external_aad = TH_2
 
-   * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
-
-   * ID_CRED_V - a CBOR type that can be used with the COSE map label. Enables the retrieval of the public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - identifier to facilitate retrieval of a public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
-   * plaintext = bstr .cborseq \[ ~protected, signature, ? UAD_2 \]
+   * plaintext = bstr .cborseq \[ ID_CRED_V, signature, ? UAD_2 \]
 
    * external_aad = TH_2
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plainstext, i.e.,
+   
+~~~~~~~~~~~
+   plaintext = bstr .cborseq \[ bstr / header_map, bstr, ? bstr ]
+~~~~~~~~~~~
 
 *  Format message_2 as the sequence of CBOR data items specified in {{asym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -621,25 +632,23 @@ Party U SHALL compose message_3 as follows:
 
 * To reduce message overhead, party U can set the message field C_V in message_3 to null (still storing the actual value of C_V) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party V to correlate message_2 and message_3.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
-   * protected = bstr .cbor { abc : ID_CRED_U }
+   * protected = bstr .cbor ID_CRED_U
 
    * payload = CRED_U
 
    * external_aad = TH_3
 
-   * abc - any COSE map label that can identify a public authentication key, see {{asym-overview}}
-
-   * ID_CRED_U - a CBOR type that can be used with the COSE map label. Enables the retrieval of the public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - identifier to facilitate retrieval of a public authentication key of Party U, see {{asym-overview}}
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
-   * plaintext =  bstr .cborseq \[ ~protected, signature, ? PAD_3 \]
+   * plaintext =  bstr .cborseq \[ ID_CRED_U, signature, ? PAD_3 \]
          
    * external_aad = TH_3
 
@@ -675,15 +684,19 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 *	Only Party U and Party V SHALL have access to the PSK,
 
-* Party V is able to retrieve the PSK using KID.
+* Party V is able to retrieve the PSK using ID_PSK.
 
-The purpose of KID is to facilitate retrieval of the PSK and it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
+where the identifiers ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+
+* ID_PSK = { 4 : bstr }
+
+The purpose of ID_PSK is to facilitate retrieval of the PSK and in the case a 'kid' parameter is used it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
 
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            TYPE, C_U, SUITES_U, SUITE, X_U, KID, UAD_1            |
+|           TYPE, C_U, SUITES_U, SUITE, X_U, ID_PSK, UAD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -713,7 +726,7 @@ message_1 = (
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
-  KID : bstr,
+  ID_PSK : bstr / header_map,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -721,7 +734,7 @@ message_1 = (
 where:
 
 * TYPE = 2
-* KID - bstr enabling the retrieval of the pre-shared key
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
 
@@ -1065,7 +1078,7 @@ h'12cd'             0x4212cd             byte string
 
 All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array \[_ message_i \] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
 
-The message format specification uses the constructs '.cbor', '.cborseq' and '~' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
+The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
 A type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
 
@@ -1074,7 +1087,6 @@ CDDL Type                       Diagnostic                Encoded
 ------------------------------------------------------------------
 uint                            24                        0x1818
 bstr .cbor uint                 << 24 >>                  0x421818
-~ bstr .cbor uint               24                        0x1818
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
@@ -1105,7 +1117,7 @@ The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are c
 * The initialization vector IV_i is a CBOR bstr, also generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
 * The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and
-plaintext = &lt;&lt; ~protected, signature &gt;&gt; in the asymmetric case. For instance, if protected = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
+plaintext = &lt;&lt; ID_CRED_x, signature &gt;&gt; in the asymmetric case. For instance, if ID_CRED_x = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to the transcript hash TH_i.
 
@@ -1187,7 +1199,7 @@ IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
 
 # Example Messages and Sizes {#sizes}
 
-This appendix gives an estimate of the message sizes of EDHOC with different authentication methods. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
+This appendix gives an examples of EDHOC message sizes with different authentication methods. The examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios. In cases where a node only have one connection or key, the identifiers may even be the empty byte string. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
 
 ## Message Sizes RPK
 
@@ -1214,14 +1226,14 @@ message_1 (39 bytes):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 plaintext = <<
-  { 4 : 'acdc' },
+  h'a1',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
     3c3d3e3f'
 >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The protected header map is 7 bytes. The length of plaintext is 73 bytes so assuming a 64-bit MAC value the length of ciphertext is 81 bytes.
+The protected header map is 2 bytes. The length of plaintext is 68 bytes so assuming a 64-bit MAC value the length of ciphertext is 76 bytes.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 = (
@@ -1231,18 +1243,18 @@ message_2 = (
     1e1f',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
-    3c3d3e3f404142434445464748494a4b4c4d4e4f50'
+    3c3d3e3f404142434445464748494a4b'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (120 bytes):
+message_2 (115 bytes):
 F6 41 C4 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 58 51 00
 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14
 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28
 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C
-3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50
+3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_3
@@ -1254,17 +1266,16 @@ message_3 = (
   h'c4',
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b
-    3c3d3e3f404142434445464748494a4b4c4d4e4f50'
+    3c3d3e3f404142434445464748494a4b'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_3 (85 bytes):
+message_3 (80 bytes):
 41 C4 58 51 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23
 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37
 38 39 3A 3B 3C 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B
-4C 4D 4E 4F 50
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Message Sizes Certificates
@@ -1293,15 +1304,15 @@ message_1 = (
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
-  'abba'
+  h'a2'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_1 (44 bytes):
+message_1 (41 bytes):
 02 41 C3 00 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C
 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F
-44 61 63 64 63
+41 A2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_2
@@ -1349,29 +1360,29 @@ The previous estimates of typical message sizes are summarized in {{fig-summary}
 =====================================================================
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
-message_1       44        39        39        39                     
-message_2       46       120       126       116 + Certificate chain 
-message_3       11        85        91        81 + Certificate chain 
+message_1       41        39        39        39                     
+message_2       46       115       126       116 + Certificate chain 
+message_3       11        80        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total          101       244       256       236 + Certificate chains
+Total           98       234       256       236 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
 In practice, most devices only have a few keys, so in deployments where assignment of key identifiers (KID, ID_CRED_V, ID_CRED_U) can be coordinated, the key identifiers can typically be much smaller (e.g. 1 byte).
 
-{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 4 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
+{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 1 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
 Flight                             #1         #2        #3      Total
 ---------------------------------------------------------------------
 DTLS 1.3 RPK + ECDHE              150        373       213        736
-DTLS 1.3 PSK + ECDHE              187        190        57        434
-DTLS 1.3 PSK                      137        150        57        344
+DTLS 1.3 PSK + ECDHE              184        190        57        431
+DTLS 1.3 PSK                      134        150        57        341
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  39        120        85        244
-EDHOC PSK + ECDHE                  44         46        11        101
+EDHOC RPK + ECDHE                  39        115        80        234
+EDHOC PSK + ECDHE                  41         46        11         98
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare1 title="Comparison of message sizes in bytes with Connection ID" artwork-align="center"}
@@ -1385,15 +1396,15 @@ Connection ID is not supported with TLS 1.3. {{fig-compare2}} compares the messa
 Flight                             #1         #2        #3      Total
 ---------------------------------------------------------------------
 DTLS 1.3 RPK + ECDHE              144        364       212        722
-DTLS 1.3 PSK + ECDHE              181        183        56        420
-DTLS 1.3 PSK                      131        143        56        330
+DTLS 1.3 PSK + ECDHE              178        183        56        417
+DTLS 1.3 PSK                      128        143        56        327
 ---------------------------------------------------------------------
 TLS 1.3  RPK + ECDHE              129        322       194        645
-TLS 1.3  PSK + ECDHE              166        157        50        373
-TLS 1.3  PSK                      116        117        50        283
+TLS 1.3  PSK + ECDHE              163        157        50        370
+TLS 1.3  PSK                      113        117        50        280
 ---------------------------------------------------------------------
-EDHOC RPK + ECDHE                  38        119        84        241
-EDHOC PSK + ECDHE                  44         45        10         98
+EDHOC RPK + ECDHE                  38        114        79        231
+EDHOC PSK + ECDHE                  41         45        10         95
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-compare2 title="Comparison of message sizes in bytes without Connection ID" artwork-align="center"}
