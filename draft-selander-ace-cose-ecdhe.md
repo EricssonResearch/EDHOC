@@ -571,7 +571,11 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet.   
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plainstext, i.e.,
+   
+~~~~~~~~~~~
+   plaintext = bstr .cborseq \[ bstr / header_map, bstr, ? bstr ]
+~~~~~~~~~~~
 
 *  Format message_2 as the sequence of CBOR data items specified in {{asym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -682,9 +686,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V is able to retrieve the PSK using ID_PSK.
 
-where the identifiers ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key.
-
-Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+where the identifiers ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
 * ID_PSK = { 4 : bstr }
 
@@ -724,7 +726,7 @@ message_1 = (
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
-  ID_PSK : identifier,
+  ID_PSK : bstr / header_map,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -732,7 +734,7 @@ message_1 = (
 where:
 
 * TYPE = 2
-* ID_PSK - identifier to facilitate retrieval of the pre-shared key
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
 
