@@ -397,13 +397,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing any COSE header parameter that can identify a public authentication key, see {{COSE}}. If the label is 'kid', only the bstr value is used.
-
-~~~~~~~~~~~
-identifier = { int / tstr => any }
-~~~~~~~~~~~
-
-In the following we give some examples of possible COSE header parameters.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing COSE header parameter that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
@@ -555,7 +549,7 @@ Party V SHALL compose message_2 as follows:
 
 * Choose a connection identifier C_V and store it for the length of the protocol. To reduce message overhead, party V can set the message field C_U in message_2 to null (still storing the actual value of C_U) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor ID_CRED_V
 
@@ -569,7 +563,7 @@ Party V SHALL compose message_2 as follows:
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
    * plaintext = bstr .cborseq \[ ID_CRED_V, signature, ? UAD_2 \]
 
@@ -634,7 +628,7 @@ Party U SHALL compose message_3 as follows:
 
 * To reduce message overhead, party U can set the message field C_V in message_3 to null (still storing the actual value of C_V) if there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party V to correlate message_2 and message_3.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor ID_CRED_U
 
@@ -648,7 +642,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * plaintext =  bstr .cborseq \[ ID_CRED_U, signature, ? PAD_3 \]
          
