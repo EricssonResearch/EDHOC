@@ -431,11 +431,11 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|              TYPE, C_U, SUITES_U, SUITE, X_U, UAD_1               |
+|              TYPE, SUITES_U, SUITE, X_U, C_U, UAD_1               |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|  C_U, C_V, X_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), UAD_2) |
+|  C_U, X_V, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), UAD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -469,7 +469,7 @@ suites = suite / [ 2* suite ]
 
 where:
 
-* TYPE = 1
+* TYPE = 1, 2, or 3
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -519,7 +519,7 @@ message_2 = (
 
 ~~~~~~~~~~~ CDDL
 data_2 = (
-  C_U : bstr / nil,
+  ? C_U : bstr,
   X_V : bstr,
   C_V : bstr,
 )
@@ -612,7 +612,7 @@ message_3 = (
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
-  C_V : bstr / nil,
+  ? C_V : bstr,
 )
 ~~~~~~~~~~~
 
@@ -696,11 +696,11 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|           TYPE, C_U, SUITES_U, SUITE, X_U, ID_PSK, UAD_1          |
+|           TYPE, SUITES_U, SUITE, X_U, ID_PSK, C_U, UAD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_U, C_V, X_V, AEAD(K_2; TH_2, UAD_2)               |
+|               C_U, X_V, C_V, AEAD(K_2; TH_2, UAD_2)               |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -733,7 +733,7 @@ message_1 = (
 
 where:
 
-* TYPE = 2
+* TYPE = 4, 5, or 6
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
