@@ -699,7 +699,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|           TYPE, SUITES_U, SUITE, X_U, ID_PSK, C_U, UAD_1          |
+|           TYPE, SUITES_U, SUITE, X_U, C_U, ID_PSK, UAD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -728,8 +728,8 @@ message_1 = (
   SUITES_U : suites,
   SUITE : uint,
   X_U : bstr,
-  ID_PSK : bstr / header_map,
   C_U : bstr,
+  ID_PSK : bstr / header_map,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
