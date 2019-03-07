@@ -296,13 +296,13 @@ Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is 
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int or with an array of labels and values from the COSE Algorithms and Elliptic Curves regitries.
+EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves regitries.
 
 ~~~~~~~~~~~
    suite = int / [ 4*4 int / tstr, ? any ]
 ~~~~~~~~~~~
 
-Currently there are two pre-defined cipher suites.
+This document specifies two pre-defined cipher suites.
 
 ~~~~~~~~~~~
    0. [ 12, -27, 4, -8, 6 ]
@@ -537,8 +537,8 @@ TH_2 = H( bstr .cborseq [ message_1, data_2 ] )
 
 where:
 
-* C_V - variable length connection identifier
 * X_V - the x-coordinate of the ephemeral public key of Party V
+* C_V - variable length connection identifier
 * H() - the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
@@ -576,7 +576,7 @@ Party V SHALL compose message_2 as follows:
    Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plainstext, i.e.,
    
 ~~~~~~~~~~~
-   plaintext = bstr .cborseq \[ bstr / header_map, bstr, ? bstr ]
+   plaintext = bstr .cborseq [ bstr / header_map, bstr, ? bstr ]
 ~~~~~~~~~~~
 
 *  Format message_2 as the sequence of CBOR data items specified in {{asym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
@@ -688,7 +688,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V is able to retrieve the PSK using ID_PSK.
 
-where the identifiers ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+where the identifier ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
 * ID_PSK = { 4 : bstr }
 
@@ -1082,7 +1082,7 @@ All EDHOC messages consist of a sequence of CBOR encoded data items. While an ED
 
 The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
-A type (e.g. an uint) may be wrapped in a byte string (bstr), and back again:
+A type (e.g. an uint) may be wrapped in a byte string (bstr):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CDDL Type                       Diagnostic                Encoded
