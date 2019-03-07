@@ -469,8 +469,7 @@ suites = suite / [ 2* suite ]
 
 where:
 
-* TYPE = 1 + CORR
-* CORR = 0, 1, or 2 is chosen based on the transport and determines if a connection identifier is omitted. 0 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. 1 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. 2 is used when there is no external correlation mechanism.
+* TYPE = 1 + c, where c = 0, 1, or 2 is chosen based on the transport and determines if a connection identifier is omitted. c = 0 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. c = 1 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. c = 2 is used when there is no external correlation mechanism. 
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -736,7 +735,7 @@ message_1 = (
 
 where:
 
-* TYPE = 4 + CORR
+* TYPE = 4 + c, where c = 0, 1, or 2 is chosen based on the transport and determines if a connection identifier is omitted.
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
