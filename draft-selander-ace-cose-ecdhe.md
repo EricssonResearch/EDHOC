@@ -78,10 +78,11 @@ normative:
 informative:
 
   I-D.hartke-core-e2e-security-reqs:
+  I-D.ietf-6tisch-dtsecurity-zerotouch-join:
   I-D.ietf-ace-oauth-authz:
   I-D.ietf-ace-oscore-profile:
   I-D.ietf-core-resource-directory:
-  I-D.ietf-6tisch-dtsecurity-zerotouch-join:
+  I-D.ietf-lwig-security-protocol-comparison:
   I-D.ietf-tls-dtls13:
 
   RFC7228:
