@@ -389,9 +389,9 @@ KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
 
 EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
-*	Only Party V SHALL have access to the private authentication key of Party V,
+* Only Party V SHALL have access to the private authentication key of Party V,
 
-*	Only Party U SHALL have access to the private authentication key of Party U,
+* Only Party U SHALL have access to the private authentication key of Party U,
 
 * Party U is able to retrieve Party V's public authentication key using ID_CRED_V,
 
@@ -684,7 +684,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
-*	Only Party U and Party V SHALL have access to the PSK,
+* Only Party U and Party V SHALL have access to the PSK,
 
 * Party V is able to retrieve the PSK using ID_PSK.
 
