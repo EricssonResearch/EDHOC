@@ -841,7 +841,7 @@ By default, the CoAP client is Party U and the CoAP server is Party V, but the r
 
 By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
 
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}.
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables Party U to correlate message_1 and message_2 so the correlation parameter c = 0.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -867,7 +867,7 @@ Client    Server
 {: #fig-coap1 title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}.
+The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables Party V to correlate message_2 and message_3 so the correlation parameter c = 1.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
