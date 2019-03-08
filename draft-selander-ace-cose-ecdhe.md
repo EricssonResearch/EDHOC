@@ -1370,7 +1370,7 @@ Total           97       233       256       236 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
-These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys. In cases where a node only have one connection or key, the identifiers may even be the empty byte string.
+These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys and connection. In cases where a node only have one connection or key, the identifiers may even be the empty byte string.
 
 For a comparision with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
 
