@@ -1147,7 +1147,7 @@ The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are cons
 
 * The key is the private authentication key of U or V. This may be stored as a COSE_KEY object or as a certificate.
 
-* The protected parameter is a map { abc : ID_CRED_x } wrapped in a byte string.
+* The protected parameter is a map ID_CRED_x = { label : value } is wrapped in a byte string.
    
 * The payload is a bstr containing the CBOR encoding of a COSE_KEY or a single certificate.
 
@@ -1160,7 +1160,7 @@ COSE constructs the input to the Signature Algorithm as follows:
 * The message to be signed M is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << { abc : ID_CRED_x } >>, TH_i, CRED_x ]
+   [ "Signature1", << { label : value } >>, TH_i, CRED_x ]
 ~~~~~~~~~~~
 
 * For instance, if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
