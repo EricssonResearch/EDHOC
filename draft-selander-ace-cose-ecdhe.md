@@ -1202,7 +1202,7 @@ IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
 
 # Example Messages and Sizes {#sizes}
 
-This appendix gives an examples of EDHOC message sizes with different authentication methods. The examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios. In cases where a node only have one connection or key, the identifiers may even be the empty byte string. It also gives examples of messages and plaintexts in CBOR diagnostic notation and hexadecimal to help implementors. Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
+To help implementors, this appendix gives an examples of EDHOC messages and plaintexts with different authentication methods. The examples use 1 byte key identifiers and connection IDs and are given in CBOR diagnostic notation and hexadecimal.  Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
 
 ## Message Sizes RPK
 
@@ -1355,7 +1355,7 @@ message_3 (11 bytes):
 
 ## Summary
 
-The previous estimates of typical message sizes are summarized in {{fig-summary}}.
+The previous examples of typical message sizes are summarized in {{fig-summary}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
@@ -1370,42 +1370,10 @@ Total           97       233       256       236 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
-In practice, most devices only have a few keys, so in deployments where assignment of key identifiers (KID, ID_CRED_V, ID_CRED_U) can be coordinated, the key identifiers can typically be much smaller (e.g. 1 byte).
+These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys. In cases where a node only have one connection or key, the identifiers may even be the empty byte string.
 
-{{fig-compare1}} compares the message sizes of EDHOC with the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with connection ID. The comparison uses a minimum number of extensions and offered algorithms/cipher suites, 1 bytes key identifiers, 1 byte connection IDs, no DTLS message fragmentation, and DTLS RPK SubjectPublicKeyInfo with point compression.
+For a comparision with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
 
-~~~~~~~~~~~~~~~~~~~~~~~
-=====================================================================
-Flight                             #1         #2        #3      Total
----------------------------------------------------------------------
-DTLS 1.3 RPK + ECDHE              150        373       213        736
-DTLS 1.3 PSK + ECDHE              184        190        57        431
-DTLS 1.3 PSK                      134        150        57        341
----------------------------------------------------------------------
-EDHOC RPK + ECDHE                  39        114        80        233
-EDHOC PSK + ECDHE                  41         45        11         97
-=====================================================================
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-compare1 title="Comparison of message sizes in bytes with Connection ID" artwork-align="center"}
-
-In reality the total overhead will be larger due to mechanisms for fragmentation, retransmission, and packet ordering. The overhead of fragmentation is roughly proportional to the number of fragments, while the expected overhead due to retransmission in noisy environments is a superlinear function of the flight sizes.
-
-Connection ID is not supported with TLS 1.3. {{fig-compare2}} compares the message sizes of the DTLS 1.3 {{I-D.ietf-tls-dtls13}} and TLS 1.3 {{RFC8446}} handshakes without connection ID.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-=====================================================================
-Flight                             #1         #2        #3      Total
----------------------------------------------------------------------
-DTLS 1.3 RPK + ECDHE              144        364       212        722
-DTLS 1.3 PSK + ECDHE              178        183        56        417
-DTLS 1.3 PSK                      128        143        56        327
----------------------------------------------------------------------
-TLS 1.3  RPK + ECDHE              129        322       194        645
-TLS 1.3  PSK + ECDHE              163        157        50        370
-TLS 1.3  PSK                      113        117        50        280
-=====================================================================
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-compare2 title="Comparison of message sizes in bytes without Connection ID" artwork-align="center"}
 
 # Test Vectors {#vectors}
 
