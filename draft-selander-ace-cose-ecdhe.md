@@ -473,7 +473,7 @@ suites = suite / [ 2* suite ]
 where:
 
 * TYPE = method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-* SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
+* SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an single suite is used, if multiple cipher suites are conveyed, an array of suites is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
@@ -1203,7 +1203,7 @@ IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
 
 # Example Messages and Sizes {#sizes}
 
-To help implementors, this appendix gives an examples of EDHOC messages and plaintexts with different authentication methods. The examples use 1 byte key identifiers and connection IDs and are given in CBOR diagnostic notation and hexadecimal.  Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
+To help implementors, this appendix gives examples in CBOR diagnostic notation and hexadecimal of EDHOC messages and plaintexts with different authentication methods. The examples use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
 
 ## Message Sizes RPK
 
@@ -1301,7 +1301,7 @@ protected = << { TDB3 : h'0001020304050607...' } >>
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
-  4,
+  5,
   0,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
