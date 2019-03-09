@@ -297,7 +297,7 @@ Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is 
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves regitries.
+EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
 
 ~~~~~~~~~~~
    suite = int / [ 4*4 int / tstr, ? any ]
@@ -574,7 +574,7 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plainstext, i.e.,
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plaintext, i.e.,
    
 ~~~~~~~~~~~
    plaintext = bstr .cborseq [ bstr / header_map, bstr, ? bstr ]
@@ -1372,7 +1372,7 @@ Total           97       233       256       236 + Certificate chains
 
 These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys and connection. In cases where a node only have one connection or key, the identifiers may even be the empty byte string.
 
-For a comparision with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
+For a comparison with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
 
 
 # Test Vectors {#vectors}
