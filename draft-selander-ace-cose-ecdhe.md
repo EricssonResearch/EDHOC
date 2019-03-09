@@ -199,7 +199,7 @@ This document is organized as follows: {{background}} describes how EDHOC builds
 
 Many constrained IoT systems today do not use any security at all, and when they do, they often do not follow best practices. One reason is that many current security protocols are not designed with constrained IoT in mind. Constrained IoT systems often deal with personal information, valuable business data, and actuators interacting with the physical world. Not only do such systems need security and privacy, they often need end-to-end protection with source authentication and perfect forward secrecy. EDHOC and OSCORE {{I-D.ietf-core-object-security}} enables security following current best practices to devices and systems where current security protocols are impractical. 
 
-EDHOC is optimized for small message sizes and can therefore be sent over a small number of radio frames. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment, especially in noisy environments. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time in constrained environments can be translated into key exchange overhead.
+EDHOC is optimized for small message sizes and can therefore be sent over a small number of radio frames. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment, especially in noisy environments. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time in constrained environments can be translated into key exchange overhead. In networks technologies with transmission back-off timers, each additional frame significantly increases the latency even if no other devices are transmitting.
 
 Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reasons.
 
@@ -270,7 +270,7 @@ To simplify for implementors, the use of CBOR and COSE in EDHOC is summarized in
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consist of a sequence of CBOR encoded data items, where the first data item of message_1 is an int specifying the method type (asymmetric, symmetric, error). The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consist of a sequence of CBOR encoded data items, where the first data item of message_1 is an int (TYPE) specifying the method (asymmetric, symmetric, error) and the correlation properties of the transport used. The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HKDF, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -428,6 +428,8 @@ The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 cert
 
 The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
+The first data item of message_1 is an int TYPE = method + corr specifying the method and the correlation properties of the transport used. corr = 0 is used when there is no external correlation mechanism. corr = 1 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. corr = 2 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. corr = 3 is used when there is an external correlation mechanism that enables the parties to correlate all the messages. The use of the correlation parameter is exemplified in {{coap}}.
+
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
@@ -470,7 +472,7 @@ suites = suite / [ 2* suite ]
 
 where:
 
-* TYPE = 1 + c, where the connection parameter c = 0, 1, or 2 is chosen based on the transport and determines if a connection identifier is omitted. c = 0 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. c = 1 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. c = 2 is used when there is no external correlation mechanism. 
+* TYPE = method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines if connection identifiers is omitted (see {{asym-overview}}).
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -546,7 +548,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* If TYPE mod 3 = 1, C_U is omitted, otherwise C_U is not omitted.
+* If corr (TYPE – method) equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_V be the x-coordinate of the ephemeral public key.
 
@@ -574,9 +576,9 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plaintext, i.e.,
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plaintext, in CDDL notation
    
-~~~~~~~~~~~
+~~~~~~~~~~~ CDDL
    plaintext = bstr .cborseq [ bstr / header_map, bstr, ? bstr ]
 ~~~~~~~~~~~
 
@@ -633,7 +635,7 @@ TH_3 = H( bstr .cborseq [ TH_2, CIPHERTEXT_2, data_3 ] )
 
 Party U SHALL compose message_3 as follows:
 
-* If TYPE mod 3 = 2, C_V is omitted, otherwise C_V is not omitted.
+* If corr (TYPE – method) equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
@@ -657,8 +659,8 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.  
-
+   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : bstr }, only the bstr is conveyed in the plaintext.
+   
 *  Format message_3 as the sequence of CBOR data items specified in {{asym-msg3-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 *  Pass the connection identifiers (C_U, C_V) and the negotiated cipher suite SUITE to the application. The application can now derive application keys using the EDHOC-Exporter interface.
@@ -736,7 +738,7 @@ message_1 = (
 
 where:
 
-* TYPE = 4 + c, where the connection parameter c = 0, 1, or 2 is chosen based on the transport and determines if a connection identifier is omitted.
+* TYPE = method + corr, where the method = 5 and the correlation parameter corr is chosen based on the transport and determines if connection identifiers is omitted.
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
@@ -841,7 +843,7 @@ By default, the CoAP client is Party U and the CoAP server is Party V, but the r
 
 By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
 
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables Party U to correlate message_1 and message_2 so the correlation parameter c = 0.
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables Party U to correlate message_1 and message_2 so the correlation parameter corr = 1.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -867,7 +869,7 @@ Client    Server
 {: #fig-coap1 title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables Party V to correlate message_2 and message_3 so the correlation parameter c = 1.
+The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables Party V to correlate message_2 and message_3 so the correlation parameter corr = 2.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -1119,8 +1121,7 @@ The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are c
 
 * The initialization vector IV_i is a CBOR bstr, also generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
 
-* The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and
-plaintext = &lt;&lt; ID_CRED_x, signature &gt;&gt; in the asymmetric case. For instance, if ID_CRED_x = h'a10140' and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'a1014043050607'.
+* The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and plaintext = &lt;&lt; ID_CRED_x, signature &gt;&gt; in the asymmetric case. Note that if ID_CRED_x contains a single 'kid' parameter, i.e., ID_CRED_x = { 4 : bstr }, only the bstr is conveyed in the plaintext. For instance, if ID_CRED_x = { 4 : h'40' } (CBOR encoding 0xA1044140) and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'414043050607'.
  
 * The external_aad is a CBOR bstr. It is always set to the transcript hash TH_i.
 
@@ -1163,7 +1164,7 @@ COSE constructs the input to the Signature Algorithm as follows:
    [ "Signature1", << { label : value } >>, TH_i, CRED_x ]
 ~~~~~~~~~~~
 
-* For instance, if abc = 4 (CBOR encoding 0x04), ID_CRED_U = h'1111' (CBOR encoding 0x421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance, if ID_CRED_x = { 4 : h'1111' } (CBOR encoding 0x A104421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
 ### Key Derivation
