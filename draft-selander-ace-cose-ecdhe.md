@@ -472,7 +472,7 @@ suites = suite / [ 2* suite ]
 
 where:
 
-* TYPE = method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines if connection identifiers is omitted (see {{asym-overview}}).
+* TYPE = method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an int is used, if multiple cipher suites are conveyed, an array of ints is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -738,7 +738,7 @@ message_1 = (
 
 where:
 
-* TYPE = method + corr, where the method = 5 and the correlation parameter corr is chosen based on the transport and determines if connection identifiers is omitted.
+* TYPE = method + corr, where the method = 5 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
