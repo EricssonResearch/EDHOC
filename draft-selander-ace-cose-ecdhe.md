@@ -1164,7 +1164,7 @@ COSE constructs the input to the Signature Algorithm as follows:
    [ "Signature1", << { label : value } >>, TH_i, CRED_x ]
 ~~~~~~~~~~~
 
-* For instance, if ID_CRED_x = { 4 : h'1111' } (CBOR encoding 0x A104421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
+* For instance, if ID_CRED_x = { 4 : h'1111' } (CBOR encoding 0xA104421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
 ### Key Derivation
