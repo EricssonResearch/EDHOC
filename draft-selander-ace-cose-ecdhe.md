@@ -472,7 +472,7 @@ suites = suite / [ 2* suite ]
 
 where:
 
-* TYPE = method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* TYPE = 4 * method + corr, where the method = 0 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an single suite is used, if multiple cipher suites are conveyed, an array of suites is used.
 * SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
 * X_U - the x-coordinate of the ephemeral public key of Party U
@@ -548,7 +548,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* If corr (TYPE – method) equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
+* If TYPE mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_V be the x-coordinate of the ephemeral public key.
 
@@ -635,7 +635,7 @@ TH_3 = H( bstr .cborseq [ TH_2, CIPHERTEXT_2, data_3 ] )
 
 Party U SHALL compose message_3 as follows:
 
-* If corr (TYPE – method) equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
+* If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
@@ -738,7 +738,7 @@ message_1 = (
 
 where:
 
-* TYPE = method + corr, where the method = 5 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* TYPE = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
 
 ## EDHOC Message 2
@@ -787,7 +787,7 @@ error = (
 
 where:
 
-* TYPE = 0
+* TYPE = -1
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
 * SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
 
@@ -1301,7 +1301,7 @@ When the certificates are identified with the x5chain header parameter, the mess
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
-  5,
+  4,
   0,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
