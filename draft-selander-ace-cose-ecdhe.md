@@ -786,45 +786,45 @@ where:
 
 ### Example Use of EDHOC Error Message with SUITES_V
 
-Assuming that Party U supports the five cipher suites \{0, 1, 2, 3, 4\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 1 but not cipher suite 0. 
+Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 6 but not cipher suite 5. 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|        TYPE, SUITES_U {0, 1, 2}, SUITE {0}, X_U, C_U, UAD_1       |
+|            TYPE, SUITES_U {0, 5, 6, 7}, X_U, C_U, UAD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                    TYPE, ERR_MSG, SUITES_V {1}                    |
+|                    TYPE, ERR_MSG, SUITES_V {6}                    |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|         TYPE, SUITES_U {0, 1}, SUITE {1}, X_U, C_U, UAD_1         |
+|             TYPE, SUITES_U {1, 5, 6}, X_U, C_U, UAD_1             |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
 {: #fig-error1 title="Example use of error message with SUITES_V."}
 {: artwork-align="center"}
 
-In {{fig-error2}}, Party V supports cipher suite 2 but not cipher suites 0 and 1.
+In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|         TYPE, SUITES_U {0, 1}, SUITE {0}, X_U, C_U, UAD_1         |
+|             TYPE, SUITES_U {0, 5, 6}, X_U, C_U, UAD_1             |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                   TYPE, ERR_MSG, SUITES_V {2, 4}                  |
+|                   TYPE, ERR_MSG, SUITES_V {7, 9}                  |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|        TYPE, SUITES_U {0, 1, 2}, SUITE {2}, X_U, C_U, UAD_1       |
+|            TYPE, SUITES_U {2, 5, 6, 7}, X_U, C_U, UAD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
 {: #fig-error2 title="Example use of error message with SUITES_V."}
 {: artwork-align="center"}
 
-As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite SUITE is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite SUITE is the most preferred (by Party U) cipher suite supported by both parties. If SUITE is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
+As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
 # Transferring EDHOC and Deriving Application Keys {#transfer}
 
