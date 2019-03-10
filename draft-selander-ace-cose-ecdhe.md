@@ -377,11 +377,11 @@ where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr
 
 ### EDHOC PSK Chaining
 
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and KID SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PSK = EDHOC-Exporter("EDHOC Chaining PSK", length)
-KID = EDHOC-Exporter("EDHOC Chaining KID", 4)
+PSK    = EDHOC-Exporter("EDHOC Chaining PSK", length)
+ID_PSK = EDHOC-Exporter("EDHOC Chaining ID_PSK", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
@@ -586,7 +586,7 @@ Party U SHALL process message_2 as follows:
 
 * Decode message_2 (see {{CBOR}}).
 
-* Retrieve the protocol state using the connection identifier C_U and/or other information such as the CoAP Token and the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_U and/or other external information such as the CoAP Token and the 5-tuple.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
@@ -665,7 +665,7 @@ Party V SHALL process message_3 as follows:
 
 * Decode message_3 (see {{CBOR}}).
 
-* Retrieve the protocol state using the connection identifier C_V and/or other information such as the CoAP Token and the 5-tuple.
+* Retrieve the protocol state using the connection identifier C_V and/or other external information such as the CoAP Token and the 5-tuple.
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3.
 
@@ -1018,9 +1018,9 @@ Cipher suite number 0 (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, Ed25519) i
 
 ## Unprotected Data
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, UAD_2, and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case. Using the same KID or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize KID. Another consideration is that the list of supported cipher suites may be used to identify the application.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAD_1, ID_CRED_V, UAD_2, and ERR_MSG in the asymmetric case, and ID_PSK, UAD_1, and ERR_MSG in the symmetric case. Using the same ID_PSK or UAD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize ID_PSK. Another consideration is that the list of supported cipher suites may be used to identify the application.
 
-Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 and ERR_MSG in the asymmetric case, and KID, UAD_1, and ERR_MSG in the symmetric case.
+Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAD_1 and ERR_MSG in the asymmetric case, and ID_PSK, UAD_1, and ERR_MSG in the symmetric case.
 
 ## Denial-of-Service
 
