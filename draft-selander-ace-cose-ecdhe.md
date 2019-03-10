@@ -328,7 +328,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152}} with the following input:
 
-* The KDF SHALL be the HKDF {{RFC5869}} in the selected cipher suite (SUITE).
+* The KDF SHALL be the HKDF {{RFC5869}} in the selected cipher suite.
 
 * The secret (Section 11.1 of {{RFC8152}}) SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
 
@@ -354,7 +354,7 @@ We define EDHOC-Key-Derivation to be the function which produces the output as d
    output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
 ~~~~~~~~~~~
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite (SUITE), and keyDataLength equal to the key length of the AEAD.
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
 
 If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
@@ -434,7 +434,7 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|              TYPE, SUITES_U, SUITE, X_U, C_U, UAD_1               |
+|                  TYPE, SUITES_U, X_U, C_U, UAD_1                  |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -468,7 +468,7 @@ message_1 = (
 where:
 
 * TYPE = 4 * method + corr, where the method = 0 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-* SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, a single suite is used, if multiple cipher suites are conveyed, an array of suites and in index is used. The zero-based index (i.e. 0 for the first or only, 1 for the second, etc.) identifies a single selected cipher suite from the array.
+* SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, a single suite is used, if multiple cipher suites are conveyed, an array of suites and an index is used. The zero-based index (i.e. 0 for the first, 1 for the second, etc.) identifies a single selected cipher suite from the array.
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
 * UAD_1 - bstr containing unprotected opaque application data
@@ -481,7 +481,7 @@ Party U SHALL compose message_1 as follows:
 
 * Determine the cipher suite to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying a cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in SUITES_U MUST be used.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_U be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let X_U be the x-coordinate of the ephemeral public key.
    
 * Choose a connection identifier C_U and store it for the length of the protocol.
 
@@ -590,9 +590,9 @@ Party U SHALL process message_2 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_V.
 
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, and IV_2.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, and IV_2.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE and the public authentication key of Party V.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the public authentication key of Party V.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
@@ -657,7 +657,7 @@ Party U SHALL compose message_3 as follows:
    
 *  Format message_3 as the sequence of CBOR data items specified in {{asym-msg3-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
-*  Pass the connection identifiers (C_U, C_V) and the negotiated cipher suite SUITE to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass the connection identifiers (C_U, C_V) and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 ### Party V Processing of Message 3
 
@@ -667,13 +667,13 @@ Party V SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the connection identifier C_V and/or other information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3.
+* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE and the public authentication key of Party U.
+* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the public authentication key of Party U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
-*  Pass PAD_3, the connection identifiers (C_U, C_V), and the negotiated cipher suite SUITE to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass PAD_3, the connection identifiers (C_U, C_V), and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -695,7 +695,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|           TYPE, SUITES_U, SUITE, X_U, C_U, ID_PSK, UAD_1          |
+|              TYPE, SUITES_U, X_U, C_U, ID_PSK, UAD_1              |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -740,7 +740,7 @@ where:
 
 *  COSE_Sign1 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = TH_2
 
@@ -754,7 +754,7 @@ where:
 
 *  COSE_Sign1 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
 
    * external_aad = TH_3
 
@@ -895,7 +895,7 @@ When EDHOC is used to derive parameters for OSCORE {{I-D.ietf-core-object-securi
 
 * The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
 
-* The AEAD Algorithm and the HMAC-based Key Derivation Function (HKDF) are the AEAD and HKDF algorithms in the cipher suite SUITE.
+* The AEAD Algorithm and the HMAC-based Key Derivation Function (HKDF) are the AEAD and HKDF algorithms in the selected cipher suite.
 
 * The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
