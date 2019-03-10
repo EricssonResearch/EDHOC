@@ -380,8 +380,8 @@ where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PSK    = EDHOC-Exporter("EDHOC Chaining PSK", length)
-ID_PSK = EDHOC-Exporter("EDHOC Chaining ID_PSK", 4)
+   PSK    = EDHOC-Exporter("EDHOC Chaining PSK", length)
+   ID_PSK = EDHOC-Exporter("EDHOC Chaining ID_PSK", 4)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
