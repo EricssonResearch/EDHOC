@@ -293,7 +293,7 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected application data (PAD_3) may be used to transfer any application data in message_3.
 
-Cryptographically, EDHOC does not put requirement on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party V.
+Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party V.
 
 ## Cipher Suites
 
