@@ -458,23 +458,17 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  SUITES_U : suites,
-  SUITE : uint,
+  SUITES_U : suite / [ uint, 2* suite ],
   X_U : bstr,
   C_U : bstr,  
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
 
-~~~~~~~~~~~ CDDL
-suites = suite / [ 2* suite ]
-~~~~~~~~~~~
-
 where:
 
 * TYPE = 4 * method + corr, where the method = 0 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-* SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, an single suite is used, if multiple cipher suites are conveyed, an array of suites is used.
-* SUITE - a single chosen cipher suite from SUITES_U (zero-based index, i.e. 0 for the first or only, 1 for the second, etc.)
+* SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, a single suite is used, if multiple cipher suites are conveyed, an array of suites and in index is used. The zero-based index (i.e. 0 for the first or only, 1 for the second, etc.) identifies a single selected cipher suite from the array.
 * X_U - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
 * UAD_1 - bstr containing unprotected opaque application data
@@ -485,7 +479,7 @@ Party U SHALL compose message_1 as follows:
 
 * The supported cipher suites and the order of preference MUST NOT be changed based on previous error messages. However, the list SUITES_U sent to Party V MAY be truncated such that cipher suites which are the least preferred are omitted. The amount of truncation MAY be changed between sessions, e.g. based on previous error messages (see next bullet), but all cipher suites which are more preferred than the least preferred cipher suite in the list MUST be included in the list.
 
-* Determine the cipher suite SUITE to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying a cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in SUITES_U MUST be used.
+* Determine the cipher suite to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying a cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in SUITES_U MUST be used.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_U be the x-coordinate of the ephemeral public key.
    
@@ -499,13 +493,13 @@ Party V SHALL process message_1 as follows:
 
 * Decode message_1 (see {{CBOR}}).
 
-* Verify that the cipher suite SUITE is supported and that no prior cipher suites in SUITES_U are supported.
+* Verify that the selected cipher suite is supported and that no prior cipher suites in SUITES_U are supported.
 
 * Validate that there is a solution to the curve definition for the given x-coordinate X_U.
 
 * Pass UAD_1 to the application.
 
-If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the cipher suite SUITE, then SUITES_V MUST include one or more supported cipher suites. If V does not support the cipher suite SUITE, but supports another cipher suite in SUITES_U, then SUITES_V MUST include the first supported cipher suite in SUITES_U.
+If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the selected cipher suite, then SUITES_V MUST include one or more supported cipher suites. If V does not support the selected cipher suite, but supports another cipher suite in SUITES_U, then SUITES_V MUST include the first supported cipher suite in SUITES_U.
 
 ## EDHOC Message 2
 
@@ -550,11 +544,11 @@ Party V SHALL compose message_2 as follows:
 
 * If TYPE mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the cipher suite SUITE. Let X_V be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let X_V be the x-coordinate of the ephemeral public key.
 
 * Choose a connection identifier C_V and store it for the length of the protocol.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor ID_CRED_V
 
@@ -568,7 +562,7 @@ Party V SHALL compose message_2 as follows:
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
    * plaintext = bstr .cborseq \[ ID_CRED_V, signature, ? UAD_2 \]
 
@@ -637,7 +631,7 @@ Party U SHALL compose message_3 as follows:
 
 * If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the cipher suite SUITE, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor ID_CRED_U
 
@@ -651,7 +645,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the cipher suite SUITE, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * plaintext =  bstr .cborseq \[ ID_CRED_U, signature, ? PAD_3 \]
          
@@ -727,8 +721,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  SUITES_U : suites,
-  SUITE : uint,
+  SUITES_U : suite / [ uint, 2* suite ],
   X_U : bstr,
   C_U : bstr,
   ID_PSK : bstr / header_map,
@@ -781,7 +774,7 @@ error SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 error = (
   TYPE : int,
   ERR_MSG : tstr,
-  ? SUITES_V : suites,
+  ? SUITES_V : suite / [ 2* suite ],
 )
 ~~~~~~~~~~~
 
@@ -789,7 +782,7 @@ where:
 
 * TYPE = -1
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
-* SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITEs_V contains the values from the EDHOC cipher suites registry and not indexes.
+* SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITEs_V only contains the values from the EDHOC cipher suites registry and no index.
 
 ### Example Use of EDHOC Error Message with SUITES_V
 
@@ -1213,7 +1206,6 @@ To help implementors, this appendix gives examples in CBOR diagnostic notation a
 message_1 = (
   1,
   0,
-  0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
   h'c3'
@@ -1221,9 +1213,9 @@ message_1 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_1 (39 bytes):
-01 00 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
-0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 41 C3
+message_1 (38 bytes):
+01 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 41 C3
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_2
@@ -1303,7 +1295,6 @@ When the certificates are identified with the x5chain header parameter, the mess
 message_1 = (
   4,
   0,
-  0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
   h'c3',
@@ -1312,10 +1303,9 @@ message_1 = (
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_1 (41 bytes):
-04 00 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E
-0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 41 C3 41
-A2
+message_1 (40 bytes):
+04 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 41 C3 41 A2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### message_2
@@ -1362,11 +1352,11 @@ The previous examples of typical message sizes are summarized in {{fig-summary}}
 =====================================================================
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
-message_1       41        39        39        39                     
+message_1       40        38        38        38                     
 message_2       45       114       126       116 + Certificate chain 
 message_3       11        80        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total           97       233       256       236 + Certificate chains
+Total           96       232       255       235 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
