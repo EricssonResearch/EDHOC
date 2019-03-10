@@ -300,7 +300,7 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 EDHOC cipher suites consist of a set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
 
 ~~~~~~~~~~~
-   suite = int / [ 4*4 int / tstr, ? any ]
+   suite = int / [ 4*4 algs: int / tstr, ? para: any ]
 ~~~~~~~~~~~
 
 This document specifies two pre-defined cipher suites.
@@ -458,7 +458,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  SUITES_U : suite / [ uint, 2* suite ],
+  SUITES_U : suite / [ index: uint, 2* suite ],
   X_U : bstr,
   C_U : bstr,  
   ? UAD_1 : bstr,
@@ -721,7 +721,7 @@ message_1 SHALL be a sequence of CBOR data items (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  SUITES_U : suite / [ uint, 2* suite ],
+  SUITES_U : suite / [ index: uint, 2* suite ],
   X_U : bstr,
   C_U : bstr,
   ID_PSK : bstr / header_map,
