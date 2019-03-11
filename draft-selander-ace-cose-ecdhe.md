@@ -373,9 +373,9 @@ The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, A
    TH_4 = H( bstr .cborseq [ TH_3, CIPHERTEXT_3 ] )
 ~~~~~~~~~~~
 
-where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}. An example use of the EDHOC-Exporter is given in {{oscore}}).
+where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
 
-### EDHOC PSK Chaining
+### EDHOC PSK Chaining {#chain}
 
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
