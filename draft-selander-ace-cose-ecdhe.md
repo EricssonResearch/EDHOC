@@ -38,6 +38,7 @@ normative:
   I-D.ietf-cbor-cddl:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-core-object-security:
+  I-D.ietf-bormann-cbor-sequence:
   
   RFC2119:
   RFC5116:
@@ -270,7 +271,7 @@ To simplify for implementors, the use of CBOR and COSE in EDHOC is summarized in
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. All EDHOC messages consist of a sequence of CBOR encoded data items, where the first data item of message_1 is an int (TYPE) specifying the method (asymmetric, symmetric, error) and the correlation properties of the transport used. The messages may be viewed as a CBOR encoding of an indefinite-length array without the first and last byte, see {{CBOR}}.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-bormann-cbor-sequence}}, where the first data item of message_1 is an int (TYPE) specifying the method (asymmetric, symmetric, error) and the correlation properties of the transport used.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HKDF, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -1074,9 +1075,7 @@ h'12cd'             0x4212cd             byte string
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-All EDHOC messages consist of a sequence of CBOR encoded data items. While an EDHOC message in itself is not a CBOR data item, it may be viewed as the CBOR encoding of an indefinite-length array \[_ message_i \] without the first byte (0x9f) and the last byte (0xff), for i = 1, 2 and 3. The same applies to the EDHOC error message.
-
-The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
+EDHOC messages are CBOR Sequences {{I-D.ietf-bormann-cbor-sequence}}. The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
 A type (e.g. an uint) may be wrapped in a byte string (bstr):
 
