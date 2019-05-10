@@ -1075,7 +1075,7 @@ h'12cd'             0x4212cd             byte string
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-EDHOC messages are CBOR Sequences {{I-D.ietf-bormann-cbor-sequence}}. The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
+EDHOC messages are CBOR Sequences {{I-D.bormann-cbor-sequence}}. The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
 A type (e.g. an uint) may be wrapped in a byte string (bstr):
 
