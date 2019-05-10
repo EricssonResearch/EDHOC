@@ -33,12 +33,12 @@ author:
         
 normative:
 
+  I-D.bormann-cbor-sequence:
   I-D.schaad-cose-x509:
   I-D.ietf-cbor-7049bis:
   I-D.ietf-cbor-cddl:
   I-D.ietf-core-echo-request-tag:
   I-D.ietf-core-object-security:
-  I-D.ietf-bormann-cbor-sequence:
   
   RFC2119:
   RFC5116:
