@@ -1131,7 +1131,7 @@ COSE constructs the input to the AEAD {{RFC5116}} as follows:
    [ "Encrypt0", h'', TH_i ]
 ~~~~~~~~~~~
 
-* This equals the concatenation of 0x8368456e63727970743040 and the CBOR encoding of TH_i. For instance if TH_2 = h'010203' (CBOR encoding 0x43010203), then A = 0x8368456e6372797074304043010203. 
+* This equals the concatenation of 0x8368456e63727970743040 and the CBOR encoding of TH_i. When SHA-256 is used, TH_i is always 32 bytes so this equals the concatenation of 0x8368456e637279707430405820 and the value of TH_i. For instance if TH_2 = h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f' then A = 0x0x8368456e637279707430405820000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f. 
 {: style="empty"}
 
 ### Signing and Verification {#COSE-sig-explained}
@@ -1184,12 +1184,14 @@ COSE_KDF_Context = [
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-If AES-CCM-16-64-128 then AlgorithmID = 10 and keyDataLength = 128 for K_i, and AlgorithmID = "IV-GENERATION" (CBOR encoding 0x6d49562d47454e45524154494f4e) and keyDataLength = 104 for IV_i. Hence, if TH_2 = h'aaaa' then
+If AES-CCM-16-64-128 then AlgorithmID = 10 (CBOR encoding 0x0a) and keyDataLength = 128 (CBOR encoding 0x1880) for K_i, and AlgorithmID = "IV-GENERATION" (CBOR encoding 0x6d49562d47454e45524154494f4e) and keyDataLength = 104 (CBOR encoding 0x1868) for IV_i. When SHA-256 is used, TH_i is always 32 bytes.  Hence, if TH_2 = h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f' then
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
+K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f6831880405820
+  000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f01 )
 IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
-                                83f6f6f683f6f6f68318684042aaaa01 ) 
+  83f6f6f683f6f6f6831868405820
+  000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f01 ) 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
