@@ -1189,7 +1189,7 @@ If AES-CCM-16-64-128 then AlgorithmID = 10 and keyDataLength = 128 for K_i, and 
 ~~~~~~~~~~~~~~~~~~~~~~~
 K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f68318804042aaaa01 )
 IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
-                                83f6f6f683f6f6f68318804042aaaa01 ) 
+                                83f6f6f683f6f6f68318684042aaaa01 ) 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
