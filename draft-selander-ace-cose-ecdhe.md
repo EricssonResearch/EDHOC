@@ -1292,7 +1292,7 @@ When the certificates are identified with the x5chain header parameter, the mess
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 = (
-  4,
+  5,
   0,
   h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d
     1e1f',
@@ -1303,7 +1303,7 @@ message_1 = (
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 (40 bytes):
-04 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+05 00 58 20 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F 41 C3 41 A2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
