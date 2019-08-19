@@ -310,7 +310,7 @@ This document specifies two pre-defined cipher suites.
    0. [ 10, -27, 4, -8, 6 ]
       (AES-CCM-16-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519)
 
-   1. [ 10, -27, 1, -7 ]
+   1. [ 10, -27, 1, -7, 1 ]
       (AES-CCM-16-64-128, ECDH-SS + HKDF-256, P-256, ES256, P-256)
 ~~~~~~~~~~~
 
