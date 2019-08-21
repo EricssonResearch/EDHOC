@@ -240,7 +240,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * CRED_U and CRED_V are the credentials containing the public authentication keys of U and V, respectively.
 
-* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of U and V, respectively
+* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of U and V, respectively.
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
@@ -368,7 +368,7 @@ Application keys and other application specific data can be derived using the ED
       EDHOC-Key-Derivation(label, 8 * length, TH_4)
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TR_4, in non-CDDL notation, is:
+The output of the EDHOC-Exporter function SHALL be derived using other = TH_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
    TH_4 = H( bstr .cborseq [ TH_3, CIPHERTEXT_3 ] )
@@ -563,7 +563,7 @@ Party V SHALL compose message_2 as follows:
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters (further clarifications in {{COSE-sig-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
    * plaintext = bstr .cborseq \[ ID_CRED_V, signature, ? UAD_2 \]
 
@@ -767,7 +767,7 @@ where:
 
 ## EDHOC Error Message
 
-This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be send by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. CoAP POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
+This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be sent by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. CoAP POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
 error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
@@ -1362,7 +1362,7 @@ Total           96       232       255       235 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
-These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys and connection. In cases where a node only have one connection or key, the identifiers may even be the empty byte string.
+These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
 For a comparison with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
 
