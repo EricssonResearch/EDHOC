@@ -240,7 +240,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * CRED_U and CRED_V are the credentials containing the public authentication keys of U and V, respectively.
 
-* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of U and V, respectively
+* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of U and V, respectively.
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
@@ -767,7 +767,7 @@ where:
 
 ## EDHOC Error Message
 
-This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be send by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. CoAP POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
+This section defines a message format for the EDHOC error message, used during the protocol. An EDHOC error message can be sent by both parties as a response to any non-error EDHOC message. After sending an error message, the protocol MUST be discontinued. Errors at the EDHOC layer are sent as normal successful messages in the lower layers (e.g. CoAP POST and 2.04 Changed). An advantage of using such a construction is to avoid issues created by usage of cross protocol proxies (e.g. UDP to TCP).
 
 error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
@@ -1362,7 +1362,7 @@ Total           96       232       255       235 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-summary title="Typical message sizes in bytes" artwork-align="center"}
 
-These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys and connection. In cases where a node only have one connection or key, the identifiers may even be the empty byte string.
+These examples use 1 byte key identifiers and connection IDs, this is realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
 For a comparison with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
 
