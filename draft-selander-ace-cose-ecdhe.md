@@ -368,7 +368,7 @@ Application keys and other application specific data can be derived using the ED
       EDHOC-Key-Derivation(label, 8 * length, TH_4)
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TR_4, in non-CDDL notation, is:
+The output of the EDHOC-Exporter function SHALL be derived using other = TH_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4, in non-CDDL notation, is:
 
 ~~~~~~~~~~~
    TH_4 = H( bstr .cborseq [ TH_3, CIPHERTEXT_3 ] )
