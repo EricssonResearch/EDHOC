@@ -1,0 +1,594 @@
+Note: These test vectors have not been verified by a second implementation yet, there might be errors
+
+---------------------------------------------------------------
+Test Vectors for EDHOC Authenticated with PSK
+---------------------------------------------------------------
+
+Pre-shared Key (PSK) (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+
+kid for PSK (1 bytes)
+a1 
+
+ID_PSK =
+{
+  4:  h'a1',
+}
+
+ID_PSK (Contains a single 'kid' parameter, so only bstr will be used used in message_1) (4 bytes)
+a1 04 41 a1 
+
+---------------------------------------------------------------
+
+method (Symmetric Authentication)
+1
+
+corr (Party U is CoAP client)
+1
+
+TYPE (4 * method + corr)
+5
+
+suite
+0
+
+Party U's ephemeral private key (32 bytes)
+f4 0c ea f8 6e 57 76 92 33 32 b8 d8 fd 3b ef 84 9c ad b1 9c 69 96 bc 27 2a f1 f6 48 d9 56 6a 4c 
+
+Party U's ephemeral public key (X_U) (32 bytes)
+ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 
+
+C_U (1 bytes)
+c1 
+
+message_1 =
+(
+  5,
+  0,
+  h'ab2fca32898322c208fb2dab5048bd43c355c6430f588897cb574961cfa9806f',
+  h'c1',
+  h'a1',
+)
+
+message_1 (40 bytes)
+05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 
+
+---------------------------------------------------------------
+
+Party V's ephemeral private key (32 bytes)
+d9 81 80 87 de 72 44 ab c1 b5 fc f2 8e 55 e4 2c 7f f9 c6 78 c0 60 51 81 f3 7a c5 d7 41 4a 7b 95 
+
+Party V's ephemeral public key (X_V) (32 bytes)
+fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 
+
+ECDH shared secret (32 bytes)
+d5 75 05 50 6d 8f 30 a8 60 a0 63 d0 1b 5b 7a d7 6a 09 4f 70 61 3b 4a e6 6c 5a 90 e5 c2 1f 23 11 
+
+salt (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+
+PRK (32 bytes)
+aa b2 f1 3c cb 1a 4f f7 96 a9 7a 32 a4 d2 fb 62 47 ef 0b 6b 06 da 04 d3 d1 06 39 4b 28 76 e2 8c 
+
+C_V (1 bytes)
+c2 
+
+data_2 =
+(
+  h'fc3b339367a5225d53a92d380323afd035d7817b6d1be47d946f6b09a9cbdc06',
+  h'c2',
+)
+
+data_2 (36 bytes)
+58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 
+
+Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (76 bytes)
+05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 
+
+TH_2 (32 bytes)
+16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+
+info (K_2) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+K_2 (16 bytes)
+ac 42 6e 5e 7d 7a d6 ae 3b 19 aa bd e0 f6 25 57 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+
+info (IV_2) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+IV_2 (13 bytes)
+ff 11 2e 1c 26 8a a2 a7 7c c3 ee 6c 4d 
+
+P_2 (0 bytes)
+
+
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+
+A_2 (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+C_2 (8 bytes)
+ba 38 b9 a3 fc 1a 58 e9 
+
+message_2 =
+(
+  h'fc3b339367a5225d53a92d380323afd035d7817b6d1be47d946f6b09a9cbdc06',
+  h'c2',
+  h'ba38b9a3fc1a58e9',
+)
+
+message_2 (45 bytes)
+58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 48 ba 38 b9 a3 fc 1a 58 e9 
+
+---------------------------------------------------------------
+
+data_3 =
+(
+  h'c2',
+)
+
+data_3 (2 bytes)
+41 c2 
+
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (42 bytes)
+16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca ba 38 b9 a3 fc 1a 58 e9 41 c2 
+
+TH_3 (32 bytes)
+79 d2 bf c6 6e 4f c9 e3 fe 5a 1b be ae 85 b5 49 0c 71 f2 74 b1 83 a9 5f 91 d2 07 35 a1 6e f0 df 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'79d2bfc66e4fc9e3fe5a1bbeae85b5490c71f274b183a95f91d20735a16ef0df' ],
+]
+
+info (K_3) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 79 d2 bf c6 6e 4f c9 e3 fe 5a 1b be ae 85 b5 49 0c 71 f2 74 b1 83 a9 5f 91 d2 07 35 a1 6e f0 df 
+
+K_3 (16 bytes)
+10 50 93 36 0a 7e 43 ce f0 e1 f0 1c 9d 70 c9 8a 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'79d2bfc66e4fc9e3fe5a1bbeae85b5490c71f274b183a95f91d20735a16ef0df' ],
+]
+
+info (IV_3) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 79 d2 bf c6 6e 4f c9 e3 fe 5a 1b be ae 85 b5 49 0c 71 f2 74 b1 83 a9 5f 91 d2 07 35 a1 6e f0 df 
+
+IV_3 (13 bytes)
+ee ed 40 23 39 dd 8b 71 94 ec 94 84 52 
+
+A_3 =
+[
+  "Encrypt0",
+  h'',
+  h'79d2bfc66e4fc9e3fe5a1bbeae85b5490c71f274b183a95f91d20735a16ef0df' ],
+]
+
+A_3 (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 79 d2 bf c6 6e 4f c9 e3 fe 5a 1b be ae 85 b5 49 0c 71 f2 74 b1 83 a9 5f 91 d2 07 35 a1 6e f0 df 
+
+P_3 (0 bytes)
+
+
+C_3 (8 bytes)
+3e 94 0a 26 01 59 e2 69 
+
+message_3 =
+(
+  h'c2',
+  h'3e940a260159e269',
+)
+
+message_3 (11 bytes)
+41 c2 48 3e 94 0a 26 01 59 e2 69 
+
+---------------------------------------------------------------
+
+Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 ) (40 bytes)
+79 d2 bf c6 6e 4f c9 e3 fe 5a 1b be ae 85 b5 49 0c 71 f2 74 b1 83 a9 5f 91 d2 07 35 a1 6e f0 df 3e 94 0a 26 01 59 e2 69 
+
+TH_4 (32 bytes)
+f7 69 90 76 a8 b8 94 3c 58 85 9f 22 9c 59 03 5c 74 2f c9 75 6a ae be 0d e5 73 d8 cb 3b 1d 98 40 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Secret",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'f7699076a8b8943c58859f229c59035c742fc9756aaebe0de573d8cb3b1d9840' ],
+]
+
+info (OSCORE Master Secret) (68 bytes)
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 f7 69 90 76 a8 b8 94 3c 58 85 9f 22 9c 59 03 5c 74 2f c9 75 6a ae be 0d e5 73 d8 cb 3b 1d 98 40 
+
+OSCORE Master Secret (16 bytes)
+7a 34 5a 5e 84 60 03 aa 95 83 34 69 51 c4 32 39 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Salt",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 64, h'', h'f7699076a8b8943c58859f229c59035c742fc9756aaebe0de573d8cb3b1d9840' ],
+]
+
+info (OSCORE Master Salt) (66 bytes)
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 f7 69 90 76 a8 b8 94 3c 58 85 9f 22 9c 59 03 5c 74 2f c9 75 6a ae be 0d e5 73 d8 cb 3b 1d 98 40 
+
+OSCORE Master Salt (8 bytes)
+b3 74 1e 56 be 8e 37 fe 
+
+Client's OSCORE Sender ID (1 bytes)
+c2 
+
+Server's OSCORE Sender ID (1 bytes)
+c1 
+
+AEAD Algorithm
+10
+
+HKDF Algorithm
+-27
+
+---------------------------------------------------------------
+Test Vectors for EDHOC Authenticated with RPK
+---------------------------------------------------------------
+
+Party U's private authentication key (32 bytes)
+53 21 fc 01 c2 98 20 06 3a 72 50 8f c6 39 25 1d c8 30 e2 f7 68 3e b8 e3 8a f1 64 a5 b9 af 9b e3 
+
+Party U's public authentication key (32 bytes)
+42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+
+kid for U's public authentication key (1 bytes)
+a2 
+
+ID_CRED_U =
+{
+  4:  h'a2',
+}
+
+ID_CRED_U (Contains a single 'kid' parameter, so only bstr will be used used in plaintext) (4 bytes)
+a1 04 41 a2 
+
+CRED_U =
+{
+  1:  1,
+ -1:  6,
+ -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7',
+}
+
+CRED_U (COSE_KEY) (40 bytes)
+a4 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+
+Party V's private authentication key (32 bytes)
+74 56 b3 a3 e5 8d 8d 26 dd 36 bc 75 d5 5b 88 63 a8 5d 34 72 f4 a0 1f 02 24 62 1b 1c b8 16 6d a9 
+
+Party V's public authentication key (32 bytes)
+1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+
+kid for V's public authentication key (1 bytes)
+a3 
+
+ID_CRED_V =
+{
+  4:  h'a3',
+}
+
+ID_CRED_V (Contains a single 'kid' parameter, so only bstr will be used used in plaintext) (4 bytes)
+a1 04 41 a3 
+
+CRED_V =
+{
+  1:  1,
+ -1:  6,
+ -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3',
+}
+
+CRED_V (COSE_KEY) (40 bytes)
+a4 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+
+---------------------------------------------------------------
+
+method (Asymmetric Authentication)
+0
+
+corr (Party U is CoAP client)
+1
+
+TYPE (4 * method + corr)
+1
+
+suite
+0
+
+Party U's ephemeral private key (32 bytes)
+d4 d8 1a ba fa d9 08 a0 cc ef ef 5a d6 b0 5d 50 27 02 f1 c1 6f 23 2c 25 92 93 09 ac 44 1b 95 8e 
+
+Party U's ephemeral public key (X_U) (32 bytes)
+b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8 f4 af 98 0d 2d b8 3a 
+
+C_U (1 bytes)
+c3 
+
+message_1 =
+(
+  1,
+  0,
+  h'b1a3e89460e88d3a8d54211dc95f0b903ff205eb71912d6db8f4af980d2db83a',
+  h'c3',
+)
+
+message_1 (38 bytes)
+01 00 58 20 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 
+
+---------------------------------------------------------------
+
+Party V's ephemeral private key (32 bytes)
+17 cd c7 bc a3 f2 a0 bd a6 0c 6d e5 b9 6f 82 a3 62 39 b4 4b de 39 7a 38 62 d5 29 ba 8b 3d 7c 62 
+
+Party V's ephemeral public key (X_V) (32 bytes)
+8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 
+
+ECDH shared secret (32 bytes)
+c6 1e 09 09 a1 9d 64 24 01 63 ec 26 2e 9c c4 f8 8c e7 7b e1 23 c5 ab 53 8d 26 b0 69 22 a5 20 67 
+
+salt (0 bytes)
+
+
+PRK (32 bytes)
+ba 9c 2c a1 c5 62 14 a6 e0 f6 13 ed a8 91 86 8a 4c a3 e3 fa bc c7 79 8f dc 01 60 80 07 59 16 71 
+
+C_V (1 bytes)
+c4 
+
+data_2 =
+(
+  h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
+  h'c4',
+)
+
+data_2 (36 bytes)
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 
+
+Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (74 bytes)
+01 00 58 20 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 
+
+TH_2 (32 bytes)
+55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+M_V =
+[
+  "Signature1",
+  << { 4: h'a3' } >>,
+  h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355',
+  {
+    1:  1,
+   -1:  6,
+   -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3',
+  },
+]
+
+M_V (message to be signed with Ed25519) (91 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a3 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 a4 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+
+V's signature (64 bytes)
+f3 67 60 9c 93 08 f6 2b 1c af 73 6c e4 38 fc 4d 49 67 4c 0f 7b f3 c1 0b c2 f9 46 7e 88 58 d8 98 be a4 54 54 f1 b3 38 ab 4b 63 d6 2a ff 2d 2d 2b 2e 27 8f 42 60 24 31 9e e8 18 9a a7 b9 22 4e 0d 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ],
+]
+
+info (K_2) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+K_2 (16 bytes)
+da d7 44 af 07 c4 da 27 d1 f0 a3 8a 0c 4b 87 38 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ],
+]
+
+info (IV_2) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+IV_2 (13 bytes)
+fb a1 65 d9 08 da a7 8e 4f 84 41 42 d0 
+
+P_2 (68 bytes)
+41 a3 58 40 f3 67 60 9c 93 08 f6 2b 1c af 73 6c e4 38 fc 4d 49 67 4c 0f 7b f3 c1 0b c2 f9 46 7e 88 58 d8 98 be a4 54 54 f1 b3 38 ab 4b 63 d6 2a ff 2d 2d 2b 2e 27 8f 42 60 24 31 9e e8 18 9a a7 b9 22 4e 0d 
+
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ],
+]
+
+A_2 (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+C_2 (76 bytes)
+1e 6b fe 0e d6 c3 37 01 08 35 96 54 34 6d 92 e6 b9 4f f8 aa d9 ce 6f 48 23 9a 06 21 44 68 8e 28 53 84 66 1f 2a 16 7c c1 58 fc c0 3f f2 38 99 ba 64 5f 0f 2d eb 38 bb 48 a8 23 af 72 3b 1f 92 54 72 0a fd d6 b4 8d 53 ee 82 02 2d 13 
+
+message_2 =
+(
+  h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
+  h'c4',
+  h'1e6bfe0ed6c3370108359654346d92e6b94ff8aad9ce6f48239a062144688e285384661f2a167cc158fcc03ff23899ba645f0f2deb38bb48a823af723b1f9254720afdd6b48d53ee82022d13',
+)
+
+message_2 (114 bytes)
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c 1e 6b fe 0e d6 c3 37 01 08 35 96 54 34 6d 92 e6 b9 4f f8 aa d9 ce 6f 48 23 9a 06 21 44 68 8e 28 53 84 66 1f 2a 16 7c c1 58 fc c0 3f f2 38 99 ba 64 5f 0f 2d eb 38 bb 48 a8 23 af 72 3b 1f 92 54 72 0a fd d6 b4 8d 53 ee 82 02 2d 13 
+
+---------------------------------------------------------------
+
+data_3 =
+(
+  h'c4',
+)
+
+data_3 (2 bytes)
+41 c4 
+
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (110 bytes)
+55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 1e 6b fe 0e d6 c3 37 01 08 35 96 54 34 6d 92 e6 b9 4f f8 aa d9 ce 6f 48 23 9a 06 21 44 68 8e 28 53 84 66 1f 2a 16 7c c1 58 fc c0 3f f2 38 99 ba 64 5f 0f 2d eb 38 bb 48 a8 23 af 72 3b 1f 92 54 72 0a fd d6 b4 8d 53 ee 82 02 2d 13 41 c4 
+
+TH_3 (32 bytes)
+71 78 58 eb f0 c1 0c 66 fe 51 a0 84 8c 82 66 f8 3a d8 de 7b bc 30 69 15 65 7c 83 dc 18 c6 94 81 
+
+M_U =
+[
+  "Signature1",
+  << { 4: h'a2' } >>,
+  h'717858ebf0c10c66fe51a0848c8266f83ad8de7bbc306915657c83dc18c69481',
+  {
+    1:  1,
+   -1:  6,
+   -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7',
+  },
+]
+
+M_U (message to be signed with Ed25519) (91 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 a4 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+
+U's signature (64 bytes)
+7a 4c 50 7c 12 39 d2 d8 a6 e4 aa 74 83 f4 37 e2 f0 fe bc bb c2 56 36 8a 86 af db 7c 76 92 e1 cb ed 75 2f 07 b0 b3 5f 1f 3f 0a 60 30 d1 92 12 ef 9d 5b f2 df 97 cf 2c 1e 0b 13 62 5c ce fc cd 0b 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'717858ebf0c10c66fe51a0848c8266f83ad8de7bbc306915657c83dc18c69481' ],
+]
+
+info (K_3) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 71 78 58 eb f0 c1 0c 66 fe 51 a0 84 8c 82 66 f8 3a d8 de 7b bc 30 69 15 65 7c 83 dc 18 c6 94 81 
+
+K_3 (16 bytes)
+ba e3 d7 1d f3 67 2d 83 28 8f 21 1a 2d 66 2f 3c 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'717858ebf0c10c66fe51a0848c8266f83ad8de7bbc306915657c83dc18c69481' ],
+]
+
+info (IV_3) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 71 78 58 eb f0 c1 0c 66 fe 51 a0 84 8c 82 66 f8 3a d8 de 7b bc 30 69 15 65 7c 83 dc 18 c6 94 81 
+
+IV_3 (13 bytes)
+f1 8d ae a1 52 2c e4 fd 27 e8 71 cf 49 
+
+A_3 =
+[
+  "Encrypt0",
+  h'',
+  h'717858ebf0c10c66fe51a0848c8266f83ad8de7bbc306915657c83dc18c69481' ],
+]
+
+A_3 (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 71 78 58 eb f0 c1 0c 66 fe 51 a0 84 8c 82 66 f8 3a d8 de 7b bc 30 69 15 65 7c 83 dc 18 c6 94 81 
+
+P_3 (68 bytes)
+41 a2 58 40 7a 4c 50 7c 12 39 d2 d8 a6 e4 aa 74 83 f4 37 e2 f0 fe bc bb c2 56 36 8a 86 af db 7c 76 92 e1 cb ed 75 2f 07 b0 b3 5f 1f 3f 0a 60 30 d1 92 12 ef 9d 5b f2 df 97 cf 2c 1e 0b 13 62 5c ce fc cd 0b 
+
+C_3 (76 bytes)
+39 22 c9 d0 7d b8 40 46 a8 71 79 9a e4 5e b0 1c c7 3e de 76 aa 3a 98 75 1a 3f 84 f4 4d be fa 50 45 f2 02 ef 75 12 ae bf cf f5 64 ca 73 87 0c 1b 94 c5 21 6e 33 85 be 04 43 12 11 61 15 88 79 24 71 3c 72 5b 5f ae 9c 07 81 9a ee 2c 
+
+message_3 =
+(
+  h'c4',
+  h'3922c9d07db84046a871799ae45eb01cc73ede76aa3a98751a3f84f44dbefa5045f202ef7512aebfcff564ca73870c1b94c5216e3385be044312116115887924713c725b5fae9c07819aee2c',
+)
+
+message_3 (80 bytes)
+41 c4 58 4c 39 22 c9 d0 7d b8 40 46 a8 71 79 9a e4 5e b0 1c c7 3e de 76 aa 3a 98 75 1a 3f 84 f4 4d be fa 50 45 f2 02 ef 75 12 ae bf cf f5 64 ca 73 87 0c 1b 94 c5 21 6e 33 85 be 04 43 12 11 61 15 88 79 24 71 3c 72 5b 5f ae 9c 07 81 9a ee 2c 
+
+---------------------------------------------------------------
+
+Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 ) (108 bytes)
+71 78 58 eb f0 c1 0c 66 fe 51 a0 84 8c 82 66 f8 3a d8 de 7b bc 30 69 15 65 7c 83 dc 18 c6 94 81 39 22 c9 d0 7d b8 40 46 a8 71 79 9a e4 5e b0 1c c7 3e de 76 aa 3a 98 75 1a 3f 84 f4 4d be fa 50 45 f2 02 ef 75 12 ae bf cf f5 64 ca 73 87 0c 1b 94 c5 21 6e 33 85 be 04 43 12 11 61 15 88 79 24 71 3c 72 5b 5f ae 9c 07 81 9a ee 2c 
+
+TH_4 (32 bytes)
+c6 8e 3f 79 72 ce 70 8b f5 3b 82 5e ea 55 de 1f 13 b7 c8 b1 21 ef 1c b5 cf 08 c3 69 b8 92 2b 24 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Secret",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'c68e3f7972ce708bf53b825eea55de1f13b7c8b121ef1cb5cf08c369b8922b24' ],
+]
+
+info (OSCORE Master Secret) (68 bytes)
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 c6 8e 3f 79 72 ce 70 8b f5 3b 82 5e ea 55 de 1f 13 b7 c8 b1 21 ef 1c b5 cf 08 c3 69 b8 92 2b 24 
+
+OSCORE Master Secret (16 bytes)
+ea 21 0a 30 df b0 67 2e 65 0b 15 21 33 0b b1 92 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Salt",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 64, h'', h'c68e3f7972ce708bf53b825eea55de1f13b7c8b121ef1cb5cf08c369b8922b24' ],
+]
+
+info (OSCORE Master Salt) (66 bytes)
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 c6 8e 3f 79 72 ce 70 8b f5 3b 82 5e ea 55 de 1f 13 b7 c8 b1 21 ef 1c b5 cf 08 c3 69 b8 92 2b 24 
+
+OSCORE Master Salt (8 bytes)
+85 f4 0b 33 e7 53 01 53 
+
+Client's OSCORE Sender ID (1 bytes)
+c4 
+
+Server's OSCORE Sender ID (1 bytes)
+c3 
+
+AEAD Algorithm
+10
+
+HKDF Algorithm
+-27
