@@ -279,10 +279,10 @@ ID_CRED_U =
   4:  h'a2',
 }
 
+The header_map contains a single 'kid' parameter, so ID_CRED_U is encoded as a CBOR bstr in the plaintext)
+
 ID_CRED_U (in protected header) (CBOR-encoded) (4 bytes)
 a1 04 41 a2 
-
-The header_map contains a single 'kid' parameter, so ID_CRED_U is encoded as a CBOR bstr in the plaintext)
 
 ID_CRED_U (in plaintext) (CBOR-encoded) (2 bytes)
 41 a2 
@@ -311,10 +311,10 @@ ID_CRED_V =
   4:  h'a3',
 }
 
+The header_map contains a single 'kid' parameter, so ID_CRED_V is encoded as a CBOR bstr in the plaintext)
+
 ID_CRED_V (encoding in protected header) (CBOR-encoded) (4 bytes)
 a1 04 41 a3 
-
-The header_map contains a single 'kid' parameter, so ID_CRED_V is encoded as a CBOR bstr in the plaintext)
 
 ID_CRED_V (encoding in plaintext) (CBOR-encoded) (2 bytes)
 41 a3 
