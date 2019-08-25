@@ -320,54 +320,76 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be performed as specified in Section 11 of {{RFC8152}} with the following input:
+Key and IV derivation SHALL be performed with the HKDF {{RFC5869}} in the selected cipher suite following the specification in Section 11 of {{RFC8152}}. The PRK is derived using HKDF-Extract {{RFC5869}}
 
-* The KDF SHALL be the HKDF {{RFC5869}} in the selected cipher suite.
+~~~~~~~~~~~~~~~~~~~~~~~
+   PRK = HKDF-Extract( salt, IKM )
+~~~~~~~~~~~~~~~~~~~~~~~
 
-* The secret (Section 11.1 of {{RFC8152}}) SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}.
+with the following input:
 
-* The salt (Section 11.1 of {{RFC8152}}) SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. The secret and the salt are both inputs to the HKDF extract stage and the PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
+* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The fields in the context information COSE_KDF_Context (Section 11.2 of {{RFC8152}}) SHALL have the following values:
+* The IKM SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}. When using the mandatory-to-implement curve25519, the ECDH shared secret is the output of the X25519 funtion {{RFC7748}}.
+
+Assuming use of the mandatory-to-implement algorithm HKDF SHA-256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+   PRK = HMAC-SHA-256( salt, ECDH shared secret )
+~~~~~~~~~~~~~~~~~~~~~~~
+
+where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case. The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
+
+~~~~~~~~~~~~~~~~~~~~~~~
+   output parameter = HKDF-Expand( PRK, info, L )
+~~~~~~~~~~~~~~~~~~~~~~~
+
+where L is the length of output material in bytes and info is the CBOR encoding of a COSE_KDF_Context
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info = [
+  AlgorithmID,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ keyDataLength, h'', other ]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+where 
 
   + AlgorithmID is an int or tstr, see below
-
-  + PartyUInfo = PartyVInfo = ( null, null, null )
   
-  + keyDataLength is a uint, see below
-  
-  + protected SHALL be a zero length bstr
+  +  keyDataLength is a uint set to the length of output material in bits, see below
 
-  + other is a bstr and SHALL be one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
- 
-  + SuppPrivInfo is omitted
+  + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-We define EDHOC-Key-Derivation to be the function which produces the output as described in {{RFC5869}} and {{RFC8152}} depending on the variable input AlgorithmID, keyDataLength, and other:
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
 
-~~~~~~~~~~~
-   output = EDHOC-Key-Derivation(AlgorithmID, keyDataLength, other)
-~~~~~~~~~~~
+If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and OutputLengthInBits equal to the IV length of the AEAD.
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
+Assuming the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using other set to the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
+~~~~~~~~~~~~~~~~~~~~~~~
+   output parameter = HMAC-SHA-256( PRK, info || 0x01 )
+~~~~~~~~~~~~~~~~~~~~~~~
+
+where \|\| means byte string concatenation.
 
 ### EDHOC-Exporter Interface {#exporter}
 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = 
-      EDHOC-Key-Derivation(label, 8 * length, TH_4)
+   EDHOC-Exporter(label, length) = HKDF-Expand(PRK, info, length) 
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = TH_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4, in non-CDDL notation, is:
+The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is an bstr and is calculated as the hash of the CBOR Sequence ( TH_3, CIPHERTEXT_3 ):
 
 ~~~~~~~~~~~
-   TH_4 = H( bstr .cborseq [ TH_3, CIPHERTEXT_3 ] )
+   TH_4 = H( TH_3, CIPHERTEXT_3 )
 ~~~~~~~~~~~
 
-where H() is the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
+where H() is the hash function in the HKDF. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
 
 ### EDHOC PSK Chaining {#chain}
 
@@ -1185,42 +1207,6 @@ COSE constructs the input to the Signature Algorithm as follows:
 
 * For instance, if ID_CRED_x = { 4 : h'1111' } (CBOR encoding 0xA104421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
-
-### Key Derivation
-
-Assuming use of the mandatory-to-implement algorithms HKDF SHA-256 and AES-CCM-16-64-128, the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
-
-~~~~~~~~~~~~~~~~~~~~~~~
-PRK = HMAC-SHA-256( salt, ECDH shared secret )
-~~~~~~~~~~~~~~~~~~~~~~~
-
-where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case. As the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
-
-~~~~~~~~~~~~~~~~~~~~~~~
-output parameter = HMAC-SHA-256( PRK, info || 0x01 )
-~~~~~~~~~~~~~~~~~~~~~~~
-
-where \|\| means byte string concatenation, and info is the CBOR encoding of 
-
-~~~~~~~~~~~~~~~~~~~~~~~
-COSE_KDF_Context = [
-  AlgorithmID,
-  [ null, null, null ],
-  [ null, null, null ],
-  [ keyDataLength, h'', TH_i ]
-]
-~~~~~~~~~~~~~~~~~~~~~~~
-
-If AES-CCM-16-64-128 then AlgorithmID = 10 (CBOR encoding 0x0a) and keyDataLength = 128 (CBOR encoding 0x1880) for K_i, and AlgorithmID = "IV-GENERATION" (CBOR encoding 0x6d49562d47454e45524154494f4e) and keyDataLength = 104 (CBOR encoding 0x1868) for IV_i. When SHA-256 is used, TH_i is always 32 bytes.  Hence, if TH_2 = h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f' then
-
-~~~~~~~~~~~~~~~~~~~~~~~
-K_2  = HMAC-SHA-256( PRK, 0x840a83f6f6f683f6f6f6831880405820
-  000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f01 )
-IV_2 = HMAC-SHA-256( PRK, 0x846d49562d47454e45524154494f4e
-  83f6f6f683f6f6f6831868405820
-  000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f01 ) 
-~~~~~~~~~~~~~~~~~~~~~~~
-
 
 # Example Messages and Sizes {#sizes}
 
