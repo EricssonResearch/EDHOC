@@ -221,13 +221,13 @@ SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of
 
 ~~~~~~~~~~~
 Party U                                                   Party V
-   |                          X_U                            |
+   |                          G_X                            |
    +-------------------------------------------------------->|
    |                                                         |
-   |  X_V, AEAD( K_2; ID_CRED_V, Sig(V; CRED_V, X_U, X_V) )  |
+   |  G_Y, AEAD( K_2; ID_CRED_V, Sig(V; CRED_V, G_X, G_Y) )  |
    |<--------------------------------------------------------+
    |                                                         |
-   |     AEAD( K_3; ID_CRED_U, Sig(U; CRED_U, X_V, X_U) )    |
+   |     AEAD( K_3; ID_CRED_U, Sig(U; CRED_U, G_Y, G_X) )    |
    +-------------------------------------------------------->|
    |                                                         |
 ~~~~~~~~~~~
@@ -236,7 +236,7 @@ Party U                                                   Party V
 
 The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. 
 
-* X_U and X_V are the ECDH ephemeral public keys of U and V, respectively.
+* G_X and G_Y are the ECDH ephemeral public keys of U and V, respectively.
 
 * CRED_U and CRED_V are the credentials containing the public authentication keys of U and V, respectively.
 
@@ -316,7 +316,7 @@ This document specifies two pre-defined cipher suites.
 
 ## Ephemeral Public Keys {#cose_key}
    
-The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only a subset of the parameters is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the x-coordinate is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
@@ -450,11 +450,11 @@ EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, X_U, C_U, UAD_1                  |
+|                  TYPE, SUITES_U, G_X, C_U, UAD_1                  |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|  C_U, X_V, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), UAD_2) |
+|  C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), UAD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -475,7 +475,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 message_1 = (
   TYPE : int,
   SUITES_U : suite / [ index: uint, 2* suite ],
-  X_U : bstr,
+  G_X : bstr,
   C_U : bstr,  
   ? UAD_1 : bstr,
 )
@@ -485,7 +485,7 @@ where:
 
 * TYPE = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * SUITES_U - cipher suites which Party U supports, in order of decreasing preference. If a single cipher suite is conveyed, a single suite is used, if multiple cipher suites are conveyed, an array of suites and an index is used. The zero-based index (i.e. 0 for the first, 1 for the second, etc.) identifies a single selected cipher suite from the array.
-* X_U - the x-coordinate of the ephemeral public key of Party U
+* G_X - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
 * UAD_1 - bstr containing unprotected opaque application data
 
@@ -497,7 +497,7 @@ Party U SHALL compose message_1 as follows:
 
 * Determine the cipher suite to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying a cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in SUITES_U MUST be used.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let X_U be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_X be the x-coordinate of the ephemeral public key.
    
 * Choose a connection identifier C_U and store it for the length of the protocol.
 
@@ -511,7 +511,7 @@ Party V SHALL process message_1 as follows:
 
 * Verify that the selected cipher suite is supported and that no prior cipher suites in SUITES_U are supported.
 
-* Validate that there is a solution to the curve definition for the given x-coordinate X_U.
+* Validate that there is a solution to the curve definition for the given x-coordinate G_X.
 
 * Pass UAD_1 to the application.
 
@@ -533,7 +533,7 @@ message_2 = (
 ~~~~~~~~~~~ CDDL
 data_2 = (
   ? C_U : bstr,
-  X_V : bstr,
+  G_Y : bstr,
   C_V : bstr,
 )
 ~~~~~~~~~~~
@@ -550,7 +550,7 @@ TH_2 = H( bstr .cborseq [ message_1, data_2 ] )
 
 where:
 
-* X_V - the x-coordinate of the ephemeral public key of Party V
+* G_Y - the x-coordinate of the ephemeral public key of Party V
 * C_V - variable length connection identifier
 * H() - the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
@@ -560,7 +560,7 @@ Party V SHALL compose message_2 as follows:
 
 * If TYPE mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let X_V be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_Y be the x-coordinate of the ephemeral public key.
 
 * Choose a connection identifier C_V and store it for the length of the protocol.
 
@@ -604,7 +604,7 @@ Party U SHALL process message_2 as follows:
 
 * Retrieve the protocol state using the connection identifier C_U and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Validate that there is a solution to the curve definition for the given x-coordinate X_V.
+* Validate that there is a solution to the curve definition for the given x-coordinate G_Y.
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, and IV_2.
 
@@ -711,11 +711,11 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|              TYPE, SUITES_U, X_U, C_U, ID_PSK, UAD_1              |
+|              TYPE, SUITES_U, G_X, C_U, ID_PSK, UAD_1              |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_U, X_V, C_V, AEAD(K_2; TH_2, UAD_2)               |
+|               C_U, G_Y, C_V, AEAD(K_2; TH_2, UAD_2)               |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -738,7 +738,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 message_1 = (
   TYPE : int,
   SUITES_U : suite / [ index: uint, 2* suite ],
-  X_U : bstr,
+  G_X : bstr,
   C_U : bstr,
   ID_PSK : bstr / header_map,
   ? UAD_1 : bstr,
@@ -806,7 +806,7 @@ Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decre
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            TYPE, SUITES_U {0, 5, 6, 7}, X_U, C_U, UAD_1           |
+|            TYPE, SUITES_U {0, 5, 6, 7}, G_X, C_U, UAD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -814,7 +814,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|             TYPE, SUITES_U {1, 5, 6}, X_U, C_U, UAD_1             |
+|             TYPE, SUITES_U {1, 5, 6}, G_X, C_U, UAD_1             |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -825,7 +825,7 @@ In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|             TYPE, SUITES_U {0, 5, 6}, X_U, C_U, UAD_1             |
+|             TYPE, SUITES_U {0, 5, 6}, G_X, C_U, UAD_1             |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -833,7 +833,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|            TYPE, SUITES_U {2, 5, 6, 7}, X_U, C_U, UAD_1           |
+|            TYPE, SUITES_U {2, 5, 6, 7}, G_X, C_U, UAD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
