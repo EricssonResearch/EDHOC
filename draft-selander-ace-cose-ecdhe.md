@@ -314,13 +314,6 @@ This document specifies two pre-defined cipher suites.
       (AES-CCM-16-64-128, ECDH-SS + HKDF-256, P-256, ES256, P-256)
 ~~~~~~~~~~~
 
-Two additional numbers are registered for application defined cipher suites. Application defined cipher suites MUST only use algorithms specified for COSE, are not interoperable with other deployments and can therefore only be used in local networks.
-
-~~~~~~~~~~~
-   -24. First application defined cipher suite.
-   -23. Second application defined cipher suite.
-~~~~~~~~~~~
-
 ## Ephemeral Public Keys {#cose_key}
    
 The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only a subset of the parameters is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
@@ -913,15 +906,49 @@ EDHOC may be transported over a different transport than CoAP. In this case the 
 
 ## EDHOC Cipher Suites Registry
 
-IANA has created a new registry titled "EDHOC Cipher Suites".
+IANA has created a new registry titled "EDHOC Cipher Suites". The registration procedure is "Expert Review". The columns of the registry are Value, Array, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
-TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: 1
+Array: [ 10, -27, 1, -7, 1 ]
+Desc: AES-CCM-16-64-128, ECDH-SS + HKDF-256, P-256, ES256, P-256
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: 0
+Array: [ 10, -27, 4, -8, 6 ]
+Desc: AES-CCM-16-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: -5
+Array:
+Desc: Reserved for Private Use
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: -6
+Array:
+Desc: Reserved for Private Use
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ## EDHOC Method Type Registry
 
-IANA has created a new registry titled "EDHOC Method Type".
+IANA has created a new registry titled "EDHOC Method Type". The registration procedure is "Expert Review". The columns of the registry are Value, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
-TODO
+~~~~~~~~~~~
++-------+------------------------------------------+-------------------+
+| Value | Specification                            | Reference         |
++-------+------------------------------------------+-------------------+
+|     0 | EDHOC Authenticated with Asymmetric Keys | [[this document]] |
+|     1 | EDHOC Authenticated with Symmetric Keys  | [[this document]] |
++-------+------------------------------------------+-------------------+
+~~~~~~~~~~~
+{: artwork-align="center"}
 
 ## The Well-Known URI Registry
 
