@@ -502,7 +502,7 @@ Party U SHALL compose message_1 as follows:
    
 * Choose a connection identifier C_U and store it for the length of the protocol.
 
-* Format message_1 as the sequence of CBOR data items specified in {{asym-msg1-form}} and encode it to a byte string (see {{CBOR}}).
+* Encode message_1 as a sequence of CBOR encoded data items as specified in {{asym-msg1-form}}
 
 ### Party V Processing of Message 1
 
@@ -572,19 +572,15 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
-   * plaintext = bstr .cborseq \[ ID_CRED_V, signature, ? UAD_2 \]
+   * plaintext = ( ID_CRED_V / kid_value, signature, ? UAD_2 )
 
    * external_aad = TH_2
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : bstr }, only the bstr is conveyed in the plaintext, in CDDL notation
-   
-~~~~~~~~~~~ CDDL
-   plaintext = bstr .cborseq [ bstr / header_map, bstr, ? bstr ]
-~~~~~~~~~~~
+   Note that 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only the bstr kid_value is conveyed in the plaintext.
 
-*  Format message_2 as the sequence of CBOR data items specified in {{asym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
+* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
 ### Party U Processing of Message 2
 
@@ -627,7 +623,7 @@ Party U SHALL compose message_3 as follows:
 
 * If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
-* Compute the transcript hash TH_3 = H( TH_2, CIPHERTEXT_2, data_3 ) where H() is the hash function in the HKDF. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+* Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HKDF. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
@@ -645,15 +641,15 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
-   * plaintext =  bstr .cborseq \[ ID_CRED_U, signature, ? PAD_3 \]
+   * plaintext = ( ID_CRED_U / kid_value, signature, ? PAD_3 )
          
    * external_aad = TH_3
 
    * PAD_3 = bstr containing opaque protected application data
 
-   Note that 'protected' and 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : bstr }, only the bstr is conveyed in the plaintext.
-   
-*  Format message_3 as the sequence of CBOR data items specified in {{asym-msg3-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
+   Note that 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only the bstr kid_value is conveyed in the plaintext.
+
+* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg4-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 *  Pass the connection identifiers (C_U, C_V) and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
@@ -730,7 +726,7 @@ message_1 = (
 where:
 
 * TYPE = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : bstr }, only the bstr used.
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, only the bstr kid_value is conveyed.
 
 ## EDHOC Message 2
 
@@ -742,7 +738,7 @@ where:
 
    * external_aad = TH_2
 
-   * plaintext = h'' / UAD_2
+   * plaintext = ? UAD_2
    
    * UAD_2 = bstr containing opaque unprotected application data
 
@@ -756,7 +752,7 @@ where:
 
    * external_aad = TH_3
 
-   * plaintext = h'' / PAD_3
+   * plaintext = ? PAD_3
  
    * PAD_3 = bstr containing opaque protected application data
 
