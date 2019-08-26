@@ -384,7 +384,7 @@ Application keys and other application specific data can be derived using the ED
    EDHOC-Exporter(label, length) = HKDF-Expand(PRK, info, length) 
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = TR_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is an bstr and is calculated as the hash of the CBOR Sequence ( TH_3, CIPHERTEXT_3 ):
+The output of the EDHOC-Exporter function SHALL be derived using other = TH_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 ~~~~~~~~~~~
    TH_4 = H( TH_3, CIPHERTEXT_3 )
@@ -522,7 +522,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ### Formatting of Message 2 {#asym-msg2-form}
 
-message_2 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
+message_2 and data_2 SHALL be a CBOR Sequences (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_2 = (
@@ -539,21 +539,10 @@ data_2 = (
 )
 ~~~~~~~~~~~
 
-~~~~~~~~~~~ CDDL
-TH_2 : bstr
-~~~~~~~~~~~
-
-where the transcript hash TH_2, in non-CDDL notation, is:
-
-~~~~~~~~~~~
-TH_2 = H( bstr .cborseq [ message_1, data_2 ] )
-~~~~~~~~~~~
-
 where:
 
 * G_Y - the x-coordinate of the ephemeral public key of Party V
 * C_V - variable length connection identifier
-* H() - the hash function in the HKDF, which takes a CBOR byte string (bstr) as input and produces a CBOR byte string as output. The use of '.cborseq' is exemplified in {{CBOR}}.
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
 
@@ -564,6 +553,8 @@ Party V SHALL compose message_2 as follows:
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_Y be the x-coordinate of the ephemeral public key.
 
 * Choose a connection identifier C_V and store it for the length of the protocol.
+
+* Compute the transcript hash TH_2 = H( message_1, data_2 ) where H() is the hash function in the HKDF. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
@@ -595,8 +586,6 @@ Party V SHALL compose message_2 as follows:
 
 *  Format message_2 as the sequence of CBOR data items specified in {{asym-msg2-form}} and encode it to a byte string (see {{CBOR}}). CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
-
-
 ### Party U Processing of Message 2
 
 Party U SHALL process message_2 as follows:
@@ -617,7 +606,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 ### Formatting of Message 3 {#asym-msg3-form}
 
-message_3 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
+message_3 and data_3 SHALL be a CBOR Sequences (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_3 = (
@@ -632,21 +621,13 @@ data_3 = (
 )
 ~~~~~~~~~~~
 
-~~~~~~~~~~~ CDDL
-TH_3 : bstr
-~~~~~~~~~~~
-
-where the transcript hash TH_3, in non-CDDL notation, is:
-
-~~~~~~~~~~~
-TH_3 = H( bstr .cborseq [ TH_2, CIPHERTEXT_2, data_3 ] )
-~~~~~~~~~~~
-
 ### Party U Processing of Message 3 {#asym-msg3-proc}
 
 Party U SHALL compose message_3 as follows:
 
 * If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
+
+* Compute the transcript hash TH_3 = H( TH_2, CIPHERTEXT_2, data_3 ) where H() is the hash function in the HKDF. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
