@@ -1,0 +1,605 @@
+
+---------------------------------------------------------------
+Test Vectors for EDHOC Authenticated with PSK
+---------------------------------------------------------------
+
+Pre-shared Key (PSK) (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+
+kid value to identify PSK (1 bytes)
+a1 
+
+COSE header_map =
+{
+  4:  h'a1',
+}
+
+The header_map contains a single 'kid' parameter, so ID_PSK is a CBOR bstr)
+
+ID_PSK (CBOR-encoded) (2 bytes)
+41 a1 
+
+---------------------------------------------------------------
+
+method (Symmetric Authentication)
+1
+
+corr (Party U is CoAP client)
+1
+
+TYPE (4 * method + corr)
+5
+
+suite
+0
+
+Party U's ephemeral private key (32 bytes)
+f4 0c ea f8 6e 57 76 92 33 32 b8 d8 fd 3b ef 84 9c ad b1 9c 69 96 bc 27 2a f1 f6 48 d9 56 6a 4c 
+
+Party U's ephemeral public key (value of X_U) (32 bytes)
+ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 
+
+Connection identifier chosen by U (value of C_U) (1 bytes)
+c1 
+
+message_1 =
+(
+  5,
+  0,
+  h'ab2fca32898322c208fb2dab5048bd43c355c6430f588897cb574961cfa9806f',
+  h'c1',
+  h'a1',
+)
+
+message_1 (CBOR Sequence) (40 bytes)
+05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 
+
+---------------------------------------------------------------
+
+Party V's ephemeral private key (32 bytes)
+d9 81 80 87 de 72 44 ab c1 b5 fc f2 8e 55 e4 2c 7f f9 c6 78 c0 60 51 81 f3 7a c5 d7 41 4a 7b 95 
+
+Party V's ephemeral public key (value of X_V) (32 bytes)
+fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 
+
+ECDH shared secret (32 bytes)
+d5 75 05 50 6d 8f 30 a8 60 a0 63 d0 1b 5b 7a d7 6a 09 4f 70 61 3b 4a e6 6c 5a 90 e5 c2 1f 23 11 
+
+salt (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+
+PRK (32 bytes)
+aa b2 f1 3c cb 1a 4f f7 96 a9 7a 32 a4 d2 fb 62 47 ef 0b 6b 06 da 04 d3 d1 06 39 4b 28 76 e2 8c 
+
+Connection identifier chosen by V (value of C_V) (1 bytes)
+c2 
+
+data_2 =
+(
+  h'fc3b339367a5225d53a92d380323afd035d7817b6d1be47d946f6b09a9cbdc06',
+  h'c2',
+)
+
+data_2 (CBOR Sequence) (36 bytes)
+58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 
+
+Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence) (76 bytes)
+05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 
+
+TH_2 (CBOR-encoded) (34 bytes)
+58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+
+info (K_2) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+K_2 (16 bytes)
+ac 42 6e 5e 7d 7a d6 ae 3b 19 aa bd e0 f6 25 57 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+
+info (IV_2) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+IV_2 (13 bytes)
+ff 11 2e 1c 26 8a a2 a7 7c c3 ee 6c 4d 
+
+P_2 (0 bytes)
+
+
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+
+A_2 (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+
+C_2 (8 bytes)
+ba 38 b9 a3 fc 1a 58 e9 
+
+message_2 =
+(
+  h'fc3b339367a5225d53a92d380323afd035d7817b6d1be47d946f6b09a9cbdc06',
+  h'c2',
+  h'ba38b9a3fc1a58e9',
+)
+
+message_2 (CBOR Sequence) (45 bytes)
+58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 48 ba 38 b9 a3 fc 1a 58 e9 
+
+---------------------------------------------------------------
+
+data_3 =
+(
+  h'c2',
+)
+
+data_3 (CBOR Sequence) (2 bytes)
+41 c2 
+
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (45 bytes)
+58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 48 ba 38 b9 a3 fc 1a 58 e9 41 c2 
+
+TH_3 (CBOR-encoded) (34 bytes)
+58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89 54 81 b5 2b 8a f5 66 d7 fe 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'1198aab3eddb61b8a1b193a9e5602b5d5fea76bc2852895481b52b8af566d7fe' ],
+]
+
+info (K_3) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89 54 81 b5 2b 8a f5 66 d7 fe 
+
+K_3 (16 bytes)
+fe 75 e3 44 27 f8 3a ad 84 16 83 c6 6f a3 8a 62 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'1198aab3eddb61b8a1b193a9e5602b5d5fea76bc2852895481b52b8af566d7fe' ],
+]
+
+info (IV_3) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89 54 81 b5 2b 8a f5 66 d7 fe 
+
+IV_3 (13 bytes)
+60 0a 33 b4 16 de 08 23 52 67 71 ec 8a 
+
+A_3 =
+[
+  "Encrypt0",
+  h'',
+  h'1198aab3eddb61b8a1b193a9e5602b5d5fea76bc2852895481b52b8af566d7fe' ],
+]
+
+A_3 (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89 54 81 b5 2b 8a f5 66 d7 fe 
+
+P_3 (0 bytes)
+
+
+C_3 (8 bytes)
+51 29 07 92 61 45 40 04 
+
+message_3 =
+(
+  h'c2',
+  h'5129079261454004',
+)
+
+message_3 (CBOR Sequence) (11 bytes)
+41 c2 48 51 29 07 92 61 45 40 04 
+
+---------------------------------------------------------------
+
+Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 ) (CBOR Sequence) (43 bytes)
+58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89 54 81 b5 2b 8a f5 66 d7 fe 48 51 29 07 92 61 45 40 04 
+
+TH_4 (CBOR-encoded) (34 bytes)
+58 20 df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Secret",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'df7c9b06f5dc0ee8860b396c78c5beb757413fa7b6a9cf283ddb4cd4c1fde43c' ],
+]
+
+info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
+
+OSCORE Master Secret (16 bytes)
+8d 36 8f 09 26 2d c5 52 7f e7 19 e6 6c 91 63 75 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Salt",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 64, h'', h'df7c9b06f5dc0ee8860b396c78c5beb757413fa7b6a9cf283ddb4cd4c1fde43c' ],
+]
+
+info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
+
+OSCORE Master Salt (8 bytes)
+4d b7 06 58 c5 e9 9f b6 
+
+Client's OSCORE Sender ID (1 bytes)
+c2 
+
+Server's OSCORE Sender ID (1 bytes)
+c1 
+
+AEAD Algorithm
+10
+
+HKDF Algorithm
+-27
+
+---------------------------------------------------------------
+Test Vectors for EDHOC Authenticated with RPK
+---------------------------------------------------------------
+
+Party U's private authentication key (32 bytes)
+53 21 fc 01 c2 98 20 06 3a 72 50 8f c6 39 25 1d c8 30 e2 f7 68 3e b8 e3 8a f1 64 a5 b9 af 9b e3 
+
+Party U's public authentication key (32 bytes)
+42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+
+kid value to identify U's public authentication key (1 bytes)
+a2 
+
+ID_CRED_U =
+{
+  4:  h'a2',
+}
+
+The header_map contains a single 'kid' parameter, so ID_CRED_U is encoded as a CBOR bstr in the plaintext)
+
+ID_CRED_U (in protected header) (CBOR-encoded) (4 bytes)
+a1 04 41 a2 
+
+ID_CRED_U (in plaintext) (CBOR-encoded) (2 bytes)
+41 a2 
+
+CRED_U =
+{
+  1:  1,
+ -1:  6,
+ -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7',
+}
+
+CRED_U (COSE_KEY) (CBOR-encoded) (40 bytes)
+a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+
+Party V's private authentication key (32 bytes)
+74 56 b3 a3 e5 8d 8d 26 dd 36 bc 75 d5 5b 88 63 a8 5d 34 72 f4 a0 1f 02 24 62 1b 1c b8 16 6d a9 
+
+Party V's public authentication key (32 bytes)
+1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+
+kid value to identify V's public authentication key (1 bytes)
+a3 
+
+ID_CRED_V =
+{
+  4:  h'a3',
+}
+
+The header_map contains a single 'kid' parameter, so ID_CRED_V is encoded as a CBOR bstr in the plaintext)
+
+ID_CRED_V (encoding in protected header) (CBOR-encoded) (4 bytes)
+a1 04 41 a3 
+
+ID_CRED_V (encoding in plaintext) (CBOR-encoded) (2 bytes)
+41 a3 
+
+CRED_V =
+{
+  1:  1,
+ -1:  6,
+ -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3',
+}
+
+CRED_V (COSE_KEY) (CBOR-encoded) (40 bytes)
+a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+
+---------------------------------------------------------------
+
+method (Asymmetric Authentication)
+0
+
+corr (Party U is CoAP client)
+1
+
+TYPE (4 * method + corr)
+1
+
+suite
+0
+
+Party U's ephemeral private key (32 bytes)
+d4 d8 1a ba fa d9 08 a0 cc ef ef 5a d6 b0 5d 50 27 02 f1 c1 6f 23 2c 25 92 93 09 ac 44 1b 95 8e 
+
+Party U's ephemeral public key (value of X_U) (32 bytes)
+b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8 f4 af 98 0d 2d b8 3a 
+
+Connection identifier chosen by U (value of C_U) (1 bytes)
+c3 
+
+message_1 =
+(
+  1,
+  0,
+  h'b1a3e89460e88d3a8d54211dc95f0b903ff205eb71912d6db8f4af980d2db83a',
+  h'c3',
+)
+
+message_1 (CBOR Sequence) (38 bytes)
+01 00 58 20 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 
+
+---------------------------------------------------------------
+
+Party V's ephemeral private key (32 bytes)
+17 cd c7 bc a3 f2 a0 bd a6 0c 6d e5 b9 6f 82 a3 62 39 b4 4b de 39 7a 38 62 d5 29 ba 8b 3d 7c 62 
+
+Party V's ephemeral public key (value of X_V) (32 bytes)
+8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 
+
+ECDH shared secret (32 bytes)
+c6 1e 09 09 a1 9d 64 24 01 63 ec 26 2e 9c c4 f8 8c e7 7b e1 23 c5 ab 53 8d 26 b0 69 22 a5 20 67 
+
+salt (0 bytes)
+
+
+PRK (32 bytes)
+ba 9c 2c a1 c5 62 14 a6 e0 f6 13 ed a8 91 86 8a 4c a3 e3 fa bc c7 79 8f dc 01 60 80 07 59 16 71 
+
+Connection identifier chosen by V (value of C_V) (1 bytes)
+c4 
+
+data_2 =
+(
+  h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
+  h'c4',
+)
+
+data_2 (CBOR Sequence) (36 bytes)
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 
+
+Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence) (74 bytes)
+01 00 58 20 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 
+
+TH_2 (CBOR-encoded) (34 bytes)
+58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+M_V =
+[
+  "Signature1",
+  << { 4: h'a3' } >>,
+  h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355',
+  {
+    1:  1,
+   -1:  6,
+   -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3',
+  },
+]
+
+M_V (message to be signed with Ed25519) (CBOR-encoded) (91 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a3 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+
+V's signature (64 bytes)
+0d 15 da 55 cf 1d 47 cd a3 1c 59 9d dd 25 45 38 ca 22 1a 41 58 19 ec 68 b0 ca 51 11 97 83 01 56 17 60 a9 df 28 b6 fb 7e 25 43 b2 be ab 84 38 b9 52 d9 57 b9 5a 61 9f 51 ca 87 19 e4 41 b7 62 05 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ],
+]
+
+info (K_2) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+K_2 (16 bytes)
+da d7 44 af 07 c4 da 27 d1 f0 a3 8a 0c 4b 87 38 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ],
+]
+
+info (IV_2) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+IV_2 (13 bytes)
+fb a1 65 d9 08 da a7 8e 4f 84 41 42 d0 
+
+P_2 (68 bytes)
+41 a3 58 40 0d 15 da 55 cf 1d 47 cd a3 1c 59 9d dd 25 45 38 ca 22 1a 41 58 19 ec 68 b0 ca 51 11 97 83 01 56 17 60 a9 df 28 b6 fb 7e 25 43 b2 be ab 84 38 b9 52 d9 57 b9 5a 61 9f 51 ca 87 19 e4 41 b7 62 05 
+
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ],
+]
+
+A_2 (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+
+C_2 (76 bytes)
+1e 6b fe 0e 28 b1 8d c8 54 20 27 b2 8b de b8 17 80 52 41 df 5a 8b 39 06 00 70 2b 42 36 5b 99 47 4c 5f bf d1 83 d2 81 4a 81 f9 03 ea 9c 18 fd 2e 30 f6 1a bf 97 c6 63 b3 92 66 01 bd 19 80 11 17 8a 9f d1 de 52 94 52 6c e4 51 cf b7 
+
+message_2 =
+(
+  h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
+  h'c4',
+  h'1e6bfe0e28b18dc8542027b28bdeb817805241df5a8b390600702b42365b99474c5fbfd183d2814a81f903ea9c18fd2e30f61abf97c663b3926601bd198011178a9fd1de5294526ce451cfb7',
+)
+
+message_2 (CBOR Sequence) (114 bytes)
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c 1e 6b fe 0e 28 b1 8d c8 54 20 27 b2 8b de b8 17 80 52 41 df 5a 8b 39 06 00 70 2b 42 36 5b 99 47 4c 5f bf d1 83 d2 81 4a 81 f9 03 ea 9c 18 fd 2e 30 f6 1a bf 97 c6 63 b3 92 66 01 bd 19 80 11 17 8a 9f d1 de 52 94 52 6c e4 51 cf b7 
+
+---------------------------------------------------------------
+
+data_3 =
+(
+  h'c4',
+)
+
+data_3 (CBOR Sequence) (2 bytes)
+41 c4 
+
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (114 bytes)
+58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 58 4c 1e 6b fe 0e 28 b1 8d c8 54 20 27 b2 8b de b8 17 80 52 41 df 5a 8b 39 06 00 70 2b 42 36 5b 99 47 4c 5f bf d1 83 d2 81 4a 81 f9 03 ea 9c 18 fd 2e 30 f6 1a bf 97 c6 63 b3 92 66 01 bd 19 80 11 17 8a 9f d1 de 52 94 52 6c e4 51 cf b7 41 c4 
+
+TH_3 (CBOR-encoded) (34 bytes)
+58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+
+M_U =
+[
+  "Signature1",
+  << { 4: h'a2' } >>,
+  h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed',
+  {
+    1:  1,
+   -1:  6,
+   -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7',
+  },
+]
+
+M_U (message to be signed with Ed25519) (CBOR-encoded) (91 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+
+U's signature (64 bytes)
+9d 28 3e 24 11 bb 4a 35 5e 90 d8 3d 43 9d f6 61 4c 34 1e ae 87 8f 64 45 d2 5a 6d 77 ac 85 fb 74 06 e7 15 52 9d 65 a5 95 37 90 9c 87 c8 ea 72 1f 00 75 e3 bc 5f 47 c1 8f ea 80 7e a0 f1 66 ba 01 
+
+COSE_KDF_Context =
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed' ],
+]
+
+info (K_3) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+
+K_3 (16 bytes)
+89 2a aa 09 f8 1e 29 df 5b d6 b3 eb b9 82 ca 70 
+
+COSE_KDF_Context =
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed' ],
+]
+
+info (IV_3) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+
+IV_3 (13 bytes)
+b0 16 11 d5 5e 4f ef 94 f1 e9 9a 7d 7f 
+
+A_3 =
+[
+  "Encrypt0",
+  h'',
+  h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed' ],
+]
+
+A_3 (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+
+P_3 (68 bytes)
+41 a2 58 40 9d 28 3e 24 11 bb 4a 35 5e 90 d8 3d 43 9d f6 61 4c 34 1e ae 87 8f 64 45 d2 5a 6d 77 ac 85 fb 74 06 e7 15 52 9d 65 a5 95 37 90 9c 87 c8 ea 72 1f 00 75 e3 bc 5f 47 c1 8f ea 80 7e a0 f1 66 ba 01 
+
+C_3 (76 bytes)
+99 cd 9d 5e 5e 81 d7 56 8c 48 3f b1 35 a7 c5 86 d1 48 e3 52 f9 cc 2d 50 65 f4 e9 df 22 42 62 1b 02 cd 5f 95 e2 58 bb 45 53 25 a7 59 51 6d b3 b2 70 c6 9c f5 b6 b6 a4 06 25 2d 73 2f f8 79 c3 f8 39 e3 07 53 4c af ce ec 9f c4 4c 72 
+
+message_3 =
+(
+  h'c4',
+  h'99cd9d5e5e81d7568c483fb135a7c586d148e352f9cc2d5065f4e9df2242621b02cd5f95e258bb455325a759516db3b270c69cf5b6b6a406252d732ff879c3f839e307534cafceec9fc44c72',
+)
+
+message_3 (CBOR Sequence) (80 bytes)
+41 c4 58 4c 99 cd 9d 5e 5e 81 d7 56 8c 48 3f b1 35 a7 c5 86 d1 48 e3 52 f9 cc 2d 50 65 f4 e9 df 22 42 62 1b 02 cd 5f 95 e2 58 bb 45 53 25 a7 59 51 6d b3 b2 70 c6 9c f5 b6 b6 a4 06 25 2d 73 2f f8 79 c3 f8 39 e3 07 53 4c af ce ec 9f c4 4c 72 
+
+---------------------------------------------------------------
+
+Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 ) (CBOR Sequence) (112 bytes)
+58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 58 4c 99 cd 9d 5e 5e 81 d7 56 8c 48 3f b1 35 a7 c5 86 d1 48 e3 52 f9 cc 2d 50 65 f4 e9 df 22 42 62 1b 02 cd 5f 95 e2 58 bb 45 53 25 a7 59 51 6d b3 b2 70 c6 9c f5 b6 b6 a4 06 25 2d 73 2f f8 79 c3 f8 39 e3 07 53 4c af ce ec 9f c4 4c 72 
+
+TH_4 (CBOR-encoded) (34 bytes)
+58 20 cf 3d 40 65 6f 27 55 86 d3 21 d7 8e 51 a3 dc df f0 43 49 8f 00 40 00 cb 11 38 81 05 f1 20 c4 8f 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Secret",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'cf3d40656f275586d321d78e51a3dcdff043498f004000cb11388105f120c48f' ],
+]
+
+info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 cf 3d 40 65 6f 27 55 86 d3 21 d7 8e 51 a3 dc df f0 43 49 8f 00 40 00 cb 11 38 81 05 f1 20 c4 8f 
+
+OSCORE Master Secret (16 bytes)
+59 98 02 98 3a 9d 94 a2 73 a1 26 67 65 d9 ea d5 
+
+COSE_KDF_Context =
+[
+  "OSCORE Master Salt",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 64, h'', h'cf3d40656f275586d321d78e51a3dcdff043498f004000cb11388105f120c48f' ],
+]
+
+info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 cf 3d 40 65 6f 27 55 86 d3 21 d7 8e 51 a3 dc df f0 43 49 8f 00 40 00 cb 11 38 81 05 f1 20 c4 8f 
+
+OSCORE Master Salt (8 bytes)
+1b e4 2d 91 0d 33 21 2d 
+
+Client's OSCORE Sender ID (1 bytes)
+c4 
+
+Server's OSCORE Sender ID (1 bytes)
+c3 
+
+AEAD Algorithm
+10
+
+HKDF Algorithm
+-27
