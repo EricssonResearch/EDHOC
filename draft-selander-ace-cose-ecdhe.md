@@ -774,11 +774,7 @@ error = (
 
 where:
 
-* C_x - if error is send by Party V and TYPE mod 4 equals 0 or 2 C_x is set to C_U, if error is send by Party U and TYPE mod 4 equals 0 or 1 C_x is set to C_V, otherwise C_x is omitted.
-, C_U is omitted, otherwise C_U is not omitted.
-* If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
-
-
+* C_x - if error is sent by Party V and TYPE mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and TYPE mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
 * SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITEs_V only contains the values from the EDHOC cipher suites registry and no index.
 
