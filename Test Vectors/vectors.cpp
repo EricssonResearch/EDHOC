@@ -1,5 +1,7 @@
 // EDHOC Test Vectors
-// Copyright (c) 2019, John Mattsson <john.mattsson@ericsson.com>
+// Copyright (c) 2019, Ericsson and John Mattsson <john.mattsson@ericsson.com>
+//
+// This software may be distributed under the terms of the 3-Clause BSD License.
 
 #include <iostream>
 #include <iomanip>
