@@ -649,7 +649,7 @@ Party U SHALL compose message_3 as follows:
 
    Note that 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only the bstr kid_value is conveyed in the plaintext.
 
-* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg4-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
+* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
 *  Pass the connection identifiers (C_U, C_V) and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
