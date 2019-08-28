@@ -671,7 +671,7 @@ Party U SHALL compose message_3 as follows:
 
     where signature is taken from the COSE_Sign1 object and ID_CRED_U is a COSE header_map or a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.
 
-   COSE constructs the input to the AEAD {{RFC5116}} as follows: Key K = K_3, Nonce N = IV_4, Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 ), and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_3 ].
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: Key K = K_3, Nonce N = IV_2, Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 ), and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_3 ].
 
 * Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
