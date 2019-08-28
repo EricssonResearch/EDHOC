@@ -367,13 +367,14 @@ For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using transcr
 
 If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
-Assuming the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
+Assuming the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   output parameter = HMAC-SHA-256( PRK, info || 0x01 )
+   output parameter = first L bytes of HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where \|\| means byte string concatenation.
+where \|\| means byte string concatenation. Assuming use of the mandatory-to-implement algorithm AES-CCM-16-64-v128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info || 0x01 ) calculated with AlgorithmID = 10 and AlgorithmID = "IV-GENERATION", respectively.
+
 
 ### EDHOC-Exporter Interface {#exporter}
 
