@@ -552,23 +552,33 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_Y be the x-coordinate of the ephemeral public key.
 
-* Choose a connection identifier C_V and store it for the length of the protocol.
+* Choe a connection identifier C_V and store it for the length of the protocol.
 
 * Compute the transcript hash TH_2 = H( message_1, data_2 ) where H() is the hash function in the HKDF. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the following parameters (further clarifications in {{COSE-sig-explained}}). The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
-   * protected = bstr .cbor ID_CRED_V
-
+   * protected = bstr.cbor ID_CRED_V
+     
    * payload = CRED_V
-
+   
    * external_aad = TH_2
 
    * ID_CRED_V - identifier to facilitate retrieval of a public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
    
-   Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
+   Note that only 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
+   
+   COSE constructs the input to the Signature Algorithm as follows:
+   
+   * The key is the private authentication key of V.
+
+   * The message M to be signed is the CBOR encoding of:
+
+~~~~~~~~~~~
+   [ "Signature1", << ID_CRED_V >>, TH_2, CRED_V ]
+~~~~~~~~~~~
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
@@ -640,6 +650,16 @@ Party U SHALL compose message_3 as follows:
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
+   
+   COSE constructs the input to the Signature Algorithm as follows:
+   
+   * The key is the private authentication key of U.
+
+   * The message M to be signed is the CBOR encoding of:
+
+~~~~~~~~~~~
+   [ "Signature1", << ID_CRED_U >>, TH_3, CRED_U ]
+~~~~~~~~~~~
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
@@ -1135,31 +1155,6 @@ bstr .cborseq [ uint, bstr ]    << 24, h'cd' >>         0x44181841cd
 ## COSE {#COSE}
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
-
-### Signing and Verification {#COSE-sig-explained}
-
-The COSE parameters used in COSE_Sign1 (see Section 4.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "TH_i" is a variable with values i = 2 or 3, depending on whether the calculation is made over message_2 or message_3. Note also that "x" in "ID_CRED_x" and "CRED_x" is a variable with values x = U or V, depending on whether it is the credential of U or of V that is used in the relevant protocol message.
-
-* The key is the private authentication key of U or V. This may be stored as a COSE_KEY object or as a certificate.
-
-* The protected parameter is a map ID_CRED_x = { label : value } is wrapped in a byte string.
-   
-* The payload is a bstr containing the CBOR encoding of a COSE_KEY or a single certificate.
-
-* external_aad = TH_i.
-
-COSE constructs the input to the Signature Algorithm as follows:
-
-* The key is the private authentication key of U or V.
-
-* The message to be signed M is the CBOR encoding of:
-
-~~~~~~~~~~~
-   [ "Signature1", << { label : value } >>, TH_i, CRED_x ]
-~~~~~~~~~~~
-
-* For instance, if ID_CRED_x = { 4 : h'1111' } (CBOR encoding 0xA104421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
-{: style="empty"}
 
 # Test Vectors {#vectors}
 
