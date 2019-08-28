@@ -703,7 +703,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 * Party V is able to retrieve the PSK using ID_PSK.
 
-where the identifier ID_PSK is a COSE header maps containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+where the identifier ID_PSK is a COSE header map containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
 * ID_PSK = { 4 : bstr }
 
@@ -800,11 +800,11 @@ where:
 
 * C_x - if error is sent by Party V and TYPE mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and TYPE mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}
-* SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITEs_V only contains the values from the EDHOC cipher suites registry and no index.
+* SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITES_V only contains the values from the EDHOC cipher suites registry and no index.
 
 ### Example Use of EDHOC Error Message with SUITES_V
 
-Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 6 but not cipher suite 5. 
+Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 6 but not the selected cipher suite 5. 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -848,7 +848,7 @@ As Party U's list of supported cipher suites and order of preference is fixed, a
 
 ## Transferring EDHOC in CoAP {#coap}
 
-It is recommended is to transport EDHOC as an exchange of CoAP {{RFC7252}} messages. CoAP is a reliable transport that can preserve packet ordering and handle message duplication. CoAP can also perform fragmentation and protect against denial of service attacks. It is recommended to carry the EDHOC flights in Confirmable messages, especially if fragmentation is used.
+It is recommended to transport EDHOC as an exchange of CoAP {{RFC7252}} messages. CoAP is a reliable transport that can preserve packet ordering and handle message duplication. CoAP can also perform fragmentation and protect against denial of service attacks. It is recommended to carry the EDHOC flights in Confirmable messages, especially if fragmentation is used.
 
 By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
 
