@@ -918,8 +918,8 @@ When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must
 * The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   Master Secret = EDHOC-Exporter("OSCORE Master Secret", length)
-   Master Salt   = EDHOC-Exporter("OSCORE Master Salt", 8)
+   Master Secret = EDHOC-Exporter( "OSCORE Master Secret", length )
+   Master Salt   = EDHOC-Exporter( "OSCORE Master Salt", 8 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Transferring EDHOC over Other Protocols {#non-coap}
@@ -1104,7 +1104,7 @@ This Appendix is intended to simplify for implementors not familiar with CBOR {{
 
 The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{RFC8610}} provides a way to express structures for protocol messages and APIs that use CBOR. {{RFC8610}} also extends the diagnostic notation.
 
-CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain information about the major type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays \[\]  of data items and maps {} of pairs of data items. Some examples are given below. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{RFC8610}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}. 
+CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain information about the major type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays \[\]  of data items, maps {} of pairs of data items, and sequences {{I-D.ietf-cbor-sequence}} of data items. Some examples are given below. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{RFC8610}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic          Encoded              Type
@@ -1117,11 +1117,12 @@ null                0xf6                 simple value
 h'12cd'             0x4212cd             byte string
 '12cd'              0x4431326364         byte string
 "12cd"              0x6431326364         text string
+{ 4: h'cd' }        0xa10441cd           map                 
 << 1, 2, null >>    0x430102f6           byte string
 [ 1, 2, null ]      0x830102f6           array      
 [_ 1, 2, null ]     0x9f0102f6ff         array (indefinite-length)
-( 1, 2, null )      0x0102f6             group
-{ 4: h'cd' }        0xa10441cd           map                 
+( 1, 2, null )      0x0102f6             sequence
+1, 2, null          0x0102f6             sequence
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
