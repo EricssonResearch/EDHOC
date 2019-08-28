@@ -267,8 +267,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR, COSE, and CoAP libraries.
 
-To simplify for implementors, the use of CBOR and COSE in EDHOC is summarized in {{CBORandCOSE}} and example messages in CBOR diagnostic notation are given in {{sizes}}.
-
+To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORandCOSE}} and test vectors including CBOR diagnostic notation are given in {{vectors}}.
 
 # EDHOC Overview {#overview}
 
@@ -366,7 +365,7 @@ where
 
 For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and OutputLengthInBits equal to the IV length of the AEAD.
+If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
 Assuming the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation, and K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
 
@@ -381,7 +380,7 @@ where \|\| means byte string concatenation.
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = HKDF-Expand(PRK, info, length) 
+   EDHOC-Exporter( label, length ) = HKDF-Expand( PRK, info, length ) 
 ~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using other = TH_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
@@ -397,8 +396,8 @@ where H() is the hash function in the HKDF. Example use of the EDHOC-Exporter is
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   PSK    = EDHOC-Exporter("EDHOC Chaining PSK", length)
-   ID_PSK = EDHOC-Exporter("EDHOC Chaining ID_PSK", 4)
+   PSK    = EDHOC-Exporter( "EDHOC Chaining PSK", length )
+   ID_PSK = EDHOC-Exporter( "EDHOC Chaining ID_PSK", 4 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
@@ -1186,6 +1185,12 @@ COSE constructs the input to the Signature Algorithm as follows:
 * For instance, if ID_CRED_x = { 4 : h'1111' } (CBOR encoding 0xA104421111), TH_3 = h'222222' (CBOR encoding 0x43222222), and CRED_U = h'55555555' (CBOR encoding 0x4455555555), then M = 0x846a5369676e61747572653145A104421111432222224455555555.
 {: style="empty"}
 
+# Test Vectors {#vectors}
+
+This appendix provides a wealth of test vectors to ease implementation and ensure interoperability.
+
+TODO: This section needs to be updated.
+
 # Example Messages and Sizes {#sizes}
 
 To help implementors, this appendix gives examples in CBOR diagnostic notation and hexadecimal of EDHOC messages and plaintexts with different authentication methods. The examples use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). Note that the examples in this appendix are not test vectors, the cryptographic parts are just replaced with byte strings of the same length.
@@ -1357,12 +1362,6 @@ These examples use 1 byte key identifiers and connection IDs, this is realistic 
 
 For a comparison with other protocols, see {{I-D.ietf-lwig-security-protocol-comparison}}.
 
-
-# Test Vectors {#vectors}
-
-This appendix provides a wealth of test vectors to ease implementation and ensure interoperability.
-
-TODO: This section needs to be updated.
 
 # Acknowledgments
 {: numbered="no"}
