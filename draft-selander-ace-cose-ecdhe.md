@@ -570,7 +570,7 @@ Party V SHALL compose message_2 as follows:
    
    Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters (further clarifications in {{COSE-enc-explained}}). The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
    * plaintext = ( ID_CRED_V / kid_value, signature, ? UAD_2 )
 
@@ -578,7 +578,9 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-   Note that 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only the bstr kid_value is conveyed in the plaintext.
+    where signature is taken from the COSE_Sign1 object and ID_CRED_V is a COSE header_map or a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only kid_value is conveyed in the plaintext. Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet
+
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: Key K = K_2, Nonce N = IV_2, Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ), and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_2 ].
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -647,7 +649,9 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-   Note that 'signature' in the plaintext are taken from the COSE_Sign1 object, and that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only the bstr kid_value is conveyed in the plaintext.
+    where signature is taken from the COSE_Sign1 object and ID_CRED_U is a COSE header_map or a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.
+
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: Key K = K_3, Nonce N = IV_4, Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 ), and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_3 ].
 
 * Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
@@ -1131,35 +1135,6 @@ bstr .cborseq [ uint, bstr ]    << 24, h'cd' >>         0x44181841cd
 ## COSE {#COSE}
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
-
-### Encryption and Decryption {#COSE-enc-explained}
-
-The COSE parameters used in COSE_Encrypt0 (see Section 5.2 of {{RFC8152}}) are constructed as described below. Note that "i" in "K_i", "IV_i" and "TH_i" is a variable with value i = 2 or 3, depending on whether the calculation is made over message_2 or message_3.
-
-* The secret key K_i is a CBOR bstr, generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
-
-* The initialization vector IV_i is a CBOR bstr, also generated with the EDHOC-Key-Derivation function as defined in {{key-der}}.
-
-* The plaintext is a CBOR bstr. If the application data (UAD and PAD) is omitted, then plaintext = h'' in the symmetric case, and plaintext = &lt;&lt; ID_CRED_x, signature &gt;&gt; in the asymmetric case. Note that if ID_CRED_x contains a single 'kid' parameter, i.e., ID_CRED_x = { 4 : bstr }, only the bstr is conveyed in the plaintext. For instance, if ID_CRED_x = { 4 : h'40' } (CBOR encoding 0xA1044140) and signature = h'050607' (CBOR encoding 0x43050607), then plaintext = h'414043050607'.
- 
-* The external_aad is a CBOR bstr. It is always set to the transcript hash TH_i.
-
-COSE constructs the input to the AEAD {{RFC5116}} as follows:
-
-* The key K is the value of the key K_i.
-
-* The nonce N is the value of the initialization vector IV_i.
-
-* The plaintext P is the value of the COSE plaintext. E.g. if the COSE plaintext = h'010203', then P = 0x010203.
-
-* The associated data A is the CBOR encoding of:
-
-~~~~~~~~~~~
-   [ "Encrypt0", h'', TH_i ]
-~~~~~~~~~~~
-
-* This equals the concatenation of 0x8368456e63727970743040 and the CBOR encoding of TH_i. When SHA-256 is used, TH_i is always 32 bytes so this equals the concatenation of 0x8368456e637279707430405820 and the value of TH_i. For instance if TH_2 = h'000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f' then A = 0x0x8368456e637279707430405820000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f. 
-{: style="empty"}
 
 ### Signing and Verification {#COSE-sig-explained}
 
