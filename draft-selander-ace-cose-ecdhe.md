@@ -3,7 +3,6 @@ title: Ephemeral Diffie-Hellman Over COSE (EDHOC)
 docname: draft-selander-lake-cose-ecdhe-latest
 
 ipr: trust200902
-wg: ACE Working Group
 cat: std
 
 coding: utf-8
