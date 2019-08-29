@@ -342,12 +342,12 @@ with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The IKM SHALL be the ECDH shared secret as defined in Section 12.4.1 of {{RFC8152}}. When using the mandatory-to-implement curve25519, the ECDH shared secret is the output of the X25519 funtion {{RFC7748}}.
+* The IKM SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the mandatory-to-implement curve25519, the ECDH shared secret is the output of the X25519 funtion {{RFC7748}}.
 
 Assuming use of the mandatory-to-implement algorithm HKDF SHA-256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   PRK = HMAC-SHA-256( salt, ECDH shared secret )
+   PRK = HMAC-SHA-256( salt, G_XY )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case. The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
@@ -396,7 +396,7 @@ Application keys and other application specific data can be derived using the ED
    EDHOC-Exporter( label, length ) = HKDF-Expand( PRK, info, length ) 
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using other = TH_4, AlgorithmID = label, and keyDataLength = 8 * length, where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = label, keyDataLength = 8 * length, and other = TH_4 where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 ~~~~~~~~~~~
    TH_4 = H( TH_3, CIPHERTEXT_3 )
@@ -570,7 +570,7 @@ Party V SHALL compose message_2 as follows:
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
-   * protected = bstr.cbor ID_CRED_V
+   * protected = bstr .cbor ID_CRED_V
      
    * payload = CRED_V
    
@@ -661,7 +661,7 @@ Party U SHALL compose message_3 as follows:
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
 
-   Note that only 'protected' and 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
+   Note that only 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
    
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -824,7 +824,7 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                    TYPE, ERR_MSG, SUITES_V {6}                    |
+|                     C_U, ERR_MSG, SUITES_V {6}                    |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
@@ -843,7 +843,7 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                   TYPE, ERR_MSG, SUITES_V {7, 9}                  |
+|                    C_U, ERR_MSG, SUITES_V {7, 9}                  |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
