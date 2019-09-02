@@ -1311,7 +1311,7 @@ kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
 41 a3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-### Message 1
+### Message 1 {#tv-rpk-1}
 
 From the input parameters (in {{rpk-tv-input-u}}):
 
@@ -1361,7 +1361,7 @@ message_1 (CBOR Sequence) (38 bytes)
 91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-### Message 2
+### Message 2 {#tv-rpk-2}
 
 Since TYPE mod 4 equals 1, C_U is omitted from data_2.
 
@@ -1418,13 +1418,15 @@ TH_2 (CBOR-encoded) (34 bytes)
 da 68 1d c2 af dd 87 03 55
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Compute COSE_Sign1 with the following parameters. From {{rpk-tv-input-v}}
+#### Signature Computation {#tv-rpk-2-sign}
+
+COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_V 
 
 * payload = bstr .cbor CRED_V (TODO: change in the spec)
 
-And from {{rpk-tv-mess1}}:
+And from {{tv-rpk-2}}:
 
 * external_aad = TH_2
 
@@ -1456,10 +1458,172 @@ b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The message is signed using the private authentication key of V, and produces the following signature:
+
 ~~~~~~~~~~~~~~~~~~~~~~~
-V's signature (64 bytes) -- TODO
+V's signature (64 bytes)
+TODO
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+#### Key and Nonce Computation {#tv-rpk-2-key}
+
+The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}.
+
+HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
+
+PRK = HMAC-SHA-256(salt, G_XY)
+
+Since this is the asymmetric case, salt is the empty byte string.
+
+G_XY is the shared secret, and since the mandatory-to-implement curve25519 is used, the ECDH shared secret is the output of the X25519 funtion.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+G_XY (TODO bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From there, PRK is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+PRK (TODO bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Key K_2 is the output of HKDF-Expand(PRK, info, L).
+
+info is defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for K_2 
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd
+                870355' ]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which as a CBOR encoded data item is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (K_2) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 55 50 b3 dc 59 84 b0 20 9a
+e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+L is the length of K_2, so 16 bytes.
+
+From these parameters, K_2 is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+K_2 (16 bytes)
+da d7 44 af 07 c4 da 27 d1 f0 a3 8a 0c 4b 87 38 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Nonce IV_2 is the output of HKDF-Expand(PRK, info, L).
+
+info is defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for IV_2 
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd
+                870355' ],
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which as a CBOR encoded data item is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (IV_2) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18
+68 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33
+2b 11 da 68 1d c2 af dd 87 03 55 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+L is the length of IV_2, so 13 bytes.
+
+From these parameters, IV_2 is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+IV_2 (13 bytes)
+fb a1 65 d9 08 da a7 8e 4f 84 41 42 d0 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Ciphertext Computation {#tv-rpk-2-ciph}
+
+COSE_Encrypt0 is computed with the following parameters. Note that UAD_2 is omitted.
+
+* empty protected header
+
+* external_aad = TH_2
+
+* plaintext = CBOR Sequence of the items kid_value, signature, in this order.
+
+with kid_value taken from {{rpk-tv-input-v}}, and signature as calculated in {{tv-rpk-2-sign}}.
+
+The plaintext is the following:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+P_2 (68 bytes)
+41 a3 58 40 0d TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From the parameters above, the Enc_structure A_2 is computed.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355' ]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string to be used as Additional Authenticated Data:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+A_2 (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2
+6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The key and nonce used are defined in {{tv-rpk-2-key}}:
+
+* key = K_2
+
+* nonce = IV_2
+
+Using the parameters above, the ciphertext C_2 can be computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_2 (TODO)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### message_2
+
+From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, C_2).
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_2 =
+(
+  h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
+  h'c4',
+  TODO
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_2 (CBOR Sequence) (114 bytes) -- TODO
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c
+32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c TODO
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Message 3
 

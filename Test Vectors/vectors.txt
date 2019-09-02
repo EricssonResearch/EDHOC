@@ -456,17 +456,17 @@ A_2 =
 A_2 (CBOR-encoded) (45 bytes)
 83 68 45 6e 63 72 79 70 74 30 40 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 
 
-C_2 (76 bytes)
+C_2 (76 bytes) -- TODO
 1e 6b fe 0e 28 b1 8d c8 54 20 27 b2 8b de b8 17 80 52 41 df 5a 8b 39 06 00 70 2b 42 36 5b 99 47 4c 5f bf d1 83 d2 81 4a 81 f9 03 ea 9c 18 fd 2e 30 f6 1a bf 97 c6 63 b3 92 66 01 bd 19 80 11 17 8a 9f d1 de 52 94 52 6c e4 51 cf b7 
 
 message_2 =
 (
   h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
   h'c4',
-  h'1e6bfe0e28b18dc8542027b28bdeb817805241df5a8b390600702b42365b99474c5fbfd183d2814a81f903ea9c18fd2e30f61abf97c663b3926601bd198011178a9fd1de5294526ce451cfb7',
+  h'1e6bfe0e28b18dc8542027b28bdeb817805241df5a8b390600702b42365b99474c5fbfd183d2814a81f903ea9c18fd2e30f61abf97c663b3926601bd198011178a9fd1de5294526ce451cfb7', --TODO
 )
 
-message_2 (CBOR Sequence) (114 bytes)
+message_2 (CBOR Sequence) (114 bytes) -- TODO
 58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c 1e 6b fe 0e 28 b1 8d c8 54 20 27 b2 8b de b8 17 80 52 41 df 5a 8b 39 06 00 70 2b 42 36 5b 99 47 4c 5f bf d1 83 d2 81 4a 81 f9 03 ea 9c 18 fd 2e 30 f6 1a bf 97 c6 63 b3 92 66 01 bd 19 80 11 17 8a 9f d1 de 52 94 52 6c e4 51 cf b7 
 
 ---------------------------------------------------------------
