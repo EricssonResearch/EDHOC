@@ -1382,7 +1382,7 @@ Data_2 is constructed, as the CBOR Sequence of the CBOR data items above.
 data_2 =
 (
   h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
-  h'c4',
+  h'c4'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1392,7 +1392,7 @@ data_2 (CBOR Sequence) (36 bytes)
 32 0e 5d 49 f3 02 a9 64 74 41 c4
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From data_2 and message_1, compute the input to the transcript hash TH_2 = H( message_1, data_2 ), as a CBOR Sequence of these 2 data items.
+From data_2 and message_1 (from {{tv-rpk-1}}), compute the input to the transcript hash TH_2 = H( message_1, data_2 ), as a CBOR Sequence of these 2 data items.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence) 
@@ -1443,7 +1443,7 @@ M_V =
    -1:  6,
    -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6b
           d3',
-  } >>,
+  } >>
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1531,7 +1531,7 @@ info for IV_2
   [ null, null, null ],
   [ null, null, null ],
   [ 104, h'', h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd
-                870355' ],
+                870355' ]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1625,7 +1625,53 @@ message_2 (CBOR Sequence) (114 bytes) -- TODO
 32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c TODO
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-### Message 3
+### Message 3 {#tv-rpk-3}
+
+Since TYPE mod 4 equals 1, C_V is not omitted from data_3.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_V (1 bytes)
+c4 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Data_3 is constructed, as the CBOR Sequence of the CBOR data item above.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_3 =
+(
+  h'c4'
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_3 (CBOR Sequence) (2 bytes)
+41 c4
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From data_3, C_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , C_2, data_3), as a CBOR Sequence of these 3 data items.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 )
+(CBOR Sequence) (114 bytes)
+58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11
+da 68 1d c2 af dd 87 03 55 TODO (CBOR bstr C_2) 41 c4 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And from there, compute the transcript hash TH_3 = H(TH_2 , C_2, data_3)
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_3 value (32 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_2 (CBOR-encoded) (34 bytes)
+58 20 TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Signature Computation {#tv-rpk-3-sign}
 
 TODO
 

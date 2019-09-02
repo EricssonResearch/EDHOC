@@ -479,10 +479,10 @@ data_3 =
 data_3 (CBOR Sequence) (2 bytes)
 41 c4 
 
-Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (114 bytes)
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (114 bytes) -- TODO
 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 58 4c 1e 6b fe 0e 28 b1 8d c8 54 20 27 b2 8b de b8 17 80 52 41 df 5a 8b 39 06 00 70 2b 42 36 5b 99 47 4c 5f bf d1 83 d2 81 4a 81 f9 03 ea 9c 18 fd 2e 30 f6 1a bf 97 c6 63 b3 92 66 01 bd 19 80 11 17 8a 9f d1 de 52 94 52 6c e4 51 cf b7 41 c4 
 
-TH_3 (CBOR-encoded) (34 bytes)
+TH_3 (CBOR-encoded) (34 bytes) -- TODO
 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
 
 M_U =
