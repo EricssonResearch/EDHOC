@@ -1189,9 +1189,11 @@ corr (Party U is CoAP client)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+No unprotected opaque application data is sent in the message exchanges.
+
 The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
 
-### Input for Party U
+### Input for Party U {#rpk-tv-input-u}
 
 The following are the parameters that are set in Party U before the first message exchange.
 
@@ -1208,7 +1210,7 @@ Party U's public authentication key (32 bytes)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_U (kid value to identify U's public authentication key) (1 bytes)
+kid value to identify U's public authentication key (1 bytes)
 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1229,7 +1231,7 @@ a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10
 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Because COSE_Keys are used, and because C_U = h'a2':
+Because COSE_Keys are used, and because kid = h'a2':
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_CRED_U =
@@ -1250,7 +1252,7 @@ kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
 41 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-### Input for Party V
+### Input for Party V {#rpk-tv-input-v}
 
 The following are the parameters that are set in Party U before the first message exchange.
 
@@ -1267,7 +1269,7 @@ Party V's public authentication key (32 bytes)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_V (kid value to identify U's public authentication key) (1 bytes)
+kid value to identify U's public authentication key (1 bytes)
 a3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1288,7 +1290,7 @@ a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30
 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Because COSE_Keys are used, and because C_V = h'a3':
+Because COSE_Keys are used, and because kid = h'a3':
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_CRED_V =
@@ -1311,7 +1313,53 @@ kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
 
 ### Message 1
 
-TODO
+From the input parameters (in {{{rpk-tv-input-u}}):
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TYPE (4 * method + corr)
+1
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+suite
+0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+SUITES_U : suite
+0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+G_X (X-coordinate of the ephemeral public key of Party U) (32 bytes)
+b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8
+f4 af 98 0d 2d b8 3a 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_U (Connection identifier chosen by U) (1 bytes)
+c3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+No UAD_1 is provided, so UAD_1 is absent from message_1.
+
+Message_1 is constructed, as the CBOR Sequence of the CBOD data items above.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_1 =
+(
+  1,
+  0,
+  h'b1a3e89460e88d3a8d54211dc95f0b903ff205eb71912d6db8f4af980d2db83a',
+  h'c3',
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_1 (CBOR Sequence) (38 bytes)
+01 00 58 20 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71
+91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Message 2
 
