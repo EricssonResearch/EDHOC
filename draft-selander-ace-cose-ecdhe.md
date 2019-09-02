@@ -1173,7 +1173,177 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 To help implementors, this appendix provides a wealth of test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). 1 byte identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
-TODO: This section needs to be updated by someone that likes Comic Sans.
+## Test Vectors for EDHOC Authenticated with Asymmetric Signature Keys (RPK)
+
+Asymmetric EDHOC is used:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+method (Asymmetric Authentication)
+0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+CoAP is used as transport:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+corr (Party U is CoAP client)
+1
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
+
+### Input for Party U
+
+The following are the parameters that are set in Party U before the first message exchange.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party U's private authentication key (32 bytes)
+53 21 fc 01 c2 98 20 06 3a 72 50 8f c6 39 25 1d c8 30 e2 f7 68 3e b8 e3 8a
+f1 64 a5 b9 af 9b e3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party U's public authentication key (32 bytes)
+42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2
+36 e6 65 0c 8a b9 c7 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_U (kid value to identify U's public authentication key) (1 bytes)
+a2 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite 0.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+CRED_U =
+{
+  1:  1,
+ -1:  6,
+ -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7',
+}
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+CRED_U (COSE_KEY) (CBOR-encoded) (40 bytes)
+a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10
+c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Because COSE_Keys are used, and because C_U = h'a2':
+
+~~~~~~~~~~~~~~~~~~~~~~~
+ID_CRED_U =
+{
+  4:  h'a2',
+}
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{asym-msg3-proc}}):
+
+~~~~~~~~~~~~~~~~~~~~~~~
+ID_CRED_U (in protected header) (CBOR-encoded) (4 bytes)
+a1 04 41 a2 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
+41 a2 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+### Input for Party V
+
+The following are the parameters that are set in Party U before the first message exchange.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party V's private authentication key (32 bytes)
+74 56 b3 a3 e5 8d 8d 26 dd 36 bc 75 d5 5b 88 63 a8 5d 34 72 f4 a0 1f 02 24
+62 1b 1c b8 16 6d a9 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party V's public authentication key (32 bytes)
+1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e
+50 4d 0f 52 9a 6b d3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_V (kid value to identify U's public authentication key) (1 bytes)
+a3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite 0.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+CRED_V =
+{
+  1:  1,
+ -1:  6,
+ -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3',
+}
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+CRED_V (COSE_KEY) (CBOR-encoded) (40 bytes)
+a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30
+dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Because COSE_Keys are used, and because C_V = h'a3':
+
+~~~~~~~~~~~~~~~~~~~~~~~
+ID_CRED_V =
+{
+  4:  h'a3',
+}
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{asym-msg3-proc}}):
+
+~~~~~~~~~~~~~~~~~~~~~~~
+ID_CRED_V (in protected header) (CBOR-encoded) (4 bytes)
+a1 04 41 a3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
+41 a3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+### Message 1
+
+TODO
+
+### Message 2
+
+TODO
+
+### Message 3
+
+TODO
+
+## Test Vectors for EDHOC Authenticated with Symmetric Signature Keys (PSK)
+
+TODO
+
+### Input for Party U
+
+TODO
+
+### Input for Party V
+
+TODO
+
+### Message 1
+
+TODO
+
+### Message 2
+
+TODO
+
+### Message 3
+
+TODO
 
 # Acknowledgments
 {: numbered="no"}
