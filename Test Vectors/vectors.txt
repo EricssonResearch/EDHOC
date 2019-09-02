@@ -402,17 +402,17 @@ M_V =
   "Signature1",
   << { 4: h'a3' } >>,
   h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355',
-  {
+  << {
     1:  1,
    -1:  6,
    -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3',
-  },
+  } >>,
 ]
 
 M_V (message to be signed with Ed25519) (CBOR-encoded) (91 bytes)
-84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a3 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a3 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 
-V's signature (64 bytes)
+V's signature (64 bytes) -- TODO
 0d 15 da 55 cf 1d 47 cd a3 1c 59 9d dd 25 45 38 ca 22 1a 41 58 19 ec 68 b0 ca 51 11 97 83 01 56 17 60 a9 df 28 b6 fb 7e 25 43 b2 be ab 84 38 b9 52 d9 57 b9 5a 61 9f 51 ca 87 19 e4 41 b7 62 05 
 
 COSE_KDF_Context =
