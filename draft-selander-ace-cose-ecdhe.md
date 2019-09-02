@@ -1313,7 +1313,7 @@ kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
 
 ### Message 1
 
-From the input parameters (in {{{rpk-tv-input-u}}):
+From the input parameters (in {{rpk-tv-input-u}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TYPE (4 * method + corr)
@@ -1343,7 +1343,7 @@ c3
 
 No UAD_1 is provided, so UAD_1 is absent from message_1.
 
-Message_1 is constructed, as the CBOR Sequence of the CBOD data items above.
+Message_1 is constructed, as the CBOR Sequence of the CBOR data items above.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 =
@@ -1363,7 +1363,103 @@ message_1 (CBOR Sequence) (38 bytes)
 
 ### Message 2
 
-TODO
+Since TYPE mod 4 equals 1, C_U is omitted from data_2.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+G_Y (X-coordinate of the ephemeral public key of Party V) (32 bytes)
+8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e
+5d 49 f3 02 a9 64 74 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_V (Connection identifier chosen by V) (1 bytes)
+c4 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Data_2 is constructed, as the CBOR Sequence of the CBOR data items above.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_2 =
+(
+  h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
+  h'c4',
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_2 (CBOR Sequence) (36 bytes)
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c
+32 0e 5d 49 f3 02 a9 64 74 41 c4
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From data_2 and message_1, compute the input to the transcript hash TH_2 = H( message_1, data_2 ), as a CBOR Sequence of these 2 data items.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence) 
+(74 bytes)
+01 00 58 20 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71
+91 2d 6d b8 f4 af 98 0d 2d b8 3a 41 c3 58 20 8d b5 77 f9 b9 c2 74 47 98 98
+7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And from there, compute the transcript hash TH_2 = H( message_1, data_2 )
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_2 value (32 bytes)
+55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68
+1d c2 af dd 87 03 55
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_2 (CBOR-encoded) (34 bytes)
+58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11
+da 68 1d c2 af dd 87 03 55
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Compute COSE_Sign1 with the following parameters. From {{rpk-tv-input-v}}
+
+* protected = bstr .cbor ID_CRED_V 
+
+* payload = bstr .cbor CRED_V (TODO: change in the spec)
+
+And from {{rpk-tv-mess1}}:
+
+* external_aad = TH_2
+
+The Sig_structure M_V to be signed is: [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ] , as defined in {{asym-msg2-proc}}:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+M_V =
+[
+  "Signature1",
+  << { 4: h'a3' } >>,
+  h'5550b3dc5984b0209ae74ea26a18918957508e30332b11da681dc2afdd870355',
+  << {
+    1:  1,
+   -1:  6,
+   -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6b
+          d3',
+  } >>,
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string ToBeSigned:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+M_V (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a3 58 20 55 50 b3 dc 59 84
+b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03
+55 58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2
+0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The message is signed using the private authentication key of V, and produces the following signature:
+~~~~~~~~~~~~~~~~~~~~~~~
+V's signature (64 bytes) -- TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
 
 ### Message 3
 
