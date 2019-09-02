@@ -490,15 +490,15 @@ M_U =
   "Signature1",
   << { 4: h'a2' } >>,
   h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed',
-  {
+  << {
     1:  1,
    -1:  6,
    -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7',
-  },
+  } >>,
 ]
 
-M_U (message to be signed with Ed25519) (CBOR-encoded) (91 bytes)
-84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+M_U (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 
 U's signature (64 bytes)
 9d 28 3e 24 11 bb 4a 35 5e 90 d8 3d 43 9d f6 61 4c 34 1e ae 87 8f 64 45 d2 5a 6d 77 ac 85 fb 74 06 e7 15 52 9d 65 a5 95 37 90 9c 87 c8 ea 72 1f 00 75 e3 bc 5f 47 c1 8f ea 80 7e a0 f1 66 ba 01 
@@ -535,33 +535,33 @@ A_3 =
 [
   "Encrypt0",
   h'',
-  h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed' ],
+  h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed' ], -- TODO
 ]
 
-A_3 (CBOR-encoded) (45 bytes)
+A_3 (CBOR-encoded) (45 bytes) -- TODO
 83 68 45 6e 63 72 79 70 74 30 40 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
 
-P_3 (68 bytes)
+P_3 (68 bytes) -- TODO
 41 a2 58 40 9d 28 3e 24 11 bb 4a 35 5e 90 d8 3d 43 9d f6 61 4c 34 1e ae 87 8f 64 45 d2 5a 6d 77 ac 85 fb 74 06 e7 15 52 9d 65 a5 95 37 90 9c 87 c8 ea 72 1f 00 75 e3 bc 5f 47 c1 8f ea 80 7e a0 f1 66 ba 01 
 
-C_3 (76 bytes)
+C_3 (76 bytes) -- TODO
 99 cd 9d 5e 5e 81 d7 56 8c 48 3f b1 35 a7 c5 86 d1 48 e3 52 f9 cc 2d 50 65 f4 e9 df 22 42 62 1b 02 cd 5f 95 e2 58 bb 45 53 25 a7 59 51 6d b3 b2 70 c6 9c f5 b6 b6 a4 06 25 2d 73 2f f8 79 c3 f8 39 e3 07 53 4c af ce ec 9f c4 4c 72 
 
 message_3 =
 (
   h'c4',
-  h'99cd9d5e5e81d7568c483fb135a7c586d148e352f9cc2d5065f4e9df2242621b02cd5f95e258bb455325a759516db3b270c69cf5b6b6a406252d732ff879c3f839e307534cafceec9fc44c72',
+  h'99cd9d5e5e81d7568c483fb135a7c586d148e352f9cc2d5065f4e9df2242621b02cd5f95e258bb455325a759516db3b270c69cf5b6b6a406252d732ff879c3f839e307534cafceec9fc44c72', -- TODO
 )
 
-message_3 (CBOR Sequence) (80 bytes)
+message_3 (CBOR Sequence) (80 bytes) -- TODO
 41 c4 58 4c 99 cd 9d 5e 5e 81 d7 56 8c 48 3f b1 35 a7 c5 86 d1 48 e3 52 f9 cc 2d 50 65 f4 e9 df 22 42 62 1b 02 cd 5f 95 e2 58 bb 45 53 25 a7 59 51 6d b3 b2 70 c6 9c f5 b6 b6 a4 06 25 2d 73 2f f8 79 c3 f8 39 e3 07 53 4c af ce ec 9f c4 4c 72 
 
 ---------------------------------------------------------------
 
-Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 ) (CBOR Sequence) (112 bytes)
+Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 ) (CBOR Sequence) (112 bytes) -- TODO
 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 58 4c 99 cd 9d 5e 5e 81 d7 56 8c 48 3f b1 35 a7 c5 86 d1 48 e3 52 f9 cc 2d 50 65 f4 e9 df 22 42 62 1b 02 cd 5f 95 e2 58 bb 45 53 25 a7 59 51 6d b3 b2 70 c6 9c f5 b6 b6 a4 06 25 2d 73 2f f8 79 c3 f8 39 e3 07 53 4c af ce ec 9f c4 4c 72 
 
-TH_4 (CBOR-encoded) (34 bytes)
+TH_4 (CBOR-encoded) (34 bytes) -- TODO
 58 20 cf 3d 40 65 6f 27 55 86 d3 21 d7 8e 51 a3 dc df f0 43 49 8f 00 40 00 cb 11 38 81 05 f1 20 c4 8f 
 
 COSE_KDF_Context =
@@ -569,13 +569,13 @@ COSE_KDF_Context =
   "OSCORE Master Secret",
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', h'cf3d40656f275586d321d78e51a3dcdff043498f004000cb11388105f120c48f' ],
+  [ 128, h'', h'cf3d40656f275586d321d78e51a3dcdff043498f004000cb11388105f120c48f' ], -- TODO
 ]
 
-info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
+info (OSCORE Master Secret) (CBOR-encoded) (68 bytes) -- TODO
 84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 cf 3d 40 65 6f 27 55 86 d3 21 d7 8e 51 a3 dc df f0 43 49 8f 00 40 00 cb 11 38 81 05 f1 20 c4 8f 
 
-OSCORE Master Secret (16 bytes)
+OSCORE Master Secret (16 bytes) -- TODO
 59 98 02 98 3a 9d 94 a2 73 a1 26 67 65 d9 ea d5 
 
 COSE_KDF_Context =
@@ -583,13 +583,13 @@ COSE_KDF_Context =
   "OSCORE Master Salt",
   [ null, null, null ],
   [ null, null, null ],
-  [ 64, h'', h'cf3d40656f275586d321d78e51a3dcdff043498f004000cb11388105f120c48f' ],
+  [ 64, h'', h'cf3d40656f275586d321d78e51a3dcdff043498f004000cb11388105f120c48f' ], -- TODO
 ]
 
-info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
+info (OSCORE Master Salt) (CBOR-encoded) (66 bytes) -- TODO
 84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 cf 3d 40 65 6f 27 55 86 d3 21 d7 8e 51 a3 dc df f0 43 49 8f 00 40 00 cb 11 38 81 05 f1 20 c4 8f 
 
-OSCORE Master Salt (8 bytes)
+OSCORE Master Salt (8 bytes) --- TODO
 1b e4 2d 91 0d 33 21 2d 
 
 Client's OSCORE Sender ID (1 bytes)
