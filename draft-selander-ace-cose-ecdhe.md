@@ -1248,13 +1248,13 @@ a1 04 41 a2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
+kid_value (in plaintext) (CBOR-encoded) (2 bytes)
 41 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Input for Party V {#rpk-tv-input-v}
 
-The following are the parameters that are set in Party U before the first message exchange.
+The following are the parameters that are set in Party V before the first message exchange.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Party V's private authentication key (32 bytes)
@@ -1307,7 +1307,7 @@ a1 04 41 a3
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value_signature (in plaintext) (CBOR-encoded) (2 bytes)
+kid_value (in plaintext) (CBOR-encoded) (2 bytes)
 41 a3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1985,19 +1985,182 @@ HKDF Algorithm
 
 ## Test Vectors for EDHOC Authenticated with Symmetric Signature Keys (PSK)
 
-TODO
+Symmetric EDHOC is used:
 
-### Input for Party U
+~~~~~~~~~~~~~~~~~~~~~~~
+method (Symmetric Authentication)
+0
+~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+CoAP is used as transport:
 
-### Input for Party V
+~~~~~~~~~~~~~~~~~~~~~~~
+corr (Party U is CoAP client)
+1
+~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+No unprotected opaque application data is sent in the message exchanges.
 
-### Message 1
+The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
 
-TODO
+### Input for Party U {#psk-tv-input-u}
+
+The following are the parameters that are set in Party U before the first message exchange.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party U's ephemeral private key (32 bytes)
+f4 0c ea f8 6e 57 76 92 33 32 b8 d8 fd 3b ef 84 9c ad b1 9c 69 96 bc 27 2a f1 f6 48 d9 56 6a 4c 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party U's ephemeral public key (value of X_U) (32 bytes)
+ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Connection identifier chosen by U (value of C_U) (1 bytes)
+c1 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~
+Pre-shared Key (PSK) (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~
+kid value to identify PSK (1 bytes)
+a1 
+~~~~~~~~~~~~~~~~~~~~
+
+So ID_PSK is defined as the following:
+
+~~~~~~~~~~~~~~~~~~~~
+ID_PSK =
+{
+  4:  h'a1',
+}
+~~~~~~~~~~~~~~~~~~~~
+
+This test vector uses COSE_Key objects to store the pre-shared key.
+
+Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-msg1-proc}}):
+
+~~~~~~~~~~~~~~~~~~~~~~~
+ID_PSK (in protected header) (CBOR-encoded) (4 bytes)
+a1 04 41 a1 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+kid_value (in plaintext) (CBOR-encoded) (2 bytes)
+41 a1 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+### Input for Party V {#psk-tv-input-v}
+
+The following are the parameters that are set in Party U before the first message exchange.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party V's ephemeral private key (32 bytes)
+d9 81 80 87 de 72 44 ab c1 b5 fc f2 8e 55 e4 2c 7f f9 c6 78 c0 60 51 81 f3 7a c5 d7 41 4a 7b 95 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party V's ephemeral public key (value of X_V) (32 bytes)
+fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Connection identifier chosen by V (value of C_V) (1 bytes)
+c2 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~
+Pre-shared Key (PSK) (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~
+kid value to identify PSK (1 bytes)
+a1 
+~~~~~~~~~~~~~~~~~~~~
+
+So ID_PSK is defined as the following:
+
+~~~~~~~~~~~~~~~~~~~~
+ID_PSK =
+{
+  4:  h'a1',
+}
+~~~~~~~~~~~~~~~~~~~~
+
+This test vector uses COSE_Key objects to store the pre-shared key.
+
+Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-msg1-proc}}):
+
+~~~~~~~~~~~~~~~~~~~~~~~
+ID_PSK (in protected header) (CBOR-encoded) (4 bytes)
+a1 04 41 a1 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+kid_value (in plaintext) (CBOR-encoded) (2 bytes)
+41 a1 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+### Message 1 {#tv-psk-1}
+
+From the input parameters (in {{psk-tv-input-u}}):
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TYPE (4 * method + corr)
+5
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+suite
+0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+SUITES_U : suite
+0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+G_X (X-coordinate of the ephemeral public key of Party U) (32 bytes)
+ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_U (Connection identifier chosen by U) (CBOR encoded) (2 bytes)
+41 c1
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+kid_value of ID_PSK (CBOR encoded) (2 bytes)
+41 a1
+~~~~~~~~~~~~~~~~~~~~~~~
+
+No UAD_1 is provided, so UAD_1 is absent from message_1.
+
+Message_1 is constructed, as the CBOR Sequence of the CBOR data items above.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_1 =
+(
+  5,
+  0,
+  h'ab2fca32898322c208fb2dab5048bd43c355c6430f588897cb574961cfa9806f',
+  h'c1',
+  h'a1',
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_1 (CBOR Sequence) (40 bytes)
+05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 
+~~~~~~~~~~~~~~~~~~~~~~~
+
 
 ### Message 2
 
