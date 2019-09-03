@@ -2161,10 +2161,207 @@ message_1 (CBOR Sequence) (40 bytes)
 05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+### Message 2 {#tv-psk-2}
 
-### Message 2
+Since TYPE mod 4 equals 1, C_U is omitted from data_2.
 
-TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+G_Y (X-coordinate of the ephemeral public key of Party V) (32 bytes)
+fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_V (Connection identifier chosen by V) (1 bytes)
+c2
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Data_2 is constructed, as the CBOR Sequence of the CBOR data items above.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_2 =
+(
+  h'fc3b339367a5225d53a92d380323afd035d7817b6d1be47d946f6b09a9cbdc06',
+  h'c2',
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_2 (CBOR Sequence) (36 bytes)
+58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From data_2 and message_1 (from {{tv-psk-1}}), compute the input to the transcript hash TH_2 = H( message_1, data_2 ), as a CBOR Sequence of these 2 data items.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence) 
+(76 bytes)
+05 00 58 20 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb 57 49 61 cf a9 80 6f 41 c1 41 a1 58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And from there, compute the transcript hash TH_2 = H( message_1, data_2 )
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_2 value (32 bytes)
+16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_2 (CBOR-encoded) (34 bytes)
+58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Key and Nonce Computation {#tv-rpk-2-key}
+
+The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}.
+
+HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
+
+PRK = HMAC-SHA-256(salt, G_XY)
+
+Since this is the symmetric case, salt is the PSK:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+salt (16 bytes)
+a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+G_XY is the shared secret, and since the mandatory-to-implement curve25519 is used, the ECDH shared secret is the output of the X25519 funtion.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+G_XY (32 bytes)
+d5 75 05 50 6d 8f 30 a8 60 a0 63 d0 1b 5b 7a d7 6a 09 4f 70 61 3b 4a e6 6c 5a 90 e5 c2 1f 23 11 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From there, PRK is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+PRK (32 bytes)
+aa b2 f1 3c cb 1a 4f f7 96 a9 7a 32 a4 d2 fb 62 47 ef 0b 6b 06 da 04 d3 d1 06 39 4b 28 76 e2 8c 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Key K_2 is the output of HKDF-Expand(PRK, info, L).
+
+info is defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for K_2 
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which as a CBOR encoded data item is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (K_2) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+L is the length of K_2, so 16 bytes.
+
+From these parameters, K_2 is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+K_2 (16 bytes)
+ac 42 6e 5e 7d 7a d6 ae 3b 19 aa bd e0 f6 25 57 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Nonce IV_2 is the output of HKDF-Expand(PRK, info, L).
+
+info is defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for IV_2 
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca' ],
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which as a CBOR encoded data item is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (IV_2) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+L is the length of IV_2, so 13 bytes.
+
+From these parameters, IV_2 is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+IV_2 (13 bytes)
+ff 11 2e 1c 26 8a a2 a7 7c c3 ee 6c 4d
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Ciphertext Computation {#tv-psk-2-ciph}
+
+COSE_Encrypt0 is computed with the following parameters. Note that UAD_2 is omitted.
+
+* empty protected header
+
+* external_aad = TH_2
+
+* empty plaintext, since UAD_2 is omitted
+
+From the parameters above, the Enc_structure A_2 is computed.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  h'164f44d856dd15222fa463f202d9c60be3c69b40f7358d341cdb7b07dee170ca',
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string to be used as Additional Authenticated Data:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+A_2 (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The key and nonce used are defined in {{tv-psk-2-key}}:
+
+* key = K_2
+
+* nonce = IV_2
+
+Using the parameters above, the ciphertext C_2 can be computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_2 (8 bytes)
+ba 38 b9 a3 fc 1a 58 e9
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### message_2
+
+From the parameter computed in {{tv-psk-2}} and {{tv-psk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, C_2).
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_2 =
+(
+  h'fc3b339367a5225d53a92d380323afd035d7817b6d1be47d946f6b09a9cbdc06',
+  h'c2',
+  h'ba38b9a3fc1a58e9',
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_2 (CBOR Sequence) (45 bytes)
+58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 48 ba 38 b9 a3 fc 1a 58 e9 
+~~~~~~~~~~~~~~~~~~~~~~~
+
 
 ### Message 3
 
