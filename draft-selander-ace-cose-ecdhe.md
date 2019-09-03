@@ -2043,7 +2043,7 @@ ID_PSK =
 
 This test vector uses COSE_Key objects to store the pre-shared key.
 
-Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-msg1-proc}}):
+Note that since the map for ID_PSK contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-overview}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_PSK (in protected header) (CBOR-encoded) (4 bytes)
@@ -2095,7 +2095,7 @@ ID_PSK =
 
 This test vector uses COSE_Key objects to store the pre-shared key.
 
-Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-msg1-proc}}):
+Note that since the map for ID_PSK contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-overview}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_PSK (in protected header) (CBOR-encoded) (4 bytes)
@@ -2212,7 +2212,7 @@ TH_2 (CBOR-encoded) (34 bytes)
 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d 34 1c db 7b 07 de e1 70 ca 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-#### Key and Nonce Computation {#tv-rpk-2-key}
+#### Key and Nonce Computation {#tv-psk-2-key}
 
 The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}.
 
@@ -2362,10 +2362,364 @@ message_2 (CBOR Sequence) (45 bytes)
 58 20 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 48 ba 38 b9 a3 fc 1a 58 e9 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+### Message 3 {#tv-psk-3}
 
-### Message 3
+Since TYPE mod 4 equals 1, C_V is not omitted from data_3.
 
+~~~~~~~~~~~~~~~~~~~~~~~
+C_V (1 bytes)
+c4 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Data_3 is constructed, as the CBOR Sequence of the CBOR data item above.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_3 =
+(
+  h'c4'
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+data_3 (CBOR Sequence) (2 bytes)
+41 c4
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From data_3, C_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , C_2, data_3), as a CBOR Sequence of these 3 data items.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 )
+(CBOR Sequence) (114 bytes)
+58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11
+da 68 1d c2 af dd 87 03 55 TODO (CBOR bstr C_2) 41 c4 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And from there, compute the transcript hash TH_3 = H(TH_2 , C_2, data_3)
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_3 value (32 bytes)
 TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_2 (CBOR-encoded) (34 bytes)
+58 20 TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Signature Computation {#tv-psk-3-sign}
+
+COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
+
+* protected = bstr .cbor ID_CRED_U 
+
+* payload = bstr .cbor CRED_U (TODO: change in the spec)
+
+And from {{tv-rpk-2}}:
+
+* external_aad = TH_3
+
+The Sig_structure M_V to be signed is: [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ] , as defined in {{asym-msg3-proc}}:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+M_U =
+[
+  "Signature1",
+  << { 4: h'a2' } >>,
+  h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed',
+  << {
+    1:  1,
+   -1:  6,
+   -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7'
+  } >>
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string ToBeSigned:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+M_U (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 73 4b ef 32 3d 86
+7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce
+ed 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff
+b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The message is signed using the private authentication key of U, and produces the following signature:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+U's signature (64 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Key and Nonce Computation {#tv-psk-3-key}
+
+The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}.
+
+HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
+
+PRK = HMAC-SHA-256(salt, G_XY)
+
+Since this is the asymmetric case, salt is the empty byte string.
+
+G_XY is the shared secret, and since the mandatory-to-implement curve25519 is used, the ECDH shared secret is the output of the X25519 funtion.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+G_XY (TODO bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From there, PRK is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+PRK (TODO bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Key K_3 is the output of HKDF-Expand(PRK, info, L).
+
+info is defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for K_3 
+[
+  10,
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd09337
+                6dceed' ]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which as a CBOR encoded data item is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (K_3) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 73 4b ef 32 3d 86 7a 12 95
+61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+L is the length of K_3, so 16 bytes.
+
+From these parameters, K_3 is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+K_3 (16 bytes)
+89 2a aa 09 f8 1e 29 df 5b d6 b3 eb b9 82 ca 70 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Nonce IV_3 is the output of HKDF-Expand(PRK, info, L).
+
+info is defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for IV_3
+[
+  "IV-GENERATION",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 104, h'', h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd09337
+                6dceed' ],
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which as a CBOR encoded data item is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (IV_3) (CBOR-encoded) (61 bytes)
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18
+68 40 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+L is the length of IV_3, so 13 bytes.
+
+From these parameters, IV_3 is computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+IV_3 (13 bytes)
+b0 16 11 d5 5e 4f ef 94 f1 e9 9a 7d 7f
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### Ciphertext Computation {#tv-psk-3-ciph}
+
+COSE_Encrypt0 is computed with the following parameters. Note that PAD_3 is omitted.
+
+* empty protected header
+
+* external_aad = TH_3
+
+* plaintext = CBOR Sequence of the items kid_value, signature, in this order.
+
+with kid_value taken from {{rpk-tv-input-u}}, and signature as calculated in {{tv-rpk-3-sign}}.
+
+The plaintext is the following:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+P_3 (68 bytes)
+41 a2 58 40 0d TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+From the parameters above, the Enc_structure A_3 is computed.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+A_2 =
+[
+  "Encrypt0",
+  h'',
+  TODO ]
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string to be used as Additional Authenticated Data:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+A_2 (CBOR-encoded) (45 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The key and nonce used are defined in {{tv-rpk-2-key}}:
+
+* key = K_3
+
+* nonce = IV_3
+
+Using the parameters above, the ciphertext C_3 can be computed:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+C_3 (TODO)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### message_3
+
+From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, C_3).
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_3 =
+(
+  h'c4',
+  TODO
+)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Which encodes to the following byte string:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+message_3 (CBOR Sequence) (114 bytes) -- TODO
+41 c4 58 4c TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### OSCORE Security Context Derivation
+
+From the previous message exchange, the Common Security Context for OSCORE {{RFC8613}} can be derived, as specified in {{exporter}}.
+
+First af all, TH_4 is computed: TH_4 = H( TH_3, C_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and C_3
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 )
+(CBOR Sequence) (112 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And from there, compute the transcript hash TH_4 = H( TH_3, C_3 )
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_4 value (32 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_4 (CBOR-encoded) (34 bytes)
+TODO 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To derive the Master Secret and Master Salt the same HKDF-Expand (PRK, info, L) is used, with different info and L.
+
+For Master Secret:
+
+L for Master Secret = 16
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Info for Master Secret =
+[
+  "OSCORE Master Secret",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', TODO ],
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, the Master Secret value computed is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+OSCORE Master Secret (16 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For Master Salt:
+
+L for Master Secret = 8
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Info for Master Salt =
+[
+  "OSCORE Master Salt",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 64, h'', TODO ],
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, the Master Secret value computed is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+OSCORE Master Salt (8 bytes)
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Client's Sender ID takes the value of C_V:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Client's OSCORE Sender ID (1 bytes)
+c4 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Server's Sender ID takes the value of C_U:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Server's OSCORE Sender ID (1 bytes)
+c3 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The algorithms are those negociated in the cipher suite:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+AEAD Algorithm
+10
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+HKDF Algorithm
+-27
+~~~~~~~~~~~~~~~~~~~~~~~
+
 
 # Acknowledgments
 {: numbered="no"}
