@@ -1461,7 +1461,7 @@ The message is signed using the private authentication key of V, and produces th
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 V's signature (64 bytes)
-TODO
+52 3d 99 6d fd 9e 2f 77 c7 68 71 8a 30 c3 48 77 8c 5e b8 64 dd 53 7e 55 5e 4a 00 05 e2 09 53 07 13 ca 14 62 0d e8 18 7e 81 99 6e e8 04 d1 53 b8 a1 f6 08 49 6f dc d9 3d 30 fc 1c 8b 45 be cc 06 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Key and Nonce Computation {#tv-rpk-2-key}
@@ -1569,7 +1569,7 @@ The plaintext is the following:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 P_2 (68 bytes)
-41 a3 58 40 0d TODO
+41 a3 58 40 52 3d 99 6d fd 9e 2f 77 c7 68 71 8a 30 c3 48 77 8c 5e b8 64 dd 53 7e 55 5e 4a 00 05 e2 09 53 07 13 ca 14 62 0d e8 18 7e 81 99 6e e8 04 d1 53 b8 a1 f6 08 49 6f dc d9 3d 30 fc 1c 8b 45 be cc 06 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 From the parameters above, the Enc_structure A_2 is computed.
@@ -1600,8 +1600,8 @@ The key and nonce used are defined in {{tv-rpk-2-key}}:
 Using the parameters above, the ciphertext C_2 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_2 (TODO)
-TODO
+C_2 (76 bytes)
+1e 6b fe 0e 77 99 ce f0 66 a3 4f 08 ef aa 90 00 6d b4 4c 90 1c f7 9b 23 85 3a b9 7f d8 db c8 53 39 d5 ed 80 87 78 3c f7 a4 a7 e0 ea 38 c2 21 78 9f a3 71 be 64 e9 3c 43 a7 db 47 d1 e3 fb 14 78 8e 96 7f dd 78 d8 80 78 e4 9b 78 bf 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### message_2
@@ -1613,16 +1613,15 @@ message_2 =
 (
   h'8db577f9b9c2744798987db557bf31ca48acd205a9db8c320e5d49f302a96474',
   h'c4',
-  TODO
+  h'1e6bfe0e7799cef066a34f08efaa90006db44c901cf79b23853ab97fd8dbc85339d5ed8087783cf7a4a7e0ea38c221789fa371be64e93c43a7db47d1e3fb14788e967fdd78d88078e49b78bf'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (CBOR Sequence) (114 bytes) -- TODO
-58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c
-32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c TODO
+message_2 (CBOR Sequence) (114 bytes)
+58 20 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32 0e 5d 49 f3 02 a9 64 74 41 c4 58 4c 1e 6b fe 0e 77 99 ce f0 66 a3 4f 08 ef aa 90 00 6d b4 4c 90 1c f7 9b 23 85 3a b9 7f d8 db c8 53 39 d5 ed 80 87 78 3c f7 a4 a7 e0 ea 38 c2 21 78 9f a3 71 be 64 e9 3c 43 a7 db 47 d1 e3 fb 14 78 8e 96 7f dd 78 d8 80 78 e4 9b 78 bf
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Message 3 {#tv-rpk-3}
@@ -1653,22 +1652,21 @@ From data_3, C_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input
 ~~~~~~~~~~~~~~~~~~~~~~~
 Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 )
 (CBOR Sequence) (114 bytes)
-58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11
-da 68 1d c2 af dd 87 03 55 TODO (CBOR bstr C_2) 41 c4 
+58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd 87 03 55 58 4c 1e 6b fe 0e 77 99 ce f0 66 a3 4f 08 ef aa 90 00 6d b4 4c 90 1c f7 9b 23 85 3a b9 7f d8 db c8 53 39 d5 ed 80 87 78 3c f7 a4 a7 e0 ea 38 c2 21 78 9f a3 71 be 64 e9 3c 43 a7 db 47 d1 e3 fb 14 78 8e 96 7f dd 78 d8 80 78 e4 9b 78 bf 41 c4
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 And from there, compute the transcript hash TH_3 = H(TH_2 , C_2, data_3)
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_3 value (32 bytes)
-TODO
+21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_2 (CBOR-encoded) (34 bytes)
-58 20 TODO
+58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Signature Computation {#tv-rpk-3-sign}
@@ -1713,7 +1711,7 @@ The message is signed using the private authentication key of U, and produces th
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 U's signature (64 bytes)
-TODO
+5c 7d 7d 64 c9 61 c5 f5 2d cf 33 91 25 92 a1 af f0 2c 33 62 b0 e7 55 0e 4b c5 66 b7 0c 20 61 f3 c5 f6 49 e5 ed 32 3d 30 a2 6c 61 2f bb 5c bd 25 f3 1c 27 22 8c ea ec 64 29 31 95 41 fe 07 8e 0e 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Key and Nonce Computation {#tv-rpk-3-key}
@@ -1750,8 +1748,7 @@ info for K_3
   10,
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd09337
-                6dceed' ]
+  [ 128, h'', h'21ccb678b79114960955885b90a2b82e3b2ca27e8e374a7907f3e7854367fc22' ]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1759,8 +1756,7 @@ Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info (K_3) (CBOR-encoded) (48 bytes)
-84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 73 4b ef 32 3d 86 7a 12 95
-61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 L is the length of K_3, so 16 bytes.
@@ -1769,7 +1765,7 @@ From these parameters, K_3 is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 K_3 (16 bytes)
-89 2a aa 09 f8 1e 29 df 5b d6 b3 eb b9 82 ca 70 
+e1 ac d4 76 f5 96 a4 60 72 44 a8 da 8c ff 49 df 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Nonce IV_3 is the output of HKDF-Expand(PRK, info, L).
@@ -1782,8 +1778,7 @@ info for IV_3
   "IV-GENERATION",
   [ null, null, null ],
   [ null, null, null ],
-  [ 104, h'', h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd09337
-                6dceed' ],
+  [ 104, h'', h'21ccb678b79114960955885b90a2b82e3b2ca27e8e374a7907f3e7854367fc22' ],
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1791,8 +1786,7 @@ Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info (IV_3) (CBOR-encoded) (61 bytes)
-84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18
-68 40 58 20 73 4b ef 32 3d 86 7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce ed 
+84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83 18 68 40 58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 L is the length of IV_3, so 13 bytes.
@@ -1801,7 +1795,7 @@ From these parameters, IV_3 is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 IV_3 (13 bytes)
-b0 16 11 d5 5e 4f ef 94 f1 e9 9a 7d 7f
+de 53 02 13 ab a2 6a 47 1a 51 f3 d6 fb
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Ciphertext Computation {#tv-rpk-3-ciph}
@@ -1820,17 +1814,18 @@ The plaintext is the following:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 P_3 (68 bytes)
-41 a2 58 40 0d TODO
+41 a2 58 40 5c 7d 7d 64 c9 61 c5 f5 2d cf 33 91 25 92 a1 af f0 2c 33 62 b0 e7 55 0e 4b c5 66 b7 0c 20 61 f3 c5 f6 49 e5 ed 32 3d 30 a2 6c 61 2f bb 5c bd 25 f3 1c 27 22 8c ea ec 64 29 31 95 41 fe 07 8e 0e 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 From the parameters above, the Enc_structure A_3 is computed.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-A_2 =
+A_3 =
+A_3 =
 [
   "Encrypt0",
   h'',
-  TODO ]
+  h'21ccb678b79114960955885b90a2b82e3b2ca27e8e374a7907f3e7854367fc22',
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1838,7 +1833,7 @@ Which encodes to the following byte string to be used as Additional Authenticate
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 A_2 (CBOR-encoded) (45 bytes)
-TODO
+83 68 45 6e 63 72 79 70 74 30 40 58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The key and nonce used are defined in {{tv-rpk-2-key}}:
@@ -1850,8 +1845,8 @@ The key and nonce used are defined in {{tv-rpk-2-key}}:
 Using the parameters above, the ciphertext C_3 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_3 (TODO)
-TODO
+C_3 (76 bytes)
+de 4a 83 3d 48 b6 64 74 14 2c c9 bd ce 87 d9 3a f8 35 57 9c 2d bf 1b 9e 2f b4 dc 66 60 0d ba c6 bb 3c c0 5c 29 0e f3 5d 51 5b 4d 7d 64 83 f5 09 61 43 b5 56 44 cf af d1 ff aa 7f 2b a3 86 36 57 83 1d d2 e5 bd 04 04 38 60 14 0d c8
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### message_3
@@ -1862,15 +1857,15 @@ From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is 
 message_3 =
 (
   h'c4',
-  TODO
+  h'de4a833d48b66474142cc9bdce87d93af835579c2dbf1b9e2fb4dc66600dbac6bb3cc05c290ef35d515b4d7d6483f5096143b55644cfafd1ffaa7f2ba3863657831dd2e5bd04043860140dc8',
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_3 (CBOR Sequence) (114 bytes) -- TODO
-41 c4 58 4c TODO
+message_3 (CBOR Sequence) (80 bytes)
+41 c4 58 4c de 4a 83 3d 48 b6 64 74 14 2c c9 bd ce 87 d9 3a f8 35 57 9c 2d bf 1b 9e 2f b4 dc 66 60 0d ba c6 bb 3c c0 5c 29 0e f3 5d 51 5b 4d 7d 64 83 f5 09 61 43 b5 56 44 cf af d1 ff aa 7f 2b a3 86 36 57 83 1d d2 e5 bd 04 04 38 60 14 0d c8 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### OSCORE Security Context Derivation
@@ -1882,21 +1877,21 @@ First af all, TH_4 is computed: TH_4 = H( TH_3, C_3 ), where the input to the ha
 ~~~~~~~~~~~~~~~~~~~~~~~
 Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 )
 (CBOR Sequence) (112 bytes)
-TODO
+58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22 58 4c de 4a 83 3d 48 b6 64 74 14 2c c9 bd ce 87 d9 3a f8 35 57 9c 2d bf 1b 9e 2f b4 dc 66 60 0d ba c6 bb 3c c0 5c 29 0e f3 5d 51 5b 4d 7d 64 83 f5 09 61 43 b5 56 44 cf af d1 ff aa 7f 2b a3 86 36 57 83 1d d2 e5 bd 04 04 38 60 14 0d c8 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 And from there, compute the transcript hash TH_4 = H( TH_3, C_3 )
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_4 value (32 bytes)
-TODO
+51 ed 39 32 bc ba e8 90 1c 1d 4d eb 94 bd 67 3a b4 d3 8c 34 81 96 09 ee 0d 5c 9d a6 e9 80 7f e5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_4 (CBOR-encoded) (34 bytes)
-TODO 
+58 20 51 ed 39 32 bc ba e8 90 1c 1d 4d eb 94 bd 67 3a b4 d3 8c 34 81 96 09 ee 0d 5c 9d a6 e9 80 7f e5  
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 To derive the Master Secret and Master Salt the same HKDF-Expand (PRK, info, L) is used, with different info and L.
@@ -1911,7 +1906,7 @@ Info for Master Secret =
   "OSCORE Master Secret",
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', TODO ],
+  [ 128, h'', h'51ed3932bcbae8901c1d4deb94bd673ab4d38c34819609ee0d5c9da6e9807fe5' ],
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1919,14 +1914,14 @@ When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
-TODO
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 51 ed 39 32 bc ba e8 90 1c 1d 4d eb 94 bd 67 3a b4 d3 8c 34 81 96 09 ee 0d 5c 9d a6 e9 80 7f e5 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, the Master Secret value computed is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 OSCORE Master Secret (16 bytes)
-TODO
+09 02 9d b0 0c 3e 01 27 42 c3 a8 69 04 07 4c 0e 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 For Master Salt:
@@ -1939,7 +1934,7 @@ Info for Master Salt =
   "OSCORE Master Salt",
   [ null, null, null ],
   [ null, null, null ],
-  [ 64, h'', TODO ],
+  [ 64, h'', h'51ed3932bcbae8901c1d4deb94bd673ab4d38c34819609ee0d5c9da6e9807fe5' ],
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1947,14 +1942,14 @@ When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
-TODO
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 51 ed 39 32 bc ba e8 90 1c 1d 4d eb 94 bd 67 3a b4 d3 8c 34 81 96 09 ee 0d 5c 9d a6 e9 80 7f e5 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, the Master Secret value computed is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 OSCORE Master Salt (8 bytes)
-TODO
+81 02 97 22 a2 30 4a 06
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The Client's Sender ID takes the value of C_V:
@@ -1989,7 +1984,7 @@ Symmetric EDHOC is used:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 method (Symmetric Authentication)
-0
+1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 CoAP is used as transport:
