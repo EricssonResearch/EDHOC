@@ -2563,22 +2563,22 @@ First af all, TH_4 is computed: TH_4 = H( TH_3, C_3 ), where the input to the ha
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Input to SHA-256 to calculate TH_4 ( TH_3, CIPHERTEXT_3 )
-(CBOR Sequence) (112 bytes)
-TODO
+(CBOR Sequence) (43 bytes)
+58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89 54 81 b5 2b 8a f5 66 d7 fe 48 51 29 07 92 61 45 40 04 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 And from there, compute the transcript hash TH_4 = H( TH_3, C_3 )
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_4 value (32 bytes)
-TODO
+df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_4 (CBOR-encoded) (34 bytes)
-TODO 
+58 20 df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 To derive the Master Secret and Master Salt the same HKDF-Expand (PRK, info, L) is used, with different info and L.
@@ -2593,7 +2593,7 @@ Info for Master Secret =
   "OSCORE Master Secret",
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', TODO ],
+  [ 128, h'', h'df7c9b06f5dc0ee8860b396c78c5beb757413fa7b6a9cf283ddb4cd4c1fde43c' ],
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2601,14 +2601,14 @@ When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
-TODO
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, the Master Secret value computed is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 OSCORE Master Secret (16 bytes)
-TODO
+8d 36 8f 09 26 2d c5 52 7f e7 19 e6 6c 91 63 75 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 For Master Salt:
@@ -2621,7 +2621,7 @@ Info for Master Salt =
   "OSCORE Master Salt",
   [ null, null, null ],
   [ null, null, null ],
-  [ 64, h'', TODO ],
+  [ 64, h'', h'df7c9b06f5dc0ee8860b396c78c5beb757413fa7b6a9cf283ddb4cd4c1fde43c' ],
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2629,28 +2629,28 @@ When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
-TODO
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6 83 f6 f6 f6 83 18 40 40 58 20 df 7c 9b 06 f5 dc 0e e8 86 0b 39 6c 78 c5 be b7 57 41 3f a7 b6 a9 cf 28 3d db 4c d4 c1 fd e4 3c 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, the Master Secret value computed is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 OSCORE Master Salt (8 bytes)
-TODO
+4d b7 06 58 c5 e9 9f b6 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The Client's Sender ID takes the value of C_V:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client's OSCORE Sender ID (1 bytes)
-c4 
+c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The Server's Sender ID takes the value of C_U:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Server's OSCORE Sender ID (1 bytes)
-c3 
+c1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The algorithms are those negociated in the cipher suite:
