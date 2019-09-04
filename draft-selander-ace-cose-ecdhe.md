@@ -928,7 +928,7 @@ To protect against denial-of-service attacks, the CoAP server MAY respond to the
 
 ### Deriving an OSCORE Context from EDHOC {#oscore}
 
-When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoAP client and server MUST be able to retrieve the OCORE protocol state using its chosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
+When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoAP client and server MUST be able to retrieve the OSCORE protocol state using its chosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
 
 * The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
 
