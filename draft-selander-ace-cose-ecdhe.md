@@ -385,7 +385,7 @@ Example: Assuming the output OKM length L is smaller than the hash function outp
    OKM = first L bytes of HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where \|\| means byte string concatenation. Assuming use of the mandatory-to-implement algorithm AES-CCM-16-64-128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info \|\| 0x01 ) calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104) respectively.
+where \|\| means byte string concatenation. Assuming use of the mandatory-to-implement algorithm AES-CCM-16-64-128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info \|\| 0x01 ) calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104), respectively.
 
 
 ### EDHOC-Exporter Interface {#exporter}
@@ -1063,7 +1063,7 @@ Compared to {{SIGMA}}, EDHOC adds an explicit method type and expands the messag
 
 EDHOC also adds negotiation of connection identifiers and downgrade protected negotiation of cryptographic parameters, i.e. an attacker cannot affect the negotiated parameters. A single session of EDHOC does not include negotiation of cipher suites, but it enables Party V to verify that the selected cipher suite is the most preferred cipher suite by U which is supported by both U and V.
 
-As required by {{RFC7258}}, IETF protocols need to mitigate pervasive monitoring when possible. One way to mitigate pervasive monitoring is to use a key exchange that provides perfect forward secrecy. EDHOC therefore only supports methods with perfect forward secrecy. To limit the effect of breaches, it is important to limit the use of symmetrical group keys for bootstrapping. EDHOC therefore strives to make the additional cost of using raw-public keys and self-signed certificates as small as possible. Raw-public keys and self-signed certificates are not a replacement for a public key infrastructure, but SHOULD be used instead of symmetrical group keys for bootstrapping.
+As required by {{RFC7258}}, IETF protocols need to mitigate pervasive monitoring when possible. One way to mitigate pervasive monitoring is to use a key exchange that provides perfect forward secrecy. EDHOC therefore only supports methods with perfect forward secrecy. To limit the effect of breaches, it is important to limit the use of symmetrical group keys for bootstrapping. EDHOC therefore strives to make the additional cost of using raw public keys and self-signed certificates as small as possible. Raw public keys and self-signed certificates are not a replacement for a public key infrastructure, but SHOULD be used instead of symmetrical group keys for bootstrapping.
 
 Compromise of the long-term keys (PSK or private authentication keys) does not compromise the security of completed EDHOC exchanges. Compromising the private authentication keys of one party lets the attacker impersonate that compromised party in EDHOC exchanges with other parties, but does not let the attacker impersonate other parties in EDHOC exchanges with the compromised party. Compromising the PSK lets the attacker impersonate Party U in EDHOC exchanges with Party V and impersonate Party V in EDHOC exchanges with Party U. Compromise of the HDKF input parameters (ECDH shared secret and/or PSK) leads to compromise of all session keys derived from that compromised shared secret. Compromise of one session key does not compromise other session keys.
 
