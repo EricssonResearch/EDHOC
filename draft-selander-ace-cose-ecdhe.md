@@ -190,7 +190,7 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a lightweight key exchange protocol providing perfect forward secrecy and identity protection. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface. A main use case for EDHOC is to establish an OSCORE security context. EDHOC uses COSE for cryptography, CBOR for encoding, and CoAP for transport. By reusing existing libraries, the additional code footprint can be kept very low. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes, see {{fig-sizes}}. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC is less than 1/4 when PSK authentication is used and less than 1/3 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}.
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC is less than 1/4 when PSK authentication is used and less than 1/3 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys, and X.509 certificates are shown in {{fig-sizes}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
@@ -342,9 +342,9 @@ with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The IKM SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the mandatory-to-implement curve25519, the ECDH shared secret is the output of the X25519 funtion {{RFC7748}}.
+* The IKM SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the mandatory-to-implement curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
-Assuming use of the mandatory-to-implement algorithm HKDF SHA-256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+Example: Assuming use of the mandatory-to-implement algorithm HKDF SHA-256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HMAC-SHA-256( salt, G_XY )
@@ -353,10 +353,10 @@ Assuming use of the mandatory-to-implement algorithm HKDF SHA-256 the extract ph
 where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case. The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   output parameter = HKDF-Expand( PRK, info, L )
+   OKM = HKDF-Expand( PRK, info, L )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where L is the length of output material in bytes and info is the CBOR encoding of a COSE_KDF_Context
+where L is the length of output keying material (OKM) in bytes and info is the CBOR encoding of a COSE_KDF_Context
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info = [
@@ -371,7 +371,7 @@ where
 
   + AlgorithmID is an int or tstr, see below
   
-  +  keyDataLength is a uint set to the length of output material in bits, see below
+  + keyDataLength is a uint set to the length of output keying material in bits, see below
 
   + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
@@ -379,13 +379,13 @@ For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using transcr
 
 If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
-Assuming the output length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
+Example: Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   output parameter = first L bytes of HMAC-SHA-256( PRK, info || 0x01 )
+   OKM = first L bytes of HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where \|\| means byte string concatenation. Assuming use of the mandatory-to-implement algorithm AES-CCM-16-64-v128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info \|\| 0x01 ) calculated with AlgorithmID = 10 and AlgorithmID = "IV-GENERATION", respectively.
+where \|\| means byte string concatenation. Assuming use of the mandatory-to-implement algorithm AES-CCM-16-64-128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info \|\| 0x01 ) calculated with AlgorithmID = 10 and AlgorithmID = "IV-GENERATION", respectively.
 
 
 ### EDHOC-Exporter Interface {#exporter}
