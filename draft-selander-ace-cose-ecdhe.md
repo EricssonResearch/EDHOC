@@ -413,7 +413,7 @@ An application using EDHOC may want to derive new PSKs to use for authentication
    ID_PSK = EDHOC-Exporter( "EDHOC Chaining ID_PSK", 4 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# EDHOC Authenticated with Asymmetric Signature Keys {#asym}
+# EDHOC Authenticated with Asymmetric Keys {#asym}
 
 ## Overview {#asym-overview}
 
