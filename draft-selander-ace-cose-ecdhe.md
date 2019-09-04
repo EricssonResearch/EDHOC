@@ -534,7 +534,7 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ### Formatting of Message 2 {#asym-msg2-form}
 
-message_2 and data_2 SHALL be a CBOR Sequences (see {{CBOR}}) as defined below
+message_2 and data_2 SHALL be CBOR Sequences (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_2 = (
@@ -564,11 +564,11 @@ Party V SHALL compose message_2 as follows:
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_Y be the x-coordinate of the ephemeral public key.
 
-* Choe a connection identifier C_V and store it for the length of the protocol.
+* Choose a connection identifier C_V and store it for the length of the protocol.
 
 * Compute the transcript hash TH_2 = H( message_1, data_2 ) where H() is the hash function in the HKDF. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. Note that only 'signature' of the COSE_Sign1 object are used in message_2, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor ID_CRED_V
      
@@ -579,9 +579,7 @@ Party V SHALL compose message_2 as follows:
    * ID_CRED_V - identifier to facilitate retrieval of a public authentication key of Party V, see {{asym-overview}}
 
    * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
-   
-   Note that only 'signature' of the COSE_Sign1 object are used in message_2, see next bullet.
-   
+     
    COSE constructs the input to the Signature Algorithm as follows:
    
    * The key is the private authentication key of V.
@@ -592,7 +590,7 @@ Party V SHALL compose message_2 as follows:
    [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ]
 ~~~~~~~~~~~
    
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
    * plaintext = ( ID_CRED_V / kid_value, signature, ? UAD_2 )
 
@@ -600,9 +598,15 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-    where signature is taken from the COSE_Sign1 object and ID_CRED_V is a COSE header_map or a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only kid_value is conveyed in the plaintext. Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_2, see next bullet
+    where signature is taken from the COSE_Sign1 object and ID_CRED_V is a COSE header_map or a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only kid_value is conveyed in the plaintext.
 
-   COSE constructs the input to the AEAD {{RFC5116}} as follows: Key K = K_2, Nonce N = IV_2, Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ), and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_2 ].
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   
+   * Key K = K_2
+   * Nonce N = IV_2
+   * Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ) 
+   
+   and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_2 ].
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -626,7 +630,7 @@ If any verification step fails, Party U MUST send an EDHOC error message back, f
 
 ### Formatting of Message 3 {#asym-msg3-form}
 
-message_3 and data_3 SHALL be a CBOR Sequences (see {{CBOR}}) as defined below
+message_3 and data_3 SHALL be CBOR Sequences (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_3 = (
@@ -649,7 +653,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HKDF. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the following parameters. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. Note that only 'signature' of the COSE_Sign1 object are used in message_3, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor ID_CRED_U
 
@@ -660,8 +664,6 @@ Party U SHALL compose message_3 as follows:
    * ID_CRED_U - identifier to facilitate retrieval of a public authentication key of Party U, see {{asym-overview}}
 
    * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
-
-   Note that only 'signature' of the COSE_Sign1 object are used in message_3, see next bullet.
    
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -673,7 +675,7 @@ Party U SHALL compose message_3 as follows:
    [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ]
 ~~~~~~~~~~~
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * plaintext = ( ID_CRED_U / kid_value, signature, ? PAD_3 )
          
@@ -681,9 +683,14 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-    where signature is taken from the COSE_Sign1 object and ID_CRED_U is a COSE header_map or a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. Note that only 'ciphertext' of the COSE_Encrypt0 object are used in message_3, see next bullet.
+    where signature is taken from the COSE_Sign1 object and ID_CRED_U is a COSE header_map or a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. 
+    
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   * Key K = K_3
+   * Nonce N = IV_2
+   * Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 )
 
-   COSE constructs the input to the AEAD {{RFC5116}} as follows: Key K = K_3, Nonce N = IV_2, Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 ), and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_3 ].
+   and the associated data A is the CBOR encoding of [ "Encrypt0", h'', TH_3 ].
 
 * Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
