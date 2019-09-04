@@ -572,7 +572,7 @@ Party V SHALL compose message_2 as follows:
    
    * protected = bstr .cbor ID_CRED_V
      
-   * payload = CRED_V
+   * payload = bstr .cbor CRED_V
    
    * external_aad = TH_2
 
@@ -589,7 +589,7 @@ Party V SHALL compose message_2 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << ID_CRED_V >>, TH_2, CRED_V ]
+   [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ]
 ~~~~~~~~~~~
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -653,7 +653,7 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor ID_CRED_U
 
-   * payload = CRED_U
+   * payload = bstr .cbor CRED_U
 
    * external_aad = TH_3
 
@@ -670,7 +670,7 @@ Party U SHALL compose message_3 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << ID_CRED_U >>, TH_3, CRED_U ]
+   [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ]
 ~~~~~~~~~~~
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the following parameters. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
