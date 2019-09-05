@@ -340,8 +340,8 @@ c3
 AEAD Algorithm
 10
 
-HKDF Algorithm
--27
+HMAC Algorithm
+5
 
 ---------------------------------------------------------------
 Test Vectors for EDHOC Authenticated with PSK
@@ -601,5 +601,5 @@ c1
 AEAD Algorithm
 10
 
-HKDF Algorithm
--27
+HMAC Algorithm
+5

@@ -177,9 +177,9 @@ void psk_vectors( void )
     uint8_t method = 1; // Symmetric
     uint8_t corr = 1; // Party U is CoAP client
     uint8_t TYPE = 4 * method + corr;
-    uint8_t suite = 0; // [ 10, -27, 4, -8, 6 ] AES-CCM-16-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519
+    uint8_t suite = 0; // [ 10, 5, 4, -8, 6 ] AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519
     int aead_algorithm_id = 10;
-    int hkdf_algorithm_id = -27;
+    int hmac_algorithm_id = 5;
     vector<uint8_t> C_U { 0xc1 };
 
     // Calculate message_1
@@ -495,7 +495,7 @@ void psk_vectors( void )
 
     print_int( "AEAD Algorithm", aead_algorithm_id );
 
-    print_int( "HKDF Algorithm", hkdf_algorithm_id );
+    print_int( "HMAC Algorithm", hmac_algorithm_id );
 }
 
 void rpk_vectors( void )
@@ -615,9 +615,9 @@ void rpk_vectors( void )
     uint8_t method = 0; // Asymmetric
     uint8_t corr = 1; // Party U is CoAP client
     uint8_t TYPE = 4 * method + corr;
-    uint8_t suite = 0; // [ 10, -27, 4, -8, 6 ] AES-CCM-16-64-128, ECDH-SS + HKDF-256, X25519, EdDSA, Ed25519
+    uint8_t suite = 0; // [ 10, 5, 4, -8, 6 ] AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519
     int aead_algorithm_id = 10;
-    int hkdf_algorithm_id = -27;
+    int hmac_algorithm_id = 5;
     vector<uint8_t> C_U { 0xc3 };
 
     // Calculate message_1
@@ -995,7 +995,7 @@ void rpk_vectors( void )
 
     print_int( "AEAD Algorithm", aead_algorithm_id );
 
-    print_int( "HKDF Algorithm", hkdf_algorithm_id );
+    print_int( "HMAC Algorithm", hmac_algorithm_id );
 }
 
 int main( void )
