@@ -2042,7 +2042,7 @@ AEAD Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-HKDF Algorithm
+HMAC Algorithm
 5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2766,7 +2766,7 @@ AEAD Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-HKDF Algorithm
+HMAC Algorithm
 5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
