@@ -321,7 +321,7 @@ void psk_vectors( void )
     cout << "  h'";
     for ( auto i : TH_2 )
         cout << hex << setfill('0') << setw(2) << (int)i;
-    cout << "' ]," << endl;
+    cout << "'," << endl;
     cout << "]" << endl;
 
     print_vector( "A_2 (CBOR-encoded)", A_2 );   
@@ -420,7 +420,7 @@ void psk_vectors( void )
     cout << "  h'";
     for ( auto i : TH_3 )
         cout << hex << setfill('0') << setw(2) << (int)i;
-    cout << "' ]," << endl;
+    cout << "'," << endl;
     cout << "]" << endl;
 
     print_vector( "A_3 (CBOR-encoded)", A_3 );   
@@ -683,7 +683,7 @@ void rpk_vectors( void )
     vector_append( message_V, cbor_tstr( "Signature1" ) );
     vector_append( message_V, cbor_bstr( ID_CRED_V_CBOR ) );
     vector_append( message_V, cbor_bstr( TH_2 ) );
-    vector_append( message_V, CRED_V_CBOR );
+    vector_append( message_V, cbor_bstr( CRED_V_CBOR ) );
     vector<uint8_t> signature_V( crypto_sign_BYTES );
     crypto_sign_detached( signature_V.data(), nullptr, message_V.data(), message_V.size(), V_sign_sk_libsodium.data() );
 
@@ -738,13 +738,13 @@ void rpk_vectors( void )
         cout << hex << setfill('0') << setw(2) << (int)i;
     cout << "' } >>," << endl;
     print_cddl_bstr( TH_2 );
-    cout << "  {" << endl;
+    cout << "  << {" << endl;
     cout << "    1:  1," << endl;
     cout << "   -1:  6," << endl;
     cout << "   -2:  h'";
     for ( auto i : V_sign_pk )
         cout << hex << setfill('0') << setw(2) << (int)i;
-    cout << "'," << endl << "  }," << endl;
+    cout << "'," << endl << "  } >>," << endl;
     cout << "]" << endl;
 
     print_vector( "M_V (message to be signed with Ed25519) (CBOR-encoded)", message_V );
@@ -789,7 +789,7 @@ void rpk_vectors( void )
     cout << "  h'";
     for ( auto i : TH_2 )
         cout << hex << setfill('0') << setw(2) << (int)i;
-    cout << "' ]," << endl;
+    cout << "'," << endl;
     cout << "]" << endl;
 
     print_vector( "A_2 (CBOR-encoded)", A_2 );   
@@ -825,7 +825,7 @@ void rpk_vectors( void )
     vector_append( message_U, cbor_tstr( "Signature1" ) );
     vector_append( message_U, cbor_bstr( ID_CRED_U_CBOR ) );
     vector_append( message_U, cbor_bstr( TH_3 ) );
-    vector_append( message_U, CRED_U_CBOR );
+    vector_append( message_U, cbor_bstr( CRED_U_CBOR ) );
     vector<uint8_t> signature_U( crypto_sign_BYTES );
     crypto_sign_detached( signature_U.data(), nullptr, message_U.data(), message_U.size(), U_sign_sk_libsodium.data() );
 
@@ -870,13 +870,13 @@ void rpk_vectors( void )
         cout << hex << setfill('0') << setw(2) << (int)i;
     cout << "' } >>," << endl;
     print_cddl_bstr( TH_3 );
-    cout << "  {" << endl;
+    cout << "  << {" << endl;
     cout << "    1:  1," << endl;
     cout << "   -1:  6," << endl;
     cout << "   -2:  h'";
     for ( auto i : U_sign_pk )
         cout << hex << setfill('0') << setw(2) << (int)i;
-    cout << "'," << endl << "  }," << endl;
+    cout << "'," << endl << "  } >>," << endl;
     cout << "]" << endl;
 
     print_vector( "M_U (message to be signed with Ed25519) (CBOR-encoded)", message_U );
@@ -920,7 +920,7 @@ void rpk_vectors( void )
     cout << "  h'";
     for ( auto i : TH_3 )
         cout << hex << setfill('0') << setw(2) << (int)i;
-    cout << "' ]," << endl;
+    cout << "'," << endl;
     cout << "]" << endl;
 
     print_vector( "A_3 (CBOR-encoded)", A_3 );   
@@ -1006,6 +1006,6 @@ int main( void )
         return 1;
     }
 
-    psk_vectors();
     rpk_vectors();
+    psk_vectors();
 }
