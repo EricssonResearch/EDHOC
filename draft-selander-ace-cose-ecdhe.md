@@ -310,7 +310,7 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of an ordered set of COSE algorithms: an AEAD algorithm, an ECDH algorithm (including HKDF algorithm), an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
+EDHOC cipher suites consist of an ordered set of COSE algorithms: an AEAD algorithm, an HMAC algorithm, an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
 
 ~~~~~~~~~~~
    suite = int / [ 4*4 algs: int / tstr, ? para: any ]
@@ -332,7 +332,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be performed with the HKDF {{RFC5869}} in the selected cipher suite following the specification in Section 11 of {{RFC8152}}. The PRK is derived using HKDF-Extract {{RFC5869}}
+Key and IV derivation SHALL be performed with the HKDF {{RFC5869}} ufollowing the specification in Section 11 of {{RFC8152}} using the HMAC algorithm in the selected cipher suite. The PRK is derived using HKDF-Extract {{RFC5869}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
