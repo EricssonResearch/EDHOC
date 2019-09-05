@@ -761,7 +761,7 @@ message_1 = (
   SUITES_U : suite / [ index: uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,
-  ( ID_PSK : { 4 : bstr } ) / ( kid_value: bstr ),
+  ( ID_PSK : header_map ) / ( kid_value: bstr ),
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
