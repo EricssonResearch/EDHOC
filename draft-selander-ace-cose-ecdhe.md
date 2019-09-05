@@ -285,7 +285,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item of message_1 is an int (TYPE) specifying the method (asymmetric, symmetric) and the correlation properties of the transport used.
 
-While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HKDF, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Party U                                                 Party V
@@ -342,9 +342,9 @@ with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The input keying material (IKM) SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
+* The input keying material (IKM) SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the mandatory-to-implement curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
-Example: Assuming use of the algorithm HKDF SHA-256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HMAC-SHA-256( salt, G_XY )
@@ -385,7 +385,7 @@ Example: Assuming the output OKM length L is smaller than the hash function outp
    OKM = first L bytes of HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where \|\| means byte string concatenation. Assuming use of the algorithm AES-CCM-16-64-128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info \|\| 0x01 ) calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104), respectively.
+where \|\| means byte string concatenation. Assuming use of the mandatory-to-implement algorithm AES-CCM-16-64-128, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of HMAC-SHA-256( PRK, info \|\| 0x01 ) calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104), respectively.
 
 
 ### EDHOC-Exporter Interface {#exporter}
@@ -402,7 +402,7 @@ The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = l
    TH_4 = H( TH_3, CIPHERTEXT_3 )
 ~~~~~~~~~~~
 
-where H() is the hash function in the HKDF. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
+where H() is the hash function in the HMAC algorithm. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
 
 ### EDHOC PSK Chaining {#chain}
 
@@ -566,7 +566,7 @@ Party V SHALL compose message_2 as follows:
 
 * Choose a connection identifier C_V and store it for the length of the protocol.
 
-* Compute the transcript hash TH_2 = H( message_1, data_2 ) where H() is the hash function in the HKDF. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+* Compute the transcript hash TH_2 = H( message_1, data_2 ) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_2, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
@@ -651,7 +651,7 @@ Party U SHALL compose message_3 as follows:
 
 * If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
-* Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HKDF. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+* Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_3, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
@@ -932,7 +932,7 @@ When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must
 
 * The client's OSCORE Sender ID is C_V and the server's OSCORE Sender ID is C_U, as defined in this document
 
-* The AEAD Algorithm and the HMAC-based Key Derivation Function (HKDF) are the AEAD and HKDF algorithms in the selected cipher suite.
+* The AEAD Algorithm and the HMAC algorithms are the AEAD and HMAC algorithms in the selected cipher suite.
 
 * The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
