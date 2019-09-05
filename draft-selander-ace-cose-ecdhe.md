@@ -1005,7 +1005,7 @@ EDHOC has been analyzed in several other documents. A formal verification of EDH
 
 ## EDHOC Cipher Suites Registry
 
-IANA has created a new registry titled "EDHOC Cipher Suites" (TODO: where). The registration procedure is "Expert Review". The columns of the registry are Value, Array, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
+IANA has created a new registry titled "EDHOC Cipher Suites" under the new heading "EDHOC". The registration procedure is "Expert Review". The columns of the registry are Value, Array, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Value: 1
@@ -1037,7 +1037,7 @@ Reference: [[this document]]
 
 ## EDHOC Method Type Registry
 
-IANA has created a new registry titled "EDHOC Method Type" (TODO: where). The registration procedure is "Expert Review". The columns of the registry are Value, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
+IANA has created a new registry titled "EDHOC Method Type" under the new heading "EDHOC". The registration procedure is "Expert Review". The columns of the registry are Value, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
 ~~~~~~~~~~~
 +-------+------------------------------------------+-------------------+
