@@ -1601,10 +1601,10 @@ The key and nonce used are defined in {{tv-rpk-2-key}}:
 
 * nonce = IV_2
 
-Using the parameters above, the ciphertext C_2 can be computed:
+Using the parameters above, the ciphertext CIPHERTEXT_2 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_2 (76 bytes)
+CIPHERTEXT_2 (76 bytes)
 1e 6b fe 0e 77 99 ce f0 66 a3 4f 08 ef aa 90 00 6d b4 4c 90 1c f7 9b 23 85
 3a b9 7f d8 db c8 53 39 d5 ed 80 87 78 3c f7 a4 a7 e0 ea 38 c2 21 78 9f a3
 71 be 64 e9 3c 43 a7 db 47 d1 e3 fb 14 78 8e 96 7f dd 78 d8 80 78 e4 9b 78
@@ -1613,7 +1613,7 @@ bf
 
 #### message_2
 
-From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, C_2).
+From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 =
@@ -1660,10 +1660,10 @@ data_3 (CBOR Sequence) (2 bytes)
 41 c4
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From data_3, C_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , C_2, data_3), as a CBOR Sequence of these 3 data items.
+From data_3, CIPHERTEXT_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , CIPHERTEXT_2, data_3), as a CBOR Sequence of these 3 data items.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-( TH_2, C_2, data_3 )
+( TH_2, CIPHERTEXT_2, data_3 )
 (CBOR Sequence) (114 bytes)
 58 20 55 50 b3 dc 59 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11
 da 68 1d c2 af dd 87 03 55 58 4c 1e 6b fe 0e 77 99 ce f0 66 a3 4f 08 ef aa
@@ -1672,7 +1672,7 @@ f7 a4 a7 e0 ea 38 c2 21 78 9f a3 71 be 64 e9 3c 43 a7 db 47 d1 e3 fb 14 78
 8e 96 7f dd 78 d8 80 78 e4 9b 78 bf 41 c4
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , C_2, data_3)
+And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_3 value (32 bytes)
@@ -1871,10 +1871,10 @@ The key and nonce used are defined in {{tv-rpk-2-key}}:
 
 * nonce = IV_3
 
-Using the parameters above, the ciphertext C_3 can be computed:
+Using the parameters above, the ciphertext CIPHERTEXT_3 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_3 (76 bytes)
+CIPHERTEXT_3 (76 bytes)
 de 4a 83 3d 48 b6 64 74 14 2c c9 bd ce 87 d9 3a f8 35 57 9c 2d bf 1b 9e 2f
 b4 dc 66 60 0d ba c6 bb 3c c0 5c 29 0e f3 5d 51 5b 4d 7d 64 83 f5 09 61 43
 b5 56 44 cf af d1 ff aa 7f 2b a3 86 36 57 83 1d d2 e5 bd 04 04 38 60 14 0d
@@ -1883,7 +1883,7 @@ c8
 
 #### message_3
 
-From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, C_3).
+From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 =
@@ -1906,10 +1906,10 @@ message_3 (CBOR Sequence) (80 bytes)
 
 From the previous message exchange, the Common Security Context for OSCORE {{RFC8613}} can be derived, as specified in {{exporter}}.
 
-First af all, TH_4 is computed: TH_4 = H( TH_3, C_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and C_3
+First af all, TH_4 is computed: TH_4 = H( TH_3, CIPHERTEXT_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and CIPHERTEXT_3
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-( TH_3, C_3 )
+( TH_3, CIPHERTEXT_3 )
 (CBOR Sequence) (112 bytes)
 58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a
 79 07 f3 e7 85 43 67 fc 22 58 4c de 4a 83 3d 48 b6 64 74 14 2c c9 bd ce 87
@@ -1918,7 +1918,7 @@ d9 3a f8 35 57 9c 2d bf 1b 9e 2f b4 dc 66 60 0d ba c6 bb 3c c0 5c 29 0e f3
 83 1d d2 e5 bd 04 04 38 60 14 0d c8 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-And from there, compute the transcript hash TH_4 = SHA-256( TH_3, C_3 )
+And from there, compute the transcript hash TH_4 = SHA-256( TH_3, CIPHERTEXT_3 )
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_4 value (32 bytes)
@@ -2397,16 +2397,16 @@ The key and nonce used are defined in {{tv-psk-2-key}}:
 
 * nonce = IV_2
 
-Using the parameters above, the ciphertext C_2 can be computed:
+Using the parameters above, the ciphertext CIPHERTEXT_2 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_2 (8 bytes)
+CIPHERTEXT_2 (8 bytes)
 ba 38 b9 a3 fc 1a 58 e9
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### message_2
 
-From the parameter computed in {{tv-psk-2}} and {{tv-psk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, C_2).
+From the parameter computed in {{tv-psk-2}} and {{tv-psk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 =
@@ -2448,15 +2448,15 @@ data_3 (CBOR Sequence) (2 bytes)
 41 c2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From data_3, C_2 ({{tv-psk-2-ciph}}), and TH_2 ({{tv-psk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , C_2, data_3), as a CBOR Sequence of these 3 data items.
+From data_3, CIPHERTEXT_2 ({{tv-psk-2-ciph}}), and TH_2 ({{tv-psk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , CIPHERTEXT_2, data_3), as a CBOR Sequence of these 3 data items.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-( TH_2, C_2, data_3 ) (CBOR Sequence) (45 bytes)
+( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (45 bytes)
 58 20 16 4f 44 d8 56 dd 15 22 2f a4 63 f2 02 d9 c6 0b e3 c6 9b 40 f7 35 8d
 34 1c db 7b 07 de e1 70 ca 48 ba 38 b9 a3 fc 1a 58 e9 41 c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , C_2, data_3)
+And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_3 value (32 bytes)
@@ -2603,16 +2603,16 @@ The key and nonce used are defined in {{tv-psk-3-key}}:
 
 * nonce = IV_3
 
-Using the parameters above, the ciphertext C_3 can be computed:
+Using the parameters above, the ciphertext CIPHERTEXT_3 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_3 (8 bytes)
+CIPHERTEXT_3 (8 bytes)
 51 29 07 92 61 45 40 04 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### message_3
 
-From the parameter computed in {{tv-psk-3}} and {{tv-psk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, C_3).
+From the parameter computed in {{tv-psk-3}} and {{tv-psk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 =
@@ -2633,16 +2633,16 @@ message_3 (CBOR Sequence) (11 bytes)
 
 From the previous message exchange, the Common Security Context for OSCORE {{RFC8613}} can be derived, as specified in {{exporter}}.
 
-First af all, TH_4 is computed: TH_4 = H( TH_3, C_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and C_3
+First af all, TH_4 is computed: TH_4 = H( TH_3, CIPHERTEXT_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and CIPHERTEXT_3
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-( TH_3, C_3 )
+( TH_3, CIPHERTEXT_3 )
 (CBOR Sequence) (43 bytes)
 58 20 11 98 aa b3 ed db 61 b8 a1 b1 93 a9 e5 60 2b 5d 5f ea 76 bc 28 52 89
 54 81 b5 2b 8a f5 66 d7 fe 48 51 29 07 92 61 45 40 04 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-And from there, compute the transcript hash TH_4 = SHA-256( TH_3, C_3 )
+And from there, compute the transcript hash TH_4 = SHA-256( TH_3, CIPHERTEXT_3 )
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_4 value (32 bytes)
