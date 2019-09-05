@@ -2043,7 +2043,7 @@ AEAD Algorithm
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 HKDF Algorithm
--27
+5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Test Vectors for EDHOC Authenticated with Symmetric Signature Keys (PSK)
@@ -2767,7 +2767,7 @@ AEAD Algorithm
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 HKDF Algorithm
--27
+5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # Acknowledgments
