@@ -1424,7 +1424,7 @@ COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_V 
 
-* payload = bstr .cbor CRED_V (TODO: change in the spec)
+* payload = bstr .cbor CRED_V
 
 And from {{tv-rpk-2}}:
 
@@ -1479,15 +1479,17 @@ Since this is the asymmetric case, salt is the empty byte string.
 G_XY is the shared secret, and since the mandatory-to-implement curve25519 is used, the ECDH shared secret is the output of the X25519 function.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_XY (TODO bytes)
-TODO
+G_XY (32 bytes)
+c6 1e 09 09 a1 9d 64 24 01 63 ec 26 2e 9c c4 f8 8c e7 7b e1 23 c5 ab 53 8d
+26 b0 69 22 a5 20 67 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 From there, PRK is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK (TODO bytes)
-TODO
+PRK (32 bytes)
+ba 9c 2c a1 c5 62 14 a6 e0 f6 13 ed a8 91 86 8a 4c a3 e3 fa bc c7 79 8f dc
+01 60 80 07 59 16 71 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Key K_2 is the output of HKDF-Expand(PRK, info, L).
@@ -1694,7 +1696,7 @@ COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_U 
 
-* payload = bstr .cbor CRED_U (TODO: change in the spec)
+* payload = bstr .cbor CRED_U
 
 And from {{tv-rpk-2}}:
 
@@ -1749,15 +1751,17 @@ Since this is the asymmetric case, salt is the empty byte string.
 G_XY is the shared secret, and since the mandatory-to-implement curve25519 is used, the ECDH shared secret is the output of the X25519 function.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_XY (TODO bytes)
-TODO
+G_XY (32 bytes)
+c6 1e 09 09 a1 9d 64 24 01 63 ec 26 2e 9c c4 f8 8c e7 7b e1 23 c5 ab 53 8d
+26 b0 69 22 a5 20 67 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 From there, PRK is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK (TODO bytes)
-TODO
+PRK (32 bytes)
+ba 9c 2c a1 c5 62 14 a6 e0 f6 13 ed a8 91 86 8a 4c a3 e3 fa bc c7 79 8f dc
+01 60 80 07 59 16 71 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Key K_3 is the output of HKDF-Expand(PRK, info, L).
@@ -2490,7 +2494,7 @@ a1 1f 8f 12 d0 87 6f 73 6d 2d 8f d2 6e 14 c2 de
 G_XY is the shared secret, and since the mandatory-to-implement curve25519 is used, the ECDH shared secret is the output of the X25519 function.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_XY (TODO bytes)
+G_XY (32 bytes)
 d5 75 05 50 6d 8f 30 a8 60 a0 63 d0 1b 5b 7a d7 6a 09 4f 70 61 3b 4a e6 6c
 5a 90 e5 c2 1f 23 11 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -2498,7 +2502,7 @@ d5 75 05 50 6d 8f 30 a8 60 a0 63 d0 1b 5b 7a d7 6a 09 4f 70 61 3b 4a e6 6c
 From there, PRK is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK (TODO bytes)
+PRK (32 bytes)
 aa b2 f1 3c cb 1a 4f f7 96 a9 7a 32 a4 d2 fb 62 47 ef 0b 6b 06 da 04 d3 d1
 06 39 4b 28 76 e2 8c 
 ~~~~~~~~~~~~~~~~~~~~~~~
