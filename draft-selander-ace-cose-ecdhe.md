@@ -406,7 +406,7 @@ where H() is the hash function in the HKDF. Example use of the EDHOC-Exporter is
 
 ### EDHOC PSK Chaining {#chain}
 
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid_value' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PSK    = EDHOC-Exporter( "EDHOC Chaining PSK", length )
@@ -598,7 +598,7 @@ Party V SHALL compose message_2 as follows:
 
    * UAD_2 = bstr containing opaque unprotected application data
 
-    where signature is taken from the COSE_Sign1 object and ID_CRED_V is a COSE header_map or a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, with kid_value : bstr, only kid_value is conveyed in the plaintext.
+    where signature is taken from the COSE_Sign1 object and ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}) or a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, with kid_value : bstr, only kid_value is conveyed in the plaintext.
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
    
@@ -683,7 +683,7 @@ Party U SHALL compose message_3 as follows:
 
    * PAD_3 = bstr containing opaque protected application data
 
-    where signature is taken from the COSE_Sign1 object and ID_CRED_U is a COSE header_map or a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, with kid_value : bstr, only kid_value is conveyed in the plaintext. 
+    where signature is taken from the COSE_Sign1 object and ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}) or a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, with kid_value : bstr, only kid_value is conveyed in the plaintext. 
     
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
    * Key K = K_3
@@ -724,7 +724,7 @@ EDHOC supports authentication with pre-shared keys. Party U and V are assumed to
 
 where the identifier ID_PSK is a COSE header map containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
-* ID_PSK = { 4 : bstr }
+* ID_PSK = { 4 : kid_value } , where kid_value : bstr
 
 The purpose of ID_PSK is to facilitate retrieval of the PSK and in the case a 'kid' parameter is used it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
 
@@ -761,7 +761,7 @@ message_1 = (
   SUITES_U : suite / [ index: uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,
-  ID_PSK : bstr / header_map,
+  ( ID_PSK : { 4 : bstr } ) / ( kid_value: bstr ),
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -769,7 +769,7 @@ message_1 = (
 where:
 
 * TYPE = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, only the bstr kid_value is conveyed.
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, with kid_value: bstr, only kid_value is conveyed.
 
 ## EDHOC Message 2
 
