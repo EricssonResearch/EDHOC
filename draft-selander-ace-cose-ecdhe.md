@@ -431,7 +431,7 @@ where the identifiers ID_CRED_U and ID_CRED_V are COSE header maps containing CO
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
-* ID_CRED_x = { 4 : bstr }, for x = U or V.
+* ID_CRED_x = { 4 : kid_value }, where kid_value : bstr, for x = U or V.
 
 Public key certificates can be identified in different ways. Several header parameters for identifying X.509 certificates are defined in {{I-D.ietf-cose-x509}} (the exact labels are TBD):
 
