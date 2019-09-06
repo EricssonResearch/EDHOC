@@ -614,8 +614,7 @@ Party V SHALL compose message_2 as follows:
    * Key K = K_2
    * Nonce N = IV_2
    * Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ) 
-   * Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ) 
-   * Associated data A = \[ "Encrypt0", h'', TH_2 \].
+   * Associated data A = \[ "Encrypt0", h'', TH_2 \]
   
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
@@ -698,8 +697,7 @@ Party U SHALL compose message_3 as follows:
    * Key K = K_3
    * Nonce N = IV_2
    * Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 )
-
-   and the associated data A is the CBOR encoding of \[ "Encrypt0", h'', TH_3 \].
+   * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
 * Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
 
