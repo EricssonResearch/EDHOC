@@ -1183,6 +1183,49 @@ bstr .cbor uint                 << 24 >>                  0x421818
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
 
+# EDHOC Authenticated with Asymmetric Diffie-Hellman Keys {#asym-dh}
+
+## Overview {#asym-dh-overview}
+
+EDHOC authenticated with assymetric Diffie-Hellman kets very similar to EDHOC authenticated with asymmetric signature keys.  Instead of static signature keys, U and V have static Diffie-Hellman keys.  The static Diffie-Hellman keys are called G_U and G_V.
+
+In the following subsections only the differences compared to EDHOC authenticated with asymmetric signature keys are described. EDHOC authenticated with asymmetric Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
+
+~~~~~~~~~~~
+Party U                                                       Party V
+|                     TYPE, SUITES_U, G_X, C_U                      |
++------------------------------------------------------------------>|
+|                             message_1                             |
+|                                                                   |
+|  C_U, G_Y, C_V, AEAD( K_2; ID_CRED_V, AEAD(G_VX; CRED_V, TH_2) )  |
+|<------------------------------------------------------------------+
+|                             message_2                             |
+|                                                                   |
+|        C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2) )       |
++------------------------------------------------------------------>|
+|                             message_3                             |
+~~~~~~~~~~~
+{: #fig-asym-dh title="Overview of EDHOC authenticated with asymmetric Diffie-Hellman keys."}
+{: artwork-align="center"}
+
+## EDHOC Message 1
+
+### Formatting of Message 1 {#asym-dh-msg1-form}
+
+* TYPE = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+
+## EDHOC Message 2
+
+### Processing of Message 2
+
+*  COSE_Sign1 is not used and replaced with an "inner" COSE_Encrypt0.
+
+   o  Compute PRK_V = HKDF-Extract( "", G_VX )
+
+   o  Compute K_V = HKDF-Expand( PRK_V, info, L )
+
+   o  Compute IV_V = HKDF-Expand( PRK_V, info, L )
+
 # Test Vectors {#vectors}
 
 To help implementors, this appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). 1 byte identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
