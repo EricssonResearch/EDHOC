@@ -392,7 +392,7 @@ where \|\| means byte string concatenation.
 Example: Assuming use of the algorithm AES-CCM-16-64-128 and HMAC 256/256, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-HMAC-SHA-256( PRK, info || 0x01 )
+   HMAC-SHA-256( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104), respectively.
