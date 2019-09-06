@@ -1,6 +1,6 @@
 ---
 title: Ephemeral Diffie-Hellman Over COSE (EDHOC)
-docname: draft-selander-lake-cose-ecdhe-latest
+docname: draft-selander-ace-cose-ecdhe-latest
 
 ipr: trust200902
 cat: std
