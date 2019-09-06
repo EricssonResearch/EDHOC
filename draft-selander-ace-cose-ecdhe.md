@@ -332,7 +332,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be performed with the HKDF {{RFC5869}} ufollowing the specification in Section 11 of {{RFC8152}} using the HMAC algorithm in the selected cipher suite. The PRK is derived using HKDF-Extract {{RFC5869}}
+Key and IV derivation SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using the HMAC algorithm in the selected cipher suite. The pseudorandom key (PRK) is derived using HKDF-Extract {{RFC5869}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
@@ -344,13 +344,15 @@ with the following input:
 
 * The input keying material (IKM) SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
-Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces a pseudorandom key (PRK) as follows:
+Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces a PRK as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HMAC-SHA-256( salt, G_XY )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case. The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
+where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case.
+
+The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    OKM = HKDF-Expand( PRK, info, L )
