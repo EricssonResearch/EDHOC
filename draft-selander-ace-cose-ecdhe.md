@@ -1240,7 +1240,7 @@ CRED_U =
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_U (COSE_KEY) (CBOR-encoded) (40 bytes)
+CRED_U (COSE_Key) (CBOR-encoded) (40 bytes)
 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10
 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1299,7 +1299,7 @@ CRED_V =
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_V (COSE_KEY) (CBOR-encoded) (40 bytes)
+CRED_V (COSE_Key) (CBOR-encoded) (40 bytes)
 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30
 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
