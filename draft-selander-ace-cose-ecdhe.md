@@ -496,7 +496,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  SUITES_U : suite / [ index: uint, 2* suite ],
+  SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,  
   ? UAD_1 : bstr,
@@ -767,10 +767,10 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   TYPE : int,
-  SUITES_U : suite / [ index: uint, 2* suite ],
+  SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,
-  ( ID_PSK : header_map ) / ( kid_value: bstr ),
+  ID_PSK : header_map // kid_value : bstr,
   ? UAD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -1159,14 +1159,13 @@ h'12cd'             0x4212cd             byte string
 { 4: h'cd' }        0xa10441cd           map                 
 << 1, 2, null >>    0x430102f6           byte string
 [ 1, 2, null ]      0x830102f6           array      
-[_ 1, 2, null ]     0x9f0102f6ff         array (indefinite-length)
 ( 1, 2, null )      0x0102f6             sequence
 1, 2, null          0x0102f6             sequence
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}. The message format specification uses the constructs '.cbor' and '.cborseq' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
+EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}. The message format specification uses the construct '.cbor' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
 
 A type (e.g. an uint) may be wrapped in a byte string (bstr):
 
@@ -1178,19 +1177,6 @@ bstr .cbor uint                 << 24 >>                  0x421818
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
-
-An array, say of an uint and a byte string, may be converted into a byte string (bstr):
-
-~~~~~~~~~~~~~~~~~~~~~~~
-CDDL Type                       Diagnostic              Encoded
---------------------------------------------------------------------
-bstr                            h'cd'                   0x41cd
-[ uint, bstr ]                  [ 24, h'cd' ]           0x82181841cd
-bstr .cborseq [ uint, bstr ]    << 24, h'cd' >>         0x44181841cd
---------------------------------------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~
-{: artwork-align="center"}
-
 
 ## COSE {#COSE}
 
