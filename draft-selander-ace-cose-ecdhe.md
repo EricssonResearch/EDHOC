@@ -596,7 +596,7 @@ Party V SHALL compose message_2 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ]
+      [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ]
 ~~~~~~~~~~~
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -680,7 +680,7 @@ Party U SHALL compose message_3 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-   [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ]
+      [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ]
 ~~~~~~~~~~~
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -694,6 +694,7 @@ Party U SHALL compose message_3 as follows:
     where signature is taken from the COSE_Sign1 object, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. 
     
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   
    * Key K = K_3
    * Nonce N = IV_2
    * Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAD_3 )
@@ -1184,7 +1185,7 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 To help implementors, this appendix provides a wealth of test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). 1 byte identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
-## Test Vectors for EDHOC Authenticated with Asymmetric Signature Keys (RPK)
+## Test Vectors for EDHOC Authenticated with Asymmetric Keys (RPK)
 
 Asymmetric EDHOC is used:
 
@@ -2039,7 +2040,7 @@ HMAC Algorithm
 5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-## Test Vectors for EDHOC Authenticated with Symmetric Signature Keys (PSK)
+## Test Vectors for EDHOC Authenticated with Symmetric Keys (PSK)
 
 Symmetric EDHOC is used:
 
