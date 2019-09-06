@@ -506,7 +506,7 @@ message_1 = (
 where:
 
 * TYPE = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-* SUITES_U - cipher suites which Party U supports in order of decreasing preference, and a selected cipher suite. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then the index identifies which suite is selected. The zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the single selected cipher suite out of the array elements listing the cipher suites (see {{error}})
+* SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
 * UAD_1 - bstr containing unprotected opaque application data
@@ -614,9 +614,9 @@ Party V SHALL compose message_2 as follows:
    * Key K = K_2
    * Nonce N = IV_2
    * Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ) 
-   
-   and the associated data A is the CBOR encoding of \[ "Encrypt0", h'', TH_2 \].
-
+   * Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAD_2 ) 
+   * Associated data A = \[ "Encrypt0", h'', TH_2 \].
+  
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
 
 ### Party U Processing of Message 2
