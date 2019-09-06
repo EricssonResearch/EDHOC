@@ -1157,7 +1157,7 @@ null                0xf6                 simple value
 h'12cd'             0x4212cd             byte string
 '12cd'              0x4431326364         byte string
 "12cd"              0x6431326364         text string
-{ 4: h'cd' }        0xa10441cd           map                 
+{ 4 : h'cd' }       0xa10441cd           map                 
 << 1, 2, null >>    0x430102f6           byte string
 [ 1, 2, null ]      0x830102f6           array      
 ( 1, 2, null )      0x0102f6             sequence
@@ -1185,7 +1185,7 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 # Test Vectors {#vectors}
 
-To help implementors, this appendix provides a wealth of test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). 1 byte identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
+To help implementors, this appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). 1 byte identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
 ## Test Vectors for EDHOC Authenticated with Asymmetric Keys (RPK)
 
