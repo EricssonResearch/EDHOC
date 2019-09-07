@@ -1230,6 +1230,8 @@ Party U                                                       Party V
 
    o external_aad = /[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> /]
 
+## EDHOC Message 3
+
 ### Processing of Message 3
 
 *  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
@@ -1244,7 +1246,7 @@ Party U                                                       Party V
 
    o external_aad = /[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> /]
 
-### EDHOC-Exporter Interface
+## EDHOC-Exporter Interface
 
 *  The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
 
@@ -1253,6 +1255,16 @@ Party U                                                       Party V
 ~~~~~~~~~~~
    EDHOC-Exporter( label, length ) = HKDF-Expand( PRK_Export, info, length ) 
 ~~~~~~~~~~~
+
+## Security Considerations
+
+EDHOC authenticated with asymmetric Diffie-Hellman keys have similar security properties as EDHOC authenticated with asymmetric signature keys with a few differences:
+
+   o  Repudiation:
+
+   o  Key compromise:
+
+## TODO Optimizations
 
 # Test Vectors {#vectors}
 
