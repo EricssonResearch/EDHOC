@@ -1187,7 +1187,7 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 ## Overview {#asym-dh-overview}
 
-EDHOC authenticated with assymetric Diffie-Hellman kets very similar to EDHOC authenticated with asymmetric signature keys.  Instead of static signature keys, U and V have static Diffie-Hellman keys.  The static Diffie-Hellman keys are called G_U and G_V.
+EDHOC authenticated with assymetric Diffie-Hellman kets very similar to EDHOC authenticated with asymmetric signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman. 
 
 In the following subsections only the differences compared to EDHOC authenticated with asymmetric signature keys are described. EDHOC authenticated with asymmetric Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
 
@@ -1218,13 +1218,41 @@ Party U                                                       Party V
 
 ### Processing of Message 2
 
-*  COSE_Sign1 is not used and replaced with an "inner" COSE_Encrypt0.
+*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. 
 
-   o  Compute PRK_V = HKDF-Extract( "", G_VX )
+   o  PRK_V = HKDF-Extract( "", G_VX )
 
-   o  Compute K_V = HKDF-Expand( PRK_V, info, L )
+   o  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
 
-   o  Compute IV_V = HKDF-Expand( PRK_V, info, L )
+   o  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+
+   o plaintext = 0x (the empty string)
+
+   o external_aad = /[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> /]
+
+### Processing of Message 3
+
+*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
+
+   o  PRK_U = HKDF-Extract( "", G_UY )
+
+   o  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+
+   o  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+
+   o plaintext = 0x (the empty string)
+
+   o external_aad = /[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> /]
+
+### EDHOC-Exporter Interface
+
+*  The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
+
+   o  PRK_Export = HKDF-Extract( "", PRK || PRK_V || PRK_U )
+
+~~~~~~~~~~~
+   EDHOC-Exporter( label, length ) = HKDF-Expand( PRK_Export, info, length ) 
+~~~~~~~~~~~
 
 # Test Vectors {#vectors}
 
