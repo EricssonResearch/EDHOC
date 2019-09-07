@@ -1230,6 +1230,8 @@ Party U                                                       Party V
 
    o external_aad = /[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> /]
 
+   o CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+
 ## EDHOC Message 3
 
 ### Processing of Message 3
@@ -1246,6 +1248,8 @@ Party U                                                       Party V
 
    o external_aad = /[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> /]
 
+   o CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+
 ## EDHOC-Exporter Interface
 
 *  The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
@@ -1258,13 +1262,29 @@ Party U                                                       Party V
 
 ## Security Considerations
 
-EDHOC authenticated with asymmetric Diffie-Hellman keys have similar security properties as EDHOC authenticated with asymmetric signature keys with a few differences:
+EDHOC authenticated with asymmetric Diffie-Hellman keys have similar security properties as EDHOC authenticated with asymmetric signature keys with a few small differences:
 
-   o  Repudiation:
+   o  Repudiation: In EDHOC authenticated with asymmetric signature keys, by presenting the private ephemeral key, Party U can prove that Party V performed a run of the protocol, and vice versa. Note that storing the private ephemeral keys violates the protocol requirements. In EDHOC authenticated with assymetric Diffie-Hellman keys, both parties can always deny having participated in the protocol.
+   
+   o  Key compromise impersonation: Just like in EDHOC authenticated with asymmetric signature keys, EDHOC with provide KCI against an attacker having the long term key. But while EDHOC authenticated with asymmetric signature key provides KCI restistance also against an attacker having the private ephemeral key, an attacker with knowledge of the private ephemeral key can impersonate the other party in the single protocol run where the ephemeral key pair is used.
 
-   o  Key compromise:
+## Message Sizes
+
+~~~~~~~~~~~~~~~~~~~~~~~
+=====================================================================
+               PSK     RPK (Signature key)     RPK (ECDH key)
+---------------------------------------------------------------------
+message_1       40              38                   38
+message_2       45             114                   56
+message_3       11              80                   22
+---------------------------------------------------------------------
+Total           96             232                  116
+=====================================================================
+~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-sizes-dh title="Typical message sizes in bytes" artwork-align="center"}
 
 ## TODO Optimizations
+
 
 # Test Vectors {#vectors}
 
