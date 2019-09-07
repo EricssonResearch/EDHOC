@@ -436,7 +436,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}) containing COSE header parameter that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps, i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}). ID_CRED_U and ID_CRED_V need to contain parameters that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
@@ -585,9 +585,9 @@ Party V SHALL compose message_2 as follows:
    
    * external_aad = TH_2
 
-   * ID_CRED_V - identifier to facilitate retrieval of a public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
-   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
+   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a signature key.
      
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -669,9 +669,9 @@ Party U SHALL compose message_3 as follows:
 
    * external_aad = TH_3
 
-   * ID_CRED_U - identifier to facilitate retrieval of a public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
-   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
+   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a signature key.
    
    COSE constructs the input to the Signature Algorithm as follows:
    
