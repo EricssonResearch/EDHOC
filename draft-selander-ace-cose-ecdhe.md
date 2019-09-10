@@ -583,13 +583,13 @@ Party V SHALL compose message_2 as follows:
    
    * protected = bstr .cbor ID_CRED_V
      
-   * payload = bstr .cbor CRED_V
+   * payload = CRED_V
    
    * external_aad = TH_2
 
    * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
-   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a signature key.
+   * CRED_V - bstr credential containing the credential of Party V, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
      
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -598,7 +598,7 @@ Party V SHALL compose message_2 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-      [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ]
+      [ "Signature1", << ID_CRED_V >>, TH_2, CRED_V ]
 ~~~~~~~~~~~
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -667,13 +667,13 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor ID_CRED_U
 
-   * payload = bstr .cbor CRED_U
+   * payload = CRED_U
 
    * external_aad = TH_3
 
    * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
-   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a signature key.
+   * CRED_U - bstr credential containing the credential of Party U, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
    
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -682,7 +682,7 @@ Party U SHALL compose message_3 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-      [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ]
+      [ "Signature1", << ID_CRED_U >>, TH_3, CRED_U ]
 ~~~~~~~~~~~
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -1234,17 +1234,17 @@ This test vector uses COSE_Key objects to store the raw public keys. Moreover, E
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CRED_U =
-{
+<< {
   1:  1,
  -1:  6,
  -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7'
-}
+} >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_U (COSE_Key) (CBOR-encoded) (40 bytes)
-a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10
-c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+CRED_U (COSE_Key) (CBOR-encoded) (42 bytes)
+58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7
+53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a2':
@@ -1293,17 +1293,17 @@ This test vector uses COSE_Key objects to store the raw public keys. Moreover, E
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CRED_V =
-{
+<< {
   1:  1,
  -1:  6,
  -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3'
-}
+} >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_V (COSE_Key) (CBOR-encoded) (40 bytes)
-a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30
-dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+CRED_V (COSE_Key) (CBOR-encoded) (42 bytes)
+58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f
+46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a3':
@@ -1440,13 +1440,13 @@ COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_V 
 
-* payload = bstr .cbor CRED_V
+* payload = CRED_V
 
 And from {{tv-rpk-2}}:
 
 * external_aad = TH_2
 
-The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \] , as defined in {{asym-msg2-proc}}:
+The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \] , as defined in {{asym-msg2-proc}}:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 M_V =
@@ -1712,13 +1712,13 @@ COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_U 
 
-* payload = bstr .cbor CRED_U
+* payload = CRED_U
 
 And from {{tv-rpk-2}}:
 
 * external_aad = TH_3
 
-The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \] , as defined in {{asym-msg3-proc}}:
+The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \] , as defined in {{asym-msg3-proc}}:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 M_U =
