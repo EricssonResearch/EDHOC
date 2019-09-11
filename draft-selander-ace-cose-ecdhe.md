@@ -89,7 +89,17 @@ informative:
   RFC7228:
   RFC7258:
   RFC8446:
-  
+
+  OPTLS:
+    target: https://eprint.iacr.org/2015/978.pdf
+    title: The OPTLS Protocol and TLS 1.3
+    author:
+      -
+        ins: H. Krawczyk
+      -
+        ins: H. Wee
+    date: October 2015
+
   LoRa1:
     target: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6021899/pdf/sensors-18-01833.pdf
     title: Enhancing LoRaWAN Security through a Lightweight and Authenticated Key Management Approach
@@ -1184,6 +1194,18 @@ bstr .cbor uint                 << 24 >>                  0x421818
 ## COSE {#COSE}
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
+
+# EDHOC Authenticated with Asymmetric Diffie-Hellman Keys {#asym-dh}
+
+The SIGMA protocol is mainly optimized for PKI and certificates. The OPTLS protocol {{OPTLS}} shows how authentication can be provided by a MAC computed from an ephemeral-static ECDH shared secret. Instead of signature authentication keys, U and V would have Diffie-Hellman authentication keys G_U and G_V, respectively. This type of authentication keys could easily be used with RPK and would provide significant reductions in message sizes as the 64 bytes signature would be replaced by an 8 bytes MAC.
+
+EDHOC authenticated with asymmetric Diffie-Hellman keys should to have similar security properties as EDHOC authenticated with asymmetric signature keys with a few differences:
+
+* Repudiation: In EDHOC authenticated with asymmetric signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa. Note that storing the private ephemeral keys violates the protocol requirements. With asymmetric Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.   
+ 
+* Key compromise impersonation: In EDHOC authenticated with asymmetric signature keys, EDHOC provides KCI against an attacker having access to the long term key or the ephemeral secret key. In EDHOC authenticated with symmetric keys, EDHOC provides KCI against an attacker having access to the ephemeral secret key, but not an attacker having access to the long-term PSK. With asymmetric Diffie-Hellman key authentication, KCI would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
+
+TODO: Initial suggestion for key derivation, message formats, and processing
 
 # Test Vectors {#vectors}
 
