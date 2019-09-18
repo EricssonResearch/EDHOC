@@ -20,7 +20,7 @@ author:
         email: goran.selander@ericsson.com
       -
         ins: J. Mattsson
-        name: John Mattsson
+        name: John Preuß Mattsson
         org: Ericsson AB
         email: john.mattsson@ericsson.com
       -
