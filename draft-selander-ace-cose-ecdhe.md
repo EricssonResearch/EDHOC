@@ -1220,17 +1220,17 @@ Party U                                                       Party V
 
 *  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. 
 
-   o  PRK_V = HKDF-Extract( "", G_VX )
+   *  PRK_V = HKDF-Extract( "", G_VX )
 
-   o  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+   *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
 
-   o  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+   *  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
 
-   o plaintext = 0x (the empty string)
+   * plaintext = 0x (the empty string)
 
-   o external_aad = /[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> /]
+   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \]
 
-   o CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
 
 ## EDHOC Message 3
 
@@ -1238,23 +1238,25 @@ Party U                                                       Party V
 
 *  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
 
-   o  PRK_U = HKDF-Extract( "", G_UY )
+   *  PRK_U = HKDF-Extract( "", G_UY )
 
-   o  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+   *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
 
-   o  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+   *  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
 
-   o plaintext = 0x (the empty string)
+   * plaintext = 0x (the empty string)
 
-   o external_aad = /[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> /]
+   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \]
 
-   o CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
 
 ## EDHOC-Exporter Interface
 
-*  The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
+The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
 
-   o  PRK_Export = HKDF-Extract( "", PRK || PRK_V || PRK_U )
+~~~~~~~~~~~
+   PRK_Export = HKDF-Extract( "", PRK || PRK_V || PRK_U )
+~~~~~~~~~~~
 
 ~~~~~~~~~~~
    EDHOC-Exporter( label, length ) = HKDF-Expand( PRK_Export, info, length ) 
@@ -1264,9 +1266,9 @@ Party U                                                       Party V
 
 EDHOC authenticated with asymmetric Diffie-Hellman keys have similar security properties as EDHOC authenticated with asymmetric signature keys with a few small differences:
 
-   o  Repudiation: In EDHOC authenticated with asymmetric signature keys, by presenting the private ephemeral key, Party U can prove that Party V performed a run of the protocol, and vice versa. Note that storing the private ephemeral keys violates the protocol requirements. In EDHOC authenticated with assymetric Diffie-Hellman keys, both parties can always deny having participated in the protocol.
+   *  Repudiation: In EDHOC authenticated with asymmetric signature keys, by presenting the private ephemeral key, Party U can prove that Party V performed a run of the protocol, and vice versa. Note that storing the private ephemeral keys violates the protocol requirements. In EDHOC authenticated with assymetric Diffie-Hellman keys, both parties can always deny having participated in the protocol.
    
-   o  Key compromise impersonation: Just like in EDHOC authenticated with asymmetric signature keys, EDHOC with provide KCI against an attacker having the long term key. But while EDHOC authenticated with asymmetric signature key provides KCI restistance also against an attacker having the private ephemeral key, an attacker with knowledge of the private ephemeral key can impersonate the other party in the single protocol run where the ephemeral key pair is used.
+   *  Key compromise impersonation: Just like in EDHOC authenticated with asymmetric signature keys, EDHOC with provide KCI against an attacker having the long term key. But while EDHOC authenticated with asymmetric signature key provides KCI restistance also against an attacker having the private ephemeral key, an attacker with knowledge of the private ephemeral key can impersonate the other party in the single protocol run where the ephemeral key pair is used.
 
 ## Message Sizes
 
