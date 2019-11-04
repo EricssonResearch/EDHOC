@@ -217,7 +217,7 @@ Total           96       232       255       235 + Certificate chains
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{I-D.ietf-cbor-7049bis}} and COSE {{RFC8152}} are used to implement these standards. The use of COSE provides crypto agility and enables use of future algorithms and headers designed for constrained IoT.
 
-This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with asymmetric key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{transfer}} describes how EDHOC can be transferred in CoAP and used to establish an OSCORE security context.
+This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with signature key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{transfer}} describes how EDHOC can be transferred in CoAP and used to establish an OSCORE security context.
 
 ## Rationale for EDHOC
 
@@ -312,7 +312,7 @@ Party U                                                 Party V
 {: #fig-flow title="EDHOC message flow"}
 {: artwork-align="center"}
 
-The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
+The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
 
 EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected application data (PAD_3) may be used to transfer any application data in message_3.
 
@@ -480,8 +480,6 @@ The first data item of message_1 is an int TYPE = 4 * method + corr specifying t
 
 1 byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
-EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
-
 ~~~~~~~~~~~
 Party U                                                       Party V
 |                  TYPE, SUITES_U, G_X, C_U, UAD_1                  |
@@ -496,7 +494,7 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
-{: #fig-asym title="Overview of EDHOC with asymmetric key authentication."}
+{: #fig-asym title="Overview of EDHOC with signature key authentication."}
 {: artwork-align="center"}
 
 ## EDHOC Message 1
@@ -767,7 +765,7 @@ Party U                                                       Party V
 {: #fig-sym title="Overview of EDHOC with symmetric key authentication."}
 {: artwork-align="center"}
 
-EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric key authentication. In the following subsections the differences compared to EDHOC with asymmetric key authentication are described.
+EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication. In the following subsections the differences compared to EDHOC with signature key authentication are described.
 
 ## EDHOC Message 1
 
@@ -1065,8 +1063,9 @@ IANA has created a new registry titled "EDHOC Method Type" under the new heading
 +-------+------------------------------------------+-------------------+
 | Value | Specification                            | Reference         |
 +-------+------------------------------------------+-------------------+
-|     0 | EDHOC Authenticated with Asymmetric Keys | [[this document]] |
+|     0 | EDHOC Authenticated with Signature Keys  | [[this document]] |
 |     1 | EDHOC Authenticated with Symmetric Keys  | [[this document]] |
+|     2 | EDHOC Authenticated with Static DH Keys  | [[this document]] |
 +-------+------------------------------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
@@ -1301,7 +1300,7 @@ Total           96             232                  116
 
 This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where Party U is CoAP client (this means that corr = 1).
 
-## Test Vectors for EDHOC Authenticated with Asymmetric Keys (RPK)
+## Test Vectors for EDHOC Authenticated with Signature Keys (RPK)
 
 Asymmetric EDHOC is used:
 
