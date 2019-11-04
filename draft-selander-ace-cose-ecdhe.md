@@ -20,7 +20,7 @@ author:
         email: goran.selander@ericsson.com
       -
         ins: J. Mattsson
-        name: John Mattsson
+        name: John Preuß Mattsson
         org: Ericsson AB
         email: john.mattsson@ericsson.com
       -
@@ -89,7 +89,17 @@ informative:
   RFC7228:
   RFC7258:
   RFC8446:
-  
+
+  OPTLS:
+    target: https://eprint.iacr.org/2015/978.pdf
+    title: The OPTLS Protocol and TLS 1.3
+    author:
+      -
+        ins: H. Krawczyk
+      -
+        ins: H. Wee
+    date: October 2015
+
   LoRa1:
     target: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6021899/pdf/sensors-18-01833.pdf
     title: Enhancing LoRaWAN Security through a Lightweight and Authenticated Key Management Approach
@@ -190,7 +200,7 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a lightweight key exchange protocol providing perfect forward secrecy and identity protection. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface. A main use case for EDHOC is to establish an OSCORE security context. EDHOC uses COSE for cryptography, CBOR for encoding, and CoAP for transport. By reusing existing libraries, the additional code footprint can be kept very low. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC is less than 1/4 when PSK authentication is used and less than 1/3 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys, and X.509 certificates are shown in {{fig-sizes}}.
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC is less than 1/4 when PSK authentication is used and less than 1/3 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys, and X.509 certificates are shown in {{fig-sizes}}. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
@@ -436,7 +446,7 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}) containing COSE header parameter that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps, i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}). ID_CRED_U and ID_CRED_V need to contain parameters that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
@@ -467,6 +477,8 @@ The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 cert
 The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
 The first data item of message_1 is an int TYPE = 4 * method + corr specifying the method and the correlation properties of the transport used. corr = 0 is used when there is no external correlation mechanism. corr = 1 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. corr = 2 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. corr = 3 is used when there is an external correlation mechanism that enables the parties to correlate all the messages. The use of the correlation parameter is exemplified in {{coap}}.
+
+1 byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
 EDHOC with asymmetric key authentication is illustrated in {{fig-asym}}.
 
@@ -581,13 +593,13 @@ Party V SHALL compose message_2 as follows:
    
    * protected = bstr .cbor ID_CRED_V
      
-   * payload = bstr .cbor CRED_V
+   * payload = CRED_V
    
    * external_aad = TH_2
 
-   * ID_CRED_V - identifier to facilitate retrieval of a public authentication key of Party V, see {{asym-overview}}
+   * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
-   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}
+   * CRED_V - bstr credential containing the credential of Party V, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
      
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -596,7 +608,7 @@ Party V SHALL compose message_2 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-      [ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> ]
+      [ "Signature1", << ID_CRED_V >>, TH_2, CRED_V ]
 ~~~~~~~~~~~
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -665,13 +677,13 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor ID_CRED_U
 
-   * payload = bstr .cbor CRED_U
+   * payload = CRED_U
 
    * external_aad = TH_3
 
-   * ID_CRED_U - identifier to facilitate retrieval of a public authentication key of Party U, see {{asym-overview}}
+   * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
-   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}
+   * CRED_U - bstr credential containing the credential of Party U, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
    
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -680,7 +692,7 @@ Party U SHALL compose message_3 as follows:
    * The message M to be signed is the CBOR encoding of:
 
 ~~~~~~~~~~~
-      [ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> ]
+      [ "Signature1", << ID_CRED_U >>, TH_3, CRED_U ]
 ~~~~~~~~~~~
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
@@ -995,7 +1007,7 @@ EDHOC itself does not provide countermeasures against Denial-of-Service attacks.
 
 ## Implementation Considerations
 
-The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. If ECDSA is supported, "deterministic ECDSA" as specified in {{RFC6979}} is RECOMMENDED.
+The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. As each pseudoranom number must only be used once, an implementation need to get a new truly random seed after reboot, or continously store state in nonvolatile memory, see ({{RFC8613}}, Appendix B.1.1) for issues and solution approaches for writing to nonvolatile memory. If ECDSA is supported, "deterministic ECDSA" as specified in {{RFC6979}} is RECOMMENDED.
 
 The referenced processing instructions in {{SP-800-56A}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks.
 
@@ -1187,7 +1199,8 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 ## Overview {#asym-dh-overview}
 
-EDHOC authenticated with assymetric Diffie-Hellman kets very similar to EDHOC authenticated with asymmetric signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman. 
+
+EDHOC authenticated with assymetric Diffie-Hellman keys is very similar to EDHOC authenticated with asymmetric signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
 
 In the following subsections only the differences compared to EDHOC authenticated with asymmetric signature keys are described. EDHOC authenticated with asymmetric Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
 
@@ -1266,10 +1279,10 @@ The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
 
 EDHOC authenticated with asymmetric Diffie-Hellman keys have similar security properties as EDHOC authenticated with asymmetric signature keys with a few small differences:
 
-   *  Repudiation: In EDHOC authenticated with asymmetric signature keys, by presenting the private ephemeral key, Party U can prove that Party V performed a run of the protocol, and vice versa. Note that storing the private ephemeral keys violates the protocol requirements. In EDHOC authenticated with assymetric Diffie-Hellman keys, both parties can always deny having participated in the protocol.
-   
-   *  Key compromise impersonation: Just like in EDHOC authenticated with asymmetric signature keys, EDHOC with provide KCI against an attacker having the long term key. But while EDHOC authenticated with asymmetric signature key provides KCI restistance also against an attacker having the private ephemeral key, an attacker with knowledge of the private ephemeral key can impersonate the other party in the single protocol run where the ephemeral key pair is used.
-
+   *  Repudiation: In EDHOC authenticated with asymmetric signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa.  Note that storing the private ephemeral keys violates the protocol requirements.  With asymmetric Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.
+      
+   *  Key compromise impersonation (KCI): In EDHOC authenticated with asymmetric signature keys, EDHOC provides KCI protection against an attacker having access to the long term key or the ephemeral secret key.  In EDHOC authenticated with symmetric keys, EDHOC provides KCI protection against an attacker having access to the ephemeral secret key, but not against an attacker having access to the long-term PSK.  With asymmetric Diffie-Hellman key authentication, KCI protection would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
+      
 ## Message Sizes
 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1285,12 +1298,9 @@ Total           96             232                  116
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-sizes-dh title="Typical message sizes in bytes" artwork-align="center"}
 
-## TODO Optimizations
-
-
 # Test Vectors {#vectors}
 
-To help implementors, this appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP (corr = 1). 1 byte identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
+This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where Party U is CoAP client (this means that corr = 1).
 
 ## Test Vectors for EDHOC Authenticated with Asymmetric Keys (RPK)
 
@@ -1337,17 +1347,17 @@ This test vector uses COSE_Key objects to store the raw public keys. Moreover, E
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CRED_U =
-{
+<< {
   1:  1,
  -1:  6,
  -2:  h'424c756ab77cc6fdecf0b3ecfcffb75310c015bf5cba2ec0a236e6650c8ab9c7'
-}
+} >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_U (COSE_Key) (CBOR-encoded) (40 bytes)
-a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10
-c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+CRED_U (COSE_Key) (CBOR-encoded) (42 bytes)
+58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7
+53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a2':
@@ -1396,17 +1406,17 @@ This test vector uses COSE_Key objects to store the raw public keys. Moreover, E
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CRED_V =
-{
+<< {
   1:  1,
  -1:  6,
  -2:  h'1b661ee5d5ef1672a2d877cd5bc20f4630dc78a114de659c7e504d0f529a6bd3'
-}
+} >>
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_V (COSE_Key) (CBOR-encoded) (40 bytes)
-a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30
-dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
+CRED_V (COSE_Key) (CBOR-encoded) (42 bytes)
+58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f
+46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a3':
@@ -1543,13 +1553,13 @@ COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_V 
 
-* payload = bstr .cbor CRED_V
+* payload = CRED_V
 
 And from {{tv-rpk-2}}:
 
 * external_aad = TH_2
 
-The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \] , as defined in {{asym-msg2-proc}}:
+The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \] , as defined in {{asym-msg2-proc}}:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 M_V =
@@ -1815,13 +1825,13 @@ COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
 * protected = bstr .cbor ID_CRED_U 
 
-* payload = bstr .cbor CRED_U
+* payload = CRED_U
 
 And from {{tv-rpk-2}}:
 
 * external_aad = TH_3
 
-The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \] , as defined in {{asym-msg3-proc}}:
+The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \] , as defined in {{asym-msg3-proc}}:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 M_U =
