@@ -1309,10 +1309,10 @@ method (Signature Authentication)
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-CoAP is used as transport:
+CoaP is used as trandsport and Party U is CoAP client:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-corr (Party U is CoAP client)
+corr (Party U can correlate message_1 and message_2)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2164,10 +2164,10 @@ method (Symmetric Authentication)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-CoAP is used as transport:
+CoaP is used as trandsport and Party U is CoAP client:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-corr (Party U is CoAP client)
+corr (Party U can correlate message_1 and message_2)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
