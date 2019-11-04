@@ -432,7 +432,7 @@ An application using EDHOC may want to derive new PSKs to use for authentication
    ID_PSK = EDHOC-Exporter( "EDHOC Chaining ID_PSK", 4 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# EDHOC Authenticated with Asymmetric Keys {#asym}
+# EDHOC Authenticated with Signature Keys {#asym}
 
 ## Overview {#asym-overview}
 
@@ -1195,11 +1195,11 @@ bstr .cbor uint                 << 24 >>                  0x421818
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
 
-# EDHOC Authenticated with Asymmetric Diffie-Hellman Keys {#asym-dh}
+# EDHOC Authenticated with Static Diffie-Hellman Keys {#asym-dh}
 
 ## Overview {#asym-dh-overview}
 
-EDHOC authenticated with assymetric Diffie-Hellman keys is very similar to EDHOC authenticated with asymmetric signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
+EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
 
 In the following subsections only the differences compared to EDHOC authenticated with asymmetric signature keys are described. EDHOC authenticated with asymmetric Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
 
