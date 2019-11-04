@@ -817,6 +817,108 @@ where:
  
    * PAD_3 = bstr containing opaque protected application data
 
+# EDHOC Authenticated with Static Diffie-Hellman Keys {#asym-dh}
+
+## Overview {#asym-dh-overview}
+
+EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
+
+In the following subsections only the differences compared to EDHOC authenticated with signature keys are described. EDHOC authenticated with static Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
+
+~~~~~~~~~~~
+Party U                                                       Party V
+|                     TYPE, SUITES_U, G_X, C_U                      |
++------------------------------------------------------------------>|
+|                             message_1                             |
+|                                                                   |
+|  C_U, G_Y, C_V, AEAD( K_2; ID_CRED_V, AEAD(G_VX; CRED_V, TH_2) )  |
+|<------------------------------------------------------------------+
+|                             message_2                             |
+|                                                                   |
+|        C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2) )       |
++------------------------------------------------------------------>|
+|                             message_3                             |
+~~~~~~~~~~~
+{: #fig-asym-dh title="Overview of EDHOC authenticated with static Diffie-Hellman keys."}
+{: artwork-align="center"}
+
+## EDHOC Message 1
+
+### Formatting of Message 1 {#asym-dh-msg1-form}
+
+* TYPE = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+
+## EDHOC Message 2
+
+### Processing of Message 2
+
+*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. 
+
+   *  PRK_V = HKDF-Extract( "", G_VX )
+
+   *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+
+   *  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+
+   * plaintext = 0x (the empty string)
+
+   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \]
+
+   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+
+## EDHOC Message 3
+
+### Processing of Message 3
+
+*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
+
+   *  PRK_U = HKDF-Extract( "", G_UY )
+
+   *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+
+   *  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+
+   * plaintext = 0x (the empty string)
+
+   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \]
+
+   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+
+## EDHOC-Exporter Interface
+
+The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
+
+~~~~~~~~~~~
+   PRK_Export = HKDF-Extract( "", PRK || PRK_V || PRK_U )
+~~~~~~~~~~~
+
+~~~~~~~~~~~
+   EDHOC-Exporter( label, length ) = HKDF-Expand( PRK_Export, info, length ) 
+~~~~~~~~~~~
+
+## Security Considerations
+
+EDHOC authenticated with static Diffie-Hellman keys have similar security properties as EDHOC authenticated with signature keys with a few small differences:
+
+   *  Repudiation: In EDHOC authenticated with signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa.  Note that storing the private ephemeral keys violates the protocol requirements.  With static Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.
+      
+   *  Key compromise impersonation (KCI): In EDHOC authenticated with signature keys, EDHOC provides KCI protection against an attacker having access to the long term key or the ephemeral secret key.  In EDHOC authenticated with symmetric keys, EDHOC provides KCI protection against an attacker having access to the ephemeral secret key, but not against an attacker having access to the long-term PSK.  With static Diffie-Hellman key authentication, KCI protection would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
+      
+## Message Sizes
+
+~~~~~~~~~~~~~~~~~~~~~~~
+=====================================================================
+               PSK     RPK (Signature key)     RPK (ECDH key)
+---------------------------------------------------------------------
+message_1       40              38                   38
+message_2       45             114                   56
+message_3       11              80                   22
+---------------------------------------------------------------------
+Total           96             232                  116
+=====================================================================
+~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-sizes-dh title="Typical message sizes in bytes" artwork-align="center"}
+
 # Error Handling {#error}
 
 ## EDHOC Error Message
@@ -1193,108 +1295,6 @@ bstr .cbor uint                 << 24 >>                  0x421818
 ## COSE {#COSE}
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
-
-# EDHOC Authenticated with Static Diffie-Hellman Keys {#asym-dh}
-
-## Overview {#asym-dh-overview}
-
-EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
-
-In the following subsections only the differences compared to EDHOC authenticated with signature keys are described. EDHOC authenticated with static Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
-
-~~~~~~~~~~~
-Party U                                                       Party V
-|                     TYPE, SUITES_U, G_X, C_U                      |
-+------------------------------------------------------------------>|
-|                             message_1                             |
-|                                                                   |
-|  C_U, G_Y, C_V, AEAD( K_2; ID_CRED_V, AEAD(G_VX; CRED_V, TH_2) )  |
-|<------------------------------------------------------------------+
-|                             message_2                             |
-|                                                                   |
-|        C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2) )       |
-+------------------------------------------------------------------>|
-|                             message_3                             |
-~~~~~~~~~~~
-{: #fig-asym-dh title="Overview of EDHOC authenticated with static Diffie-Hellman keys."}
-{: artwork-align="center"}
-
-## EDHOC Message 1
-
-### Formatting of Message 1 {#asym-dh-msg1-form}
-
-* TYPE = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-
-## EDHOC Message 2
-
-### Processing of Message 2
-
-*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. 
-
-   *  PRK_V = HKDF-Extract( "", G_VX )
-
-   *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
-
-   *  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
-
-   * plaintext = 0x (the empty string)
-
-   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \]
-
-   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
-
-## EDHOC Message 3
-
-### Processing of Message 3
-
-*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
-
-   *  PRK_U = HKDF-Extract( "", G_UY )
-
-   *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
-
-   *  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
-
-   * plaintext = 0x (the empty string)
-
-   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \]
-
-   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
-
-## EDHOC-Exporter Interface
-
-The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
-
-~~~~~~~~~~~
-   PRK_Export = HKDF-Extract( "", PRK || PRK_V || PRK_U )
-~~~~~~~~~~~
-
-~~~~~~~~~~~
-   EDHOC-Exporter( label, length ) = HKDF-Expand( PRK_Export, info, length ) 
-~~~~~~~~~~~
-
-## Security Considerations
-
-EDHOC authenticated with static Diffie-Hellman keys have similar security properties as EDHOC authenticated with signature keys with a few small differences:
-
-   *  Repudiation: In EDHOC authenticated with signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa.  Note that storing the private ephemeral keys violates the protocol requirements.  With static Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.
-      
-   *  Key compromise impersonation (KCI): In EDHOC authenticated with signature keys, EDHOC provides KCI protection against an attacker having access to the long term key or the ephemeral secret key.  In EDHOC authenticated with symmetric keys, EDHOC provides KCI protection against an attacker having access to the ephemeral secret key, but not against an attacker having access to the long-term PSK.  With static Diffie-Hellman key authentication, KCI protection would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
-      
-## Message Sizes
-
-~~~~~~~~~~~~~~~~~~~~~~~
-=====================================================================
-               PSK     RPK (Signature key)     RPK (ECDH key)
----------------------------------------------------------------------
-message_1       40              38                   38
-message_2       45             114                   56
-message_3       11              80                   22
----------------------------------------------------------------------
-Total           96             232                  116
-=====================================================================
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-sizes-dh title="Typical message sizes in bytes" artwork-align="center"}
 
 # Test Vectors {#vectors}
 
