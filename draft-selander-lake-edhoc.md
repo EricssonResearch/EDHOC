@@ -436,7 +436,7 @@ An application using EDHOC may want to derive new PSKs to use for authentication
 
 ## Overview {#asym-overview}
 
-EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
+EDHOC supports authentication with raw public keys (RPK) and public key certificates with static Diffe-Hellman keys with the requirements that:
 
 * Only Party V SHALL have access to the private authentication key of Party V,
 
