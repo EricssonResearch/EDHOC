@@ -821,7 +821,7 @@ where:
 
 ## Overview {#asym-dh-overview}
 
-EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
+EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys. Instead of signature authentication keys, U and V have static Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman key exchange.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
 
 In the following subsections only the differences compared to EDHOC authenticated with signature keys are described. EDHOC authenticated with static Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
 
