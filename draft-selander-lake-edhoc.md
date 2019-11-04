@@ -293,7 +293,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item of message_1 is an int (TYPE) specifying the method (asymmetric, symmetric) and the correlation properties of the transport used.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item of message_1 is an int (TYPE) specifying the method (singature, static DH, symmetric) and the correlation properties of the transport used.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -350,7 +350,7 @@ Key and IV derivation SHALL be performed with HKDF {{RFC5869}} following the spe
 
 with the following input:
 
-* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys. The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
+* The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
 * The input keying material (IKM) SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
@@ -968,7 +968,7 @@ EDHOC may be transported over a different transport than CoAP. In this case the 
 ## Security Properties
 EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{SIGMA}}. Using the terminology from {{SIGMA}}, EDHOC provides perfect forward secrecy, mutual authentication with aliveness, consistency, peer awareness, and identity protection. As described in {{SIGMA}}, peer awareness is provided to Party V, but not to Party U. EDHOC also inherits Key Compromise Impersonation (KCI) resistance from SIGMA-I.
 
-EDHOC with asymmetric authentication offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically that which is not possible to infer from routing information in the lower layers.
+EDHOC with asymmetric authentication (signature, static DH) offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically that which is not possible to infer from routing information in the lower layers.
 
 Compared to {{SIGMA}}, EDHOC adds an explicit method type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session.
 
@@ -1200,7 +1200,7 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys.  Instead of signature authentication keys, U and V have Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
 
-In the following subsections only the differences compared to EDHOC authenticated with asymmetric signature keys are described. EDHOC authenticated with asymmetric Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
+In the following subsections only the differences compared to EDHOC authenticated with signature keys are described. EDHOC authenticated with static Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -1216,7 +1216,7 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
-{: #fig-asym-dh title="Overview of EDHOC authenticated with asymmetric Diffie-Hellman keys."}
+{: #fig-asym-dh title="Overview of EDHOC authenticated with static Diffie-Hellman keys."}
 {: artwork-align="center"}
 
 ## EDHOC Message 1
@@ -1275,11 +1275,11 @@ The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
 
 ## Security Considerations
 
-EDHOC authenticated with asymmetric Diffie-Hellman keys have similar security properties as EDHOC authenticated with asymmetric signature keys with a few small differences:
+EDHOC authenticated with static Diffie-Hellman keys have similar security properties as EDHOC authenticated with signature keys with a few small differences:
 
-   *  Repudiation: In EDHOC authenticated with asymmetric signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa.  Note that storing the private ephemeral keys violates the protocol requirements.  With asymmetric Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.
+   *  Repudiation: In EDHOC authenticated with signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa.  Note that storing the private ephemeral keys violates the protocol requirements.  With static Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.
       
-   *  Key compromise impersonation (KCI): In EDHOC authenticated with asymmetric signature keys, EDHOC provides KCI protection against an attacker having access to the long term key or the ephemeral secret key.  In EDHOC authenticated with symmetric keys, EDHOC provides KCI protection against an attacker having access to the ephemeral secret key, but not against an attacker having access to the long-term PSK.  With asymmetric Diffie-Hellman key authentication, KCI protection would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
+   *  Key compromise impersonation (KCI): In EDHOC authenticated with signature keys, EDHOC provides KCI protection against an attacker having access to the long term key or the ephemeral secret key.  In EDHOC authenticated with symmetric keys, EDHOC provides KCI protection against an attacker having access to the ephemeral secret key, but not against an attacker having access to the long-term PSK.  With static Diffie-Hellman key authentication, KCI protection would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
       
 ## Message Sizes
 
@@ -1302,10 +1302,10 @@ This appendix provides detailed test vectors to ease implementation and ensure i
 
 ## Test Vectors for EDHOC Authenticated with Signature Keys (RPK)
 
-Asymmetric EDHOC is used:
+EDHOC with signature authentication is used:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-method (Asymmetric Authentication)
+method (Signature Authentication)
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
 
