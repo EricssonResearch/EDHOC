@@ -352,7 +352,7 @@ with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The input keying material (IKM) SHALL be the ECDH shared secret G_XY as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
+* The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
 Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces a PRK as follows:
 
@@ -854,7 +854,7 @@ Party U                                                       Party V
 
 *  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. 
 
-   *  PRK_V = HKDF-Extract( "", G_VX )
+   *  PRK_V = HKDF-Extract( "", G_VX ), where G_VX is the ECDH shared secret calculated from G_V and X, or G_X and V)
 
    *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
 
@@ -872,7 +872,7 @@ Party U                                                       Party V
 
 *  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
 
-   *  PRK_U = HKDF-Extract( "", G_UY )
+   *  PRK_U = HKDF-Extract( "", G_UY ), where G_UY is the ECDH shared secret calculated from G_U and Y, or G_Y and U)
 
    *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
 
