@@ -906,6 +906,8 @@ EDHOC authenticated with static Diffie-Hellman keys have similar security proper
       
 ## Message Sizes
 
+Authentication with static Diffie-Hellman keys provide significant reductions in message sizes compared to signature keys. The relative differences are particulare large for PRKs where the signatures make up a large part of the total number of bytes. 
+
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
                PSK     RPK (Signature key)     RPK (ECDH key)
