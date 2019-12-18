@@ -277,7 +277,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
-* Verification of a common preferred cipher suite (AEAD algorithm, ECDH algorithm, ECDH curve, signature algorithm):
+* Verification of a common preferred cipher suite (AEAD algorithm, ECDH algorithm, ECDH curve, signature algorithm, signature algorithm parameters):
 
    * U lists supported cipher suites in order of preference
    
@@ -1095,7 +1095,7 @@ The data rates in many IoT deployments are very limited. Given that the applicat
 
 ## Cipher Suites
 
-Cipher suite number 0 (AES-CCM-64-64-128, ECDH-SS + HKDF-256, X25519, Ed25519) is mandatory to implement. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
+Cipher suite number 0 (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519) is mandatory to implement. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
 
 The HMAC algorithm HMAC 256/64 (HMAC w/ SHA-256 truncated to 64 bits) SHALL NOT be supported for use in EDHOC.
 
