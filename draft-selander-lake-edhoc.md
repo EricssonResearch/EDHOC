@@ -829,15 +829,15 @@ In the following subsections only the differences compared to EDHOC authenticate
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                     TYPE, SUITES_U, G_X, C_U, UAD_1               |
+|                  TYPE, SUITES_U, G_X, C_U, UAD_1                  |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-| C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V,AEAD(G_VX;CRED_V, TH_2), UAD_2) |
+| C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V, AEAD(G_VX;CRED_V,TH_2), UAD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|      C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), PAD )    |
+|    C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), PAD_3 )    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
