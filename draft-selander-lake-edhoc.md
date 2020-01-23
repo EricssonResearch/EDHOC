@@ -285,7 +285,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Method types and error handling.
 
-* Transport of opaque application defined data.
+* Transport of opaque auxiliary defined data.
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR, COSE, and CoAP libraries.
 
@@ -314,7 +314,7 @@ Party U                                                 Party V
 
 The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. The certificates and RPKs can contain signature keys are static Diffie-Hellman keys. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
 
-EDHOC allows opaque application data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Application Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected application data (PAD_3) may be used to transfer any application data in message_3.
+EDHOC allows opaque auxiliary data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (PAD_3) may be used to transfer any auxiliary data in message_3.
 
 Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party V.
 
@@ -527,7 +527,7 @@ where:
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
-* UAD_1 - bstr containing unprotected opaque application data
+* UAD_1 - bstr containing unprotected opaque auxiliary data
 
 ### Party U Processing of Message 1
 
@@ -623,7 +623,7 @@ Party V SHALL compose message_2 as follows:
 
    * external_aad = TH_2
 
-   * UAD_2 = bstr containing opaque unprotected application data
+   * UAD_2 = bstr containing opaque unprotected auxiliary data
 
     where signature is taken from the COSE_Sign1 object, ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only kid_value is conveyed in the plaintext.
 
@@ -707,7 +707,7 @@ Party U SHALL compose message_3 as follows:
          
    * external_aad = TH_3
 
-   * PAD_3 = bstr containing opaque protected application data
+   * PAD_3 = bstr containing opaque protected auxiliary data
 
     where signature is taken from the COSE_Sign1 object, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. 
     
@@ -809,7 +809,7 @@ where:
 
    * plaintext = ? UAD_2
    
-   * UAD_2 = bstr containing opaque unprotected application data
+   * UAD_2 = bstr containing opaque unprotected auxiliary data
 
 ## EDHOC Message 3
 
@@ -823,7 +823,7 @@ where:
 
    * plaintext = ? PAD_3
  
-   * PAD_3 = bstr containing opaque protected application data
+   * PAD_3 = bstr containing opaque protected auxiliary data
 
 # EDHOC Authenticated with Static Diffie-Hellman Keys {#asym-dh}
 
@@ -1084,7 +1084,7 @@ EDHOC inherits its security properties from the theoretical SIGMA-I protocol {{S
 
 EDHOC with asymmetric authentication (signature, static DH) offers identity protection of Party U against active attacks and identity protection of Party V against passive attacks. The roles should be assigned to protect the most sensitive identity, typically that which is not possible to infer from routing information in the lower layers. EDHOC with symmetric authentication does not offer protection of the PSK identifier ID_PSK. Protection of PSK identifiers are posible but requires a four message protocol to achieve mutual authentication.
 
-Compared to {{SIGMA}}, EDHOC adds an explicit method type and expands the message authentication coverage to additional elements such as algorithms, application data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session.
+Compared to {{SIGMA}}, EDHOC adds an explicit method type and expands the message authentication coverage to additional elements such as algorithms, auxiliary data, and previous messages. This protects against an attacker replaying messages or injecting messages from another session.
 
 EDHOC also adds negotiation of connection identifiers and downgrade protected negotiation of cryptographic parameters, i.e. an attacker cannot affect the negotiated parameters. A single session of EDHOC does not include negotiation of cipher suites, but it enables Party V to verify that the selected cipher suite is the most preferred cipher suite by U which is supported by both U and V.
 
@@ -1328,7 +1328,7 @@ corr (Party U can correlate message_1 and message_2)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-No unprotected opaque application data is sent in the message exchanges.
+No unprotected opaque auxiliary data is sent in the message exchanges.
 
 The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
 
@@ -2195,7 +2195,7 @@ corr (Party U can correlate message_1 and message_2)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-No unprotected opaque application data is sent in the message exchanges.
+No unprotected opaque auxiliary data is sent in the message exchanges.
 
 The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
 
