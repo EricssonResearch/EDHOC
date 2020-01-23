@@ -1462,6 +1462,12 @@ SUITES_U : suite
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
+Party U's ephemeral private key (32 bytes)
+d4 d8 1a ba fa d9 08 a0 cc ef ef 5a d6 b0 5d 50 27 02 f1 c1 6f 23 2c 25 92
+93 09 ac 44 1b 95 8e
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
 G_X (X-coordinate of the ephemeral public key of Party U) (32 bytes)
 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d b8
 f4 af 98 0d 2d b8 3a 
@@ -1495,6 +1501,12 @@ message_1 (CBOR Sequence) (38 bytes)
 ### Message 2 {#tv-rpk-2}
 
 Since TYPE mod 4 equals 1, C_U is omitted from data_2.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Party V's ephemeral private key (32 bytes)
+17 cd c7 bc a3 f2 a0 bd a6 0c 6d e5 b9 6f 82 a3 62 39 b4 4b de 39 7a 38 62
+d5 29 ba 8b 3d 7c 62
+~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 G_Y (X-coordinate of the ephemeral public key of Party V) (32 bytes)
@@ -1840,7 +1852,7 @@ M_U =
 [
   "Signature1",
   << { 4: h'a2' } >>,
-  h'734bef323d867a12956127c2e62ade42c0f119e5487750c0c31fd093376dceed',
+  h'21ccb678b79114960955885b90a2b82e3b2ca27e8e374a7907f3e7854367fc22',
   << {
     1:  1,
    -1:  6,
@@ -1854,10 +1866,10 @@ Which encodes to the following byte string ToBeSigned:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 M_U (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
-84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 73 4b ef 32 3d 86
-7a 12 95 61 27 c2 e6 2a de 42 c0 f1 19 e5 48 77 50 c0 c3 1f d0 93 37 6d ce
-ed 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff
-b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
+84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 21 cc b6 78 b7 91
+14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc
+22 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff
+b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The message is signed using the private authentication key of U, and produces the following signature:
@@ -1995,7 +2007,7 @@ A_3 =
 Which encodes to the following byte string to be used as Additional Authenticated Data:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-A_2 (CBOR-encoded) (45 bytes)
+A_3 (CBOR-encoded) (45 bytes)
 83 68 45 6e 63 72 79 70 74 30 40 58 20 21 cc b6 78 b7 91 14 96 09 55 88 5b
 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43 67 fc 22 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -2190,7 +2202,7 @@ f1 f6 48 d9 56 6a 4c
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party U's ephemeral public key (value of X_U) (32 bytes)
+Party U's ephemeral public key (value of G_X) (32 bytes)
 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97 cb
 57 49 61 cf a9 80 6f 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -2244,7 +2256,7 @@ d9 81 80 87 de 72 44 ab c1 b5 fc f2 8e 55 e4 2c 7f f9 c6 78 c0 60 51 81 f3
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party V's ephemeral public key (value of X_V) (32 bytes)
+Party V's ephemeral public key (value of G_Y) (32 bytes)
 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d 94
 6f 6b 09 a9 cb dc 06 
 ~~~~~~~~~~~~~~~~~~~~~~~
