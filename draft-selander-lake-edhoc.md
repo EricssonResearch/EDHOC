@@ -277,7 +277,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
-* Verification of a common preferred cipher suite (EDHOC AEAD algorithm, application AEAD algorithm, EDHOC HMAC algorithm, application HMAC algorithm , EDHOC ECDH curve, EDHOC signature algorithm, EDHOC signature algorithm curve):
+* Verification of a common preferred cipher suite:
 
    * U lists supported cipher suites in order of preference
    
@@ -312,7 +312,7 @@ Party U                                                 Party V
 {: #fig-flow title="EDHOC message flow"}
 {: artwork-align="center"}
 
-The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. The certificates and RPKs can contain signature keys are static Diffie-Hellman keys. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
+The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. The certificates and RPKs can contain signature keys or static Diffie-Hellman keys. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
 
 EDHOC allows opaque auxiliary data (UAD and PAD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (UAD_1, UAD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (PAD_3) may be used to transfer any auxiliary data in message_3.
 
@@ -320,9 +320,11 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an application AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, and an EDHOC signature algorithm curve. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
+EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
 
 The different methods (singature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
+
+an application AEAD algorithm, 
 
 ~~~~~~~~~~~
    suite = int / [ 7*7 algs: int / tstr ]
@@ -331,16 +333,16 @@ The different methods (singature, static DH, symmetric) use the same cipher suit
 This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
-   0. [ 10, 10, 5, 5, 4, -8, 6 ]
+   0. [ 10, 5, 4, -8, 6, 10, 5 ]
       (AES-CCM-16-64-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, X25519, EdDSA, Ed25519)
 
-   1. [ 10, 10, 5, 5, 1, -7, 1 ]
+   1. [ 10, 5, 1, -7, 1, 10, 5 ]
       (AES-CCM-16-64-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, P-256, ES256, P-256)
 
-   2. [ 30, 10, 5, 5, 4, -8, 6 ]
+   2. [ 30, 5, 4, -8, 6, 10, 5 ]
       (AES-CCM-16-128-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, X25519, EdDSA, Ed25519)
 
-   3. [ 30, 10, 5, 5, 1, -7, 1 ]
+   3. [ 30, 5, 1, -7, 1, 10, 5 ]
       (AES-CCM-16-128-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, P-256, ES256, P-256)
 ~~~~~~~~~~~
 
@@ -1103,7 +1105,7 @@ The data rates in many IoT deployments are very limited. Given that the applicat
 
 ## Cipher Suites
 
-Cipher suite number 0 (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519) is mandatory to implement. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
+Cipher suite number 0 (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519) is mandatory to implement. Impelementations only need to implement the algorithms needed for their supported methods. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
 
 The HMAC algorithm HMAC 256/64 (HMAC w/ SHA-256 truncated to 64 bits) SHALL NOT be supported for use in EDHOC.
 
