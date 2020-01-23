@@ -334,16 +334,20 @@ This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
    0. [ 10, 5, 4, -8, 6, 10, 5 ]
-      (AES-CCM-16-64-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, X25519, EdDSA, Ed25519)
+      (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519,
+       AES-CCM-16-64-128, HMAC 256/256)
 
-   1. [ 10, 5, 1, -7, 1, 10, 5 ]
-      (AES-CCM-16-64-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, P-256, ES256, P-256)
+   1. [ 30, 5, 4, -8, 6, 10, 5 ]
+      (AES-CCM-16-128-128, HMAC 256/256, X25519, EdDSA, Ed25519,
+       AES-CCM-16-64-128, HMAC 256/256)
 
-   2. [ 30, 5, 4, -8, 6, 10, 5 ]
-      (AES-CCM-16-128-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, X25519, EdDSA, Ed25519)
+   2. [ 10, 5, 1, -7, 1, 10, 5 ]
+      (AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256,
+       AES-CCM-16-64-128, HMAC 256/256)
 
    3. [ 30, 5, 1, -7, 1, 10, 5 ]
-      (AES-CCM-16-128-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, P-256, ES256, P-256)
+      (AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
+       AES-CCM-16-64-128, HMAC 256/256)
 ~~~~~~~~~~~
 
 ## Ephemeral Public Keys {#cose_key}
