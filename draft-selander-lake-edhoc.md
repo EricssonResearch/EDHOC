@@ -277,7 +277,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
 
-* Verification of a common preferred cipher suite (AEAD algorithm, ECDH algorithm, ECDH curve, signature algorithm, signature algorithm parameters):
+* Verification of a common preferred cipher suite (EDHOC AEAD algorithm, application AEAD algorithm, EDHOC HMAC algorithm, application HMAC algorithm , EDHOC ECDH curve, EDHOC signature algorithm, EDHOC signature algorithm curve):
 
    * U lists supported cipher suites in order of preference
    
@@ -320,20 +320,28 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of an ordered set of COSE algorithms: an AEAD algorithm, an HMAC algorithm, an ECDH curve, a signature algorithm, and signature algorithm parameters. The signature algorithm is not used when EDHOC is authenticated with symmetric keys. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
+EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an application AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, and an EDHOC signature algorithm curve. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
+
+The different methods (singature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
 
 ~~~~~~~~~~~
-   suite = int / [ 4*4 algs: int / tstr, ? para: any ]
+   suite = int / [ 7*7 algs: int / tstr ]
 ~~~~~~~~~~~
 
-This document specifies two pre-defined cipher suites.
+This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
-   0. [ 10, 5, 4, -8, 6 ]
-      (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519)
+   0. [ 10, 10, 5, 5, 4, -8, 6 ]
+      (AES-CCM-16-64-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, X25519, EdDSA, Ed25519)
 
-   1. [ 10, 5, 1, -7, 1 ]
-      (AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256)
+   1. [ 10, 10, 5, 5, 1, -7, 1 ]
+      (AES-CCM-16-64-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, P-256, ES256, P-256)
+
+   2. [ 30, 10, 5, 5, 4, -8, 6 ]
+      (AES-CCM-16-128-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, X25519, EdDSA, Ed25519)
+
+   3. [ 30, 10, 5, 5, 1, -7, 1 ]
+      (AES-CCM-16-128-128, AES-CCM-16-64-128, HMAC 256/256, HMAC 256/256, P-256, ES256, P-256)
 ~~~~~~~~~~~
 
 ## Ephemeral Public Keys {#cose_key}
