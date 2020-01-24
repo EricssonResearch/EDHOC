@@ -314,7 +314,7 @@ Party U                                                 Party V
 
 The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. The certificates and RPKs can contain signature keys or static Diffie-Hellman keys. EDHOC assumes the existence of mechanisms (certification authority, manual distribution, etc.) for binding identities with authentication keys (public or pre-shared). When a public key infrastructure is used, the identity is included in the certificate and bound to the authentication key by trust in the certification authority. When the credential is manually distributed (PSK, RPK, self-signed certificate), the identity and authentication key is distributed out-of-band and bound together by trust in the distribution method. EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
 
-EDHOC allows opaque auxiliary data (UAX and PAX) to be sent in the EDHOC messages. Unprotected Auxiliary Data (UAX_1, UAX_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (PAX_3) may be used to transfer any auxiliary data in message_3.
+EDHOC allows opaque auxiliary data (AD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (AD_1, AD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (AD_3) may be used to transfer any auxiliary data in message_3.
 
 Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party V.
 
@@ -496,15 +496,15 @@ The first data item of message_1 is an int TYPE = 4 * method + corr specifying t
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, G_X, C_U, UAX_1                  |
+|                  TYPE, SUITES_U, G_X, C_U, AD_1                  |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|  C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), UAX_2) |
+|  C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), AD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|       C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, TH_3), PAX_3)      |
+|       C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, TH_3), AD_3)      |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -523,7 +523,7 @@ message_1 = (
   SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,  
-  ? UAX_1 : bstr,
+  ? AD_1 : bstr,
 )
 ~~~~~~~~~~~
 
@@ -533,7 +533,7 @@ where:
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
-* UAX_1 - bstr containing unprotected opaque auxiliary data
+* AD_1 - bstr containing unprotected opaque auxiliary data
 
 ### Party U Processing of Message 1
 
@@ -559,7 +559,7 @@ Party V SHALL process message_1 as follows:
 
 * Validate that there is a solution to the curve definition for the given x-coordinate G_X.
 
-* Pass UAX_1 to the application.
+* Pass AD_1 to the application.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued. If V does not support the selected cipher suite, then SUITES_V MUST include one or more supported cipher suites. If V does not support the selected cipher suite, but supports another cipher suite in SUITES_U, then SUITES_V MUST include the first supported cipher suite in SUITES_U.
 
@@ -625,11 +625,11 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
-   * plaintext = ( ID_CRED_V / kid_value, signature, ? UAX_2 )
+   * plaintext = ( ID_CRED_V / kid_value, signature, ? AD_2 )
 
    * external_aad = TH_2
 
-   * UAX_2 = bstr containing opaque unprotected auxiliary data
+   * AD_2 = bstr containing opaque unprotected auxiliary data
 
     where signature is taken from the COSE_Sign1 object, ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only kid_value is conveyed in the plaintext.
 
@@ -637,7 +637,7 @@ Party V SHALL compose message_2 as follows:
    
    * Key K = K_2
    * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_V / kid_value, signature, ? UAX_2 ) 
+   * Plaintext P = ( ID_CRED_V / kid_value, signature, ? AD_2 ) 
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
   
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
@@ -709,11 +709,11 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
-   * plaintext = ( ID_CRED_U / kid_value, signature, ? PAX_3 )
+   * plaintext = ( ID_CRED_U / kid_value, signature, ? AD_3 )
          
    * external_aad = TH_3
 
-   * PAX_3 = bstr containing opaque protected auxiliary data
+   * AD_3 = bstr containing opaque protected auxiliary data
 
     where signature is taken from the COSE_Sign1 object, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. 
     
@@ -721,7 +721,7 @@ Party U SHALL compose message_3 as follows:
    
    * Key K = K_3
    * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_U / kid_value, signature, ? PAX_3 )
+   * Plaintext P = ( ID_CRED_U / kid_value, signature, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
 * Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
@@ -742,7 +742,7 @@ Party V SHALL process message_3 as follows:
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
-*  Pass PAX_3, the connection identifiers (C_U, C_V), and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
+*  Pass AD_3, the connection identifiers (C_U, C_V), and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
 # EDHOC Authenticated with Symmetric Keys {#sym}
 
@@ -764,15 +764,15 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|              TYPE, SUITES_U, G_X, C_U, ID_PSK, UAX_1              |
+|              TYPE, SUITES_U, G_X, C_U, ID_PSK, AD_1              |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_U, G_Y, C_V, AEAD(K_2; TH_2, UAX_2)               |
+|               C_U, G_Y, C_V, AEAD(K_2; TH_2, AD_2)               |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    C_V, AEAD(K_3; TH_3, PAX_3)                    |
+|                    C_V, AEAD(K_3; TH_3, AD_3)                    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -794,7 +794,7 @@ message_1 = (
   G_X : bstr,
   C_U : bstr,
   ID_PSK : header_map // kid_value : bstr,
-  ? UAX_1 : bstr,
+  ? AD_1 : bstr,
 )
 ~~~~~~~~~~~
 
@@ -813,9 +813,9 @@ where:
 
    * external_aad = TH_2
 
-   * plaintext = ? UAX_2
+   * plaintext = ? AD_2
    
-   * UAX_2 = bstr containing opaque unprotected auxiliary data
+   * AD_2 = bstr containing opaque unprotected auxiliary data
 
 ## EDHOC Message 3
 
@@ -827,9 +827,9 @@ where:
 
    * external_aad = TH_3
 
-   * plaintext = ? PAX_3
+   * plaintext = ? AD_3
  
-   * PAX_3 = bstr containing opaque protected auxiliary data
+   * AD_3 = bstr containing opaque protected auxiliary data
 
 # EDHOC Authenticated with Static Diffie-Hellman Keys {#asym-dh}
 
@@ -843,15 +843,15 @@ In the following subsections only the differences compared to EDHOC authenticate
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, G_X, C_U, UAX_1                  |
+|                  TYPE, SUITES_U, G_X, C_U, AD_1                  |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-| C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V, AEAD(G_VX;CRED_V,TH_2), UAX_2) |
+| C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V, AEAD(G_VX;CRED_V,TH_2), AD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|    C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), PAX_3 )    |
+|    C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), AD_3 )    |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -965,7 +965,7 @@ Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decre
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            TYPE, SUITES_U {0, 5, 6, 7}, G_X, C_U, UAX_1           |
+|            TYPE, SUITES_U {0, 5, 6, 7}, G_X, C_U, AD_1            |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -973,7 +973,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|             TYPE, SUITES_U {1, 5, 6}, G_X, C_U, UAX_1             |
+|             TYPE, SUITES_U {1, 5, 6}, G_X, C_U, AD_1              |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -984,7 +984,7 @@ In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|             TYPE, SUITES_U {0, 5, 6}, G_X, C_U, UAX_1             |
+|             TYPE, SUITES_U {0, 5, 6}, G_X, C_U, AD_1              |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -992,7 +992,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|            TYPE, SUITES_U {2, 5, 6, 7}, G_X, C_U, UAX_1           |
+|            TYPE, SUITES_U {2, 5, 6, 7}, G_X, C_U, AD_1            |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -1115,9 +1115,9 @@ The HMAC algorithm HMAC 256/64 (HMAC w/ SHA-256 truncated to 64 bits) SHALL NOT 
 
 ## Unprotected Data
 
-Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to UAX_1, ID_CRED_V, UAX_2, and ERR_MSG in the asymmetric case, and ID_PSK, UAX_1, and ERR_MSG in the symmetric case. Using the same ID_PSK or UAX_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize ID_PSK. Another consideration is that the list of supported cipher suites may be used to identify the application.
+Party U and V must make sure that unprotected data and metadata do not reveal any sensitive information. This also applies for encrypted data sent to an unauthenticated party. In particular, it applies to AD_1, ID_CRED_V, AD_2, and ERR_MSG in the asymmetric case, and ID_PSK, AD_1, and ERR_MSG in the symmetric case. Using the same ID_PSK or AD_1 in several EDHOC sessions allows passive eavesdroppers to correlate the different sessions. The communicating parties may therefore anonymize ID_PSK. Another consideration is that the list of supported cipher suites may be used to identify the application.
 
-Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to UAX_1 and ERR_MSG in the asymmetric case, and ID_PSK, UAX_1, and ERR_MSG in the symmetric case.
+Party U and V must also make sure that unauthenticated data does not trigger any harmful actions. In particular, this applies to AD_1 and ERR_MSG in the asymmetric case, and ID_PSK, AD_1, and ERR_MSG in the symmetric case.
 
 ## Denial-of-Service
 
@@ -1133,7 +1133,7 @@ Party U and V are responsible for verifying the integrity of certificates. The s
 
 Party U and V are allowed to select the connection identifiers C_U and C_V, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent application protocol (e.g. OSCORE {{RFC8613}}). The choice of connection identifier is not security critical in EDHOC but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong connection identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieve the wrong security context (which also terminates the protocol as the message cannot be verified).
 
-Party V MUST finish the verification step of message_3 before passing PAX_3 to the application.
+Party V MUST finish the verification step of message_3 before passing AD_3 to the application.
 
 If two nodes unintentionally initiate two simultaneous EDHOC message exchanges with each other even if they only want to complete a single EDHOC message exchange, they MAY terminate the exchange with the lexicographically smallest G_X. If the two G_X values are equal, the received message_1 MUST be discarded to mitigate reflection attacks. Note that in the case of two simultaneous EDHOC exchanges where the nodes only complete one and where the nodes have different preferred cipher suites, an attacker can affect which of the two nodes’ preferred cipher suites will be used by blocking the other exchange.
 
@@ -1492,7 +1492,7 @@ C_U (Connection identifier chosen by U) (1 bytes)
 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-No UAX_1 is provided, so UAX_1 is absent from message_1.
+No AD_1 is provided, so AD_1 is absent from message_1.
 
 Message_1 is constructed, as the CBOR Sequence of the CBOR data items above.
 
@@ -1716,7 +1716,7 @@ fb a1 65 d9 08 da a7 8e 4f 84 41 42 d0
 
 #### Ciphertext Computation {#tv-rpk-2-ciph}
 
-COSE_Encrypt0 is computed with the following parameters. Note that UAX_2 is omitted.
+COSE_Encrypt0 is computed with the following parameters. Note that AD_2 is omitted.
 
 * empty protected header
 
@@ -1988,7 +1988,7 @@ de 53 02 13 ab a2 6a 47 1a 51 f3 d6 fb
 
 #### Ciphertext Computation {#tv-rpk-3-ciph}
 
-COSE_Encrypt0 is computed with the following parameters. Note that PAX_3 is omitted.
+COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitted.
 
 * empty protected header
 
@@ -2348,7 +2348,7 @@ kid_value of ID_PSK (CBOR encoded) (2 bytes)
 41 a1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-No UAX_1 is provided, so UAX_1 is absent from message_1.
+No UAD_1 is provided, so AD_1 is absent from message_1.
 
 Message_1 is constructed, as the CBOR Sequence of the CBOR data items above.
 
@@ -2525,13 +2525,13 @@ ff 11 2e 1c 26 8a a2 a7 7c c3 ee 6c 4d
 
 #### Ciphertext Computation {#tv-psk-2-ciph}
 
-COSE_Encrypt0 is computed with the following parameters. Note that UAX_2 is omitted.
+COSE_Encrypt0 is computed with the following parameters. Note that AD_2 is omitted.
 
 * empty protected header
 
 * external_aad = TH_2
 
-* empty plaintext, since UAX_2 is omitted
+* empty plaintext, since AD_2 is omitted
 
 From the parameters above, the Enc_structure A_2 is computed.
 
@@ -2731,13 +2731,13 @@ IV_3 (13 bytes)
 
 #### Ciphertext Computation {#tv-psk-3-ciph}
 
-COSE_Encrypt0 is computed with the following parameters. Note that PAX_2 is omitted.
+COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitted.
 
 * empty protected header
 
 * external_aad = TH_3
 
-* empty plaintext, since PAX_2 is omitted
+* empty plaintext, since AD_3 is omitted
 
 From the parameters above, the Enc_structure A_3 is computed.
 
