@@ -320,32 +320,32 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm. Each cipher suite is either identified with a pre-defined int label or with an array of labels and values from the COSE Algorithms and Elliptic Curves registries.
+EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label.
 
 The different methods (singature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
 
 an application AEAD algorithm, 
 
 ~~~~~~~~~~~
-   suite = int / [ 7*7 algs: int / tstr ]
+   suite = int
 ~~~~~~~~~~~
 
 This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
-   0. [ 10, 5, 4, -8, 6, 10, 5 ]
+   0. ( 10, 5, 4, -8, 6, 10, 5 )
       (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519,
        AES-CCM-16-64-128, HMAC 256/256)
 
-   1. [ 30, 5, 4, -8, 6, 10, 5 ]
+   1. ( 30, 5, 4, -8, 6, 10, 5 )
       (AES-CCM-16-128-128, HMAC 256/256, X25519, EdDSA, Ed25519,
        AES-CCM-16-64-128, HMAC 256/256)
 
-   2. [ 10, 5, 1, -7, 1, 10, 5 ]
+   2. ( 10, 5, 1, -7, 1, 10, 5 )
       (AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256,
        AES-CCM-16-64-128, HMAC 256/256)
 
-   3. [ 30, 5, 1, -7, 1, 10, 5 ]
+   3. ( 30, 5, 1, -7, 1, 10, 5 )
       (AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
        AES-CCM-16-64-128, HMAC 256/256)
 ~~~~~~~~~~~
