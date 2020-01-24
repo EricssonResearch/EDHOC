@@ -496,15 +496,15 @@ The first data item of message_1 is an int TYPE = 4 * method + corr specifying t
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, G_X, C_U, AD_1                  |
+|                  TYPE, SUITES_U, G_X, C_U, AD_1                   |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|  C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), AD_2) |
+|  C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), AD_2)  |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|       C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, TH_3), AD_3)      |
+|       C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, TH_3), AD_3)       |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -764,15 +764,15 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|              TYPE, SUITES_U, G_X, C_U, ID_PSK, AD_1              |
+|              TYPE, SUITES_U, G_X, C_U, ID_PSK, AD_1               |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_U, G_Y, C_V, AEAD(K_2; TH_2, AD_2)               |
+|               C_U, G_Y, C_V, AEAD(K_2; TH_2, AD_2)                |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    C_V, AEAD(K_3; TH_3, AD_3)                    |
+|                    C_V, AEAD(K_3; TH_3, AD_3)                     |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -843,15 +843,15 @@ In the following subsections only the differences compared to EDHOC authenticate
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, G_X, C_U, AD_1                  |
+|                  TYPE, SUITES_U, G_X, C_U, AD_1                   |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-| C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V, AEAD(G_VX;CRED_V,TH_2), AD_2) |
+|  C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V, AEAD(G_VX;CRED_V,TH_2), AD_2) |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|    C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), AD_3 )    |
+|     C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), AD_3)     |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -1148,30 +1148,48 @@ EDHOC has been analyzed in several other documents. A formal verification of EDH
 IANA has created a new registry titled "EDHOC Cipher Suites" under the new heading "EDHOC". The registration procedure is "Expert Review". The columns of the registry are Value, Array, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Value: 1
-Array: [ 10, 5, 1, -7, 1 ]
-Desc: AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256
-Reference: [[this document]]
-~~~~~~~~~~~~~~~~~~~~~~~
-
-~~~~~~~~~~~~~~~~~~~~~~~
-Value: 0
-Array: [ 10, 5, 4, -8, 6 ]
-Desc: AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519
+Value: -6
+Algorithms: N/A
+Desc: Reserved for Private Use
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Value: -5
-Array:
+Algorithms: N/A
 Desc: Reserved for Private Use
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Value: -6
-Array:
-Desc: Reserved for Private Use
+Value: 0
+Array: 10, 5, 4, -8, 6, 10, 5
+Desc: AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519,
+      AES-CCM-16-64-128, HMAC 256/256
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: 1
+Array: 30, 5, 4, -8, 6, 10, 5
+Desc: AES-CCM-16-128-128, HMAC 256/256, X25519, EdDSA, Ed25519,
+      AES-CCM-16-64-128, HMAC 256/256
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: 2
+Array: 10, 5, 1, -7, 1, 10, 5
+Desc: AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256,
+      AES-CCM-16-64-128, HMAC 256/256
+Reference: [[this document]]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Value: 3
+Array: 30, 5, 1, -7, 1, 10, 5
+Desc: AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
+      AES-CCM-16-64-128, HMAC 256/256
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
