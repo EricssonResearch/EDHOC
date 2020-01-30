@@ -324,12 +324,6 @@ EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD 
 
 The different methods (signature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
 
-an application AEAD algorithm, 
-
-~~~~~~~~~~~
-   suite = int
-~~~~~~~~~~~
-
 This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
@@ -525,6 +519,8 @@ message_1 = (
   C_U : bstr,  
   ? AD_1 : bstr,
 )
+
+suite = int
 ~~~~~~~~~~~
 
 where:
