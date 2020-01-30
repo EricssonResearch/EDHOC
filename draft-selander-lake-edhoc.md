@@ -604,15 +604,15 @@ Party V SHALL compose message_2 as follows:
 *  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_2, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor ID_CRED_V
-     
+
+      * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
+
    * payload = CRED_V
-   
+
+      * CRED_V - bstr credential containing the credential of Party V, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
+
    * external_aad = TH_2
 
-   * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
-
-   * CRED_V - bstr credential containing the credential of Party V, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
-     
    COSE constructs the input to the Signature Algorithm as follows:
    
    * The key is the private authentication key of V.
@@ -689,13 +689,13 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor ID_CRED_U
 
+      * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
+
    * payload = CRED_U
 
+      * CRED_U - bstr credential containing the credential of Party U, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
+
    * external_aad = TH_3
-
-   * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
-
-   * CRED_U - bstr credential containing the credential of Party U, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
    
    COSE constructs the input to the Signature Algorithm as follows:
    
@@ -880,7 +880,7 @@ Party U                                                       Party V
 
    * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \]
 
-   * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+      * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
 
 ## EDHOC Message 3
 
@@ -898,7 +898,7 @@ Party U                                                       Party V
 
    * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \]
 
-   * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+      * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
 
 ## EDHOC-Exporter Interface
 
