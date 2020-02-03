@@ -292,7 +292,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item of message_1 is an int (METH_CORR) specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used. An implementation may support only Party U or only Party V. An implementation may support only a single method. Party U and Party V needs to have agreed on a single method to be used for EDHOC.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used, see {{transport}}. An implementation may support only Party U or only Party V. An implementation may support only a single method. Party U and Party V needs to have agreed on a single method to be used for EDHOC.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -505,7 +505,7 @@ The connection identifiers C_U and C_V do not have any cryptographic purpose in 
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                METH_CORR, SUITES_U, G_X, C_U, AD_1                |
+|               METHOD_CORR, SUITES_U, G_X, C_U, AD_1               |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -528,7 +528,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  METH_CORR : int,
+  METHOD_CORR : int,
   SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,  
@@ -540,7 +540,7 @@ suite = int
 
 where:
 
-* METH_CORR = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
+* METHOD_CORR = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the ephemeral public key of Party U
 * C_U - variable length connection identifier
@@ -602,7 +602,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* If METH_CORR mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
+* If METHOD_CORR mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite and format it as a COSE_Key. Let G_Y be the 'x' parameter of the COSE_Key.
 
@@ -688,7 +688,7 @@ data_3 = (
 
 Party U SHALL compose message_3 as follows:
 
-* If METH_CORR mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
+* If METHOD_CORR mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
 * Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
@@ -771,7 +771,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            METH_CORR, SUITES_U, G_X, C_U, ID_PSK, AD_1            |
+|           METHOD_CORR, SUITES_U, G_X, C_U, ID_PSK, AD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -796,7 +796,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  METH_CORR : int,
+  METHOD_CORR : int,
   SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,
@@ -807,7 +807,7 @@ message_1 = (
 
 where:
 
-* METH_CORR = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METHOD_CORR = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, with kid_value: bstr, only kid_value is conveyed.
 
 ## EDHOC Message 2
@@ -850,7 +850,7 @@ In the following subsections only the differences compared to EDHOC authenticate
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                METH_CORR, SUITES_U, G_X, C_U, AD_1                |
+|               METHOD_CORR, SUITES_U, G_X, C_U, AD_1               |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -869,7 +869,7 @@ Party U                                                       Party V
 
 ### Formatting of Message 1 {#asym-dh-msg1-form}
 
-* METH_CORR = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METHOD_CORR = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 
 ## EDHOC Message 2
 
@@ -962,7 +962,7 @@ error = (
 
 where:
 
-* C_x - if error is sent by Party V and METH_CORR mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and METH_CORR mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
+* C_x - if error is sent by Party V and METHOD_CORR mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and METHOD_CORR mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}. ERR_MSG MAY be a 0-length text string.
 * SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITES_V only contains the values from the EDHOC cipher suites registry and no index. SUITES_V MUST only be included in replies to message_1.
 
@@ -972,7 +972,7 @@ Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decre
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|          METH_CORR, SUITES_U {0, 5, 6, 7}, G_X, C_U, AD_1         |
+|         METHOD_CORR, SUITES_U {0, 5, 6, 7}, G_X, C_U, AD_1        |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -980,7 +980,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|           METH_CORR, SUITES_U {1, 5, 6}, G_X, C_U, AD_1           |
+|          METHOD_CORR, SUITES_U {1, 5, 6}, G_X, C_U, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -991,7 +991,7 @@ In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|           METH_CORR, SUITES_U {0, 5, 6}, G_X, C_U, AD_1           |
+|          METHOD_CORR, SUITES_U {0, 5, 6}, G_X, C_U, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -999,7 +999,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|         METH_CORR, SUITES_U {2, 5, 6, 7}, G_X, C_U, AD_1          |
+|        METHOD_CORR, SUITES_U {2, 5, 6, 7}, G_X, C_U, AD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
