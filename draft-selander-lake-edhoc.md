@@ -317,7 +317,7 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 
 EDHOC includes connection identifiers (C_U, C_V) to correlate messages. The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
-1 byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string. If the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
+One byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string. If the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
 
    * corr = 0, the transport does not provide a correlation mechanism.
 
