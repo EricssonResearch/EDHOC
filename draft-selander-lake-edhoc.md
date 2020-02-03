@@ -316,11 +316,11 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC allows opaque auxiliary data (AD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (AD_1, AD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (AD_3) may be used to transfer any auxiliary data in message_3.
 
-An implementation may support only Party U or only Party V.
+An implementation may support only Party U or only Party V. An implementation may support only a single method. Party U and Party V needs to have agreed on a single method to be used for EDHOC.
 
 ## Transport {#transport}
 
-Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. The transport is responsible to handle message loss, reordering, message duplication, fragmentation, and denial of service protection, where necessary. The initiator needs to have agreed with the responder on a transport to be used for EDHOC. It is recommended to transport EDHOC in CoAP payloads, see {{transfer}}.
+Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. The transport is responsible to handle message loss, reordering, message duplication, fragmentation, and denial of service protection, where necessary. Party U and Party V needs to have agreed on a transport to be used for EDHOC. It is recommended to transport EDHOC in CoAP payloads, see {{transfer}}.
 
 EDHOC includes connection identifiers (C_U, C_V) to correlate messages. However, if the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
 
