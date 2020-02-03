@@ -362,7 +362,7 @@ This document specifies four pre-defined cipher suites.
 
 ## Ephemeral Public Keys {#cose_key}
    
-The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the x-coordinate is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an y-coordinate, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the 'x' parameter is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an 'y' parameter , any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
@@ -541,7 +541,7 @@ where:
 
 * METH_CORR = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
-* G_X - the x-coordinate of the ephemeral public key of Party U
+* G_X - the ephemeral public key of Party U
 * C_U - variable length connection identifier
 * AD_1 - bstr containing unprotected opaque auxiliary data
 
@@ -553,7 +553,7 @@ Party U SHALL compose message_1 as follows:
 
 * Determine the cipher suite to use with Party V in message_1. If Party U previously received from Party V an error message to message_1 with diagnostic payload identifying a cipher suite that U supports, then U SHALL use that cipher suite. Otherwise the first cipher suite in SUITES_U MUST be used.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_X be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite and format it as a COSE_Key. Let G_X be the 'x' parameter of the COSE_Key.
    
 * Choose a connection identifier C_U and store it for the length of the protocol.
 
@@ -566,8 +566,6 @@ Party V SHALL process message_1 as follows:
 * Decode message_1 (see {{CBOR}}).
 
 * Verify that the selected cipher suite is supported and that no prior cipher suites in SUITES_U are supported.
-
-* Validate that there is a solution to the curve definition for the given x-coordinate G_X.
 
 * Pass AD_1 to the application.
 
@@ -596,7 +594,7 @@ data_2 = (
 
 where:
 
-* G_Y - the x-coordinate of the ephemeral public key of Party V
+* G_Y - the ephemeral public key of Party V
 * C_V - variable length connection identifier
 
 ### Party V Processing of Message 2 {#asym-msg2-proc}
@@ -605,7 +603,7 @@ Party V SHALL compose message_2 as follows:
 
 * If METH_CORR mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
-* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_Y be the x-coordinate of the ephemeral public key.
+* Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite and format it as a COSE_Key. Let G_Y be the 'x' parameter of the COSE_Key.
 
 * Choose a connection identifier C_V and store it for the length of the protocol.
 
@@ -659,8 +657,6 @@ Party U SHALL process message_2 as follows:
 * Decode message_2 (see {{CBOR}}).
 
 * Retrieve the protocol state using the connection identifier C_U and/or other external information such as the CoAP Token and the 5-tuple.
-
-* Validate that there is a solution to the curve definition for the given x-coordinate G_Y.
 
 * Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, and IV_2.
 
@@ -1133,7 +1129,7 @@ EDHOC itself does not provide countermeasures against Denial-of-Service attacks.
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. As each pseudoranom number must only be used once, an implementation need to get a new truly random seed after reboot, or continously store state in nonvolatile memory, see ({{RFC8613}}, Appendix B.1.1) for issues and solution approaches for writing to nonvolatile memory. If ECDSA is supported, "deterministic ECDSA" as specified in {{RFC6979}} is RECOMMENDED.
 
-The referenced processing instructions in {{SP-800-56A}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks.
+The referenced processing instructions in {{SP-800-56A}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks. Depending on the selected curve, the parties should perform various validations of each other's public keys, see e.g. Section 5 of {{SP-800-56A}}.
 
 Party U and V are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported. The private authentication keys and the PSK (even though it is used as salt) MUST be kept secret.
 
@@ -1154,14 +1150,14 @@ EDHOC has been analyzed in several other documents. A formal verification of EDH
 IANA has created a new registry titled "EDHOC Cipher Suites" under the new heading "EDHOC". The registration procedure is "Expert Review". The columns of the registry are Value, Array, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Value: -6
+Value: -24
 Algorithms: N/A
 Desc: Reserved for Private Use
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Value: -5
+Value: -23
 Algorithms: N/A
 Desc: Reserved for Private Use
 Reference: [[this document]]
