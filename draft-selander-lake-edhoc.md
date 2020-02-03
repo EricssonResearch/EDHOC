@@ -336,11 +336,7 @@ For example, if the key exchange is transported over CoAP, the CoAP Token can be
 
 ## Cipher Suites
 
-EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label.
-
-The different methods (signature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
-
-This document specifies four pre-defined cipher suites.
+EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label. This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
    0. ( 10, 5, 4, -8, 6, 10, 5 )
@@ -359,6 +355,10 @@ This document specifies four pre-defined cipher suites.
       (AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
        AES-CCM-16-64-128, HMAC 256/256)
 ~~~~~~~~~~~
+
+The different methods (signature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
+
+Party U need to have a list of cipher suites it supports in order of decreasing preference. Party V need to have a list of cipher suites it supports.
 
 ## Ephemeral Public Keys {#cose_key}
    
