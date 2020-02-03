@@ -267,7 +267,7 @@ The parties exchanging messages are called "U" and "V". They exchange identities
 
 * Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
 
-* AEAD(K; . ) denotes authenticated encryption with additional data using the key K derived from the shared secret. The authenticated encryption MUST NOT be replaced by plain encryption, see {{security}}.
+* AEAD(K; . ) denotes authenticated encryption with additional data using the key K derived from the shared secret.
 
 In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
@@ -285,7 +285,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Method types and error handling.
 
-* Transport of opaque auxiliary defined data.
+* Transport of opaque auxiliary data.
 
 EDHOC is designed to encrypt and integrity protect as much information as possible, and all symmetric keys are derived using as much previous information as possible. EDHOC is furthermore designed to be as compact and lightweight as possible, in terms of message sizes, processing, and the ability to reuse already existing CBOR, COSE, and CoAP libraries.
 
@@ -293,7 +293,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item of message_1 is an int (TYPE) specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item of message_1 is an int (METH_CORR) specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -316,7 +316,23 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC allows opaque auxiliary data (AD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (AD_1, AD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (AD_3) may be used to transfer any auxiliary data in message_3.
 
-Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. It is recommended to transport the EDHOC message in CoAP payloads, see {{transfer}}. An implementation may support only Party U or only Party V.
+An implementation may support only Party U or only Party V.
+
+## Transport {#transport}
+
+Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. The transport is responsible to handle message loss, reordering, message duplication, fragmentation, and denial of service protection, where necessary. The initiator needs to have agreed with the responder on a transport to be used for EDHOC. It is recommended to transport EDHOC in CoAP payloads, see {{transfer}}.
+
+EDHOC includes connection identifiers (C_U, C_V) to correlate messages. However, if the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
+
+   * corr = 0, the transport does not provide a correlation mechanism.
+
+   * corr = 1, the transport rovides a correlation mechanism that enables Party V to correlate message_2 and message_1.
+
+   * corr = 2, the transport rovides a correlation mechanism that enables Party U to correlate message_3 and message_2.
+
+   * corr = 3, the transport rovides a correlation mechanism that enables both parties to correlate all three messages.
+
+For example, if the key exchange is transported over CoAP, the CoAP Token can be used to correlate messages, see {{coap}}.
 
 ## Cipher Suites
 
@@ -484,13 +500,11 @@ The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 cert
 
 The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
-The first data item of message_1 is an int TYPE = 4 * method + corr specifying the method and the correlation properties of the transport used. corr = 0 is used when there is no external correlation mechanism. corr = 1 is used when there is an external correlation mechanism (e.g. the Token in CoAP) that enables Party U to correlate message_1 and message_2. corr = 2 is used when there is an external correlation mechanism that enables Party V to correlate message_2 and message_3. corr = 3 is used when there is an external correlation mechanism that enables the parties to correlate all the messages. The use of the correlation parameter is exemplified in {{coap}}.
-
 1 byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, G_X, C_U, AD_1                   |
+|                METH_CORR, SUITES_U, G_X, C_U, AD_1                |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -513,7 +527,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  TYPE : int,
+  METH_CORR : int,
   SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,  
@@ -525,7 +539,7 @@ suite = int
 
 where:
 
-* TYPE = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METH_CORR = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the x-coordinate of the ephemeral public key of Party U
 * C_U - variable length connection identifier
@@ -589,7 +603,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* If TYPE mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
+* If METH_CORR mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite. Let G_Y be the x-coordinate of the ephemeral public key.
 
@@ -677,7 +691,7 @@ data_3 = (
 
 Party U SHALL compose message_3 as follows:
 
-* If TYPE mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
+* If METH_CORR mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
 * Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
@@ -760,7 +774,7 @@ EDHOC with symmetric key authentication is illustrated in {{fig-sym}}.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|              TYPE, SUITES_U, G_X, C_U, ID_PSK, AD_1               |
+|            METH_CORR, SUITES_U, G_X, C_U, ID_PSK, AD_1            |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -785,7 +799,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 message_1 = (
-  TYPE : int,
+  METH_CORR : int,
   SUITES_U : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_U : bstr,
@@ -796,7 +810,7 @@ message_1 = (
 
 where:
 
-* TYPE = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METH_CORR = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, with kid_value: bstr, only kid_value is conveyed.
 
 ## EDHOC Message 2
@@ -839,7 +853,7 @@ In the following subsections only the differences compared to EDHOC authenticate
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|                  TYPE, SUITES_U, G_X, C_U, AD_1                   |
+|                METH_CORR, SUITES_U, G_X, C_U, AD_1                |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -858,7 +872,7 @@ Party U                                                       Party V
 
 ### Formatting of Message 1 {#asym-dh-msg1-form}
 
-* TYPE = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METH_CORR = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 
 ## EDHOC Message 2
 
@@ -951,7 +965,7 @@ error = (
 
 where:
 
-* C_x - if error is sent by Party V and TYPE mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and TYPE mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
+* C_x - if error is sent by Party V and METH_CORR mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and METH_CORR mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}. ERR_MSG MAY be a 0-length text string.
 * SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITES_V only contains the values from the EDHOC cipher suites registry and no index. SUITES_V MUST only be included in replies to message_1.
 
@@ -961,7 +975,7 @@ Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decre
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|            TYPE, SUITES_U {0, 5, 6, 7}, G_X, C_U, AD_1            |
+|          METH_CORR, SUITES_U {0, 5, 6, 7}, G_X, C_U, AD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -969,7 +983,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|             TYPE, SUITES_U {1, 5, 6}, G_X, C_U, AD_1              |
+|           METH_CORR, SUITES_U {1, 5, 6}, G_X, C_U, AD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -980,7 +994,7 @@ In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|             TYPE, SUITES_U {0, 5, 6}, G_X, C_U, AD_1              |
+|           METH_CORR, SUITES_U {0, 5, 6}, G_X, C_U, AD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -988,7 +1002,7 @@ Party U                                                       Party V
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|            TYPE, SUITES_U {2, 5, 6, 7}, G_X, C_U, AD_1            |
+|         METH_CORR, SUITES_U {2, 5, 6, 7}, G_X, C_U, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -997,7 +1011,7 @@ Party U                                                       Party V
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
-# Transferring EDHOC and Deriving Application Keys {#transfer}
+# Transferring EDHOC and Deriving an OSCORE Context {#transfer}
 
 ## Transferring EDHOC in CoAP {#coap}
 
@@ -1074,10 +1088,6 @@ When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must
    Master Secret = EDHOC-Exporter( "OSCORE Master Secret", length )
    Master Salt   = EDHOC-Exporter( "OSCORE Master Salt", 8 )
 ~~~~~~~~~~~~~~~~~~~~~~~
-
-## Transferring EDHOC over Other Protocols {#non-coap}
-
-EDHOC may be transported over a different transport than CoAP. In this case the lower layers need to handle message loss, reordering, message duplication, fragmentation, and denial of service protection.
 
 # Security Considerations {#security}
 
