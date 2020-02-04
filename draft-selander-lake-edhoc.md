@@ -217,7 +217,7 @@ Total           96       116       255       235 + Certificate chains
 
 The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{I-D.ietf-cbor-7049bis}} and COSE {{RFC8152}} are used to implement these standards. The use of COSE provides crypto agility and enables use of future algorithms and headers designed for constrained IoT.
 
-This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with signature key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{asym-dh}} specifies EDHOC with static Diffie-Hellman key authentication, {{error}} specifies the EDHOC error message, and {{transfer}} describes how EDHOC can be transferred in CoAP and used to establish an OSCORE security context.
+This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with signature key and static Diffie-Hellman key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{transfer}} describes how EDHOC can be transferred in CoAP and used to establish an OSCORE security context.
 
 ## Rationale for EDHOC
 
@@ -445,7 +445,11 @@ calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDa
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter( label, length ) = HKDF-Expand( PRK, info, length ) 
+   PRK_Exp = HKDF-Extract( "", PRK || ? PRK_V || ? PRK_U )
+~~~~~~~~~~~
+
+~~~~~~~~~~~
+   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_Exp, info, length) 
 ~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = label, keyDataLength = 8 * length, and other = TH_4 where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
@@ -465,11 +469,12 @@ An application using EDHOC may want to derive new PSKs to use for authentication
    ID_PSK = EDHOC-Exporter( "EDHOC Chaining ID_PSK", 4 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# EDHOC Authenticated with Signature Keys {#asym}
+
+# EDHOC Authenticated with Signature and Static Diffie-Hellman Keys {#asym}
 
 ## Overview {#asym-overview}
 
-EDHOC supports authentication with raw public keys (RPK) and public key certificates with static Diffe-Hellman keys with the requirements that:
+EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
 * Only Party V SHALL have access to the private authentication key of Party V,
 
@@ -505,7 +510,9 @@ Public key certificates can be identified in different ways. Several header para
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
-The actual credentials CRED_U and CRED_V (e.g., a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in the signature payload, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order.
+The actual credentials CRED_U and CRED_V (e.g., a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in the signature/AEAD payload, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order.
+
+The authentication must be a signature key or a static Diffe-Hellman keys. Party U and Party V MAY use different types of authentication keys, e.g. one uses a signature key and the other uses a static Diffe-Hellman key. When using a signature keys, the authentication is provided by a signature. When using a static Diffie-Hellman keys (called G_U and G_V, respectively) the authentication is provided by a Message Authentication Code (MAC) computed from an ephemeral-static ECDH shared secret which enables significant reductions in message sizes. The MAC is implemented with an AEAD algorithm.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -513,15 +520,15 @@ Party U                                                       Party V
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|  C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Sig(V; CRED_V, TH_2), AD_2)  |
+|    C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Signature_or_MAC, AD_2)    |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|       C_V, AEAD(K_3; ID_CRED_U, Sig(U; CRED_U, TH_3), AD_3)       |
+|         C_V, AEAD(K_3; ID_CRED_U, Signature_or_MAC, AD_3)         |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
-{: #fig-asym title="Overview of EDHOC with signature key authentication."}
+{: #fig-asym title="Overview of EDHOC with asymmetric key authentication."}
 {: artwork-align="center"}
 
 ## EDHOC Message 1
@@ -544,7 +551,7 @@ suite = int
 
 where:
 
-* METHOD_CORR = 4 * method + corr, where the method = 0 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
+* METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the ephemeral public key of Party U
 * C_U - variable length connection identifier
@@ -606,7 +613,7 @@ where:
 
 Party V SHALL compose message_2 as follows:
 
-* If METHOD_CORR mod 4 equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
+* If corr (METHOD_CORR mod 4) equals 1 or 3, C_U is omitted, otherwise C_U is not omitted.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite and format it as a COSE_Key. Let G_Y be the 'x' parameter of the COSE_Key.
 
@@ -614,7 +621,7 @@ Party V SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H( message_1, data_2 ) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_2, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* If method equals 0 or 1, compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_2, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
    
    * protected = bstr .cbor ID_CRED_V
 
@@ -635,25 +642,39 @@ Party V SHALL compose message_2 as follows:
 ~~~~~~~~~~~
       [ "Signature1", << ID_CRED_V >>, TH_2, CRED_V ]
 ~~~~~~~~~~~
-   
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+
+* If method equals 2 or 3, compute the an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below.
+
+   *  PRK_V = HKDF-Extract( "", G_VX ), where G_VX is the ECDH shared secret calculated from G_V and X, or G_X and V)
+
+   *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+
+   *  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
+
+   * plaintext = 0x (the empty string)
+
+   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
+
+      * CRED_V - bstr containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+
+* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
-   * plaintext = ( ID_CRED_V / kid_value_V, signature, ? AD_2 )
+   * plaintext = ( ID_CRED_V / kid_value_V, Signature_or_MAC, ? AD_2 )
 
    * external_aad = TH_2
 
    * AD_2 = bstr containing opaque unprotected auxiliary data
 
-    where signature is taken from the COSE_Sign1 object, ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value_V is a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value_V }, only kid_value_V is conveyed in the plaintext.
+    where signature_or_MAC is the signature taken from the COSE_Sign1 object or the ciphertext taken from the inner COSE_Encrypt0, ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value_V is a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value_V }, only kid_value_V is conveyed in the plaintext.
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
-   
+
    * Key K = K_2
    * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_V / kid_value_V, signature, ? AD_2 ) 
+   * Plaintext P = ( ID_CRED_V / kid_value_V, Signature_or_MAC, ? AD_2 ) 
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
   
-* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
+* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the outer COSE_Encrypt0 ciphertext. 
 
 ### Party U Processing of Message 2
 
@@ -663,11 +684,13 @@ Party U SHALL process message_2 as follows:
 
 * Retrieve the protocol state using the connection identifier C_U and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, and IV_2.
+* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, and IV_2.
 
 * Verify that the unverifed identity of Party V is among the allowed identites for this connection.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the public authentication key of Party V.
+* If method equals 0 or 1, verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the public authentication key of Party V.
+
+* If method equals 2 or 3, verify the inner COSE_Encrypt0 as defined in Section 4.4 of {{RFC8152}}, using the AEAD algorithm in the selected cipher suite, K_V, and IV_V.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
@@ -694,11 +717,11 @@ data_3 = (
 
 Party U SHALL compose message_3 as follows:
 
-* If METHOD_CORR mod 4 equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
+* If corr equals 2 or 3, C_V is omitted, otherwise C_V is not omitted.
 
 * Compute the transcript hash TH_3 = H( TH_2 , CIPHERTEXT_2, data_3 ) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_3, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+*  If method equals 0 or 2, compute COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. Note that only 'signature' of the COSE_Sign1 object is used to create message_3, see next bullet. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
    * protected = bstr .cbor ID_CRED_U
 
@@ -720,24 +743,38 @@ Party U SHALL compose message_3 as follows:
       [ "Signature1", << ID_CRED_U >>, TH_3, CRED_U ]
 ~~~~~~~~~~~
 
-* Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+* If method equals 2 or 3, compute the an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below.
 
-   * plaintext = ( ID_CRED_U / kid_value_U, signature, ? AD_3 )
+   *  PRK_U = HKDF-Extract( "", G_UY ), where G_UY is the ECDH shared secret calculated from G_U and Y, or G_Y and U)
+
+   *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+
+   *  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
+
+   * plaintext = 0x (the empty string)
+
+   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
+
+      * CRED_U - bstr containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+
+* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
+
+   * plaintext = ( ID_CRED_U / kid_value_U, Signature_or_MAC, ? AD_3 )
          
    * external_aad = TH_3
 
    * AD_3 = bstr containing opaque protected auxiliary data
 
-    where signature is taken from the COSE_Sign1 object, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value_U is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value_U }, only kid_value_U is conveyed in the plaintext. 
-    
+    where signature_or_MAC is the signature taken from the COSE_Sign1 object or the ciphertext taken from the inner COSE_Encrypt0, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value_U is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value_U }, only kid_value_U is conveyed in the plaintext. 
+
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
-   
+
    * Key K = K_3
    * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_U / kid_value_U, signature, ? AD_3 )
+   * Plaintext P = ( ID_CRED_U / kid_value_U, Signature_or_MAC, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
-* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
+* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the outer COSE_Encrypt0 ciphertext.
 
 *  Pass the connection identifiers (C_U, C_V) and the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
@@ -753,7 +790,9 @@ Party V SHALL process message_3 as follows:
 
 * Verify that the unverifed identity of Party U is among the allowed identites for this connection.
 
-* Verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the public authentication key of Party U.
+* If method equals 0 or 1, verify COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the public authentication key of Party U.
+
+* If method equals 2 or 3, verify the inner COSE_Encrypt0 as defined in Section 4.4 of {{RFC8152}}, using the AEAD algorithm in the selected cipher suite, K_U, and IV_U.
 
 If any verification step fails, Party V MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
@@ -815,7 +854,7 @@ message_1 = (
 
 where:
 
-* METHOD_CORR = 4 * method + corr, where the method = 1 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METHOD_CORR = 4 * method + corr, where method = 4 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, with kid_value: bstr, only kid_value is conveyed.
 
 ## EDHOC Message 2
@@ -846,112 +885,6 @@ where:
  
    * AD_3 = bstr containing opaque protected auxiliary data
 
-# EDHOC Authenticated with Static Diffie-Hellman Keys {#asym-dh}
-
-NOTE: This section is more work-in-progress that the other parts. The current format and processing is a conservative design with format and processing as close to the signature key authentication as possible. Many different choices can be made for the message format and what to include in the key derivations. In a future version the key derivation, security considerations, and message sizes should be integrated with the rest of the document.
-
-## Overview {#asym-dh-overview}
-
-EDHOC authenticated with static Diffie-Hellman keys is very similar to EDHOC authenticated with signature keys. Instead of signature authentication keys, U and V have static Diffie-Hellman authentication keys called G_U and G_V, respectively. This means that the credentials (certificates, RPK) must include a public key that can be used for Diffie-Hellman key exchange.  The authentication is provided by a MAC computed from an ephemeral-static ECDH shared secret which enables  significant reductions in message sizes.  
-
-In the following subsections only the differences compared to EDHOC authenticated with signature keys are described. EDHOC authenticated with static Diffie-Hellman keys is illustrated in {{fig-asym-dh}}.
-
-~~~~~~~~~~~
-Party U                                                       Party V
-|               METHOD_CORR, SUITES_U, G_X, C_U, AD_1               |
-+------------------------------------------------------------------>|
-|                             message_1                             |
-|                                                                   |
-|  C_U, G_Y, C_V, AEAD(K_2;ID_CRED_V, AEAD(G_VX;CRED_V,TH_2), AD_2) |
-|<------------------------------------------------------------------+
-|                             message_2                             |
-|                                                                   |
-|     C_V, AEAD(K_3; ID_CRED_U, AEAD(G_UY; CRED_V, TH_2), AD_3)     |
-+------------------------------------------------------------------>|
-|                             message_3                             |
-~~~~~~~~~~~
-{: #fig-asym-dh title="Overview of EDHOC authenticated with static Diffie-Hellman keys."}
-{: artwork-align="center"}
-
-## EDHOC Message 1
-
-### Formatting of Message 1 {#asym-dh-msg1-form}
-
-* METHOD_CORR = 4 * method + corr, where the method = 2 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
-
-## EDHOC Message 2
-
-### Processing of Message 2
-
-*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. 
-
-   *  PRK_V = HKDF-Extract( "", G_VX ), where G_VX is the ECDH shared secret calculated from G_V and X, or G_X and V)
-
-   *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
-
-   *  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
-
-   * plaintext = 0x (the empty string)
-
-   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
-
-      * CRED_V - bstr containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
-
-## EDHOC Message 3
-
-### Processing of Message 3
-
-*  COSE_Sign1 is not used and 'signature' is replaced with the 'ciphertext' from an inner COSE_Encrypt0. The inner COSE_Encrypt0 in computed with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. 
-
-   *  PRK_U = HKDF-Extract( "", G_UY ), where G_UY is the ECDH shared secret calculated from G_U and Y, or G_Y and U)
-
-   *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
-
-   *  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
-
-   * plaintext = 0x (the empty string)
-
-   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
-
-      * CRED_U - bstr containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
-
-## EDHOC-Exporter Interface
-
-The EDHOC-Exporter interface uses the key PRK_Export instead of PRK
-
-~~~~~~~~~~~
-   PRK_Export = HKDF-Extract( "", PRK || PRK_V || PRK_U )
-~~~~~~~~~~~
-
-~~~~~~~~~~~
-   EDHOC-Exporter( label, length ) = HKDF-Expand( PRK_Export, info, length ) 
-~~~~~~~~~~~
-
-## Security Considerations
-
-EDHOC authenticated with static Diffie-Hellman keys have similar security properties as EDHOC authenticated with signature keys with a few small differences:
-
-   *  Repudiation: In EDHOC authenticated with signature keys, Party U could theoretically prove that Party V performed a run of the protocol by presenting the private ephemeral key, and vice versa.  Note that storing the private ephemeral keys violates the protocol requirements.  With static Diffie-Hellman key authentication, both parties can always deny having participated in the protocol, this is similar to EDHOC with symmetric key authentication.
-      
-   *  Key compromise impersonation (KCI): In EDHOC authenticated with signature keys, EDHOC provides KCI protection against an attacker having access to the long term key or the ephemeral secret key.  In EDHOC authenticated with symmetric keys, EDHOC provides KCI protection against an attacker having access to the ephemeral secret key, but not against an attacker having access to the long-term PSK.  With static Diffie-Hellman key authentication, KCI protection would be provided against an attacker having access to the long-term Diffie-Hellman key, but not to an attacker having access to the ephemeral secret key. Note that the term KCI has typically been used for compromise of long-term keys, and that an attacker with access to the ephemeral secret key can only attack that specific protocol run.
-      
-## Message Sizes
-
-Authentication with static Diffie-Hellman keys provide significant reductions in message sizes compared to signature keys. The relative differences are particulare large for PRKs where the signatures make up a large part of the total number of bytes. 
-
-~~~~~~~~~~~~~~~~~~~~~~~
-=====================================================================
-               PSK     RPK (Signature key)     RPK (ECDH key)
----------------------------------------------------------------------
-message_1       40              38                   38
-message_2       45             114                   56
-message_3       11              80                   22
----------------------------------------------------------------------
-Total           96             232                  116
-=====================================================================
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-sizes-dh title="Typical message sizes in bytes" artwork-align="center"}
-
 # Error Handling {#error}
 
 ## EDHOC Error Message
@@ -970,7 +903,7 @@ error = (
 
 where:
 
-* C_x - if error is sent by Party V and METHOD_CORR mod 4 equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and METHOD_CORR mod 4 equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
+* C_x - if error is sent by Party V and corr (METHOD_CORR mod 4) equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and corr (METHOD_CORR mod 4) equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}. ERR_MSG MAY be a 0-length text string.
 * SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITES_V only contains the values from the EDHOC cipher suites registry and no index. SUITES_V MUST only be included in replies to message_1.
 
@@ -1015,69 +948,6 @@ Party U                                                       Party V
 {: artwork-align="center"}
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
-
-# Transferring EDHOC and Deriving an OSCORE Context {#transfer}
-
-## Transferring EDHOC in CoAP {#coap}
-
-It is recommended to transport EDHOC as an exchange of CoAP {{RFC7252}} messages. CoAP is a reliable transport that can preserve packet ordering and handle message duplication. CoAP can also perform fragmentation and protect against denial of service attacks. It is recommended to carry the EDHOC flights in Confirmable messages, especially if fragmentation is used.
-
-By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
-
-By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
-
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables Party U to correlate message_1 and message_2 so the correlation parameter corr = 1.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-Client    Server
-  |          |
-  +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_1
-  |          |
-  |<---------+ Header: 2.04 Changed
-  |   2.04   | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_2
-  |          |
-  +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_3
-  |          |
-  |<---------+ Header: 2.04 Changed
-  |   2.04   | 
-  |          |
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-coap1 title="Transferring EDHOC in CoAP"}
-{: artwork-align="center"}
-
-The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables Party V to correlate message_2 and message_3 so the correlation parameter corr = 2.
-
-~~~~~~~~~~~~~~~~~~~~~~~
-Client    Server
-  |          |
-  +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          |
-  |<---------+ Header: 2.04 Changed
-  |   2.04   | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_1
-  |          |
-  +--------->| Header: POST (Code=0.02)
-  |   POST   | Uri-Path: "/.well-known/edhoc"
-  |          | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_2
-  |          |
-  |<---------+ Header: 2.04 Changed
-  |   2.04   | Content-Format: application/edhoc
-  |          | Payload: EDHOC message_3
-  |          |
-~~~~~~~~~~~~~~~~~~~~~~~
-{: #fig-coap2 title="Transferring EDHOC in CoAP"}
-{: artwork-align="center"}
-
-To protect against denial-of-service attacks, the CoAP server MAY respond to the first POST request with a 4.01 (Unauthorized) containing an Echo option {{I-D.ietf-core-echo-request-tag}}. This forces the initiator to demonstrate its reachability at its apparent network address. If message fragmentation is needed, the EDHOC messages may be fragmented using the CoAP Block-Wise Transfer mechanism {{RFC7959}}.
 
 ### Deriving an OSCORE Context from EDHOC {#oscore}
 
