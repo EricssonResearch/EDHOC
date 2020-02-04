@@ -1080,11 +1080,13 @@ IANA has created a new registry titled "EDHOC Method Type" under the new heading
 
 ~~~~~~~~~~~
 +-------+------------------------------------------+-------------------+
-| Value | Specification                            | Reference         |
+| Value | Party V             | Party U            | Reference         |
 +-------+------------------------------------------+-------------------+
-|     0 | EDHOC Authenticated with Signature Keys  | [[this document]] |
-|     1 | EDHOC Authenticated with Symmetric Keys  | [[this document]] |
-|     2 | EDHOC Authenticated with Static DH Keys  | [[this document]] |
+|     0 | Signature Key       | Signature Key      | [[this document]] |
+|     1 | Signature Key       | Static DH Key      | [[this document]] |
+|     2 | Static DH Key       | Signature Key      | [[this document]] |
+|     3 | Static DH Key       | Static DH Key      | [[this document]] |
+|     4 | PSK                 | PSK                | [[this document]] |
 +-------+------------------------------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
