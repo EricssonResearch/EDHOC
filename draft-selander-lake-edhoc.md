@@ -479,11 +479,11 @@ EDHOC supports authentication with raw public keys (RPK) and public key certific
 
 * Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
 
-where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps, i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}). ID_CRED_U and ID_CRED_V need to contain parameters that can identify a public authentication key, see {{COSE}}. In the following we give some examples of possible COSE header parameters.
+where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps, i.e. CBOR maps containing COSE Common Header Parameters, see Section 3.1 of {{RFC8152}}). ID_CRED_U and ID_CRED_V need to contain parameters that can identify a public authentication key. In the following paragraph we give some examples of possible COSE header parameters used.
 
-Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
+Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter:
 
-* ID_CRED_x = { 4 : kid_value }, where kid_value : bstr, for x = U or V.
+* ID_CRED_x = { 4 : kid_value_x }, where kid_value_x : bstr, for x = U or V.
 
 Public key certificates can be identified in different ways. Several header parameters for identifying X.509 certificates are defined in {{I-D.ietf-cose-x509}} (the exact labels are TBD):
 
@@ -638,7 +638,7 @@ Party V SHALL compose message_2 as follows:
    
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the parameters below.  Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
  
-   * plaintext = ( ID_CRED_V / kid_value, signature, ? AD_2 )
+   * plaintext = ( ID_CRED_V / kid_value_V, signature, ? AD_2 )
 
    * external_aad = TH_2
 
@@ -650,7 +650,7 @@ Party V SHALL compose message_2 as follows:
    
    * Key K = K_2
    * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_V / kid_value, signature, ? AD_2 ) 
+   * Plaintext P = ( ID_CRED_V / kid_value_V, signature, ? AD_2 ) 
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
   
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the COSE_Encrypt0 ciphertext. 
@@ -722,19 +722,19 @@ Party U SHALL compose message_3 as follows:
 
 * Compute COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. The unprotected header (not included in the EDHOC message) MAY contain parameters (e.g. 'alg').
 
-   * plaintext = ( ID_CRED_U / kid_value, signature, ? AD_3 )
+   * plaintext = ( ID_CRED_U / kid_value_U, signature, ? AD_3 )
          
    * external_aad = TH_3
 
    * AD_3 = bstr containing opaque protected auxiliary data
 
-    where signature is taken from the COSE_Sign1 object, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value }, only kid_value is conveyed in the plaintext. 
+    where signature is taken from the COSE_Sign1 object, ID_CRED_U is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value_U is a bstr. If ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_value_U }, only kid_value_U is conveyed in the plaintext. 
     
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
    
    * Key K = K_3
    * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_U / kid_value, signature, ? AD_3 )
+   * Plaintext P = ( ID_CRED_U / kid_value_U, signature, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
 * Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the COSE_Encrypt0 ciphertext.
@@ -1414,7 +1414,7 @@ ID_CRED_U =
 }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{asym-msg3-proc}}):
+Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_U is used when added to the plaintext (see {{asym-msg3-proc}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_CRED_U (in protected header) (CBOR-encoded) (4 bytes)
@@ -1422,7 +1422,7 @@ a1 04 41 a2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value (in plaintext) (CBOR-encoded) (2 bytes)
+kid_value_U (in plaintext) (CBOR-encoded) (2 bytes)
 41 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1473,7 +1473,7 @@ ID_CRED_V =
 }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{asym-msg3-proc}}):
+Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_V is used when added to the plaintext (see {{asym-msg3-proc}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_CRED_V (in protected header) (CBOR-encoded) (4 bytes)
@@ -1481,7 +1481,7 @@ a1 04 41 a3
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value (in plaintext) (CBOR-encoded) (2 bytes)
+kid_value_V (in plaintext) (CBOR-encoded) (2 bytes)
 41 a3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1751,9 +1751,9 @@ COSE_Encrypt0 is computed with the following parameters. Note that AD_2 is omitt
 
 * external_aad = TH_2
 
-* plaintext = CBOR Sequence of the items kid_value, signature, in this order.
+* plaintext = CBOR Sequence of the items kid_value_V, signature, in this order.
 
-with kid_value taken from {{rpk-tv-input-v}}, and signature as calculated in {{tv-rpk-2-sign}}.
+with kid_value_V taken from {{rpk-tv-input-v}}, and signature as calculated in {{tv-rpk-2-sign}}.
 
 The plaintext is the following:
 
@@ -2023,9 +2023,9 @@ COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitt
 
 * external_aad = TH_3
 
-* plaintext = CBOR Sequence of the items kid_value, signature, in this order.
+* plaintext = CBOR Sequence of the items kid_value_U, signature, in this order.
 
-with kid_value taken from {{rpk-tv-input-u}}, and signature as calculated in {{tv-rpk-3-sign}}.
+with kid_value_U taken from {{rpk-tv-input-u}}, and signature as calculated in {{tv-rpk-3-sign}}.
 
 The plaintext is the following:
 
