@@ -644,7 +644,7 @@ Party V SHALL compose message_2 as follows:
 
    * AD_2 = bstr containing opaque unprotected auxiliary data
 
-    where signature is taken from the COSE_Sign1 object, ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value is a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value }, only kid_value is conveyed in the plaintext.
+    where signature is taken from the COSE_Sign1 object, ID_CRED_V is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}), and kid_value_V is a bstr. If ID_CRED_V contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_value_V }, only kid_value_V is conveyed in the plaintext.
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
    
