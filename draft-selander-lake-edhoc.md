@@ -339,8 +339,6 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
 
-The party would then accept any public-key certificate with that identity string.
-
 ## Cipher Suites
 
 EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label. This document specifies four pre-defined cipher suites.
