@@ -505,7 +505,7 @@ Public key certificates can be identified in different ways. Several header para
 
 In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
-The actual credentials CRED_U and CRED_V (e.g. a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in the signature payload, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order.
+The actual credentials CRED_U and CRED_V (e.g., a COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in the signature payload, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order.
 
 ~~~~~~~~~~~
 Party U                                                       Party V
@@ -622,7 +622,7 @@ Party V SHALL compose message_2 as follows:
 
    * payload = CRED_V
 
-      * CRED_V - bstr credential containing the credential of Party V, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
+      * CRED_V - bstr containing the credential of Party V, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
 
    * external_aad = TH_2
 
@@ -706,7 +706,7 @@ Party U SHALL compose message_3 as follows:
 
    * payload = CRED_U
 
-      * CRED_U - bstr credential containing the credential of Party U, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
+      * CRED_U - bstr containing the credential of Party U, e.g. its public authentication key or X.509 certificate see {{asym-overview}}. The public key must be a signature key. Note that if objects that are not bstr are used, such as COSE_Key for public authentication keys, these objects must be wrapped in a CBOR bstr.
 
    * external_aad = TH_3
    
@@ -893,9 +893,9 @@ Party U                                                       Party V
 
    * plaintext = 0x (the empty string)
 
-   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, << CRED_V >> \]
+   * external_aad = \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
 
-      * CRED_V - bstr credential containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+      * CRED_V - bstr containing the public authentication key of Party V, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
 
 ## EDHOC Message 3
 
@@ -911,9 +911,9 @@ Party U                                                       Party V
 
    * plaintext = 0x (the empty string)
 
-   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, << CRED_U >> \]
+   * external_aad = \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
 
-      * CRED_U - bstr credential containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
+      * CRED_U - bstr containing the public authentication key of Party U, see {{asym-overview}}. The public key must be a Diffie-Hellman key.
 
 ## EDHOC-Exporter Interface
 
@@ -1400,7 +1400,7 @@ CRED_U =
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_U (COSE_Key) (CBOR-encoded) (42 bytes)
+CRED_U (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7
 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1459,7 +1459,7 @@ CRED_V =
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_V (COSE_Key) (CBOR-encoded) (42 bytes)
+CRED_V (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
 58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f
 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
