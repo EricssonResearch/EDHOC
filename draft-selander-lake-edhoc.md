@@ -949,6 +949,70 @@ Party U                                                       Party V
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
 
+
+# Transferring EDHOC and Deriving an OSCORE Context {#transfer}
+
+## Transferring EDHOC in CoAP {#coap}
+
+It is recommended to transport EDHOC as an exchange of CoAP {{RFC7252}} messages. CoAP is a reliable transport that can preserve packet ordering and handle message duplication. CoAP can also perform fragmentation and protect against denial of service attacks. It is recommended to carry the EDHOC flights in Confirmable messages, especially if fragmentation is used.
+
+By default, the CoAP client is Party U and the CoAP server is Party V, but the roles SHOULD be chosen to protect the most sensitive identity, see {{security}}. By default, EDHOC is transferred in POST requests and 2.04 (Changed) responses to the Uri-Path: "/.well-known/edhoc", but an application may define its own path that can be discovered e.g. using resource directory {{I-D.ietf-core-resource-directory}}.
+
+By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
+
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables Party U to correlate message_1 and message_2 so the correlation parameter corr = 1.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Client    Server
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "/.well-known/edhoc"
+  |          | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_1
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_2
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "/.well-known/edhoc"
+  |          | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_3
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | 
+  |          |
+~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-coap1 title="Transferring EDHOC in CoAP"}
+{: artwork-align="center"}
+
+The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables Party V to correlate message_2 and message_3 so the correlation parameter corr = 2.
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Client    Server
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "/.well-known/edhoc"
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_1
+  |          |
+  +--------->| Header: POST (Code=0.02)
+  |   POST   | Uri-Path: "/.well-known/edhoc"
+  |          | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_2
+  |          |
+  |<---------+ Header: 2.04 Changed
+  |   2.04   | Content-Format: application/edhoc
+  |          | Payload: EDHOC message_3
+  |          |
+~~~~~~~~~~~~~~~~~~~~~~~
+{: #fig-coap2 title="Transferring EDHOC in CoAP"}
+{: artwork-align="center"}
+
+To protect against denial-of-service attacks, the CoAP server MAY respond to the first POST request with a 4.01 (Unauthorized) containing an Echo option {{I-D.ietf-core-echo-request-tag}}. This forces the initiator to demonstrate its reachability at its apparent network address. If message fragmentation is needed, the EDHOC messages may be fragmented using the CoAP Block-Wise Transfer mechanism {{RFC7959}}.
+
 ### Deriving an OSCORE Context from EDHOC {#oscore}
 
 When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must make sure that the EDHOC connection identifiers are unique, i.e. C_V MUST NOT be equal to C_U. The CoAP client and server MUST be able to retrieve the OSCORE protocol state using its chosen connection identifier and optionally other information such as the 5-tuple. In case that the CoAP client is party U and the CoAP server is party V:
