@@ -620,9 +620,7 @@ Party V SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Let Inner_AAD_2 be the be CBOR encoding of:
-
-   \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
+*  Let Inner_AAD_2 be the sequence ( << ID_CRED_V >>, TH_2, CRED_V )
 
    * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
@@ -642,7 +640,9 @@ Party V SHALL compose message_2 as follows:
 
       * The key is the private authentication key of V.
 
-      * The message M to be signed is Inner_AAD_2.
+      * The message M to be signed is the CBOR encoding of
+
+         \[ "Signature1", Inner_AAD_2 \]
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
@@ -731,9 +731,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Let Inner_AAD_3 be the be CBOR encoding of:
-
-   \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
+*  Let Inner_AAD_3 be the sequence ( << ID_CRED_U >>, TH_3, CRED_U )
 
    * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
@@ -753,7 +751,9 @@ Party U SHALL compose message_3 as follows:
 
       * The key is the private authentication key of U.
 
-      * The message M to be signed is Inner_AAD_3.
+      * The message M to be signed is the CBOR encoding of
+
+         \[ "Signature1", Inner_AAD_3 \]
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
