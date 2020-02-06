@@ -85,6 +85,7 @@ informative:
   I-D.ietf-core-resource-directory:
   I-D.ietf-lwig-security-protocol-comparison:
   I-D.ietf-tls-dtls13:
+  I-D.selander-ace-ake-authz:
 
   RFC7228:
   RFC7258:
@@ -367,7 +368,13 @@ Party U need to have a list of cipher suites it supports in order of decreasing 
 
 ## Auxiliary Data
 
-EDHOC allows opaque auxiliary data (AD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (AD_1, AD_2) may be sent in message_1 and message_2 and can be e.g. be used to transfer access tokens that are protected outside of EDHOC. Protected Auxiliary Data (AD_3) may be used to transfer any auxiliary data in message_3.
+In order to reduce round trips and number of messages, and in some cases also streamline processing, certain security features may be integrated into EDHOC by transporting auxiliary data together with the messages. One example is the transport of third-party authorization information protected outside of EDHOC {{I-D.selander-ace-ake-authz}}. Another example is the embedding of a certificate enrolment request or a newly issued certificate.
+
+EDHOC allows opaque auxiliary data (AD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (AD_1, AD_2) may be sent in message_1 and message_2, respectively. Protected Auxiliary Data (AD_3) may be sent in message_3.
+
+
+Since data carried in AD1 and AD2 may not be protected, and the content of AD3 is available to both party U and V, special considerations need to be made such that the availability of the data a) does not violate security and privacy requirements of the service which uses this data, and b) does not violate the security properties of EDHOC.
+
 
 ## Ephemeral Public Keys {#cose_key}
    
