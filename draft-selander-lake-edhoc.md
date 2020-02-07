@@ -627,19 +627,17 @@ Party V SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Let Inner_AAD_2 be the sequence ( << ID_CRED_V >>, TH_2, CRED_V )
-
-   * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
-
-   * CRED_V - bstr containing the credential of Party V, see {{asym-overview}}. 
-
 * Compute Signature_or_MAC_2 as follows:
 
    If method equals 0 or 1, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. The public authentication key must be a signature key. 
 
    * protected = bstr .cbor ID_CRED_V
 
+      * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
+
    * payload = CRED_V
+
+      * CRED_V - bstr containing the credential of Party V, see {{asym-overview}}. 
 
    * external_aad = TH_2
 
@@ -649,7 +647,7 @@ Party V SHALL compose message_2 as follows:
 
       * The message M to be signed is the CBOR encoding of
 
-         \[ "Signature1", Inner_AAD_2 \]
+         \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
@@ -663,14 +661,14 @@ Party V SHALL compose message_2 as follows:
 
    * plaintext = 0x (the empty string)
 
-   * external_aad = Inner_AAD_2
+   * external_aad = ???
 
       COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_V
       * Nonce N = IV_V
       * Plaintext P = 0x (the empty string)
-      * Associated data A = \[ "Encrypt0", h'', Inner_AAD_2 \]
+      * Associated data A = \[ "Encrypt0", h'', ??? \]
 
    * Signature_or_MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
@@ -738,19 +736,17 @@ Party U SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-*  Let Inner_AAD_3 be the sequence ( << ID_CRED_U >>, TH_3, CRED_U )
-
-   * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
-
-   * CRED_U - bstr containing the credential of Party U, see {{asym-overview}}. 
-
 * Compute Signature_or_MAC_3 as follows:
 
    If method equals 0 or 2, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. The public authentication key must be a signature key. 
 
    * protected = bstr .cbor ID_CRED_U
 
+      * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
+
    * payload = CRED_U
+
+      * CRED_U - bstr containing the credential of Party U, see {{asym-overview}}. 
 
    * external_aad = TH_3
 
@@ -760,7 +756,7 @@ Party U SHALL compose message_3 as follows:
 
       * The message M to be signed is the CBOR encoding of
 
-         \[ "Signature1", Inner_AAD_3 \]
+         \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
@@ -774,14 +770,14 @@ Party U SHALL compose message_3 as follows:
 
    * plaintext = 0x (the empty string)
 
-   * external_aad = Inner_AAD
+   * external_aad = ???
 
       COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_U
       * Nonce N = IV_U
       * Plaintext P = 0x (the empty string)
-      * Associated data A = \[ "Encrypt0", h'', Inner_AAD_3 \]
+      * Associated data A = \[ "Encrypt0", h'', ??? \]
 
    * Signature_or_MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
