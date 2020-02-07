@@ -670,7 +670,7 @@ Party V SHALL compose message_2 as follows:
       * Key K = K_V
       * Nonce N = IV_V
       * Plaintext P = 0x (the empty string)
-      * Associated data A = \[ "Encrypt0", h'', ??? \]
+      * Associated data A = \[ "Encrypt0", << ID_CRED_V >>, << TH_2, CRED_V >> \]
 
    * Signature_or_MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
@@ -781,7 +781,7 @@ Party U SHALL compose message_3 as follows:
       * Key K = K_U
       * Nonce N = IV_U
       * Plaintext P = 0x (the empty string)
-      * Associated data A = \[ "Encrypt0", h'', ??? \]
+      * Associated data A = \[ "Encrypt0", << ID_CRED_U >>, << TH_3, CRED_U >> \]
 
    * Signature_or_MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
