@@ -243,7 +243,7 @@ Readers are expected to be familiar with the terms and concepts described in CBO
 SIGMA (SIGn-and-MAc) is a family of theoretical protocols with a large number of variants {{SIGMA}}. Like IKEv2 and (D)TLS 1.3 {{RFC8446}}, EDHOC is built on a variant of the SIGMA protocol which provide identity protection of the initiator (SIGMA-I), and like (D)TLS 1.3, EDHOC implements the SIGMA-I variant as Sign-then-MAC. The SIGMA-I protocol using an authenticated encryption algorithm is shown in {{fig-sigma}}.
 
 ~~~~~~~~~~~
-Party U                                                   Party V
+Initiator                                               Responder
    |                          G_X                            |
    +-------------------------------------------------------->|
    |                                                         |
@@ -293,12 +293,12 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used, see {{transport}}. An implementation may support only Party U or only Party V. An implementation may support only a single method. Party U and Party V needs to have agreed on a single method to be used for EDHOC.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used, see {{transport}}. An implementation may support only Intiator or only Responder. An implementation may support only a single method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
 
-While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, Party U can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
-Party U                                                 Party V
+Initiator                                             Responder
    |                                                       |
    | ------------------ EDHOC message_1 -----------------> |
    |                                                       |
@@ -314,7 +314,7 @@ Party U                                                 Party V
 
 ## Transport and Message Correlation {#transport}
 
-Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. The transport is responsible to handle message loss, reordering, message duplication, fragmentation, and denial of service protection, where necessary. Party U and Party V needs to have agreed on a transport to be used for EDHOC. It is recommended to transport EDHOC in CoAP payloads, see {{transfer}}.
+Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. The transport is responsible to handle message loss, reordering, message duplication, fragmentation, and denial of service protection, where necessary. The Initiator and the Responder need to have agreed on a transport to be used for EDHOC. It is recommended to transport EDHOC in CoAP payloads, see {{transfer}}.
 
 EDHOC includes connection identifiers (C_U, C_V) to correlate messages. The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
@@ -322,9 +322,9 @@ One byte connection and credential identifiers are realistic in many scenarios a
 
    * corr = 0, the transport does not provide a correlation mechanism.
 
-   * corr = 1, the transport rovides a correlation mechanism that enables Party V to correlate message_2 and message_1.
+   * corr = 1, the transport rovides a correlation mechanism that enables the Responder to correlate message_2 and message_1.
 
-   * corr = 2, the transport rovides a correlation mechanism that enables Party U to correlate message_3 and message_2.
+   * corr = 2, the transport rovides a correlation mechanism that enables the Initiator to correlate message_3 and message_2.
 
    * corr = 3, the transport rovides a correlation mechanism that enables both parties to correlate all three messages.
 
@@ -364,7 +364,7 @@ EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD 
 
 The different methods (signature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
 
-Party U need to have a list of cipher suites it supports in order of decreasing preference. Party V need to have a list of cipher suites it supports.
+The Initiator need to have a list of cipher suites it supports in order of decreasing preference. The Responder need to have a list of cipher suites it supports.
 
 ## Auxiliary Data
 
@@ -372,9 +372,7 @@ In order to reduce round trips and number of messages, and in some cases also st
 
 EDHOC allows opaque auxiliary data (AD) to be sent in the EDHOC messages. Unprotected Auxiliary Data (AD_1, AD_2) may be sent in message_1 and message_2, respectively. Protected Auxiliary Data (AD_3) may be sent in message_3.
 
-
 Since data carried in AD1 and AD2 may not be protected, and the content of AD3 is available to both party U and V, special considerations need to be made such that the availability of the data a) does not violate security and privacy requirements of the service which uses this data, and b) does not violate the security properties of EDHOC.
-
 
 ## Ephemeral Public Keys {#cose_key}
    
@@ -482,55 +480,55 @@ An application using EDHOC may want to derive new PSKs to use for authentication
 
 EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
-* Only Party V SHALL have access to the private authentication key of Party V,
+* Only the Responder SHALL have access to the Responder's private authentication key,
 
-* Only Party U SHALL have access to the private authentication key of Party U,
+* Only the Initiator SHALL have access to the Initiator's private authentication key,
 
-* Party U is able to retrieve Party V's public authentication key using ID_CRED_V,
+* The Initiator is able to retrieve the Responder's public authentication key using ID_CRED_R,
 
-* Party V is able to retrieve Party U's public authentication key using ID_CRED_U,
+* The Responder is able to retrieve the Initiator's public authentication key using ID_CRED_I,
 
-where the identifiers ID_CRED_U and ID_CRED_V are COSE header_maps, i.e. CBOR maps containing COSE Common Header Parameters, see Section 3.1 of {{RFC8152}}). ID_CRED_U and ID_CRED_V need to contain parameters that can identify a public authentication key. In the following paragraph we give some examples of possible COSE header parameters used.
+where the identifiers ID_CRED_I and ID_CRED_R are COSE header_maps, i.e. CBOR maps containing COSE Common Header Parameters, see Section 3.1 of {{RFC8152}}). ID_CRED_I and ID_CRED_R need to contain parameters that can identify a public authentication key. In the following paragraph we give some examples of possible COSE header parameters used.
 
 Raw public keys are most optimally stored as COSE_Key objects and identified with a 'kid' parameter:
 
-* ID_CRED_x = { 4 : kid_x }, where kid_x : bstr, for x = U or V.
+* ID_CRED_x = { 4 : kid_x }, where kid_x : bstr, for x = I or R.
 
 Public key certificates can be identified in different ways. Several header parameters for identifying X.509 certificates are defined in {{I-D.ietf-cose-x509}} (the exact labels are TBD):
 
 * by a hash value with the 'x5t' parameter;
 
-   * ID_CRED_x = { TBD1 : COSE_CertHash }, for x = U or V,
+   * ID_CRED_x = { TBD1 : COSE_CertHash }, for x = I or R,
 
 * by a URL with the 'x5u' parameter;
 
-   * ID_CRED_x = { TBD2 : uri }, for x = U or V,
+   * ID_CRED_x = { TBD2 : uri }, for x = I or R,
 
 * or by a bag of certificates with the 'x5bag' parameter;
 
-   * ID_CRED_x = { TBD3 : COSE_X509 }, for x = U or V.
+   * ID_CRED_x = { TBD3 : COSE_X509 }, for x = I or R,
 
 * by a certificate chain with the 'x5chain' parameter;
 
-   * ID_CRED_x = { TBD4 : COSE_X509 }, for x = U or V,
+   * ID_CRED_x = { TBD4 : COSE_X509 }, for x = I or R,
 
-In the latter two examples, ID_CRED_U and ID_CRED_V contain the actual credential used for authentication. The purpose of ID_CRED_U and ID_CRED_V is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_U and ID_CRED_V are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+In the latter two examples, ID_CRED_I and ID_CRED_R contain the actual credential used for authentication. The purpose of ID_CRED_I and ID_CRED_R is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_I and ID_CRED_R are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
 The authentication keys must be a signature keys or static Diffe-Hellman keys. Party U and Party V MAY use different types of authentication keys, e.g. one uses a signature key and the other uses a static Diffe-Hellman key. When using a signature key, the authentication is provided by a signature. When using a static Diffie-Hellman key the authentication is provided by a Message Authentication Code (MAC) computed from an ephemeral-static ECDH shared secret which enables significant reductions in message sizes. The MAC is implemented with an AEAD algorithm.  When using a static Diffie-Hellman keys the private and public authentication keys are called U, V, G_U and G_V, respectively.
 
-The actual credentials CRED_U and CRED_V (e.g., a bstr wrapped COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_U and CRED_V are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
+The actual credentials CRED_I and CRED_R (e.g., a bstr wrapped COSE_Key or a single X.509 certificate) are signed by party U and V, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. Party U and Party V MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_U and CRED_V are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
 
 ~~~~~~~~~~~
-Party U                                                       Party V
-|               METHOD_CORR, SUITES_U, G_X, C_U, AD_1               |
+Initiator                                                   Responder
+|               METHOD_CORR, SUITES_U, G_X, C_I, AD_1               |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|   C_U, G_Y, C_V, AEAD(K_2; ID_CRED_V, Signature_or_MAC_2, AD_2)   |
+|   C_I, G_Y, C_R, AEAD(K_2; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|        C_V, AEAD(K_3; ID_CRED_U, Signature_or_MAC_3, AD_3)        |
+|        C_R, AEAD(K_3; ID_CRED_I, Signature_or_MAC_3, AD_3)        |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -546,9 +544,9 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   METHOD_CORR : int,
-  SUITES_U : suite / [ index : uint, 2* suite ],
+  SUITES_I : suite / [ index : uint, 2* suite ],
   G_X : bstr,
-  C_U : bstr,  
+  C_I : bstr,  
   ? AD_1 : bstr,
 )
 
@@ -560,12 +558,12 @@ where:
 * METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_U - cipher suites which Party U supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the ephemeral public key of Party U
-* C_U - variable length connection identifier
+* C_I - variable length connection identifier
 * AD_1 - bstr containing unprotected opaque auxiliary data
 
 ### Party U Processing of Message 1
 
-Party U SHALL compose message_1 as follows:
+The Initiator SHALL compose message_1 as follows:
 
 * The supported cipher suites and the order of preference MUST NOT be changed based on previous error messages. However, the list SUITES_U sent to Party V MAY be truncated such that cipher suites which are the least preferred are omitted. The amount of truncation MAY be changed between sessions, e.g. based on previous error messages (see next bullet), but all cipher suites which are more preferred than the least preferred cipher suite in the list MUST be included in the list.
 
@@ -604,9 +602,9 @@ message_2 = (
 
 ~~~~~~~~~~~ CDDL
 data_2 = (
-  ? C_U : bstr,
+  ? C_I : bstr,
   G_Y : bstr,
-  C_V : bstr,
+  C_R : bstr,
 )
 ~~~~~~~~~~~
 
@@ -724,7 +722,7 @@ message_3 = (
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
-  ? C_V : bstr,
+  ? C_R : bstr,
 )
 ~~~~~~~~~~~
 
@@ -839,16 +837,16 @@ The purpose of ID_PSK is to facilitate retrieval of the PSK and in the case a 'k
 EDHOC with symmetric key authentication is illustrated in {{fig-sym}}. 
 
 ~~~~~~~~~~~
-Party U                                                       Party V
-|           METHOD_CORR, SUITES_U, G_X, C_U, ID_PSK, AD_1           |
+Initiator                                                   Responder
+|           METHOD_CORR, SUITES_I, G_X, C_I, ID_PSK, AD_1           |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_U, G_Y, C_V, AEAD(K_2; TH_2, AD_2)                |
+|               C_I, G_Y, C_R, AEAD(K_2; TH_2, AD_2)                |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    C_V, AEAD(K_3; TH_3, AD_3)                     |
+|                    C_R, AEAD(K_3; TH_3, AD_3)                     |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -866,9 +864,9 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   METHOD_CORR : int,
-  SUITES_U : suite / [ index : uint, 2* suite ],
+  SUITES_I : suite / [ index : uint, 2* suite ],
   G_X : bstr,
-  C_U : bstr,
+  C_I : bstr,
   ID_PSK : header_map // kid_value : bstr,
   ? AD_1 : bstr,
 )
@@ -933,7 +931,7 @@ error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 error = (
   ? C_x : bstr,
   ERR_MSG : tstr,
-  ? SUITES_V : suite / [ 2* suite ],
+  ? SUITES_R : suite / [ 2* suite ],
 )
 ~~~~~~~~~~~
 
@@ -949,15 +947,15 @@ Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decre
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|         METHOD_CORR, SUITES_U {0, 5, 6, 7}, G_X, C_U, AD_1        |
+|         METHOD_CORR, SUITES_I {0, 5, 6, 7}, G_X, C_I, AD_1        |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                     C_U, ERR_MSG, SUITES_V {6}                    |
+|                     C_I, ERR_MSG, SUITES_R {6}                    |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|          METHOD_CORR, SUITES_U {1, 5, 6}, G_X, C_U, AD_1          |
+|          METHOD_CORR, SUITES_I {1, 5, 6}, G_X, C_I, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -968,19 +966,19 @@ In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6
 
 ~~~~~~~~~~~
 Party U                                                       Party V
-|          METHOD_CORR, SUITES_U {0, 5, 6}, G_X, C_U, AD_1          |
+|          METHOD_CORR, SUITES_U {0, 5, 6}, G_X, C_I, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|                    C_U, ERR_MSG, SUITES_V {7, 9}                  |
+|                    C_I, ERR_MSG, SUITES_R {7, 9}                  |
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|        METHOD_CORR, SUITES_U {2, 5, 6, 7}, G_X, C_U, AD_1         |
+|        METHOD_CORR, SUITES_I {2, 5, 6, 7}, G_X, C_I, AD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
-{: #fig-error2 title="Example use of error message with SUITES_V."}
+{: #fig-error2 title="Example use of error message with SUITES_R."}
 {: artwork-align="center"}
 
 As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
