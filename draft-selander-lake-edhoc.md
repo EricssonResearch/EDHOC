@@ -688,7 +688,7 @@ Party V SHALL compose message_2 as follows:
 
       * Key K = K_2
       * Nonce N = IV_2
-      * Plaintext P = ( ID_CRED_V / kid_value_V, Signature_or_MAC, ? AD_2 ) 
+      * Plaintext P = ( ID_CRED_V / kid_V, Signature_or_MAC, ? AD_2 ) 
       * Associated data A = \[ "Encrypt0", h'', TH_2 \]
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the outer COSE_Encrypt0 ciphertext. 
