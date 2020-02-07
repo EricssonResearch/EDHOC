@@ -887,29 +887,42 @@ where:
 
 ### Processing of Message 2
 
-*  COSE_Sign1 is not used.
+*  Signature_or_MAC_2 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
-
-   * external_aad = TH_2
-
+* The outer COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty.
    * plaintext = ? AD_2
    
       * AD_2 = bstr containing opaque unprotected auxiliary data
 
+   * external_aad = TH_2
+
+      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+
+      * Key K = K_2
+      * Nonce N = IV_2
+      * Plaintext P = ? AD_2
+      * Associated data A = \[ "Encrypt0", h'', TH_2 \]
+      
 ## EDHOC Message 3
 
 ### Processing of Message 3
 
-*  COSE_Sign1 is not used.
+*  Signature_or_MAC_3 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty. The unprotected header MAY contain parameters (e.g. 'alg').
-
-   * external_aad = TH_3
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty.
 
    * plaintext = ? AD_3
  
       * AD_3 = bstr containing opaque protected auxiliary data
+
+   * external_aad = TH_3
+
+      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+
+      * Key K = K_3
+      * Nonce N = IV_3
+      * Plaintext P = ? AD_3
+      * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
 # Error Handling {#error}
 
