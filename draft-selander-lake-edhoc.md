@@ -645,15 +645,13 @@ Party V SHALL compose message_2 as follows:
 
       * The key is the private authentication key of V.
 
-      * The message M to be signed is the CBOR encoding of
-
-         \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
+      * The message M to be signed = \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
    If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
-   *  PRK_V = HKDF-Extract( "", G_VX ), where G_VX is the ECDH shared secret calculated from G_V and X, or G_X and V)
+   *  PRK_V = HKDF-Extract( "", G_VX ), where G_VX is the ECDH shared secret calculated from G_V and X, or G_X and V
 
    *  K_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
 
@@ -756,15 +754,13 @@ Party U SHALL compose message_3 as follows:
 
       * The key is the private authentication key of U.
 
-      * The message M to be signed is the CBOR encoding of
-
-         \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
+      * The message M to be signed = \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
    If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
-   *  PRK_U = HKDF-Extract( "", G_UY ), where G_UY is the ECDH shared secret calculated from G_U and Y, or G_Y and U)
+   *  PRK_U = HKDF-Extract( "", G_UY ), where G_UY is the ECDH shared secret calculated from G_U and Y, or G_Y and U
 
    *  K_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
 
