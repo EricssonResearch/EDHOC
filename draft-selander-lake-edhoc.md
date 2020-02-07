@@ -659,9 +659,11 @@ Party V SHALL compose message_2 as follows:
 
    *  IV_V = HKDF-Expand( PRK_V, info, L ), where other = TH_2
 
+   * protected = bstr .cbor ID_CRED_V
+
    * plaintext = 0x (the empty string)
 
-   * external_aad = ???
+   * external_aad = << TH_2, CRED_V >>
 
       COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
@@ -768,9 +770,11 @@ Party U SHALL compose message_3 as follows:
 
    *  IV_U = HKDF-Expand( PRK_U, info, L ), where other = TH_3
 
+   * protected = bstr .cbor ID_CRED_U
+
    * plaintext = 0x (the empty string)
 
-   * external_aad = ???
+   * external_aad = << TH_3, CRED_U >>
 
       COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
