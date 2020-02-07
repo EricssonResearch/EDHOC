@@ -39,7 +39,7 @@ string vector_to_string( vector<uint8_t> v ) {
     for ( int i = 0; i < v.size(); ++i ) {
         ostringstream ss;
         ss << hex << setfill('0') << setw(2) << (int)v[i];
-        if(i % 24 == 0 and i > 1) //column 75 to the line
+        if(i % 23 == 0 and i > 1) //column 75 to the line
             ss << endl;
         else
             ss << " ";
@@ -678,13 +678,15 @@ void rpk_vectors( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    print_fig("CRED_U =", "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( U_sign_pk ) + "\n} >>");
+    string cred_u_str = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( U_sign_pk ) + "\n} >>";
+    print_fig("CRED_U =", cred_u_str);
 
     print_fig("CRED_U (bstr-wrapped COSE_Key) (CBOR-encoded) (" + to_string(cbor_bstr(CRED_U_CBOR).size()) + " bytes)" , vector_to_string( cbor_bstr(CRED_U_CBOR)) + "\n" );
 
     cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_U ) <<":";
 
-    print_fig("ID_CRED_U =" , "{ \n  4:  " + vector_to_cddl_bstr( kid_U ) + "\n}" );
+    string id_cred_u_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_U ) + "\n}";
+    print_fig("ID_CRED_U =" , "{ \n  4:  " + id_cred_u_str );
 
     cout << "Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_U is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
 
@@ -959,6 +961,102 @@ void rpk_vectors( void )
     cout << "Which encodes to the following byte string:" << endl;
 
     print_fig("message_2 (CBOR Sequence) (" + to_string(message_2.size()) + " bytes)", vector_to_string (message_2));
+
+
+    // message_3 ////////////////////////////////////////////////////////////////////////////
+
+    // Calculate data_3
+    vector<uint8_t> data_3;
+    vector_append( data_3, cbor_bstr( C_V ) );
+
+    // Calculate TH_3
+    vector<uint8_t> TH_3_input;
+    vector_append( TH_3_input, cbor_bstr( TH_2 ) );
+    vector_append( TH_3_input, cbor_bstr( C_2 ) );
+    vector_append( TH_3_input, data_3 );
+    vector<uint8_t> TH_3 = hash_sha_256( TH_3_input );
+
+
+    // Print //////////////////////////////////////////////
+
+    cout << "### Message 3 {#tv-rpk-3}" << endl << endl;
+
+    cout << "Since TYPE mod 4 equals " + to_string(TYPE) + ", C_V is not omitted from data_3." << endl << endl;
+
+    print_fig("C_V (" + to_string(C_V .size()) + " bytes)", vector_to_string(C_V));
+
+    cout << "Data_3 is constructed, as the CBOR Sequence of the CBOR data item above." << endl;
+
+    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V) + "\n)");
+
+    cout << "From data_3, CIPHERTEXT_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , CIPHERTEXT_2, data_3), as a CBOR Sequence of these 3 data items." << endl;
+
+    print_fig("( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (" + to_string(TH_3_input.size()) + " bytes)" , vector_to_string(TH_3_input));
+
+    cout << "And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)" << endl;
+
+    cout << "And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)" << endl << endl;
+
+    print_fig("TH_3 value (" + to_string(TH_3.size()) + " bytes)" , vector_to_string(TH_3));
+
+    cout << "When encoded as a CBOR bstr, that gives:" << endl << endl;
+
+    print_fig("TH_3 (CBOR-encoded) (" + to_string(cbor_bstr(TH_3).size()) + " bytes)" , vector_to_string(cbor_bstr(TH_3)));   
+
+    // Calculate signature
+    vector<uint8_t> message_U { 0x84 }; // CBOR array of length 4
+    vector_append( message_U, cbor_tstr( "Signature1" ) );
+    vector_append( message_U, cbor_bstr( ID_CRED_U_CBOR ) );
+    vector_append( message_U, cbor_bstr( TH_3 ) );
+    vector_append( message_U, cbor_bstr( CRED_U_CBOR ) );
+    vector<uint8_t> signature_U( crypto_sign_BYTES );
+    crypto_sign_detached( signature_U.data(), nullptr, message_U.data(), message_U.size(), U_sign_sk_libsodium.data() );
+
+    // Print //////////////////////////////////////////////
+
+    cout << "#### Signature Computation {#tv-rpk-3-sign}" << endl << endl;
+
+    cout << "COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-u}}:" << endl << endl;
+    cout << "* protected = bstr .cbor ID_CRED_U " << endl << endl;
+    cout << "* payload = CRED_U" << endl << endl;
+    cout << "And from {{tv-rpk-3}}:" << endl << endl;
+    cout << "* external_aad = TH_3" << endl << endl;
+    cout << "The Sig_structure M_U to be signed is: \\[ \"Signature1\", << ID_CRED_U >>, TH_3, CRED_U \\] , as defined in {{asym-msg3-proc}}:" << endl << endl;
+
+    print_fig("M_U =" , "[\n  \"Signature1\",\n  << " + line(id_cred_u_str) + " >>,\n  " + vector_to_cddl_bstr(TH_3) + ",\n  "+ tab(cred_u_str) + "\n]");
+
+    cout << "Which encodes to the following byte string ToBeSigned:" << endl;
+
+    print_fig("M_U (message to be signed with Ed25519) (CBOR-encoded) (" + to_string(message_U.size()) + " bytes)", vector_to_string(message_U));
+
+    cout << "The message is signed using the private authentication key of U, and produces the following signature:" << endl;
+
+    print_fig("U's signature (" + to_string(signature_U.size()) + " bytes)", vector_to_string(signature_U));
+
+
+
+    // Derive key and IV
+    vector<uint8_t> info_K_3 = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3 );
+    vector<uint8_t> K_3 = hkdf_expand_sha_256( PRK, info_K_3, 16 );
+    vector<uint8_t> info_IV_3 = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3 );
+    vector<uint8_t> IV_3 = hkdf_expand_sha_256( PRK, info_IV_3, 13 );
+
+    // Calculate ciphertext
+    vector<uint8_t> P_3;
+    vector_append( P_3, cbor_bstr( kid_U ) ); // ID_CRED_U contains a single 'kid' parameter, so only bstr is used
+    vector_append( P_3, cbor_bstr( signature_U ) );
+    vector<uint8_t> A_3 = { 0x83 }; // CBOR array of length 3
+    vector_append( A_3, cbor_tstr( "Encrypt0" ) );
+    vector_append( A_3, cbor_bstr( { } ) ); // empty bstr 
+    vector_append( A_3, cbor_bstr( TH_3 ) );
+    vector<uint8_t> C_3 = aes_ccm_16_64_128( K_3, IV_3, P_3, A_3 );
+
+    // Calculate message_3
+    vector<uint8_t> message_3;
+    vector_append( message_3, data_3 );
+    vector_append( message_3, cbor_bstr( C_3 ) );
+
+    // Print
 
 
 /*
