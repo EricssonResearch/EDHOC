@@ -340,7 +340,7 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
 
-## Cipher Suites {#cipher-suites}
+## Cipher Suites {#cs}
 
 EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, a EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label. This document specifies four pre-defined cipher suites.
 
@@ -370,9 +370,9 @@ The Initiator need to have a list of cipher suites it supports in order of decre
 
 EDHOC allows the communication or negotiation of various protocol features during the execution of the protocol.
 
-* The Initiator proposes a cipher suite (see {{cipher-suites}}), and the Responder either accepts or rejects, and may make a counter proposal. 
+* The Initiator proposes a cipher suite (see {{cs}}), and the Responder either accepts or rejects, and may make a counter proposal. 
 
-* The Initiator decides on the correlation parameter corr (see {{#transport}}}). This is typically given by the transport which the Initiator and the Responder have agreed on beforehand. The Responder either accepts or rejects.
+* The Initiator decides on the correlation parameter corr (see {{transport}}). This is typically given by the transport which the Initiator and the Responder have agreed on beforehand. The Responder either accepts or rejects.
 
 * The Initiator decides on the method parameter (signature, static DH, symmetric). The Responder either accepts or rejects.
 
