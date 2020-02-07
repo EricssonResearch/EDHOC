@@ -895,7 +895,7 @@ where:
 
    * plaintext = ? AD_2
    
-   * AD_2 = bstr containing opaque unprotected auxiliary data
+      * AD_2 = bstr containing opaque unprotected auxiliary data
 
 ## EDHOC Message 3
 
@@ -909,7 +909,7 @@ where:
 
    * plaintext = ? AD_3
  
-   * AD_3 = bstr containing opaque protected auxiliary data
+      * AD_3 = bstr containing opaque protected auxiliary data
 
 # Error Handling {#error}
 
