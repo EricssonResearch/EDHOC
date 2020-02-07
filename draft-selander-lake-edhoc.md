@@ -633,17 +633,17 @@ Party V SHALL compose message_2 as follows:
 
       * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
-   * external_aad = TH_2
-
-   * payload = CRED_V
+   * external_aad = << TH_2, CRED_V >>
 
       * CRED_V - bstr containing the credential of Party V, see {{asym-overview}}. 
+
+   * payload = 0x (the empty string)
 
    COSE constructs the input to the Signature Algorithm as:
 
       * The key is the private authentication key of V.
 
-      * The message M to be signed = \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
+      * The message M to be signed = \[ "Signature1", << ID_CRED_V >>, << TH_2, CRED_V >>, h'' \]
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
@@ -742,17 +742,17 @@ Party U SHALL compose message_3 as follows:
 
       * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
-   * external_aad = TH_3
-
-   * payload = CRED_U
+   * external_aad = << TH_3, CRED_U >>
 
       * CRED_U - bstr containing the credential of Party U, see {{asym-overview}}. 
+
+   * payload = 0x (the empty string)
 
    COSE constructs the input to the Signature Algorithm as:
 
       * The key is the private authentication key of U.
 
-      * The message M to be signed = \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
+      * The message M to be signed = \[ "Signature1", << ID_CRED_U >>, << TH_3, CRED_U >>, h'' \]
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
