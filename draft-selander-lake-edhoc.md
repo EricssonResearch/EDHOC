@@ -247,31 +247,31 @@ Initiator                                               Responder
    |                          G_X                            |
    +-------------------------------------------------------->|
    |                                                         |
-   |  G_Y, AEAD( K_2; ID_CRED_V, Sig(V; CRED_V, G_X, G_Y) )  |
+   |  G_Y, AEAD( K_2; ID_CRED_R, Sig(R; CRED_R, G_X, G_Y) )  |
    |<--------------------------------------------------------+
    |                                                         |
-   |     AEAD( K_3; ID_CRED_U, Sig(U; CRED_U, G_Y, G_X) )    |
+   |     AEAD( K_3; ID_CRED_I, Sig(I; CRED_I, G_Y, G_X) )    |
    +-------------------------------------------------------->|
    |                                                         |
 ~~~~~~~~~~~
 {: #fig-sigma title="Authenticated encryption variant of the SIGMA-I protocol."}
 {: artwork-align="center"}
 
-The parties exchanging messages are called "U" and "V". They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. 
+The parties exchanging messages are called Initiator (I) and Responder (R). They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. 
 
-* G_X and G_Y are the ECDH ephemeral public keys of U and V, respectively.
+* G_X and G_Y are the ECDH ephemeral public keys of I and R, respectively.
 
-* CRED_U and CRED_V are the credentials containing the public authentication keys of U and V, respectively.
+* CRED_U and CRED_V are the credentials containing the public authentication keys of I and R, respectively.
 
-* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of U and V, respectively.
+* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of I and R, respectively.
 
-* Sig(U; . ) and S(V; . ) denote signatures made with the private authentication key of U and V, respectively.
+* Sig(I; . ) and S(R; . ) denote signatures made with the private authentication key of I and R, respectively.
 
 * AEAD(K; . ) denotes authenticated encryption with additional data using the key K derived from the shared secret.
 
 In order to create a "full-fledged" protocol some additional protocol elements are needed. EDHOC adds:
 
-* Explicit connection identifiers C_U, C_V chosen by U and V, respectively, enabling the recipient to find the protocol state.
+* Explicit connection identifiers C_I, C_R chosen by I and R, respectively, enabling the recipient to find the protocol state.
 
 * Transcript hashes TH_2, TH_3, TH_4 used for key derivation and as additional authenticated data.
 
@@ -295,7 +295,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method (signature, static DH, symmetric) and the correlation properties of the transport used, see {{transport}}. An implementation may support only Intiator or only Responder. An implementation may support only a single method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
 
-While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_U, C_V). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_I, C_R). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Initiator                                             Responder
@@ -316,7 +316,7 @@ Initiator                                             Responder
 
 Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is not bound to a particular transport layer, and can be used in environments without IP. The transport is responsible to handle message loss, reordering, message duplication, fragmentation, and denial of service protection, where necessary. The Initiator and the Responder need to have agreed on a transport to be used for EDHOC. It is recommended to transport EDHOC in CoAP payloads, see {{transfer}}.
 
-EDHOC includes connection identifiers (C_U, C_V) to correlate messages. The connection identifiers C_U and C_V do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
+EDHOC includes connection identifiers (C_I, C_R) to correlate messages. The connection identifiers C_I and C_R do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
 One byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string. If the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
 
@@ -468,7 +468,7 @@ calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDa
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   PRK_Exp = HKDF-Extract( "", PRK || ? PRK_V || ? PRK_U )
+   PRK_Exp = HKDF-Extract( "", PRK || ? PRK_R || ? PRK_I )
 ~~~~~~~~~~~
 
 ~~~~~~~~~~~
@@ -579,7 +579,7 @@ where:
 * C_I - variable length connection identifier
 * AD_1 - bstr containing unprotected opaque auxiliary data
 
-### Party U Processing of Message 1
+### Initiator Processing of Message 1
 
 The Initiator SHALL compose message_1 as follows:
 
@@ -651,17 +651,17 @@ Party V SHALL compose message_2 as follows:
 
       * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
-   * external_aad = TH_2
-
-   * payload = CRED_V
+   * external_aad = << TH_2, CRED_V >>
 
       * CRED_V - bstr containing the credential of Party V, see {{asym-overview}}. 
+
+   * payload = 0x (the empty string)
 
    COSE constructs the input to the Signature Algorithm as:
 
       * The key is the private authentication key of V.
 
-      * The message M to be signed = \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \]
+      * The message M to be signed = \[ "Signature1", << ID_CRED_V >>, << TH_2, CRED_V >>, h'' \]
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
@@ -707,7 +707,7 @@ Party V SHALL compose message_2 as follows:
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the outer COSE_Encrypt0 ciphertext. 
 
-### Party U Processing of Message 2
+### Initiator Processing of Message 2
 
 Party U SHALL process message_2 as follows:
 
@@ -744,7 +744,7 @@ data_3 = (
 )
 ~~~~~~~~~~~
 
-### Party U Processing of Message 3 {#asym-msg3-proc}
+### Initiator Processing of Message 3 {#asym-msg3-proc}
 
 Party U SHALL compose message_3 as follows:
 
@@ -760,17 +760,17 @@ Party U SHALL compose message_3 as follows:
 
       * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
-   * external_aad = TH_3
-
-   * payload = CRED_U
+   * external_aad = << TH_3, CRED_U >>
 
       * CRED_U - bstr containing the credential of Party U, see {{asym-overview}}. 
+
+   * payload = 0x (the empty string)
 
    COSE constructs the input to the Signature Algorithm as:
 
       * The key is the private authentication key of U.
 
-      * The message M to be signed = \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \]
+      * The message M to be signed = \[ "Signature1", << ID_CRED_U >>, << TH_3, CRED_U >>, h'' \]
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
@@ -957,14 +957,14 @@ where:
 
 * C_x - if error is sent by Party V and corr (METHOD_CORR mod 4) equals 0 or 2 then C_x is set to C_U, else if error is sent by Party U and corr (METHOD_CORR mod 4) equals 0 or 1 then C_x is set to C_V, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}. ERR_MSG MAY be a 0-length text string.
-* SUITES_V - cipher suites from SUITES_U or the EDHOC cipher suites registry that V supports. Note that SUITES_V only contains the values from the EDHOC cipher suites registry and no index. SUITES_V MUST only be included in replies to message_1.
+* SUITES_R - cipher suites from SUITES_I or the EDHOC cipher suites registry that the Responder supports. Note that SUITES_R only contains the values from the EDHOC cipher suites registry and no index. SUITES_R MUST only be included in replies to message_1.
 
-### Example Use of EDHOC Error Message with SUITES_V
+### Example Use of EDHOC Error Message with SUITES_R
 
 Assuming that Party U supports the five cipher suites \{5, 6, 7, 8, 9\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how Party U can truncate SUITES_U and how SUITES_V is used by Party V to give Party U information about the cipher suites that Party V supports. In {{fig-error1}}, Party V supports cipher suite 6 but not the selected cipher suite 5. 
 
 ~~~~~~~~~~~
-Party U                                                       Party V
+Initiator                                                   Responder
 |         METHOD_CORR, SUITES_I {0, 5, 6, 7}, G_X, C_I, AD_1        |
 +------------------------------------------------------------------>|
 |                             message_1                             |
@@ -983,7 +983,7 @@ Party U                                                       Party V
 In {{fig-error2}}, Party V supports cipher suite 7 but not cipher suites 5 and 6.
 
 ~~~~~~~~~~~
-Party U                                                       Party V
+Initiator                                                   Responder
 |          METHOD_CORR, SUITES_U {0, 5, 6}, G_X, C_I, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
@@ -999,8 +999,7 @@ Party U                                                       Party V
 {: #fig-error2 title="Example use of error message with SUITES_R."}
 {: artwork-align="center"}
 
-As Party U's list of supported cipher suites and order of preference is fixed, and Party V only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_U that Party V supports, the parties can verify that the selected cipher suite is the most preferred (by Party U) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_U that Party V supports, Party V will discontinue the protocol. 
-
+As the Initiator's list of supported cipher suites and order of preference is fixed, and the Responder only accepts message_1 if the selected cipher suite is the first cipher suite in SUITES_I that the Responder supports, the parties can verify that the selected cipher suite is the most preferred (by the Initiator) cipher suite supported by both parties. If the selected cipher suite is not the first cipher suite in SUITES_I that the Responder supports, the Responder will discontinue the protocol. 
 
 # Transferring EDHOC and Deriving an OSCORE Context {#transfer}
 
