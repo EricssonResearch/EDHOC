@@ -635,13 +635,13 @@ Party V SHALL compose message_2 as follows:
 
       * ID_CRED_V - identifier to facilitate retrieval of CRED_V, see {{asym-overview}}
 
+   * external_aad = TH_2
+
    * payload = CRED_V
 
       * CRED_V - bstr containing the credential of Party V, see {{asym-overview}}. 
 
-   * external_aad = TH_2
-
-      COSE constructs the input to the Signature Algorithm as:
+   COSE constructs the input to the Signature Algorithm as:
 
       * The key is the private authentication key of V.
 
@@ -659,35 +659,35 @@ Party V SHALL compose message_2 as follows:
 
    * protected = bstr .cbor ID_CRED_V
 
-   * plaintext = 0x (the empty string)
-
    * external_aad = << TH_2, CRED_V >>
 
-      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   * plaintext = 0x (the empty string)
+
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_V
       * Nonce N = IV_V
-      * Plaintext P = 0x (the empty string)
       * Associated data A = \[ "Encrypt0", << ID_CRED_V >>, << TH_2, CRED_V >> \]
+      * Plaintext P = 0x (the empty string)
 
    * Signature_or_MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
 * Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. 
 
-   * plaintext = ( ID_CRED_V / kid_V, Signature_or_MAC_2, ? AD_2 )
-
    * external_aad = TH_2
 
-   * AD_2 = bstr containing opaque unprotected auxiliary data
+   * plaintext = ( ID_CRED_V / kid_V, Signature_or_MAC_2, ? AD_2 )
+
+      * AD_2 = bstr containing opaque unprotected auxiliary data
 
    * Note that if ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_V = { 4 : kid_V }, only kid_V is conveyed in the plaintext, see {{asym-overview}}.
 
-      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_2
       * Nonce N = IV_2
-      * Plaintext P = ( ID_CRED_V / kid_V, Signature_or_MAC, ? AD_2 ) 
       * Associated data A = \[ "Encrypt0", h'', TH_2 \]
+      * Plaintext P = ( ID_CRED_V / kid_V, Signature_or_MAC, ? AD_2 ) 
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the outer COSE_Encrypt0 ciphertext. 
 
@@ -705,7 +705,7 @@ Party U SHALL process message_2 as follows:
 
 * Verify Singature_or_MAC_2 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg2-proc}}.
 
-* Pass AD_1 to the application.
+* Pass AD_2 to the application.
 
 If any verification step fails, Party U MUST send an EDHOC error message back, formatted as defined in {{error}}, and the protocol MUST be discontinued.
 
@@ -744,13 +744,13 @@ Party U SHALL compose message_3 as follows:
 
       * ID_CRED_U - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
 
+   * external_aad = TH_3
+
    * payload = CRED_U
 
       * CRED_U - bstr containing the credential of Party U, see {{asym-overview}}. 
 
-   * external_aad = TH_3
-
-      COSE constructs the input to the Signature Algorithm as:
+   COSE constructs the input to the Signature Algorithm as:
 
       * The key is the private authentication key of U.
 
@@ -768,35 +768,35 @@ Party U SHALL compose message_3 as follows:
 
    * protected = bstr .cbor ID_CRED_U
 
-   * plaintext = 0x (the empty string)
-
    * external_aad = << TH_3, CRED_U >>
 
-      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   * plaintext = 0x (the empty string)
+
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_U
       * Nonce N = IV_U
-      * Plaintext P = 0x (the empty string)
       * Associated data A = \[ "Encrypt0", << ID_CRED_U >>, << TH_3, CRED_U >> \]
+      * Plaintext P = 0x (the empty string)
 
    * Signature_or_MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
 * Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
 
-   * plaintext = ( ID_CRED_U / kid_U, Signature_or_MAC_3, ? AD_3 )
-
    * external_aad = TH_3
 
-   * AD_3 = bstr containing opaque protected auxiliary data
+   * plaintext = ( ID_CRED_U / kid_U, Signature_or_MAC_3, ? AD_3 )
+
+      * AD_3 = bstr containing opaque protected auxiliary data
 
    * Note that if ID_CRED_U contains a single 'kid' parameter, i.e., ID_CRED_U = { 4 : kid_U }, only kid_U is conveyed in the plaintext, see {{asym-overview}}.
 
-      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_3
       * Nonce N = IV_2
-      * Plaintext P = ( ID_CRED_U / kid_U, Signature_or_MAC_3, ? AD_3 )
       * Associated data A = \[ "Encrypt0", h'', TH_3 \]
+      * Plaintext P = ( ID_CRED_U / kid_U, Signature_or_MAC_3, ? AD_3 )
 
 Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the outer COSE_Encrypt0 ciphertext.
 
@@ -886,18 +886,19 @@ where:
 *  Signature_or_MAC_2 is not used.
 
 * The outer COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty.
+
+   * external_aad = TH_2
+
    * plaintext = ? AD_2
    
       * AD_2 = bstr containing opaque unprotected auxiliary data
 
-   * external_aad = TH_2
-
-      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_2
       * Nonce N = IV_2
-      * Plaintext P = ? AD_2
       * Associated data A = \[ "Encrypt0", h'', TH_2 \]
+      * Plaintext P = ? AD_2
       
 ## EDHOC Message 3
 
@@ -907,18 +908,18 @@ where:
 
 * COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty.
 
+   * external_aad = TH_3
+
    * plaintext = ? AD_3
  
       * AD_3 = bstr containing opaque protected auxiliary data
 
-   * external_aad = TH_3
-
-      COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
       * Key K = K_3
       * Nonce N = IV_3
-      * Plaintext P = ? AD_3
       * Associated data A = \[ "Encrypt0", h'', TH_3 \]
+      * Plaintext P = ? AD_3
 
 # Error Handling {#error}
 
