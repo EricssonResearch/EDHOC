@@ -39,7 +39,7 @@ string vector_to_string( vector<uint8_t> v ) {
     for ( int i = 0; i < v.size(); ++i ) {
         ostringstream ss;
         ss << hex << setfill('0') << setw(2) << (int)v[i];
-        if(i % 25 == 0 and i != 0) //column 75 to the line
+        if(i % 24 == 0 and i > 1) //column 75 to the line
             ss << endl;
         else
             ss << " ";
@@ -75,17 +75,26 @@ string tab( string s ){
     return r;
 }
 
-//
+// remove extra whitespaces in a string
+string remove_extra_whitespaces(string &input)
+{
+    string output;  
+    unique_copy (input.begin(), input.end(), back_insert_iterator<string>(output), [](char x,char y){ return isspace(x) && isspace(y);});  
+    return output;
+}
+
+// removes returns carriages and extra white spaces in a string
 string line ( string s ){
     string r;
-    for (auto i : s){
-        if (i == '\n')
+    for ( int i = 0; i < s.size(); ++i ) {
+        if (s[i] == '\n')
             r += " ";
         else
-            r += i;
+            r += s[i];
     }
-    return r;
+    return remove_extra_whitespaces(r);
 }
+
 
 // print a CDDL int to cout
 void print_cddl_int( int i ) {
@@ -103,16 +112,17 @@ void print_cddl_bstr( vector<uint8_t> v ) {
 
 string vector_to_cddl_bstr( vector<uint8_t> v ) {
     string s;
-    s += "  h'";
-    for ( auto i : v ) {
+    s += "h'";
+    for ( int i = 0; i < v.size(); ++i ) {
         ostringstream ss;
-        ss << hex << setfill('0') << setw(2) << (int)i;
+        ss << hex << setfill('0') << setw(2) << (int)v[i];
+        if( i % 34 == 0 and i > 1 ) //column 75 to the line
+            ss << endl;
         s += ss.str();
     }
     s += "'";
     return s;
 }
-
 
 // CBOR encodes an uint8_t
 vector<uint8_t> cbor_uint8( uint8_t i ) {
@@ -200,14 +210,14 @@ vector<uint8_t> gen_info( vector<uint8_t> AlgorithmID_CBOR, int keyDataLength, v
 string info_string( string id, int keyDataLength, vector<uint8_t> other )
 {
     string s;
-    s = "[\n  " + id + ", \n  [ null, null, null ], \n  [ null, null, null ], \n  [ " + to_string(keyDataLength) + ", h''," + vector_to_cddl_bstr(other) + "]\n]";
+    s = "[\n  " + id + ", \n  [ null, null, null ], \n  [ null, null, null ], \n  [ " + to_string(keyDataLength) + ", h'', " + vector_to_cddl_bstr(other) + "]\n]";
     return s;
 }
 
 string enc_string( vector<uint8_t> ext_aad )
 {
     string s;
-    s = "[\n  \"Encrypt0\",\n  h'',\n" + vector_to_cddl_bstr(ext_aad) + "\n]";
+    s = "[\n  \"Encrypt0\",\n  h'',\n  " + vector_to_cddl_bstr(ext_aad) + "\n]";
     return s;
 }
 
@@ -668,13 +678,13 @@ void rpk_vectors( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    print_fig("CRED_U =", "<< {\n  1:  1,\n -1:  6,\n -2:" + vector_to_cddl_bstr( U_sign_pk ) + "\n} >>");
+    print_fig("CRED_U =", "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( U_sign_pk ) + "\n} >>");
 
     print_fig("CRED_U (bstr-wrapped COSE_Key) (CBOR-encoded) (" + to_string(cbor_bstr(CRED_U_CBOR).size()) + " bytes)" , vector_to_string( cbor_bstr(CRED_U_CBOR)) + "\n" );
 
-    cout << "Because COSE_Keys are used, and because kid =" << vector_to_cddl_bstr( kid_U ) <<":";
+    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_U ) <<":";
 
-    print_fig("ID_CRED_U =" , "{ \n  4:" + vector_to_cddl_bstr( kid_U ) + "\n}" );
+    print_fig("ID_CRED_U =" , "{ \n  4:  " + vector_to_cddl_bstr( kid_U ) + "\n}" );
 
     cout << "Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_U is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
 
@@ -686,7 +696,7 @@ void rpk_vectors( void )
     cout << "### Input for Party V {#rpk-tv-input-v}" << endl;
 
     cout << endl;
-    cout << "The following are the parameters that are set in Party U before the first message exchange." << endl;
+    cout << "The following are the parameters that are set in Party V before the first message exchange." << endl;
 
     print_fig("Party V's private authentication key (" + to_string(V_sign_sk.size()) + " bytes)" , vector_to_string(V_sign_sk));
 
@@ -696,17 +706,17 @@ void rpk_vectors( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    string cred_v_str = "<< {\n  1:  1,\n -1:  6,\n -2:" + vector_to_cddl_bstr( V_sign_pk ) + "\n} >>";
+    string cred_v_str = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( V_sign_pk ) + "\n} >>";
     print_fig("CRED_V =" , cred_v_str );
 
     print_fig("CRED_V (bstr-wrapped COSE_Key) (CBOR-encoded) (" + to_string(cbor_bstr(CRED_V_CBOR).size()) + " bytes)" , vector_to_string( cbor_bstr(CRED_V_CBOR)) + "\n" );
 
-    cout << "Because COSE_Keys are used, and because kid =" << vector_to_cddl_bstr( kid_V ) <<":";
+    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_V ) <<":";
 
-    string id_cred_v_str = "{ \n  4:" + vector_to_cddl_bstr( kid_V ) + "\n}";
+    string id_cred_v_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_V ) + "\n}";
     print_fig("ID_CRED_V =" , id_cred_v_str );
 
-    cout << "Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_V is used when transported in the protected header of the COSE Object, but only the kid_value_V is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
+    cout << "Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_V is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
 
     print_fig("ID_CRED_V (in protected header) (CBOR-encoded) (" + to_string(ID_CRED_V_CBOR.size()) + " bytes)" , vector_to_string( ID_CRED_V_CBOR ) );
     
@@ -743,7 +753,7 @@ void rpk_vectors( void )
     cout << "No AD_1 is provided, so AD_1 is absent from message_1." << endl << endl;
     cout << "Message_1 is constructed, as the CBOR Sequence of the CBOR data items above." << endl;
 
-    print_fig("message_1" , "(\n  " + to_string(TYPE) + ",\n  " + to_string(suite) + ",\n" + vector_to_cddl_bstr(U_kx_pk) + ",\n" + vector_to_cddl_bstr(C_U) + "\n)");
+    print_fig("message_1 =" , "(\n  " + to_string(TYPE) + ",\n  " + to_string(suite) + ",\n  " + vector_to_cddl_bstr(U_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_U) + "\n)");
 
     print_fig("message_1 (CBOR Sequence) (" + to_string(message_1.size()) + " bytes)", vector_to_string(message_1) );
 
@@ -788,7 +798,7 @@ void rpk_vectors( void )
 
     cout << "Data_2 is constructed, as the CBOR Sequence of the CBOR data items above." << endl << endl;
 
-    print_fig("data_2 =", "(\n" + vector_to_cddl_bstr(V_kx_pk) + ",\n" + vector_to_cddl_bstr(C_V) + "\n)");
+    print_fig("data_2 =", "(\n  " + vector_to_cddl_bstr(V_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_V) + "\n)");
     print_fig("data_2 (CBOR Sequence) (" + to_string(data_2.size()) + " bytes)", vector_to_string(data_2));
 
     cout << "From data_2 and message_1 (from {{tv-rpk-1}}), compute the input to the transcript hash TH_2 = H( message_1, data_2 ), as a CBOR Sequence of these 2 data items." << endl << endl;
@@ -801,7 +811,7 @@ void rpk_vectors( void )
 
     cout << "When encoded as a CBOR bstr, that gives:" << endl << endl;
 
-    print_fig("TH_2 value (" + to_string(cbor_bstr(TH_2).size()) + " bytes)" , vector_to_string(cbor_bstr(TH_2)));
+    print_fig("TH_2 (CBOR-encoded) (" + to_string(cbor_bstr(TH_2).size()) + " bytes)" , vector_to_string(cbor_bstr(TH_2)));
 
     // Calculate signature
     vector<uint8_t> message_V { 0x84 }; // CBOR array of length 4
@@ -823,7 +833,7 @@ void rpk_vectors( void )
     cout << "* external_aad = TH_2" << endl << endl;
     cout << "The Sig_structure M_V to be signed is: \\[ \"Signature1\", << ID_CRED_V >>, TH_2, CRED_V \\] , as defined in {{asym-msg2-proc}}:" << endl << endl;
 
-    print_fig("M_V =" , "[\n  \"Signature1\",\n  " + line(id_cred_v_str) + ",\n" + vector_to_cddl_bstr(TH_2) + "\n  "+ tab(cred_v_str) + "\n]");
+    print_fig("M_V =" , "[\n  \"Signature1\",\n  << " + line(id_cred_v_str) + " >>,\n  " + vector_to_cddl_bstr(TH_2) + ",\n  "+ tab(cred_v_str) + "\n]");
 
     cout << "Which encodes to the following byte string ToBeSigned:" << endl;
 
@@ -871,7 +881,7 @@ void rpk_vectors( void )
 
     cout << "From these parameters, K_2 is computed:" << endl;
 
-    print_fig("K2 (" + to_string(K_2.size()) + " bytes)", vector_to_string(K_2));
+    print_fig("K_2 (" + to_string(K_2.size()) + " bytes)", vector_to_string(K_2));
 
     cout << "Nonce IV_2 is the output of HKDF-Expand(PRK, info, L)." << endl << endl;
 
@@ -887,7 +897,7 @@ void rpk_vectors( void )
 
     cout << "From these parameters, IV_2 is computed:" << endl;
 
-    print_fig("IV2 (" + to_string(IV_2.size()) + " bytes)", vector_to_string(IV_2));
+    print_fig("IV_2 (" + to_string(IV_2.size()) + " bytes)", vector_to_string(IV_2));
 
 
     // Calculate ciphertext
@@ -919,7 +929,7 @@ void rpk_vectors( void )
 
     cout << "Which encodes to the following byte string to be used as Additional Authenticated Data:" << endl;
 
-    print_fig("A_2 (" + to_string(A_2.size()) + " bytes)", vector_to_string (A_2));
+    print_fig("A_2 (CBOR-encoded) (" + to_string(A_2.size()) + " bytes)", vector_to_string (A_2));
 
 
     cout << "The key and nonce used are defined in {{tv-rpk-2-key}}:" << endl << endl;
@@ -944,7 +954,7 @@ void rpk_vectors( void )
 
     cout << "From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2)." << endl << endl;
 
-    print_fig("message_2 =" , "(\n" + vector_to_cddl_bstr(V_kx_pk) + ",\n" + vector_to_cddl_bstr(C_V) + ",\n" + vector_to_cddl_bstr(C_2) + "\n)");
+    print_fig("message_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_V) + ",\n  " + vector_to_cddl_bstr(C_2) + "\n)");
 
     cout << "Which encodes to the following byte string:" << endl;
 
