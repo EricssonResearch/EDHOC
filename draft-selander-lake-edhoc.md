@@ -535,7 +535,7 @@ In the latter two examples, ID_CRED_I and ID_CRED_R contain the actual credentia
 The authentication keys must be a signature keys or static Diffe-Hellman keys. The Initiator and the Responder
  MAY use different types of authentication keys, e.g. one uses a signature key and the other uses a static Diffe-Hellman key. When using a signature key, the authentication is provided by a signature. When using a static Diffie-Hellman key the authentication is provided by a Message Authentication Code (MAC) computed from an ephemeral-static ECDH shared secret which enables significant reductions in message sizes. The MAC is implemented with an AEAD algorithm.  When using a static Diffie-Hellman keys the private and public authentication keys are called U, V, G_U and G_V, respectively.
 
-The actual credentials CRED_I and CRED_R (e.g., a bstr wrapped COSE_Key or a single X.509 certificate) are signed by the Initiator and the Responder, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. The Initiator and the Responder MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_U and CRED_V are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
+The actual credentials CRED_I and CRED_R (e.g., a bstr wrapped COSE_Key or a single X.509 certificate) are signed by the Initiator and the Responder, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. The Initiator and the Responder MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_I and CRED_R are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
@@ -759,7 +759,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * protected = bstr .cbor ID_CRED_I
 
-      * ID_CRED_I - identifier to facilitate retrieval of CRED_U, see {{asym-overview}}
+      * ID_CRED_I - identifier to facilitate retrieval of CRED_I, see {{asym-overview}}
 
    * external_aad = << TH_3, CRED_I >>
 
