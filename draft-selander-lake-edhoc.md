@@ -847,7 +847,7 @@ EDHOC supports authentication with pre-shared keys. The Initiator and the Respon
 
 where the identifier ID_PSK is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}) containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
-* ID_PSK = { 4 : kid_value } , where kid_value : bstr
+* ID_PSK = { 4 : kid_psk } , where kid_psk : bstr
 
 The purpose of ID_PSK is to facilitate retrieval of the PSK and in the case a 'kid' parameter is used it may be very short. It is RECOMMENDED that it uniquely identify the PSK as the recipient may otherwise have to try several keys.
 
@@ -884,7 +884,7 @@ message_1 = (
   SUITES_I : suite / [ index : uint, 2* suite ],
   G_X : bstr,
   C_I : bstr,
-  ID_PSK : header_map // kid_value : bstr,
+  ID_PSK : header_map // kid_psk : bstr,
   ? AD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -892,7 +892,7 @@ message_1 = (
 where:
 
 * METHOD_CORR = 4 * method + corr, where method = 4 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
-* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, with kid_value: bstr, only kid_value is conveyed.
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_psk }, with kid_psk: bstr, only kid_psk is conveyed.
 
 ## EDHOC Message 2
 
@@ -1104,7 +1104,7 @@ The data rates in many IoT deployments are very limited. Given that the applicat
 
 ## Cipher Suites
 
-Cipher suite number 0 (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519) is mandatory to implement. Implementations only need to implement the algorithms needed for their supported methods. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
+Cipher suite number 0 (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519, AES-CCM-16-64-128, HMAC 256/256) is mandatory to implement. Implementations only need to implement the algorithms needed for their supported methods. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
 
 The HMAC algorithm HMAC 256/64 (HMAC w/ SHA-256 truncated to 64 bits) SHALL NOT be supported for use in EDHOC.
 
