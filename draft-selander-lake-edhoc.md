@@ -840,11 +840,11 @@ If any verification step fails, Party V MUST send an EDHOC error message back, f
 
 ## Overview {#sym-overview}
 
-EDHOC supports authentication with pre-shared keys. Party U and V are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
+EDHOC supports authentication with pre-shared keys. The Initiator and the Responder are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
-* Only Party U and Party V SHALL have access to the PSK,
+* Only the Initiator and the Responder SHALL have access to the PSK,
 
-* Party V is able to retrieve the PSK using ID_PSK.
+* The Responder is able to retrieve the PSK using ID_PSK.
 
 where the identifier ID_PSK is a COSE header_map (i.e. a CBOR map containing COSE Common Header Parameters, see {{RFC8152}}) containing COSE header parameter that can identify a pre-shared key. Pre-shared keys are typically stored as COSE_Key objects and identified with a 'kid' parameter (see {{RFC8152}}):
 
@@ -871,7 +871,7 @@ Initiator                                                   Responder
 {: #fig-sym title="Overview of EDHOC with symmetric key authentication."}
 {: artwork-align="center"}
 
-EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication. In the following subsections the differences compared to EDHOC with signature key authentication are described.
+EDHOC with symmetric key authentication is very similar to EDHOC with asymmetric authentication. In the following subsections the differences compared to EDHOC with asymmetric authentication are described.
 
 ## EDHOC Message 1
 
@@ -892,7 +892,7 @@ message_1 = (
 
 where:
 
-* METHOD_CORR = 4 * method + corr, where method = 4 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{asym-overview}}).
+* METHOD_CORR = 4 * method + corr, where method = 4 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_value }, with kid_value: bstr, only kid_value is conveyed.
 
 ## EDHOC Message 2
