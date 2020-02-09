@@ -261,9 +261,9 @@ The parties exchanging messages are called Initiator (I) and Responder (R). They
 
 * G_X and G_Y are the ECDH ephemeral public keys of I and R, respectively.
 
-* CRED_U and CRED_V are the credentials containing the public authentication keys of I and R, respectively.
+* CRED_I and CRED_R are the credentials containing the public authentication keys of I and R, respectively.
 
-* ID_CRED_U and ID_CRED_V are data enabling the recipient party to retrieve the credential of I and R, respectively.
+* ID_CRED_I and ID_CRED_R are data enabling the recipient party to retrieve the credential of I and R, respectively.
 
 * Sig(I; . ) and S(R; . ) denote signatures made with the private authentication key of I and R, respectively.
 
@@ -279,9 +279,9 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Verification of a common preferred cipher suite:
 
-   * U lists supported cipher suites in order of preference
+   * The Initiator lists supported cipher suites in order of preference
    
-   * V verifies that the selected cipher suite is the first supported cipher suite
+   * The Responder verifies that the selected cipher suite is the first supported cipher suite
 
 * Method types and error handling.
 
