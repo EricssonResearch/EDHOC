@@ -576,7 +576,7 @@ where:
 
 * METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
-* G_X - the ephemeral public key of Party U
+* G_X - the ephemeral public key of the Initiator
 * C_I - variable length connection identifier
 * AD_1 - bstr containing unprotected opaque auxiliary data
 
@@ -629,7 +629,7 @@ data_2 = (
 
 where:
 
-* G_Y - the ephemeral public key of Party V
+* G_Y - the ephemeral public key of the Responder
 * C_V - variable length connection identifier
 
 ### Responder Processing of Message 2 {#asym-msg2-proc}
@@ -646,7 +646,7 @@ The Responder SHALL compose message_2 as follows:
 
 * Compute Signature_or_MAC_2 as follows:
 
-   If method equals 0 or 2, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. The public authentication key must be a signature key. 
+   If method equals 0 or 2, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of the Responder, and the parameters below. The public authentication key must be a signature key. 
 
    * protected = bstr .cbor ID_CRED_R
 
@@ -654,7 +654,7 @@ The Responder SHALL compose message_2 as follows:
 
    * external_aad = << TH_2, CRED_R >>
 
-      * CRED_R - bstr containing the credential of Party V, see {{asym-overview}}. 
+      * CRED_R - bstr containing the credential of the Responder, see {{asym-overview}}. 
 
    * payload = 0x (the empty string)
 
@@ -755,7 +755,7 @@ The Initiator  SHALL compose message_3 as follows:
 
 * Compute Signature_or_MAC_3 as follows:
 
-   If method equals 0 or 1, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. The public authentication key must be a signature key. 
+   If method equals 0 or 1, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of the Initiator, and the parameters below. The public authentication key must be a signature key. 
 
    * protected = bstr .cbor ID_CRED_I
 
@@ -1012,7 +1012,7 @@ By default, the CoAP client is the Initiator and the CoAP server is the Responde
 
 By default, the message flow is as follows: EDHOC message_1 is sent in the payload of a POST request from the client to the server's resource for EDHOC. EDHOC message_2 or the EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response. EDHOC message_3 or the EDHOC error message is sent from the client to the server's resource in the payload of a POST request. If needed, an EDHOC error message is sent from the server to the client in the payload of a 2.04 (Changed) response.
 
-An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables Party U to correlate message_1 and message_2 so the correlation parameter corr = 1.
+An example of a successful EDHOC exchange using CoAP is shown in {{fig-coap1}}. In this case the CoAP Token enables the Initiator to correlate message_1 and message_2 so the correlation parameter corr = 1.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -1038,7 +1038,7 @@ Client    Server
 {: #fig-coap1 title="Transferring EDHOC in CoAP"}
 {: artwork-align="center"}
 
-The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables Party V to correlate message_2 and message_3 so the correlation parameter corr = 2.
+The exchange in {{fig-coap1}} protects the client identity against active attackers and the server identity against passive attackers. An alternative exchange that protects the server identity against active attackers and the client identity against passive attackers is shown in {{fig-coap2}}. In this case the CoAP Token enables the Responder to correlate message_2 and message_3 so the correlation parameter corr = 2.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client    Server
@@ -1100,7 +1100,7 @@ The security of the SIGMA protocol requires the MAC to be bound to the identity 
 
 To reduce message overhead EDHOC does not use explicit nonces and instead rely on the ephemeral public keys to provide randomness to each session. A good amount of randomness is important for the key generation, to provide liveness, and to protect against interleaving attacks. For this reason, the ephemeral keys MUST NOT be reused, and both parties SHALL generate fresh random ephemeral key pairs. 
 
-The choice of key length used in the different algorithms needs to be harmonized, so that a sufficient security level is maintained for certificates, EDHOC, and the protection of application data. Party U and V should enforce a minimum security level.
+The choice of key length used in the different algorithms needs to be harmonized, so that a sufficient security level is maintained for certificates, EDHOC, and the protection of application data. The Initiator and the Responder should enforce a minimum security level.
 
 The data rates in many IoT deployments are very limited. Given that the application keys are protected as well as the long-term authentication keys they can often be used for years or even decades before the cryptographic limits are reached. If the application keys established through EDHOC need to be renewed, the communicating parties can derive application keys with other labels or run EDHOC again.
 
@@ -1130,7 +1130,7 @@ The Initiator and the Responder are responsible for verifying the integrity of c
 
 The Initiator and the Responder are allowed to select the connection identifiers C_I and C_R, respectively, for the other party to use in the ongoing EDHOC protocol as well as in a subsequent application protocol (e.g. OSCORE {{RFC8613}}). The choice of connection identifier is not security critical in EDHOC but intended to simplify the retrieval of the right security context in combination with using short identifiers. If the wrong connection identifier of the other party is used in a protocol message it will result in the receiving party not being able to retrieve a security context (which will terminate the protocol) or retrieve the wrong security context (which also terminates the protocol as the message cannot be verified).
 
-Party V MUST finish the verification step of message_3 before passing AD_3 to the application.
+The Responder MUST finish the verification step of message_3 before passing AD_3 to the application.
 
 If two nodes unintentionally initiate two simultaneous EDHOC message exchanges with each other even if they only want to complete a single EDHOC message exchange, they MAY terminate the exchange with the lexicographically smallest G_X. If the two G_X values are equal, the received message_1 MUST be discarded to mitigate reflection attacks. Note that in the case of two simultaneous EDHOC exchanges where the nodes only complete one and where the nodes have different preferred cipher suites, an attacker can affect which of the two nodes’ preferred cipher suites will be used by blocking the other exchange.
 
