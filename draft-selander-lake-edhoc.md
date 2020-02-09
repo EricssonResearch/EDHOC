@@ -645,7 +645,7 @@ Party V SHALL compose message_2 as follows:
 
 * Compute Signature_or_MAC_2 as follows:
 
-   If method equals 0 or 1, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. The public authentication key must be a signature key. 
+   If method equals 0 or 2, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party V, and the parameters below. The public authentication key must be a signature key. 
 
    * protected = bstr .cbor ID_CRED_V
 
@@ -665,7 +665,7 @@ Party V SHALL compose message_2 as follows:
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
-   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. The public key must be a static Diffie-Hellman key. 
+   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_V, IV_V, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
    *  PRK_V = HKDF-Extract( "", G_VX ), where G_VX is the ECDH shared secret calculated from G_V and X, or G_X and V
 
@@ -754,7 +754,7 @@ Party U SHALL compose message_3 as follows:
 
 * Compute Signature_or_MAC_3 as follows:
 
-   If method equals 0 or 2, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. The public authentication key must be a signature key. 
+   If method equals 0 or 1, Ccompute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of Party U, and the parameters below. The public authentication key must be a signature key. 
 
    * protected = bstr .cbor ID_CRED_U
 
@@ -774,7 +774,7 @@ Party U SHALL compose message_3 as follows:
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
-   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. The public key must be a static Diffie-Hellman key. 
+   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
    *  PRK_U = HKDF-Extract( "", G_UY ), where G_UY is the ECDH shared secret calculated from G_U and Y, or G_Y and U
 
