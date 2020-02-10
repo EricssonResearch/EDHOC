@@ -484,7 +484,7 @@ where H() is the hash function in the HMAC algorithm. Example use of the EDHOC-E
 
 ### EDHOC PSK Chaining {#chain}
 
-An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid_value' parameter SHOULD be derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid_value' parameter SHOULD be derived as follows where length is the key length (in bytes) of the EDHOC AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PSK    = EDHOC-Exporter( "EDHOC Chaining PSK", length )
@@ -665,7 +665,7 @@ The Responder SHALL compose message_2 as follows:
 
    * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
 
-   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_R, IV_R, and the parameters below. The public key must be a static Diffie-Hellman key. 
+   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_R, IV_R, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
    *  PRK_R = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R
 
@@ -688,7 +688,7 @@ The Responder SHALL compose message_2 as follows:
 
    * Signature_or_MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
-* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. 
+* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. 
 
    * external_aad = TH_2
 
@@ -715,7 +715,7 @@ The Initiator SHALL process message_2 as follows:
 
 * Retrieve the protocol state using the connection identifier C_I and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, and IV_2.
+* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, and IV_2.
 
 * Verify that the unverifed identity of the Responder is among the allowed identites for this connection.
 
@@ -774,7 +774,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
-   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key must be a static Diffie-Hellman key. 
+   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
    *  PRK_I = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I
 
@@ -797,7 +797,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * Signature_or_MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0 object.
 
-* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
+* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
 
    * external_aad = TH_3
 
@@ -826,7 +826,7 @@ the Responder SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the connection identifier C_R and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, and IV_3.
+* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, and IV_3.
 
 * Verify that the unverifed identity of the Initiator is among the allowed identites for this connection.
 
@@ -901,7 +901,7 @@ where:
 
 *  Signature_or_MAC_2 is not used.
 
-* The outer COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty.
+* The outer COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty.
 
    * external_aad = TH_2
 
@@ -922,7 +922,7 @@ where:
 
 *  Signature_or_MAC_3 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty.
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty.
 
    * external_aad = TH_3
 
@@ -1070,9 +1070,9 @@ When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties must
 
 * The client's OSCORE Sender ID is C_R and the server's OSCORE Sender ID is C_I, as defined in this document
 
-* The AEAD Algorithm and the HMAC algorithms are the AEAD and HMAC algorithms in the selected cipher suite.
+* The AEAD Algorithm and the HMAC algorithms are the application AEAD and HMAC algorithms in the selected cipher suite.
 
-* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the AEAD Algorithm.
+* The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the application AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    Master Secret = EDHOC-Exporter( "OSCORE Master Secret", length )
