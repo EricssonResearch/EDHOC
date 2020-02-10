@@ -19,6 +19,8 @@
 
 using namespace std;
 
+#define COLUMN 72
+
 // Concatenates a to the end of v (may not work if a = v)
 void vector_append( vector<uint8_t> &v, vector<uint8_t> a ) {
     v.reserve( 1000 ); // big so that iterators are stable during insert
@@ -31,7 +33,7 @@ string vector_to_string( vector<uint8_t> v ) {
     for ( int i = 1; i < v.size() + 1; ++i ) {
         ostringstream ss;
         ss << hex << setfill('0') << setw(2) << (int)v[i - 1];
-        if(i % 23 == 0) //column 75 to the line
+        if(i % (COLUMN / 3) == 0) //column 75 to the line
             ss << endl;
         else
             ss << " ";
@@ -88,14 +90,28 @@ string line ( string s ){
 }
 
 // returns a cddl bstr from vector
-string vector_to_cddl_bstr( vector<uint8_t> v ) {
+string vector_to_cddl_bstr_old( vector<uint8_t> v ) {
     string s;
     s += "h'";
     for ( int i = 0; i < v.size(); ++i ) {
         ostringstream ss;
         ss << hex << setfill('0') << setw(2) << (int)v[i];
-        if( i % 34 == 0 and i > 1 ) //column 75 to the line
-            ss << endl;
+        s += ss.str();
+    }
+    s += "'";
+    return s;
+}
+
+// returns a cddl bstr from vector
+string vector_to_cddl_bstr( vector<uint8_t> v , int spaces ) {
+    string s;
+    s += "h'";
+    int column;
+    for ( int i = 1; i < v.size() + 1; ++i ) {
+        ostringstream ss;
+        ss << hex << setfill('0') << setw(2) << (int)v[i - 1];
+        if( i * 2 % (COLUMN - spaces) == 0) //to the line
+            ss << endl << string(spaces, ' ');
         s += ss.str();
     }
     s += "'";
@@ -188,7 +204,7 @@ vector<uint8_t> gen_info( vector<uint8_t> AlgorithmID_CBOR, int keyDataLength, v
 string info_string( string id, int keyDataLength, vector<uint8_t> other )
 {
     string s;
-    s = "[\n  " + id + ",\n  [ null, null, null ],\n  [ null, null, null ],\n  [ " + to_string(keyDataLength) + ", h'', " + vector_to_cddl_bstr(other) + "]\n]";
+    s = "[\n  " + id + ",\n  [ null, null, null ],\n  [ null, null, null ],\n  [ " + to_string(keyDataLength) + ", h'', " + vector_to_cddl_bstr(other, 16) + "]\n]";
     return s;
 }
 
@@ -196,7 +212,7 @@ string info_string( string id, int keyDataLength, vector<uint8_t> other )
 string enc_string( vector<uint8_t> ext_aad )
 {
     string s;
-    s = "[\n  \"Encrypt0\",\n  h'',\n  " + vector_to_cddl_bstr(ext_aad) + "\n]";
+    s = "[\n  \"Encrypt0\",\n  h'',\n  " + vector_to_cddl_bstr(ext_aad, 4) + "\n]";
     return s;
 }
 
@@ -264,7 +280,7 @@ void psk_vectors( void )
 
     cout << "So ID_PSK is defined as the following:" << endl;
 
-    print_fig( "ID_PSK =" , "{\n  4:" + vector_to_cddl_bstr(kid) + "\n}");
+    print_fig( "ID_PSK =" , "{\n  4:" + vector_to_cddl_bstr(kid, 6) + "\n}");
 
     cout << "This test vector uses COSE_Key objects to store the pre-shared key." << endl << endl;
 
@@ -302,7 +318,7 @@ void psk_vectors( void )
 
     cout << "So ID_PSK is defined as the following:" << endl;
 
-    print_fig( "ID_PSK =" , "{\n  4:" + vector_to_cddl_bstr(kid) + "\n}");
+    print_fig( "ID_PSK =" , "{\n  4:" + vector_to_cddl_bstr(kid, 6) + "\n}");
 
     cout << "This test vector uses COSE_Key objects to store the pre-shared key." << endl << endl;
 
@@ -345,7 +361,7 @@ void psk_vectors( void )
 
     cout << "Message_1 is constructed, as the CBOR Sequence of the CBOR data items above." << endl;
 
-    print_fig("message_1 =", "(\n  " + to_string(TYPE) + ",\n  " + to_string(suite) + ",\n  " + vector_to_cddl_bstr(U_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_U) + ",\n  " + vector_to_cddl_bstr(kid) + "\n)");
+    print_fig("message_1 =", "(\n  " + to_string(TYPE) + ",\n  " + to_string(suite) + ",\n  " + vector_to_cddl_bstr(U_kx_pk , 4) + ",\n  " + vector_to_cddl_bstr(C_U, 4) + ",\n  " + vector_to_cddl_bstr(kid, 4) + "\n)");
 
     print_fig_with_bytes("message_1 (CBOR Sequence)" , message_1);
 
@@ -374,7 +390,7 @@ void psk_vectors( void )
 
     cout << "Data_2 is constructed, as the CBOR Sequence of the CBOR data items above." << endl;
 
-    print_fig("data_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_V) + "\n)");
+    print_fig("data_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk , 4) + ",\n  " + vector_to_cddl_bstr(C_V , 4) + "\n)");
 
     print_fig_with_bytes("data_2 (CBOR Sequence)" , data_2);
     
@@ -513,7 +529,7 @@ void psk_vectors( void )
 
     cout << "From the parameter computed in {{tv-psk-2}} and {{tv-psk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2)." << endl;
 
-    print_fig("message_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_V)  + ",\n  " + vector_to_cddl_bstr(C_2) + "\n)");
+    print_fig("message_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk , 4) + ",\n  " + vector_to_cddl_bstr(C_V , 4)  + ",\n  " + vector_to_cddl_bstr(C_2 , 4) + "\n)");
 
     cout << "Which encodes to the following byte string:" << endl;
 
@@ -543,7 +559,7 @@ void psk_vectors( void )
 
     cout << "Data_3 is constructed, as the CBOR Sequence of the CBOR data item above." << endl;
 
-    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V) + "\n)");
+    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V , 4) + "\n)");
 
     print_fig_with_bytes("data_3 (CBOR Sequence)" , data_3);
 
@@ -670,7 +686,7 @@ void psk_vectors( void )
 
     cout << "From the parameter computed in {{tv-psk-3}} and {{tv-psk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3)." << endl;
 
-    print_fig("message_3 =" , "(\n  " + vector_to_cddl_bstr(C_V)  + ",\n  " + vector_to_cddl_bstr(C_3) + "\n)");
+    print_fig("message_3 =" , "(\n  " + vector_to_cddl_bstr(C_V , 4)  + ",\n  " + vector_to_cddl_bstr(C_3 , 4) + "\n)");
 
     cout << "Which encodes to the following byte string:" << endl;
 
@@ -836,14 +852,16 @@ void rpk_vectors( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    string cred_u_str = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( U_sign_pk ) + "\n} >>";
+    string cred_u_str = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( U_sign_pk , 8) + "\n} >>";
+    string cred_u_str_tab = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( U_sign_pk , 10) + "\n} >>"; // quick fix for when the same string is tabbed
+
     print_fig("CRED_U =", cred_u_str);
 
     print_fig_with_bytes("CRED_U (bstr-wrapped COSE_Key) (CBOR-encoded)" , cbor_bstr(CRED_U_CBOR));
 
-    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_U ) <<":";
+    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_U , 0) <<":";
 
-    string id_cred_u_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_U ) + "\n}";
+    string id_cred_u_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_U , 8) + "\n}";
     print_fig("ID_CRED_U =" , id_cred_u_str );
 
     cout << "Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_U is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
@@ -866,14 +884,16 @@ void rpk_vectors( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    string cred_v_str = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( V_sign_pk ) + "\n} >>";
+    string cred_v_str = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( V_sign_pk , 8) + "\n} >>";
+    string cred_v_str_tab = "<< {\n  1:  1,\n -1:  6,\n -2:  " + vector_to_cddl_bstr( V_sign_pk , 10) + "\n} >>"; // quick fix for when the same string is tabbed later
+
     print_fig("CRED_V =" , cred_v_str );
 
     print_fig_with_bytes("CRED_V (bstr-wrapped COSE_Key) (CBOR-encoded)" , cbor_bstr(CRED_V_CBOR));
 
-    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_V ) <<":";
+    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_V , 0) <<":";
 
-    string id_cred_v_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_V ) + "\n}";
+    string id_cred_v_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_V , 8) + "\n}";
     print_fig("ID_CRED_V =" , id_cred_v_str );
 
     cout << "Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_V is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
@@ -913,7 +933,7 @@ void rpk_vectors( void )
     cout << "No AD_1 is provided, so AD_1 is absent from message_1." << endl << endl;
     cout << "Message_1 is constructed, as the CBOR Sequence of the CBOR data items above." << endl;
 
-    print_fig("message_1 =" , "(\n  " + to_string(TYPE) + ",\n  " + to_string(suite) + ",\n  " + vector_to_cddl_bstr(U_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_U) + "\n)");
+    print_fig("message_1 =" , "(\n  " + to_string(TYPE) + ",\n  " + to_string(suite) + ",\n  " + vector_to_cddl_bstr(U_kx_pk , 4) + ",\n  " + vector_to_cddl_bstr(C_U , 4) + "\n)");
 
     print_fig_with_bytes("message_1 (CBOR Sequence)", message_1);
 
@@ -958,7 +978,7 @@ void rpk_vectors( void )
 
     cout << "Data_2 is constructed, as the CBOR Sequence of the CBOR data items above." << endl << endl;
 
-    print_fig("data_2 =", "(\n  " + vector_to_cddl_bstr(V_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_V) + "\n)");
+    print_fig("data_2 =", "(\n  " + vector_to_cddl_bstr(V_kx_pk , 4) + ",\n  " + vector_to_cddl_bstr(C_V , 4) + "\n)");
     print_fig_with_bytes("data_2 (CBOR Sequence)" , data_2);
 
     cout << "From data_2 and message_1 (from {{tv-rpk-1}}), compute the input to the transcript hash TH_2 = H( message_1, data_2 ), as a CBOR Sequence of these 2 data items." << endl << endl;
@@ -993,7 +1013,7 @@ void rpk_vectors( void )
     cout << "* external_aad = TH_2" << endl << endl;
     cout << "The Sig_structure M_V to be signed is: \\[ \"Signature1\", << ID_CRED_V >>, TH_2, CRED_V \\] , as defined in {{asym-msg2-proc}}:" << endl << endl;
 
-    print_fig("M_V =" , "[\n  \"Signature1\",\n  << " + line(id_cred_v_str) + " >>,\n  " + vector_to_cddl_bstr(TH_2) + ",\n  "+ tab(cred_v_str) + "\n]");
+    print_fig("M_V =" , "[\n  \"Signature1\",\n  << " + line(id_cred_v_str) + " >>,\n  " + vector_to_cddl_bstr(TH_2 , 4) + ",\n  "+ tab(cred_v_str_tab) + "\n]");
 
     cout << "Which encodes to the following byte string ToBeSigned:" << endl;
 
@@ -1114,7 +1134,7 @@ void rpk_vectors( void )
 
     cout << "From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2)." << endl << endl;
 
-    print_fig("message_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk) + ",\n  " + vector_to_cddl_bstr(C_V) + ",\n  " + vector_to_cddl_bstr(C_2) + "\n)");
+    print_fig("message_2 =" , "(\n  " + vector_to_cddl_bstr(V_kx_pk , 4) + ",\n  " + vector_to_cddl_bstr(C_V , 4) + ",\n  " + vector_to_cddl_bstr(C_2 , 4) + "\n)");
 
     cout << "Which encodes to the following byte string:" << endl;
 
@@ -1145,7 +1165,7 @@ void rpk_vectors( void )
 
     cout << "Data_3 is constructed, as the CBOR Sequence of the CBOR data item above." << endl;
 
-    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V) + "\n)");
+    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V , 4) + "\n)");
 
     print_fig_with_bytes("data_3 (CBOR Sequence)", data_3);
 
@@ -1181,7 +1201,7 @@ void rpk_vectors( void )
     cout << "* external_aad = TH_3" << endl << endl;
     cout << "The Sig_structure M_U to be signed is: \\[ \"Signature1\", << ID_CRED_U >>, TH_3, CRED_U \\] , as defined in {{asym-msg3-proc}}:" << endl << endl;
 
-    print_fig("M_U =" , "[\n  \"Signature1\",\n  << " + line(id_cred_u_str) + " >>,\n  " + vector_to_cddl_bstr(TH_3) + ",\n  "+ tab(cred_u_str) + "\n]");
+    print_fig("M_U =" , "[\n  \"Signature1\",\n  << " + line(id_cred_u_str) + " >>,\n  " + vector_to_cddl_bstr(TH_3 , 4) + ",\n  "+ tab(cred_u_str_tab) + "\n]");
 
     cout << "Which encodes to the following byte string ToBeSigned:" << endl;
 
@@ -1303,7 +1323,7 @@ void rpk_vectors( void )
 
     cout << "From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3)." << endl << endl;
 
-    print_fig("message_3 =" , "(\n  " + vector_to_cddl_bstr(C_V) + ",\n  " + vector_to_cddl_bstr(C_3) + "\n)");
+    print_fig("message_3 =" , "(\n  " + vector_to_cddl_bstr(C_V , 4) + ",\n  " + vector_to_cddl_bstr(C_3 , 4) + "\n)");
 
     cout << "Which encodes to the following byte string:" << endl;
 
