@@ -396,25 +396,30 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using the HMAC algorithm in the selected cipher suite. The pseudorandom key (PRK) is derived using HKDF-Extract {{RFC5869}}
+Key and IV derivation SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using the HMAC algorithm in the selected cipher suite. The pseudorandom keys (PRK) is derived using HKDF-Extract {{RFC5869}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-with the following input:
+The pseudorandom key PRK_2 is derived with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
 * The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
-Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces a PRK as follows:
+Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces PRK_2 as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   PRK = HMAC-SHA-256( salt, G_XY )
+   PRK_2 = HMAC-SHA-256( salt, G_XY )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case.
+
+The pseudorandom keys PRK_3 and PRK_4 are defined as follow:
+
+   * If PRK_R has been derived, then PRK_3 = PRK_R, oterwise PRK_3 = PRK_2
+   * If PRK_I has been derived, then PRK_4 = PRK_I, oterwise PRK_4 = PRK_3
 
 The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
 
@@ -441,9 +446,9 @@ where
 
   + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using the pseudorandom keys PRK_2 and PRK_3 and transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
+If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the pseudorandom keys PRK_2 and PRK_3 and transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
 
 Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
@@ -466,11 +471,7 @@ calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDa
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   PRK_Exp = HKDF-Extract( "", PRK || ? PRK_R || ? PRK_I )
-~~~~~~~~~~~
-
-~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_Exp, info, length) 
+   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_4, info, length) 
 ~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = label, keyDataLength = 8 * length, and other = TH_4 where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
@@ -666,7 +667,7 @@ The Responder SHALL compose message_2 as follows:
 
    If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_R, IV_R, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
-   *  PRK_R = HKDF-Extract( "", G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R
+   *  PRK_R = HKDF-Extract( RPK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R
 
    *  K_R = HKDF-Expand( PRK_R, info, L ), where other = TH_2
 
@@ -773,9 +774,9 @@ The Initiator  SHALL compose message_3 as follows:
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
-   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. The public key must be a static Diffie-Hellman key. 
+   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
-   *  PRK_I = HKDF-Extract( "", G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I
+   *  PRK_I = HKDF-Extract( RPK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I
 
    *  K_I = HKDF-Expand( PRK_I, info, L ), where other = TH_3
 
