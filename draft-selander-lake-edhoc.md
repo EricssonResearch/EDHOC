@@ -291,7 +291,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the authentication method (signature, static DH, symmetric) and the correlation properties of the transport used, see {{transport}}. An implementation may support only Intiator or only Responder. An implementation may support only a single authentication method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
+EDHOC consists of three flights (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method and the correlation properties of the transport used, see {{transport}}. The method specifies the authentication methods used (signature, static DH, symmetric). An implementation may support only Intiator or Responder. An implementation may support only a single method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_I, C_R). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -316,7 +316,7 @@ Cryptographically, EDHOC does not put requirements on the lower layers. EDHOC is
 
 EDHOC includes connection identifiers (C_I, C_R) to correlate messages. The connection identifiers C_I and C_R do not have any cryptographic purpose in EDHOC. They contain information facilitating retrieval of the protocol state and may therefore be very short. The connection identifier MAY be used with an application protocol (e.g. OSCORE) for which EDHOC establishes keys, in which case the connection identifiers SHALL adhere to the requirements for that protocol. Each party choses a connection identifier it desires the other party to use in outgoing messages.
 
-One byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string. If the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
+If the transport provides a mechanism for correlating messages, some of the connection identifiers may be omitted. There are four cases:
 
    * corr = 0, the transport does not provide a correlation mechanism.
 
@@ -336,7 +336,9 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 * When PKI is not used (PSK, RPK, self-signed certificate), the public authentication key of the other party is both the trust anchor and the identity. Before running EDHOC, each party need a set of public authentication keys that they allow communicating with. Only a limited set of public authentication keys are accepted. EDHOC provides proof that the other party possesses the private authentication key corresponding to the public authentication key. Any bindings between the public authentication key and other identities is out of scope of EDHOC.
 
-EDHOC with symmetric key authentication is very similar to EDHOC with signature key authentication, the difference being that information is only MACed, not signed, and that session keys are derived from the ECDH shared secret and the PSK.
+## Identifiers
+
+One byte connection and credential identifiers are realistic in many scenarios as most constrained devices only have a few keys and connections. In cases where a node only has one connection or key, the identifiers may even be the empty byte string. 
 
 ## Cipher Suites {#cs}
 
@@ -360,7 +362,7 @@ EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD 
        AES-CCM-16-64-128, HMAC 256/256)
 ~~~~~~~~~~~
 
-The different methods (signature, static DH, symmetric) use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used when EDHOC is authenticated with static DH and symmetric keys. 
+The different methods use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used is methods without signature authentication.
 
 The Initiator need to have a list of cipher suites it supports in order of decreasing preference. The Responder need to have a list of cipher suites it supports.
 
@@ -444,9 +446,9 @@ where
 
   + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using the pseudorandom keys PRK_2 and PRK_3 and transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the AEAD in the selected cipher suite, and keyDataLength equal to the key length of the AEAD.
+For message_2 and message_3, the keys K_2 and K_3 SHALL be derived using the pseudorandom keys PRK_2 and PRK_3 and transcript hashes TH_2 and TH_3 respectively. The key SHALL be derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD.
 
-If the AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the pseudorandom keys PRK_2 and PRK_3 and transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the AEAD.
+If the EDHOC AEAD algorithm uses an IV, then IV_2 and IV_3 for message_2 and message_3 SHALL be derived using the pseudorandom keys PRK_2 and PRK_3 and transcript hashes TH_2 and TH_3 respectively. The IV SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD.
 
 Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
