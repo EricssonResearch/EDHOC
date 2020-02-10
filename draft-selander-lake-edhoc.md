@@ -774,7 +774,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
 
-   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_U, IV_U, and the parameters below. The public key must be a static Diffie-Hellman key. 
+   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
    *  PRK_I = HKDF-Extract( RPK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I
 
