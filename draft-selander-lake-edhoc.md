@@ -226,7 +226,7 @@ Many constrained IoT systems today do not use any security at all, and when they
 
 EDHOC is optimized for small message sizes and can therefore be sent over a small number of radio frames. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment, especially in noisy environments. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time in constrained environments can be translated into key exchange overhead. In networks technologies with transmission back-off time, each additional frame significantly increases the latency even if no other devices are transmitting.
 
-Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for security reasons such as perfect forward secrecy.
+Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device rebooting or for security reasons such as perfect forward secrecy.
 
 EDHOC is adapted to primitives and protocols designed for the Internet of Things: EDHOC is built on CBOR and COSE which enables small message overhead and efficient parsing in constrained devices. EDHOC is not bound to a particular transport layer, but it is recommended to transport the EDHOC message in CoAP payloads. EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{RFC8613}} providing the necessary input parameters with required properties. Maximum code complexity (ROM/Flash) is often a constraint in many devices and by reusing already existing libraries, the additional code footprint for EDHOC + OSCORE can be kept very low.
 
@@ -332,7 +332,7 @@ For example, if the key exchange is transported over CoAP, the CoAP Token can be
 
 The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw public keys (RPK), or public key certificates. The certificates and RPKs can contain signature keys or static Diffie-Hellman keys. EDHOC assumes the existence of mechanisms (certification authority, trusted third party, manual distribution, etc.) for distributing authentication keys (public or pre-shared) and identities. Policies are set based on the identity of the other party, and parties typically only allow connections from a small restricted set of identities.
 
-* When a Public Key Infrastructure (PKI) is used, the trust anchor is a Certification Authority (CA) certificate and the identity is the subject (e.g. a domain name or NAI) included in the other party's certificate. Before running EDHOC, each party needs at least one CA certificate and a set of identities that they allow communicating with. Only a limited set of identities are accepted. Any validated public-key certificate with an allowed identity is accepted. EDHOC provides proof that the other party possesses the private authentication key corresponding to the public authentication key in its certificate. The certification path provides proof that the identity in the certificate owns the public key in the certificate.
+* When a Public Key Infrastructure (PKI) is used, the trust anchor is a Certification Authority (CA) certificate and the identity is the subject (e.g. a domain name, NAI, or EUI) included in the other party's certificate. Before running EDHOC, each party needs at least one CA certificate and a set of identities that they allow communicating with. Only a limited set of identities are accepted. Any validated public-key certificate with an allowed identity is accepted. EDHOC provides proof that the other party possesses the private authentication key corresponding to the public authentication key in its certificate. The certification path provides proof that the identity in the certificate owns the public key in the certificate.
 
 * When PKI is not used (PSK, RPK, self-signed certificate), the public authentication key of the other party is both the trust anchor and the identity. Before running EDHOC, each party need a set of public authentication keys that they allow communicating with. Only a limited set of public authentication keys are accepted. EDHOC provides proof that the other party possesses the private authentication key corresponding to the public authentication key. Any bindings between the public authentication key and other identities is out of scope of EDHOC.
 
@@ -534,7 +534,7 @@ In the latter two examples, ID_CRED_I and ID_CRED_R contain the actual credentia
 The authentication keys must be a signature keys or static Diffie-Hellman keys. The Initiator and the Responder
  MAY use different types of authentication keys, e.g. one uses a signature key and the other uses a static Diffie-Hellman key. When using a signature key, the authentication is provided by a signature. When using a static Diffie-Hellman key the authentication is provided by a Message Authentication Code (MAC) computed from an ephemeral-static ECDH shared secret which enables significant reductions in message sizes. The MAC is implemented with an AEAD algorithm.  When using a static Diffie-Hellman keys the Initiator's and Responder's private authentication keys are called I and R respectively and the public authentication keys are called G_I and G_R respectively.
 
-The actual credentials CRED_I and CRED_R (e.g., a bstr wrapped COSE_Key or a single X.509 certificate) are signed by the Initiator and the Responder, respectively to prevent duplicate-signature key selection (DSKS) attacks, see {{asym-msg3-form}} and {{asym-msg2-form}}. The Initiator and the Responder MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_I and CRED_R are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
+The actual credentials CRED_I and CRED_R (e.g., a COSE_Key or a single X.509 certificate) are signed by the Initiator and the Responder respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}. The Initiator and the Responder MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_I and CRED_R are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
@@ -647,11 +647,11 @@ The Responder SHALL compose message_2 as follows:
 
    If method equals 0 or 2, compute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of the Responder, and the parameters below. The public authentication key must be a signature key. 
 
-   * protected = bstr .cbor ID_CRED_R
+   * protected = << ID_CRED_R >>
 
       * ID_CRED_R - identifier to facilitate retrieval of CRED_R, see {{asym-overview}}
 
-   * payload = 0x (the empty string)
+   * payload = h''
 
    * external_aad = << TH_2, CRED_R >>
 
@@ -675,9 +675,9 @@ The Responder SHALL compose message_2 as follows:
 
    *  IV_R = HKDF-Expand( PRK_R, info, L ), where other = TH_2
 
-   * protected = bstr .cbor ID_CRED_R
+   * protected = << ID_CRED_R >>
 
-   * plaintext = 0x (the empty string)
+   * plaintext = h''
 
    * external_aad = << TH_2, CRED_R >>
 
@@ -760,11 +760,11 @@ The Initiator  SHALL compose message_3 as follows:
 
    If method equals 0 or 1, compute an COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of the Initiator, and the parameters below. The public authentication key must be a signature key. 
 
-   * protected = bstr .cbor ID_CRED_I
+   * protected =  << ID_CRED_I >>
 
       * ID_CRED_I - identifier to facilitate retrieval of CRED_I, see {{asym-overview}}
 
-   * payload = 0x (the empty string)
+   * payload = h''
 
    * external_aad = << TH_3, CRED_I >>
 
@@ -778,7 +778,6 @@ The Initiator  SHALL compose message_3 as follows:
 
    * The message M to be signed =
 
-
      \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I >>, h'' \]
 
    If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key must be a static Diffie-Hellman key. 
@@ -789,9 +788,9 @@ The Initiator  SHALL compose message_3 as follows:
 
    *  IV_I = HKDF-Expand( PRK_I, info, L ), where other = TH_3
 
-   * protected = bstr .cbor ID_CRED_I
+   * protected = << ID_CRED_I >>
 
-   * plaintext = 0x (the empty string)
+   * plaintext = h''
 
    * external_aad = << TH_3, CRED_I >>
 
