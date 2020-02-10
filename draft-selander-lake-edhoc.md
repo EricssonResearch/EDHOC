@@ -1290,6 +1290,7 @@ Expert reviewers should take into consideration the following points:
 * Clarity and correctness of registrations. Experts are expected to check the clarity of purpose and use of the requested entries. Expert needs to make sure the values of algorithms are taken from the right registry, when that's required. Expert should consider requesting an opinion on the correctness of registered parameters from relevant IETF working groups. Encodings that do not meet these objective of clarity and completeness should not be registered.
 * Experts should take into account the expected usage of fields when approving point assignment. The length of the encoded value should be weighed against how many code points of that length are left, the size of device it will be used on, and the number of code points left that encode to that size.
 * Specifications are recommended. When specifications are not provided, the description provided needs to have sufficient information to verify the points above.
+
 --- back
 
 # Use of CBOR, CDDL and COSE in EDHOC {#CBORandCOSE}
