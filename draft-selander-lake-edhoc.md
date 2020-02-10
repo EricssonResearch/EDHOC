@@ -226,7 +226,7 @@ Many constrained IoT systems today do not use any security at all, and when they
 
 EDHOC is optimized for small message sizes and can therefore be sent over a small number of radio frames. The message size of a key exchange protocol may have a large impact on the performance of an IoT deployment, especially in noisy environments. For example, in a network bootstrapping setting a large number of devices turned on in a short period of time may result in large latencies caused by parallel key exchanges. Requirements on network formation time in constrained environments can be translated into key exchange overhead. In networks technologies with transmission back-off time, each additional frame significantly increases the latency even if no other devices are transmitting.
 
-Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reasons.
+Power consumption for wireless devices is highly dependent on message transmission, listening, and reception. For devices that only send a few bytes occasionally, the battery lifetime may be significantly reduced by a heavy key exchange protocol. Moreover, a key exchange may need to be executed more than once, e.g. due to a device losing power or rebooting for other reasons such as perfect forward secrecy.
 
 EDHOC is adapted to primitives and protocols designed for the Internet of Things: EDHOC is built on CBOR and COSE which enables small message overhead and efficient parsing in constrained devices. EDHOC is not bound to a particular transport layer, but it is recommended to transport the EDHOC message in CoAP payloads. EDHOC is not bound to a particular communication security protocol but works off-the-shelf with OSCORE {{RFC8613}} providing the necessary input parameters with required properties. Maximum code complexity (ROM/Flash) is often a constraint in many devices and by reusing already existing libraries, the additional code footprint for EDHOC + OSCORE can be kept very low.
 
@@ -234,9 +234,7 @@ EDHOC is adapted to primitives and protocols designed for the Internet of Things
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all capitals, as shown here.
 
-The word "encryption" without qualification always refers to authenticated encryption, in practice implemented with an Authenticated Encryption with Additional Data (AEAD) algorithm, see {{RFC5116}}.
-
-Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}}, COSE {{RFC8152}}, and CDDL {{RFC8610}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. Examples of CBOR and CDDL are provided in {{CBOR}}.
+Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}} {{I-D.ietf-cbor-sequence}}, COSE {{RFC8152}}, and CDDL {{RFC8610}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. Examples of CBOR and CDDL are provided in {{CBOR}}.
 
 # Background {#background}
 
@@ -257,7 +255,7 @@ Initiator                                               Responder
 {: #fig-sigma title="Authenticated encryption variant of the SIGMA-I protocol."}
 {: artwork-align="center"}
 
-The parties exchanging messages are called Initiator (I) and Responder (R). They exchange identities and ephemeral public keys, compute the shared secret, and derive symmetric application keys. 
+The parties exchanging messages are called Initiator (I) and Responder (R). They exchange ephemeral public keys, compute the shared secret, and derive symmetric application keys. 
 
 * G_X and G_Y are the ECDH ephemeral public keys of I and R, respectively.
 
@@ -275,7 +273,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Transcript hashes TH_2, TH_3, TH_4 used for key derivation and as additional authenticated data.
 
-* Computationally independent keys derived from the ECDH shared secret and used for encryption of different messages.
+* Computationally independent keys derived from the ECDH shared secret and used for authenticated encryption of different messages.
 
 * Verification of a common preferred cipher suite:
 
