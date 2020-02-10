@@ -28,10 +28,10 @@ void vector_append( vector<uint8_t> &v, vector<uint8_t> a ) {
 // returns a string from vector
 string vector_to_string( vector<uint8_t> v ) {
     string s;
-    for ( int i = 0; i < v.size(); ++i ) {
+    for ( int i = 1; i < v.size() + 1; ++i ) {
         ostringstream ss;
-        ss << hex << setfill('0') << setw(2) << (int)v[i];
-        if(i % 23 == 0 and i > 1) //column 75 to the line
+        ss << hex << setfill('0') << setw(2) << (int)v[i - 1];
+        if(i % 23 == 0) //column 75 to the line
             ss << endl;
         else
             ss << " ";
@@ -188,7 +188,7 @@ vector<uint8_t> gen_info( vector<uint8_t> AlgorithmID_CBOR, int keyDataLength, v
 string info_string( string id, int keyDataLength, vector<uint8_t> other )
 {
     string s;
-    s = "[\n  " + id + ", \n  [ null, null, null ], \n  [ null, null, null ], \n  [ " + to_string(keyDataLength) + ", h'', " + vector_to_cddl_bstr(other) + "]\n]";
+    s = "[\n  " + id + ",\n  [ null, null, null ],\n  [ null, null, null ],\n  [ " + to_string(keyDataLength) + ", h'', " + vector_to_cddl_bstr(other) + "]\n]";
     return s;
 }
 
