@@ -1203,15 +1203,15 @@ Reference: [[this document]]
 IANA has created a new registry titled "EDHOC Method Type" under the new heading "EDHOC". The registration procedure is "Expert Review". The columns of the registry are Value, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
 ~~~~~~~~~~~
-+-------+------------------------------------------+-------------------+
-| Value | Initiator           | Responder          | Reference         |
-+-------+------------------------------------------+-------------------+
-|     0 | Signature Key       | Signature Key      | [[this document]] |
-|     1 | Signature Key       | Static DH Key      | [[this document]] |
-|     2 | Static DH Key       | Signature Key      | [[this document]] |
-|     3 | Static DH Key       | Static DH Key      | [[this document]] |
-|     4 | PSK                 | PSK                | [[this document]] |
-+-------+------------------------------------------+-------------------+
++-------+-------------------+-------------------+-------------------+
+| Value | Initiator         | Responder         | Reference         |
++-------+-------------------+-------------------+-------------------+
+|     0 | Signature Key     | Signature Key     | [[this document]] |
+|     1 | Signature Key     | Static DH Key     | [[this document]] |
+|     2 | Static DH Key     | Signature Key     | [[this document]] |
+|     3 | Static DH Key     | Static DH Key     | [[this document]] |
+|     4 | PSK               | PSK               | [[this document]] |
++-------+-------------------+-------------------+-------------------+
 ~~~~~~~~~~~
 {: artwork-align="center"}
 
