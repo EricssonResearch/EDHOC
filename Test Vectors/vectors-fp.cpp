@@ -850,7 +850,7 @@ void rpk_vectors( void )
 
     print_fig_with_bytes("ID_CRED_U (in protected header) (CBOR-encoded)" , ID_CRED_U_CBOR);
     
-    print_fig_with_bytes("kid_value_U (in plaintext) (CBOR-encoded)" , kid_U);
+    print_fig_with_bytes("kid_value_U (in plaintext) (CBOR-encoded)" , cbor_bstr(kid_U));
 
     // Input for Party V //////////////////////////////////////////////
     cout << "### Input for Party V {#rpk-tv-input-v}" << endl;
@@ -1147,13 +1147,13 @@ void rpk_vectors( void )
 
     print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V) + "\n)");
 
+    print_fig_with_bytes("data_3 (CBOR Sequence)", data_3);
+
     cout << "From data_3, CIPHERTEXT_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , CIPHERTEXT_2, data_3), as a CBOR Sequence of these 3 data items." << endl;
 
     print_fig_with_bytes("( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence)" , TH_3_input);
 
     cout << "And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)" << endl;
-
-    cout << "And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)" << endl << endl;
 
     print_fig_with_bytes("TH_3 value" , TH_3);
 
