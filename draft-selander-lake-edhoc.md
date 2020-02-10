@@ -667,7 +667,7 @@ The Responder SHALL compose message_2 as follows:
 
    If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_R, IV_R, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
-   *  PRK_R = HKDF-Extract( RPK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R
+   *  PRK_R = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R
 
    *  K_R = HKDF-Expand( PRK_R, info, L ), where other = TH_2
 
@@ -776,7 +776,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key must be a static Diffie-Hellman key. 
 
-   *  PRK_I = HKDF-Extract( RPK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I
+   *  PRK_I = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I
 
    *  K_I = HKDF-Expand( PRK_I, info, L ), where other = TH_3
 
