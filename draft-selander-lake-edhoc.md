@@ -661,7 +661,7 @@ The Responder SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Depending on method, Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 or 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
+* Depending on method, Signature_or_MAC_2 is the 'signature' of a COSE_Sign1 or the 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
 
    * protected =  << ID_CRED_R >>
 
@@ -673,7 +673,7 @@ The Responder SHALL compose message_2 as follows:
 
    * payload or plaintext = h''
 
-   If method equals 0 or 2, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, and the private authentication key of the Responder. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
+   If method equals 0 or 2, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the private authentication key of the Responder. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
 
    * The key is the private authentication key of the Responder.
 
@@ -754,7 +754,7 @@ The Initiator  SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Depending on method, Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 or 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
+* Depending on method, Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 or the 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
 
    * protected =  << ID_CRED_I >>
 
@@ -766,7 +766,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * payload or plaintext = h''
 
-   If method equals 0 or 1, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, and the private authentication key of the Initiator. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
+   If method equals 0 or 1, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the private authentication key of the Initiator. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
 
    * The key is the private authentication key of the Initiator.
 
