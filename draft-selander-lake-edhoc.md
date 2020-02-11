@@ -291,7 +291,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 # EDHOC Overview {#overview}
 
-EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method and the correlation properties of the transport used, see {{transport}}. The method specifies the authentication methods used (signature, static DH, symmetric). An implementation may support only Initiator or Responder. An implementation may support only a single method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
+EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method and the correlation properties of the transport used, see {{transport}}. The method specifies the authentication methods used (signature, static DH, symmetric), see {{method-types}}. An implementation may support only Initiator or Responder. An implementation may support only a single method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
 
 While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_I, C_R). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
@@ -377,7 +377,7 @@ EDHOC allows the communication or negotiation of various protocol features durin
 
 * The Initiator decides on the correlation parameter corr (see {{transport}}). This is typically given by the transport which the Initiator and the Responder have agreed on beforehand. The Responder either accepts or rejects.
 
-* The Initiator decides on the method parameter (signature, static DH, symmetric). The Responder either accepts or rejects.
+* The Initiator decides on the method parameter, see {{method-types}}. The Responder either accepts or rejects.
 
 TODO: Do we want to enable parties negotiating public key method?
 
@@ -507,7 +507,7 @@ An application using EDHOC may want to derive new PSKs to use for authentication
 
 ## Overview {#asym-overview}
 
-EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
+This section specifies authentication method = 0, 1, 2, and 3, see {{method-types}}. EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
 
 * Only the Responder SHALL have access to the Responder's private authentication key,
 
@@ -585,7 +585,7 @@ suite = int
 
 where:
 
-* METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
+* METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 (see {{method-types}}) and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the ephemeral public key of the Initiator
 * C_I - variable length connection identifier
@@ -828,7 +828,7 @@ Pass the connection identifiers (C_I, C_R) and the application algorithms in the
 
 ### Responder Processing of Message 3
 
-the Responder SHALL process message_3 as follows:
+The Responder SHALL process message_3 as follows:
 
 * Decode message_3 (see {{CBOR}}).
 
@@ -848,7 +848,7 @@ If any verification step fails, the Responder MUST send an EDHOC error message b
 
 ## Overview {#sym-overview}
 
-EDHOC supports authentication with pre-shared keys. The Initiator and the Responder are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
+EDHOC supports authentication with pre-shared keys (authentication method = 4, see {{method-types}}). The Initiator and the Responder are assumed to have a pre-shared key (PSK) with a good amount of randomness and the requirement that:
 
 * Only the Initiator and the Responder SHALL have access to the PSK,
 
@@ -1202,7 +1202,7 @@ Desc: AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-## EDHOC Method Type Registry
+## EDHOC Method Type Registry {#method-types}
 
 IANA has created a new registry titled "EDHOC Method Type" under the new heading "EDHOC". The registration procedure is "Expert Review". The columns of the registry are Value, Description, and Reference, where Value is an integer and the other columns are text strings. The initial contents of the registry are:
 
@@ -1217,6 +1217,7 @@ IANA has created a new registry titled "EDHOC Method Type" under the new heading
 |     4 | PSK               | PSK               | [[this document]] |
 +-------+-------------------+-------------------+-------------------+
 ~~~~~~~~~~~
+{: #fig-method-types title="Method Types"}
 {: artwork-align="center"}
 
 ## The Well-Known URI Registry
