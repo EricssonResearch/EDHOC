@@ -271,7 +271,7 @@ In order to create a "full-fledged" protocol some additional protocol elements a
 
 * Explicit connection identifiers C_I, C_R chosen by I and R, respectively, enabling the recipient to find the protocol state.
 
-* Transcript hashes TH_2, TH_3, TH_4 used for key derivation and as additional authenticated data.
+* Transcript hashes (hashes of message data) TH_2, TH_3, TH_4 used for key derivation and as additional authenticated data.
 
 * Computationally independent keys derived from the ECDH shared secret and used for authenticated encryption of different messages.
 
@@ -392,23 +392,25 @@ Since data carried in AD1 and AD2 may not be protected, and the content of AD3 i
 
 ## Ephemeral Public Keys {#cose_key}
    
-The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the 'x' parameter is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an 'y' parameter , any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
+The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the 'x' parameter is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an 'y' parameter, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
 ## Key Derivation {#key-der}
 
-Key and IV derivation SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using the HMAC algorithm in the selected cipher suite. The pseudorandom keys (PRK) is derived using HKDF-Extract {{RFC5869}}
+Derivation of key and IV used with the AEAD functions SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using a pseudorandom key (PRK) and the HMAC algorithm in the selected cipher suite. The PRKs are derived using HKDF-Extract {{RFC5869}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The pseudorandom key PRK_2 is derived with the following input:
+PRK_j, where j = 2 or 3, is used to derive key and IV for message_j. PRK_4 is used to derive export keys. PRK_I and PRK_R are used to derive additional keys in case of static Diffie-Hellmann authentication of Initator and Responder, respectively.
+
+PRK_2 is derived with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
 * The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
 
-Example: Assuming use of HMAC 256/256 the extract phase of HKDF produces PRK_2 as follows:
+Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK_2 as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK_2 = HMAC-SHA-256( salt, G_XY )
@@ -418,8 +420,10 @@ where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in
 
 The pseudorandom keys PRK_3 and PRK_4 are defined as follow:
 
-   * If PRK_R has been derived, then PRK_3 = PRK_R, else PRK_3 = PRK_2
-   * If PRK_I has been derived, then PRK_4 = PRK_I, else PRK_4 = PRK_3
+   * If PRK_R has been derived, i.e. static DH authentication of the Responder, then PRK_3 = PRK_R, else PRK_3 = PRK_2
+   * If PRK_I has been derived, i.e. static DH authentication of the Initiator, then PRK_4 = PRK_I, else PRK_4 = PRK_3
+
+This construction allows a common definition of PRKs also in the case of static DH methods, which requires additional keys and IVs.
 
 The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
 
@@ -458,10 +462,10 @@ Assuming the output OKM length L is smaller than the hash function output size, 
 
 where \|\| means byte string concatenation.
 
-Example: Assuming use of the algorithm AES-CCM-16-64-128 and HMAC 256/256, K_i and IV_i are therefore the first 16 and 13 bytes, respectively, of
+Example: Assume the use of the algorithm AES-CCM-16-64-128 and HMAC 256/256 and fix j = 2 or 3. K_j and IV_j are thus the first 16 and 13 bytes, respectively, of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   HMAC-SHA-256( PRK, info || 0x01 )
+   HMAC-SHA-256( PRK_j, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104), respectively.
