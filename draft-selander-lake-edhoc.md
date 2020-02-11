@@ -728,7 +728,7 @@ The Initiator SHALL process message_2 as follows:
 
 * Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, and IV_2.
 
-* Verify that the unverified identity of the Responder is among the allowed identities for this connection.
+* Verify that the identity of the Responder is among the allowed identities for this connection.
 
 * Verify Signature_or_MAC_2 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg2-proc}}.
 
@@ -843,7 +843,7 @@ the Responder SHALL process message_3 as follows:
 
 * Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, and IV_3.
 
-* Verify that the unverified identity of the Initiator is among the allowed identities for this connection.
+* Verify that the identity of the Initiator is among the allowed identities for this connection.
 
 * Verify Signature_or_MAC_3 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg3-proc}}.
 
