@@ -655,23 +655,19 @@ The Responder SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Compute Signature_or_MAC_2 as follows:
+* Depending on method, Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 or 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
 
-   If method equals 0 or 2, compute a COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of the Responder, and the parameters below. The public authentication key MUST be a signature key. 
-
-   * protected = << ID_CRED_R >>
+   * protected =  << ID_CRED_R >>
 
       * ID_CRED_R - identifier to facilitate retrieval of CRED_R, see {{asym-overview}}
-
-   * payload = h''
 
    * external_aad = << TH_2, CRED_R >>
 
       * CRED_R - bstr containing the credential of the Responder, see {{asym-overview}}. 
 
-   * Signature_or_MAC_2 is the 'signature' of the COSE_Sign1 object.
+   * payload or plaintext = h''
 
-   COSE constructs the input to the Signature Algorithm as:
+   If method equals 0 or 2, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, and the private authentication key of the Responder. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
 
    * The key is the private authentication key of the Responder.
 
@@ -679,17 +675,7 @@ The Responder SHALL compose message_2 as follows:
 
      \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R >>, h'' \]
 
-   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_R, IV_R, and the parameters below. The public key MUST be a static Diffie-Hellman key. 
-
-   * protected = << ID_CRED_R >>
-
-   * plaintext = h''
-
-   * external_aad = << TH_2, CRED_R >>
-
-   * Signature_or_MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0 object.
-
-   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_R, and IV_R. The public key MUST be a static Diffie-Hellman key. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
    * Key K = K_R
    * Nonce N = IV_R
@@ -697,7 +683,7 @@ The Responder SHALL compose message_2 as follows:
    * Associated data A =
 
      \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R >> \]
-
+     
 * Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. 
 
    * plaintext = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 )
@@ -762,23 +748,19 @@ The Initiator  SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Compute Signature_or_MAC_3 as follows:
-
-   If method equals 0 or 1, compute a COSE_Sign1 as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, the private authentication key of the Initiator, and the parameters below. The public authentication key MUST be a signature key. 
+* Depending on method, Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 or 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
 
    * protected =  << ID_CRED_I >>
 
       * ID_CRED_I - identifier to facilitate retrieval of CRED_I, see {{asym-overview}}
 
-   * payload = h''
-
    * external_aad = << TH_3, CRED_I >>
 
       * CRED_I - bstr containing the credential of the Initiator, see {{asym-overview}}. 
 
-   * Signature_or_MAC_3 is the 'signature' of the COSE_Sign1 object.
+   * payload or plaintext = h''
 
-   COSE constructs the input to the Signature Algorithm as:
+   If method equals 0 or 1, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite, and the private authentication key of the Initiator. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
 
    * The key is the private authentication key of the Initiator.
 
@@ -786,17 +768,7 @@ The Initiator  SHALL compose message_3 as follows:
 
      \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I >>, h'' \]
 
-   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, IV_I, and the parameters below. The public key MUST be a static Diffie-Hellman key. 
-
-   * protected = << ID_CRED_I >>
-
-   * plaintext = h''
-
-   * external_aad = << TH_3, CRED_I >>
-
-   * Signature_or_MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0 object.
-
-   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   If method equals 0 or 1, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, and IV_I. The public key MUST be a static Diffie-Hellman key. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
    * Key K = K_I
    * Nonce N = IV_I
@@ -804,7 +776,7 @@ The Initiator  SHALL compose message_3 as follows:
    * Associated data A =
 
      \[ "Encrypt0", << ID_CRED_I >>, << TH_3, CRED_I >> \]
-
+          
 * Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
 
    * external_aad = TH_3
