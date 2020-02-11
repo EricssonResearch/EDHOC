@@ -411,7 +411,7 @@ PRK_2 is derived with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
-* The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
+* The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}.
 
 Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK_2 as follows:
 
@@ -423,15 +423,21 @@ where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in
 
 The pseudorandom keys PRK_R, PRK_3, PRK_I, and PRK_4 are defined as follow:
 
-* PRK_R is derived as PRK_R = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
+* PRK_R is derived as PRK_R = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R.
 
 * If PRK_R has been derived, i.e. static DH authentication of the Responder, then PRK_3 = PRK_R, else PRK_3 = PRK_2
 
-* PRK_I is derived as PRK_I = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I. When using the curve25519, the ECDH shared secret is the output of the X25519 function {{RFC7748}}.
+* PRK_I is derived as PRK_I = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I.
 
 * If PRK_I has been derived, i.e. static DH authentication of the Responder, then PRK_4 = PRK_I, else PRK_4 = PRK_3
 
 This construction allows a common definition of PRKs also in the case of static DH methods, which requires additional keys and IVs.
+
+Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and G_IY are the outputs of the X25519 function {{RFC7748}}:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+   G_XY = X25519( Y, G_X ) = X25519( X, G_Y )
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
 
