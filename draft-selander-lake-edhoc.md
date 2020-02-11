@@ -208,10 +208,10 @@ EDHOC is designed to work in highly constrained scenarios making it especially s
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
 message_1       40        38        38        38                     
-message_2       45        56       126       116 + Certificate chain 
+message_2       45        48       126       116 + Certificate chain 
 message_3       11        22        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total           96       116       255       235 + Certificate chains
+Total           96       108       255       235 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-sizes title="Typical message sizes in bytes" artwork-align="center"}
@@ -560,7 +560,7 @@ Initiator                                                   Responder
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|   C_I, G_Y, C_R, AEAD(K_2; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
+|    C_I, G_Y, C_R, Enc(K_2; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -689,14 +689,16 @@ The Responder SHALL compose message_2 as follows:
    * Associated data A =
 
      \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R >> \]
-     
-* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. 
+
+* Depending on method, CIPHERTEXT_2 is the 'ciphertext' of an outer COSE_Encrypt0 or a XOR encrypted plaintext with the following common parameters:
 
    * plaintext = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 )
 
       * AD_2 = bstr containing opaque unprotected auxiliary data
 
       * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only kid_R is conveyed in the plaintext, see {{asym-overview}}.
+
+   If method equals 0 or 2, compute an outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. The protected header SHALL be empty. 
 
    * external_aad = TH_2
 
@@ -707,7 +709,13 @@ The Responder SHALL compose message_2 as follows:
    * Plaintext P = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 ) 
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
 
-* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the outer COSE_Encrypt0 ciphertext. 
+   If method equals 1 or 3, compute CIPHERTEXT_2 as follows:
+   
+   * CIPHERTEXT_2 = plaintext XOR K_2X
+
+      * The key K_2X SHALL be derived using the pseudorandom key PRK_2, the transcript hash TH_2, AlgorithmID = "XOR-ENCRYPTION", and keyDataLength equal to the length of the plaintext.
+
+* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
 ### Initiator Processing of Message 2
 
@@ -717,7 +725,7 @@ The Initiator SHALL process message_2 as follows:
 
 * Retrieve the protocol state using the connection identifier C_I and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, and IV_2.
+* Decrypt CIPHERTEXT_2. The decryption process depends on the method, see {{asym-msg2-proc}}.
 
 * Verify that the identity of the Responder is among the allowed identities for this connection.
 
