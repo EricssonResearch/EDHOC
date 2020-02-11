@@ -34,7 +34,6 @@ normative:
 
   I-D.ietf-cbor-sequence:
   I-D.ietf-cose-x509:
-  I-D.ietf-cbor-7049bis:
   I-D.ietf-core-echo-request-tag:
   
   RFC2119:
@@ -44,6 +43,7 @@ normative:
   RFC6979:
   RFC7252:
   RFC7748:
+  RFC7049:
   RFC7959:
   RFC8152:
   RFC8174:
@@ -197,7 +197,7 @@ This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a very compa
 
 # Introduction
 
-Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protection needs to work over a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{RFC8152}}), which builds on the Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}}. Object Security for Constrained RESTful Environments (OSCORE) {{RFC8613}} is a method for application-layer protection of the Constrained Application Protocol (CoAP), using COSE. 
+Security at the application layer provides an attractive option for protecting Internet of Things (IoT) deployments, for example where transport layer security is not sufficient {{I-D.hartke-core-e2e-security-reqs}} or where the protection needs to work over a variety of underlying protocols. IoT devices may be constrained in various ways, including memory, storage, processing capacity, and energy {{RFC7228}}. A method for protecting individual messages at the application layer suitable for constrained devices, is provided by CBOR Object Signing and Encryption (COSE) {{RFC8152}}), which builds on the Concise Binary Object Representation (CBOR) {{RFC7049}}. Object Security for Constrained RESTful Environments (OSCORE) {{RFC8613}} is a method for application-layer protection of the Constrained Application Protocol (CoAP), using COSE. 
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a lightweight key exchange protocol providing perfect forward secrecy and identity protection. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface. A main use case for EDHOC is to establish an OSCORE security context. EDHOC uses COSE for cryptography, CBOR for encoding, and CoAP for transport. By reusing existing libraries, the additional code footprint can be kept very low. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
@@ -216,7 +216,7 @@ Total           96       116       255       235 + Certificate chains
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-sizes title="Typical message sizes in bytes" artwork-align="center"}
 
-The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{I-D.ietf-cbor-7049bis}} and COSE {{RFC8152}} are used to implement these standards. The use of COSE provides crypto agility and enables use of future algorithms and headers designed for constrained IoT.
+The ECDH exchange and the key derivation follow {{SIGMA}}, NIST SP-800-56A {{SP-800-56A}}, and HKDF {{RFC5869}}. CBOR {{RFC7049}} and COSE {{RFC8152}} are used to implement these standards. The use of COSE provides crypto agility and enables use of future algorithms and headers designed for constrained IoT.
 
 This document is organized as follows: {{background}} describes how EDHOC builds on SIGMA-I, {{overview}} specifies general properties of EDHOC, including message flow, formatting of the ephemeral public keys, and key derivation, {{asym}} specifies EDHOC with signature key and static Diffie-Hellman key authentication, {{sym}} specifies EDHOC with symmetric key authentication, {{error}} specifies the EDHOC error message, and {{transfer}} describes how EDHOC can be transferred in CoAP and used to establish an OSCORE security context.
 
@@ -234,7 +234,7 @@ EDHOC is adapted to primitives and protocols designed for the Internet of Things
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all capitals, as shown here.
 
-Readers are expected to be familiar with the terms and concepts described in CBOR {{I-D.ietf-cbor-7049bis}} {{I-D.ietf-cbor-sequence}}, COSE {{RFC8152}}, and CDDL {{RFC8610}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{I-D.ietf-cbor-7049bis}}. Examples of CBOR and CDDL are provided in {{CBOR}}.
+Readers are expected to be familiar with the terms and concepts described in CBOR {{RFC7049}} {{I-D.ietf-cbor-sequence}}, COSE {{RFC8152}}, and CDDL {{RFC8610}}. The Concise Data Definition Language (CDDL) is used to express CBOR data structures {{RFC7049}}. Examples of CBOR and CDDL are provided in {{CBOR}}.
 
 # Background {#background}
 
@@ -541,7 +541,7 @@ In the latter two examples, ID_CRED_I and ID_CRED_R contain the actual credentia
 The authentication keys must be a signature keys or static Diffie-Hellman keys. The Initiator and the Responder
  MAY use different types of authentication keys, e.g. one uses a signature key and the other uses a static Diffie-Hellman key. When using a signature key, the authentication is provided by a signature. When using a static Diffie-Hellman key the authentication is provided by a Message Authentication Code (MAC) computed from an ephemeral-static ECDH shared secret which enables significant reductions in message sizes. The MAC is implemented with an AEAD algorithm.  When using a static Diffie-Hellman keys the Initiator's and Responder's private authentication keys are called I and R respectively and the public authentication keys are called G_I and G_R respectively.
 
-The actual credentials CRED_I and CRED_R (e.g., a COSE_Key or a single X.509 certificate) are signed by the Initiator and the Responder respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}. The Initiator and the Responder MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order. Note that that CRED_I and CRED_R are always CBOR bstr, if e.g. COSE_Keys are used they need to be wrapped in a CBOR bstr.
+The actual credentials CRED_I and CRED_R (e.g., a COSE_Key or a single X.509 certificate) are signed by the Initiator and the Responder respectively, see {{asym-msg3-form}} and {{asym-msg2-form}}. The Initiator and the Responder MAY use different types of credentials, e.g. one uses RPK and the other uses certificate. When included in signature or MAC, COSE_Keys of type OKP SHALL only include the parameters 1 (kty), -1 (crv), and -2 (x-coordinate). COSE_Keys of type EC2 SHALL only include the parameters 1 (kty), -1 (crv), -2 (x-coordinate), and -3 (y-coordinate). The parameters SHALL be encoded in decreasing order.
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
@@ -1306,13 +1306,13 @@ Expert reviewers should take into consideration the following points:
 
 # Use of CBOR, CDDL and COSE in EDHOC {#CBORandCOSE}
 
-This Appendix is intended to simplify for implementors not familiar with CBOR {{I-D.ietf-cbor-7049bis}}, CDDL {{RFC8610}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}.
+This Appendix is intended to simplify for implementors not familiar with CBOR {{RFC7049}}, CDDL {{RFC8610}}, COSE {{RFC8152}}, and HKDF {{RFC5869}}.
 
 ## CBOR and CDDL  {#CBOR}
 
-The Concise Binary Object Representation (CBOR) {{I-D.ietf-cbor-7049bis}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{RFC8610}} provides a way to express structures for protocol messages and APIs that use CBOR. {{RFC8610}} also extends the diagnostic notation.
+The Concise Binary Object Representation (CBOR) {{RFC7049}} is a data format designed for small code size and small message size. CBOR builds on the JSON data model but extends it by e.g. encoding binary data directly without base64 conversion. In addition to the binary CBOR encoding, CBOR also has a diagnostic notation that is readable and editable by humans. The Concise Data Definition Language (CDDL) {{RFC8610}} provides a way to express structures for protocol messages and APIs that use CBOR. {{RFC8610}} also extends the diagnostic notation.
 
-CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain information about the major type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays \[\]  of data items, maps {} of pairs of data items, and sequences {{I-D.ietf-cbor-sequence}} of data items. Some examples are given below. For a complete specification and more examples, see {{I-D.ietf-cbor-7049bis}} and {{RFC8610}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}. 
+CBOR data items are encoded to or decoded from byte strings using a type-length-value encoding scheme, where the three highest order bits of the initial byte contain information about the major type. CBOR supports several different types of data items, in addition to integers (int, uint), simple values (e.g. null), byte strings (bstr), and text strings (tstr), CBOR also supports arrays \[\]  of data items, maps {} of pairs of data items, and sequences {{I-D.ietf-cbor-sequence}} of data items. Some examples are given below. For a complete specification and more examples, see {{RFC7049}} and {{RFC8610}}. We recommend implementors to get used to CBOR by using the CBOR playground {{CborMe}}. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Diagnostic          Encoded              Type
@@ -1330,19 +1330,6 @@ h'12cd'             0x4212cd             byte string
 [ 1, 2, null ]      0x830102f6           array      
 ( 1, 2, null )      0x0102f6             sequence
 1, 2, null          0x0102f6             sequence
-------------------------------------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~
-{: artwork-align="center"}
-
-EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}. The message format specification uses the construct '.cbor' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
-
-A type (e.g. an uint) may be wrapped in a byte string (bstr):
-
-~~~~~~~~~~~~~~~~~~~~~~~
-CDDL Type                       Diagnostic                Encoded
-------------------------------------------------------------------
-uint                            24                        0x1818
-bstr .cbor uint                 << 24 >>                  0x421818
 ------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
