@@ -730,7 +730,7 @@ The Initiator SHALL process message_2 as follows:
 
 * Verify that the unverified identity of the Responder is among the allowed identities for this connection.
 
-* Verify Singature_or_MAC_2 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg2-proc}}.
+* Verify Signature_or_MAC_2 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg2-proc}}.
 
 * Pass AD_2 to the security application.
 
@@ -845,7 +845,7 @@ the Responder SHALL process message_3 as follows:
 
 * Verify that the unverified identity of the Initiator is among the allowed identities for this connection.
 
-* Verify Singature_or_MAC_3 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg3-proc}}.
+* Verify Signature_or_MAC_3 using the algorithm in the selected cipher suite. The verification process depends on the method, see {{asym-msg3-proc}}.
 
 *  Pass AD_3, the connection identifiers (C_I, C_R), and the application algorithms in the selected cipher suite to the security application. The application can now derive application keys using the EDHOC-Exporter interface.
 
