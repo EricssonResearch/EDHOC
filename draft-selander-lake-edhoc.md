@@ -1331,19 +1331,6 @@ h'12cd'             0x4212cd             byte string
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: artwork-align="center"}
 
-EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}. The message format specification uses the construct '.cbor' enabling conversion between different CDDL types matching different CBOR items with different encodings. Some examples are given below.
-
-A type (e.g. an uint) may be wrapped in a byte string (bstr):
-
-~~~~~~~~~~~~~~~~~~~~~~~
-CDDL Type                       Diagnostic                Encoded
-------------------------------------------------------------------
-uint                            24                        0x1818
-bstr .cbor uint                 << 24 >>                  0x421818
-------------------------------------------------------------------
-~~~~~~~~~~~~~~~~~~~~~~~
-{: artwork-align="center"}
-
 ## COSE {#COSE}
 
 CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create and process signatures, message authentication codes, and encryption using CBOR. COSE builds on JOSE, but is adapted to allow more efficient processing in constrained devices. EDHOC makes use of COSE_Key, COSE_Encrypt0, COSE_Sign1, and COSE_KDF_Context objects.
