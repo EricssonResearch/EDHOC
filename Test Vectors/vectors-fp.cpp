@@ -1716,10 +1716,10 @@ void static_vectors ( void )
     vector<uint8_t> A_R = { 0x83 }; // CBOR array of length 3
     vector_append( A_R, cbor_tstr( "Encrypt0" ) );
     vector_append( A_R, cbor_bstr(ID_CRED_R_CBOR) ); // protected contains the serialized ID_CRED_R
-    vector<uint8_t> ext_aad;
-    vector_append( ext_aad , TH_2 );
-    vector_append( ext_aad , CRED_R_CBOR ); //CRED_R map in this case
-    vector_append( A_R, cbor_bstr( ext_aad ) );
+    vector<uint8_t> ext_aad_2;
+    vector_append( ext_aad_2 , TH_2 );
+    vector_append( ext_aad_2 , CRED_R_CBOR ); //CRED_R map in this case
+    vector_append( A_R, cbor_bstr( ext_aad_2 ) );
 
     vector<uint8_t> C_M = aes_ccm_16_64_128( K_R, IV_R, P_R, A_R );
     //TODO: Check why this returns 9 bytes of 0s
@@ -1735,15 +1735,15 @@ void static_vectors ( void )
   
     cout << "The external_aad is the following:" << endl ;
 
-    print_fig_with_bytes("(TH_2 , CRED_R ) (CBOR Sequence)" , ext_aad);
+    print_fig_with_bytes("(TH_2 , CRED_R ) (CBOR Sequence)" , ext_aad_2);
 
     cout << "Which encodes to the following byte string:" << endl;
 
-    print_fig_with_bytes("(TH_2 , CRED_R ) (CBOR Sequence) (CBOR-encoded)" , cbor_bstr(ext_aad));
+    print_fig_with_bytes("(TH_2 , CRED_R ) (CBOR Sequence) (CBOR-encoded)" , cbor_bstr(ext_aad_2));
 
     cout << "From the parameters above, the Enc_structure A_2 is computed." << endl;
 
-    print_fig("A_R =" , enc_string(ID_CRED_R_CBOR , ext_aad));
+    print_fig("A_R =" , enc_string(ID_CRED_R_CBOR , ext_aad_2));
 
     cout << "Which encodes to the following byte string to be used as Additional Authenticated Data:" << endl;
 
@@ -1870,12 +1870,11 @@ void static_vectors ( void )
     print_fig_with_bytes("message_2 (CBOR Sequence)" , message_2);
 
 
-/*
     // message_3 ////////////////////////////////////////////////////////////////////////////
 
     // Calculate data_3
     vector<uint8_t> data_3;
-    vector_append( data_3, cbor_bstr( C_V ) );
+    vector_append( data_3, cbor_bstr( C_R ) );
 
     // Calculate TH_3
     vector<uint8_t> TH_3_input;
@@ -1889,13 +1888,13 @@ void static_vectors ( void )
 
     cout << "### Message 3 {#tv-rpk-3}" << endl << endl;
 
-    cout << "Since TYPE mod 4 equals " + to_string(TYPE) + ", C_V is not omitted from data_3." << endl << endl;
+    cout << "Since TYPE mod 4 equals " + to_string(corr) + ", C_R is not omitted from data_3." << endl << endl;
 
-    print_fig_with_bytes("C_V" , C_V);
+    print_fig_with_bytes("C_R" , C_R);
 
     cout << "Data_3 is constructed, as the CBOR Sequence of the CBOR data item above." << endl;
 
-    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_V , 4) + "\n)");
+    print_fig("data_3 =" , "(\n  " + vector_to_cddl_bstr(C_R , 4) + "\n)");
 
     print_fig_with_bytes("data_3 (CBOR Sequence)", data_3);
 
@@ -1911,80 +1910,157 @@ void static_vectors ( void )
 
     print_fig_with_bytes("TH_3 (CBOR-encoded)" , cbor_bstr(TH_3));   
 
-    // Calculate signature
-    vector<uint8_t> message_U { 0x84 }; // CBOR array of length 4
-    vector_append( message_U, cbor_tstr( "Signature1" ) );
-    vector_append( message_U, cbor_bstr( ID_CRED_I_CBOR ) );
-    vector_append( message_U, cbor_bstr( TH_3 ) );
-    vector_append( message_U, cbor_bstr( CRED_I_CBOR ) );
-    vector<uint8_t> signature_U( crypto_sign_BYTES );
-    crypto_sign_detached( signature_U.data(), nullptr, message_U.data(), message_U.size(), I_sign_sk_libsodium.data() );
+
+    // Calculate ECDH shared secret G_IY - I and G_Y
+    vector<uint8_t> shared_secret_se( crypto_scalarmult_BYTES );
+    if ( crypto_scalarmult( shared_secret_se.data(), R_kx_pk.data(), I_dh_sk.data() ) == -1 ) {
+        cout << "crypto_scalarmult error";
+        return;
+    }
+
+    // Derive key and IV for MAC
+    vector<uint8_t> PRK_I = hkdf_extract_sha_256( PRK_R, shared_secret_se );
+    vector<uint8_t> info_K_I = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3 );
+    vector<uint8_t> K_I = hkdf_expand_sha_256( PRK_I, info_K_I, 16 );
+    vector<uint8_t> info_IV_I = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3 );
+    vector<uint8_t> IV_I = hkdf_expand_sha_256( PRK_I, info_IV_I, 13 );
 
     // Print //////////////////////////////////////////////
 
-    cout << "#### Signature Computation {#tv-rpk-3-sign}" << endl << endl;
+    cout << "#### MAC Computation {#tv-ss-3-mac}" << endl << endl;
 
-    cout << "COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-u}}:" << endl << endl;
-    cout << "* protected = bstr .cbor ID_CRED_U " << endl << endl;
-    cout << "* payload = CRED_U" << endl << endl;
-    cout << "And from {{tv-rpk-3}}:" << endl << endl;
-    cout << "* external_aad = TH_3" << endl << endl;
-    cout << "The Sig_structure M_U to be signed is: \\[ \"Signature1\", << ID_CRED_U >>, TH_3, CRED_U \\] , as defined in {{asym-msg3-proc}}:" << endl << endl;
+    cout << "Since method equals 3, a COSE_Encrypt0 is calculated." << endl << endl;
 
-    print_fig("M_U =" , "[\n  \"Signature1\",\n  << " + line(id_cred_I_str) + " >>,\n  " + vector_to_cddl_bstr(TH_3 , 4) + ",\n  "+ tab(cred_I_str_tab) + "\n]");
+    cout << "##### Key and Nonce Computation {#tv-ss-3-key-mac}" << endl << endl;
 
-    cout << "Which encodes to the following byte string ToBeSigned:" << endl;
+    cout << "The key and nonce for calculating the MAC are calculated as follows, as specified in {{key-der}}." << endl << endl;
+    cout << "HKDF SHA-256 is the HKDF used (as defined by cipher suite 0)." << endl << endl;
+    cout << "PRK_I = HMAC-SHA-256 (PRK_3, G_IY)" << endl << endl;
+    cout << "with PRK_3 = PRK_R." << endl << endl;
+    cout << "G_IY is the ECDH shared secret, and since the curve25519 is used, the ECDH shared secret is the output of the X25519 function." << endl;
 
-    print_fig_with_bytes("M_U (message to be signed with Ed25519) (CBOR-encoded)" , message_U);
+    print_fig_with_bytes("G_IY", shared_secret_se);
 
-    cout << "The message is signed using the private authentication key of U, and produces the following signature:" << endl;
+    cout << "From there, PRK_I is computed:" << endl;
 
-    print_fig_with_bytes("U's signature" , signature_U);
+    print_fig_with_bytes("PRK_I" , PRK_I);
 
+    cout << "Key K_I is the output of HKDF-Expand(PRK_I, info, L)." << endl << endl;
+    cout << "info is defined as follows:" << endl;
+
+    print_fig("info for K_I =", info_string(to_string(aead_algorithm_id), 128, TH_3));
+
+    cout << "Which as a CBOR encoded data item is:" << endl;
+
+    // TODO: check if info should be a bstr or not
+    print_fig_with_bytes("info (K_I) (CBOR-encoded)" , info_K_I);
+
+    cout << "L is the length of K_I, so " + to_string(K_I.size()) + " bytes." << endl << endl;
+
+    cout << "From these parameters, K_I is computed:" << endl;
+
+    print_fig_with_bytes("K_I" , K_I);
+
+    cout << "Nonce IV_I is the output of HKDF-Expand(PRK_I, info, L)." << endl << endl;
+
+    cout << "info is defined as follows:" << endl;
+
+    print_fig("info for IV_I =", info_string("\"IV-GENERATION\"", 104, TH_3));
+
+    cout << "Which as a CBOR encoded data item is:" << endl;
+
+    print_fig_with_bytes("info (IV_I) (CBOR-encoded)" , info_IV_I);
+   
+    cout << "L is the length of IV_I, so " + to_string(IV_I.size()) + " bytes." << endl << endl;
+
+    cout << "From these parameters, IV_I is computed:" << endl;
+
+    print_fig_with_bytes("IV_I" , IV_I);   
+
+    // Calculate MAC
+    vector<uint8_t> P_I;
+    vector_append( P_I, cbor_bstr( { } ) ); // empty bstr
+
+    vector<uint8_t> A_I = { 0x83 }; // CBOR array of length 3
+    vector_append( A_I, cbor_tstr( "Encrypt0" ) );
+    vector_append( A_I, cbor_bstr(ID_CRED_I_CBOR) ); // protected contains the serialized ID_CRED_I
+    vector<uint8_t> ext_aad_3;
+    vector_append( ext_aad_3 , TH_3 );
+    vector_append( ext_aad_3 , CRED_I_CBOR ); //CRED_I map in this case
+    vector_append( A_I, cbor_bstr( ext_aad_3 ) );
+
+    vector<uint8_t> C_N = aes_ccm_16_64_128( K_I, IV_I, P_I, A_I );
+    //TODO: Check why this returns 9 bytes of 0s
+
+    cout << "##### MAC Computation {#tv-ss-3-mac-comp}" << endl << endl;
+
+    cout << "COSE_Encrypt0 is computed with the following parameters." << endl << endl;
+    cout << "* protected header = CBOR-encoded ID_CRED_I" << endl << endl;
+    cout << "* external_aad = CBOR Sequence of TH_3 and CRED_I, in this order" << endl << endl;
+    cout << "* empty plaintext" << endl << endl;
+
+    print_fig_with_bytes("Protected header: ID_CRED_I (CBOR-encoded)" , cbor_bstr(ID_CRED_I_CBOR));
+  
+    cout << "The external_aad is the following:" << endl ;
+
+    print_fig_with_bytes("(TH_3 , CRED_I ) (CBOR Sequence)" , ext_aad_3);
+
+    cout << "Which encodes to the following byte string:" << endl;
+
+    print_fig_with_bytes("(TH_3 , CRED_I ) (CBOR Sequence) (CBOR-encoded)" , cbor_bstr(ext_aad_3));
+
+    cout << "From the parameters above, the Enc_structure A_I is computed." << endl;
+
+    print_fig("A_I =" , enc_string(ID_CRED_I_CBOR , ext_aad_3));
+
+    cout << "Which encodes to the following byte string to be used as Additional Authenticated Data:" << endl;
+
+    print_fig_with_bytes("A_I (CBOR-encoded)" , A_I );
+
+
+    cout << "The key and nonce used are defined in {{tv-ss-3-key}}:" << endl << endl;
+
+    cout << "* key = K_I" << endl << endl;
+
+    cout << "* nonce = IV_I" << endl << endl;
+
+    cout << "Using the parameters above, the ciphertext CIPHERTEXT_I can be computed:" << endl;
+
+    print_fig_with_bytes("CIPHERTEXT_I" , C_N);
 
 
     // Derive key and IV
     vector<uint8_t> info_K_3 = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3 );
-    vector<uint8_t> K_3 = hkdf_expand_sha_256( PRK, info_K_3, 16 );
+    vector<uint8_t> K_3 = hkdf_expand_sha_256( PRK_R, info_K_3, 16 );
     vector<uint8_t> info_IV_3 = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3 );
-    vector<uint8_t> IV_3 = hkdf_expand_sha_256( PRK, info_IV_3, 13 );
+    vector<uint8_t> IV_3 = hkdf_expand_sha_256( PRK_R, info_IV_3, 13 );
 
     // Print //////////////////////////////////////////////
 
-    cout << "#### Key and Nonce Computation {#tv-rpk-3-key}" << endl << endl;
+    cout << "#### Key and Nonce Computation {#tv-ss-2-key}" << endl << endl;
 
     cout << "The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}." << endl << endl;
+    cout << "HKDF SHA-256 is the HKDF used (as defined by cipher suite 0)." << endl << endl;
+    cout << "PRK_3 = PRK_R = HMAC-SHA-256(PRK_2, G_RX) as defined in {{tv-ss-2-mac}}" << endl << endl;
 
-    cout << "HKDF SHA-256 is the HKDF used (as defined by cipher suite " << suite << " )." << endl << endl;
+    print_fig_with_bytes("PRK_3" , PRK_R);
 
-    cout << "PRK = HMAC-SHA-256(salt, G_XY)" << endl << endl;
-
-    cout << "Since this is the asymmetric case, salt is the empty byte string." << endl << endl;
-
-    cout << "G_XY is the shared secret, and since the curve25519 is used, the ECDH shared secret is the output of the X25519 function." << endl << endl;
-
-    print_fig_with_bytes("G_XY", shared_secret);
-
-    cout << "From there, PRK is computed:" << endl;
-
-    print_fig_with_bytes("PRK", PRK);
-
-    cout << "Key K_3 is the output of HKDF-Expand(PRK, info, L)." << endl << endl;
+    cout << "Key K_3 is the output of HKDF-Expand(PRK_3, info, L)." << endl << endl;
     cout << "info is defined as follows:" << endl;
 
     print_fig("info for K_3 =", info_string(to_string(aead_algorithm_id), 128, TH_3));
 
-    cout << "Which as a CBOR encoded data item is:" << endl; 
+    cout << "Which as a CBOR encoded data item is:" << endl;
 
-    print_fig_with_bytes( "info (K_3) (CBOR-encoded)" , info_K_3);
+    print_fig_with_bytes("info (K_3) (CBOR-encoded)" , info_K_3);
 
-    cout << "L is the length of K_3, so " << K_3.size() << " bytes. "<< endl << endl;
+    cout << "L is the length of K_3, so " + to_string(K_3.size()) + " bytes." << endl << endl;
 
     cout << "From these parameters, K_3 is computed:" << endl;
 
-    print_fig_with_bytes( "K_3" , K_3);
+    print_fig_with_bytes("K_3" , K_3);
 
-    cout << "Nonce IV_3 is the output of HKDF-Expand(PRK, info, L).";
+    cout << "Nonce IV_3 is the output of HKDF-Expand(PRK, info, L)." << endl << endl;
 
     cout << "info is defined as follows:" << endl;
 
@@ -1992,17 +2068,19 @@ void static_vectors ( void )
 
     cout << "Which as a CBOR encoded data item is:" << endl;
 
-    print_fig_with_bytes("info (IV_3) (CBOR-encoded)", info_IV_3);
+    print_fig_with_bytes("info (IV_3) (CBOR-encoded)" , info_IV_3);
+   
+    cout << "L is the length of IV_3, so " + to_string(IV_3.size()) + " bytes." << endl << endl;
 
     cout << "From these parameters, IV_3 is computed:" << endl;
 
-    print_fig_with_bytes( "IV_3" , IV_3);
+    print_fig_with_bytes("IV_3" , IV_3);
 
 
     // Calculate ciphertext
     vector<uint8_t> P_3;
-    vector_append( P_3, cbor_bstr( kid_U ) ); // ID_CRED_U contains a single 'kid' parameter, so only bstr is used
-    vector_append( P_3, cbor_bstr( signature_U ) );
+    vector_append( P_3, cbor_bstr( kid_I ) ); // ID_CRED_V contains a single 'kid' parameter, so only bstr is used
+    vector_append( P_3, cbor_bstr( C_N ) );
     vector<uint8_t> A_3 = { 0x83 }; // CBOR array of length 3
     vector_append( A_3, cbor_tstr( "Encrypt0" ) );
     vector_append( A_3, cbor_bstr( { } ) ); // empty bstr 
@@ -2011,13 +2089,13 @@ void static_vectors ( void )
 
     // Print //////////////////////////////////////////////
 
-    cout << "#### Ciphertext Computation {#tv-rpk-3-ciph}" << endl << endl;
+    cout << "#### Ciphertext Computation {#tv-ss-3-ciph}" << endl << endl;
 
     cout << "COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitted." << endl << endl;
     cout << "* empty protected header" << endl << endl;
     cout << "* external_aad = TH_3" << endl << endl;
-    cout << "* plaintext = CBOR Sequence of the items kid_value_U, signature, in this order." << endl << endl;
-    cout << "with kid_value_U taken from {{rpk-tv-input-u}}, and signature as calculated in {{tv-rpk-3-sign}}." << endl << endl;
+    cout << "* plaintext = CBOR Sequence of the items kid_R, CIPHERTEXT_R, in this order." << endl << endl;
+    cout << "with kid_R taken from {{ss-tv-input-v}}, and CIPHERTEXT_R as calculated in {{tv-ss-2-mac-comp}}." << endl << endl;
     cout << "The plaintext is the following:" << endl ;
 
     print_fig_with_bytes("P_3 " , P_3);
@@ -2031,7 +2109,7 @@ void static_vectors ( void )
     print_fig_with_bytes("A_3 (CBOR-encoded)" , A_3 );
 
 
-    cout << "The key and nonce used are defined in {{tv-rpk-3-key}}:" << endl << endl;
+    cout << "The key and nonce used are defined in {{tv-ss-3-key}}:" << endl << endl;
 
     cout << "* key = K_3" << endl << endl;
 
@@ -2045,97 +2123,20 @@ void static_vectors ( void )
     // Calculate message_3
     vector<uint8_t> message_3;
     vector_append( message_3, data_3 );
-    vector_append( message_3, cbor_bstr( C_3 ) );
+    vector_append( message_3, cbor_bstr( C_3 ) ); 
 
     // Print //////////////////////////////////////////////
 
     cout << "#### message_3" << endl << endl;
 
-    cout << "From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3)." << endl << endl;
+    cout << "From the parameter computed in {{tv-ss-3}} and {{tv-ss-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_I, CIPHERTEXT_3)." << endl << endl;
 
-    print_fig("message_3 =" , "(\n  " + vector_to_cddl_bstr(C_V , 4) + ",\n  " + vector_to_cddl_bstr(C_3 , 4) + "\n)");
+    print_fig("message_3 =" , "(\n  " + vector_to_cddl_bstr(C_I , 4) + ",\n  " + vector_to_cddl_bstr(C_3 , 4) + "\n)");
 
     cout << "Which encodes to the following byte string:" << endl;
 
     print_fig_with_bytes("message_3 (CBOR Sequence)" , message_3);
 
-
-    // OSCORE ////////////////////////////////////////////////////////////////////////////
-
-    // Calculate TH_4
-    vector<uint8_t> TH_4_input;
-    vector_append( TH_4_input, cbor_bstr( TH_3 ) );
-    vector_append( TH_4_input, cbor_bstr( C_3 ) );
-    vector<uint8_t> TH_4 = hash_sha_256( TH_4_input );
-
-    // Derive OSCORE Master Secret and Salt
-    vector<uint8_t> info_OSCORE_secret = gen_info( cbor_tstr( "OSCORE Master Secret" ), 128, TH_4 );
-    vector<uint8_t> OSCORE_secret = hkdf_expand_sha_256( PRK,  info_OSCORE_secret, 16 );
-    vector<uint8_t> info_OSCORE_salt = gen_info( cbor_tstr( "OSCORE Master Salt" ), 64, TH_4 );
-    vector<uint8_t> OSCORE_salt = hkdf_expand_sha_256( PRK, info_OSCORE_salt, 8 );
-
-    // Print //////////////////////////////////////////////
-
-    cout << "#### OSCORE Security Context Derivation" << endl << endl;
-
-    cout << "From the previous message exchange, the Common Security Context for OSCORE {{RFC8613}} can be derived, as specified in {{exporter}}." << endl << endl;
-
-    cout << "First af all, TH_4 is computed: TH_4 = H( TH_3, CIPHERTEXT_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and CIPHERTEXT_3" << endl;
-
-    print_fig_with_bytes("( TH_3, CIPHERTEXT_3 ) (CBOR Sequence)" , TH_4_input);
-
-    cout << "And from there, compute the transcript hash TH_4 = SHA-256( TH_3, CIPHERTEXT_3 )" << endl;
-
-    print_fig_with_bytes( "TH_4 value" , TH_4);
-
-    cout << "When encoded as a CBOR bstr, that gives:" << endl;
-
-    print_fig_with_bytes( "TH_4 (CBOR-encoded)", cbor_bstr(TH_4));
-
-    cout << "To derive the Master Secret and Master Salt the same HKDF-Expand (PRK, info, L) is used, with different info and L." << endl << endl;
-
-    cout << "For Master Secret:" << endl << endl;
-
-    cout << "L for Master Secret = 16" << endl;
-
-    print_fig("info for Master Secret =", info_string("\"OSCORE Master Secret\"", 128, TH_4));
-
-    cout << "When encoded as a CBOR bstr, that gives:" << endl;
-
-    print_fig_with_bytes("info (OSCORE Master Secret) (CBOR-encoded)" , info_OSCORE_secret);
-
-    cout << "Finally, the Master Secret value computed is:" << endl;
-
-    print_fig_with_bytes("OSCORE Master Secret", OSCORE_secret);
-
-    cout << "For Master Salt:" << endl << endl;
-
-    cout << "L for Master Salt = 8" << endl;
-
-    print_fig("info for Master Salt =", info_string("\"OSCORE Master Salt\"", 64, TH_4));
-
-    cout << "When encoded as a CBOR bstr, that gives:" << endl;
-
-    print_fig_with_bytes("info (OSCORE Master Salt) (CBOR-encoded)" , info_OSCORE_salt);
-
-    cout << "Finally, the Master Salt value computed is:" << endl;
-
-    print_fig_with_bytes("OSCORE Master Salt", OSCORE_salt);
-
-    cout << "The Client's Sender ID takes the value of C_V:" << endl;
-
-    print_fig_with_bytes("Client's OSCORE Sender ID", C_V);
-
-    cout << "The Server's Sender ID takes the value of C_U:" << endl;
-
-    print_fig_with_bytes("Server's OSCORE Sender ID", C_U);
-
-    cout << "The algorithms are those negociated in the cipher suite:" << endl;
-
-    print_fig("AEAD Algorithm", to_string(aead_algorithm_id));
-
-    print_fig("HMAC Algorithm", to_string(hmac_algorithm_id));
-*/
 }
 
 int main( void )
@@ -2150,7 +2151,7 @@ int main( void )
 
     cout << endl << endl << "# Test Vectors {#vectors}" << endl << endl << "This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where Party U is CoAP client (this means that corr = 1). " << endl;
 
-    //rpk_vectors();
-    //psk_vectors();
+    rpk_vectors();
+    psk_vectors();
     static_vectors();
 }
