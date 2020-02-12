@@ -1312,9 +1312,11 @@ CBOR Object Signing and Encryption (COSE) {{RFC8152}} describes how to create an
 
 
 
+
+
 # Test Vectors {#vectors}
 
-This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where Party U is CoAP client (this means that corr = 1). 
+This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where the Initiator acts as CoAP client (this means that corr = 1). 
 
 ## Test Vectors for EDHOC Authenticated with Signature Keys (RPK)
 
@@ -1325,44 +1327,44 @@ method (Signature Authentication)
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-CoaP is used as transport and Party U is CoAP client:
+CoaP is used as transport and the Initiator acts as CoAP client:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-corr (Party U can correlate message_1 and message_2)
+corr (the Initiator can correlate message_1 and message_2)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 No unprotected opaque auxiliary data is sent in the message exchanges.
 
-The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
+The pre-defined Cipher Suite 0 is in place both on the Initiator and the Responder, see {{cipher-suites}}.
 
-### Input for Party U {#rpk-tv-input-u}
+### Input for the Initiator {#rpk-tv-input-u}
 
-The following are the parameters that are set in Party U before the first message exchange.
+The following are the parameters that are set in the Initiator before the first message exchange.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party U's private authentication key (32 bytes)
+Initiator's private authentication key (32 bytes)
 53 21 fc 01 c2 98 20 06 3a 72 50 8f c6 39 25 1d c8 30 e2 f7 68 3e b8 e3
 8a f1 64 a5 b9 af 9b e3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party U's public authentication key (32 bytes)
+Initiator's public authentication key (32 bytes)
 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0
 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid value to identify U's public authentication key (1 byte)
+kid value to identify the Initiator's public authentication key (1 byte)
 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite 0.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_U =
+CRED_I =
 << {
   1:  1,
  -1:  6,
@@ -1373,45 +1375,45 @@ CRED_U =
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_U (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
+CRED_I (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3 ec fc ff
 b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a2':
 ~~~~~~~~~~~~~~~~~~~~~~~
-ID_CRED_U =
+ID_CRED_I =
 { 
   4:  h'a2'
 }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that since the map for ID_CRED_U contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_U is used when added to the plaintext (see {{asym-msg3-proc}}):
+Note that since the map for ID_CRED_I contains a single 'kid' parameter, ID_CRED_I is used when transported in the protected header of the COSE Object, but only the kid_I is used when added to the plaintext (see {{asym-msg3-proc}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-ID_CRED_U (in protected header) (CBOR-encoded) (4 bytes)
+ID_CRED_I (in protected header) (CBOR-encoded) (4 bytes)
 a1 04 41 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value_U (in plaintext) (CBOR-encoded) (2 bytes)
+kid_I (in plaintext) (CBOR-encoded) (2 bytes)
 41 a2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-### Input for Party V {#rpk-tv-input-v}
+### Input for the Responder {#rpk-tv-input-v}
 
-The following are the parameters that are set in Party V before the first message exchange.
+The following are the parameters that are set in the Responder before the first message exchange.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party V's private authentication key (32 bytes)
+the Responder's private authentication key (32 bytes)
 74 56 b3 a3 e5 8d 8d 26 dd 36 bc 75 d5 5b 88 63 a8 5d 34 72 f4 a0 1f 02
 24 62 1b 1c b8 16 6d a9 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party V's public authentication key (32 bytes)
+the Responder's public authentication key (32 bytes)
 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2 0f 46 30 dc 78 a1 14 de 65 9c
 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1425,7 +1427,7 @@ a3
 This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve Ed25519 are used. That is in agreement with the Cipher Suite 0.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_V =
+CRED_R =
 << {
   1:  1,
  -1:  6,
@@ -1436,29 +1438,29 @@ CRED_V =
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_V (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
+CRED_R (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
 58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77 cd 5b c2
 0f 46 30 dc 78 a1 14 de 65 9c 7e 50 4d 0f 52 9a 6b d3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a3':
 ~~~~~~~~~~~~~~~~~~~~~~~
-ID_CRED_V =
+ID_CRED_R =
 { 
   4:  h'a3'
 }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that since the map for ID_CRED_V contains a single 'kid' parameter, ID_CRED_U is used when transported in the protected header of the COSE Object, but only the kid_value_V is used when added to the plaintext (see {{asym-msg3-proc}}):
+Note that since the map for ID_CRED_R contains a single 'kid' parameter, ID_CRED_I is used when transported in the protected header of the COSE Object, but only the kid_R is used when added to the plaintext (see {{asym-msg3-proc}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-ID_CRED_V (in protected header) (CBOR-encoded) (4 bytes)
+ID_CRED_R (in protected header) (CBOR-encoded) (4 bytes)
 a1 04 41 a3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value_V (in plaintext) (CBOR-encoded) (2 bytes)
+kid_R (in plaintext) (CBOR-encoded) (2 bytes)
 41 a3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1479,27 +1481,27 @@ suite
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-SUITES_U : suite
+SUITES_I : suite
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party U's ephemeral private key (32 bytes)
+Initiator's ephemeral private key (32 bytes)
 d4 d8 1a ba fa d9 08 a0 cc ef ef 5a d6 b0 5d 50 27 02 f1 c1 6f 23 2c 25
 92 93 09 ac 44 1b 95 8e 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_X (X-coordinate of the ephemeral public key of Party U) (32 bytes)
+G_X (X-coordinate of the ephemeral public key of the Initiator) (32 bytes)
 b1 a3 e8 94 60 e8 8d 3a 8d 54 21 1d c9 5f 0b 90 3f f2 05 eb 71 91 2d 6d
 b8 f4 af 98 0d 2d b8 3a 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_U (Connection identifier chosen by U) (1 byte)
+C_I (Connection identifier chosen by the Initiator) (1 byte)
 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1526,25 +1528,25 @@ message_1 (CBOR Sequence) (38 bytes)
 
 ### Message 2 {#tv-rpk-2}
 
-Since TYPE mod 4 equals 1, C_U is omitted from data_2.
+Since TYPE mod 4 equals 1, C_I is omitted from data_2.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party V's ephemeral private key (32 bytes)
+Responder's ephemeral private key (32 bytes)
 17 cd c7 bc a3 f2 a0 bd a6 0c 6d e5 b9 6f 82 a3 62 39 b4 4b de 39 7a 38
 62 d5 29 ba 8b 3d 7c 62 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_Y (X-coordinate of the ephemeral public key of Party V) (32 bytes)
+G_Y (X-coordinate of the ephemeral public key of the Responder) (32 bytes)
 8d b5 77 f9 b9 c2 74 47 98 98 7d b5 57 bf 31 ca 48 ac d2 05 a9 db 8c 32
 0e 5d 49 f3 02 a9 64 74 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_V (Connection identifier chosen by V) (1 byte)
+C_R (Connection identifier chosen by the Responder) (1 byte)
 c4 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1599,19 +1601,19 @@ TH_2 (CBOR-encoded) (34 bytes)
 
 COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-v}}:
 
-* protected = bstr .cbor ID_CRED_V 
+* protected = bstr .cbor ID_CRED_R 
 
-* payload = CRED_V
+* payload = CRED_R
 
 And from {{tv-rpk-2}}:
 
 * external_aad = TH_2
 
-The Sig_structure M_V to be signed is: \[ "Signature1", << ID_CRED_V >>, TH_2, CRED_V \] , as defined in {{asym-msg2-proc}}:
+The Sig_structure M_R to be signed is: \[ "Signature1", << ID_CRED_R >>, TH_2, CRED_R \] , as defined in {{asym-msg2-proc}}:
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-M_V =
+M_R =
 [
   "Signature1",
   << { 4: h'a3' } >>,
@@ -1628,7 +1630,7 @@ M_V =
 Which encodes to the following byte string ToBeSigned:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-M_V (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
+M_R (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
 84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a3 58 20 55 50 b3 dc 59
 84 b0 20 9a e7 4e a2 6a 18 91 89 57 50 8e 30 33 2b 11 da 68 1d c2 af dd
 87 03 55 58 28 a3 01 01 20 06 21 58 20 1b 66 1e e5 d5 ef 16 72 a2 d8 77
@@ -1744,9 +1746,9 @@ COSE_Encrypt0 is computed with the following parameters. Note that AD_2 is omitt
 
 * external_aad = TH_2
 
-* plaintext = CBOR Sequence of the items kid_value_V, signature, in this order.
+* plaintext = CBOR Sequence of the items kid_R, signature, in this order.
 
-with kid_value_V taken from {{rpk-tv-input-v}}, and signature as calculated in {{tv-rpk-2-sign}}.
+with kid_R taken from {{rpk-tv-input-v}}, and signature as calculated in {{tv-rpk-2-sign}}.
 
 The plaintext is the following:
 
@@ -1794,7 +1796,7 @@ e4 9b 78 bf
 
 #### message_2
 
-From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2).
+From the parameter computed in {{tv-rpk-2}} and {{tv-rpk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_R, CIPHERTEXT_2).
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1821,11 +1823,11 @@ ed 80 87 78 3c f7 a4 a7 e0 ea 38 c2 21 78 9f a3 71 be 64 e9 3c 43 a7 db
 
 ### Message 3 {#tv-rpk-3}
 
-Since TYPE mod 4 equals 1, C_V is not omitted from data_3.
+Since TYPE mod 4 equals 1, C_R is not omitted from data_3.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_V (1 byte)
+C_R (1 byte)
 c4 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1876,19 +1878,19 @@ TH_3 (CBOR-encoded) (34 bytes)
 
 COSE_Sign1 is computed with the following parameters. From {{rpk-tv-input-u}}:
 
-* protected = bstr .cbor ID_CRED_U 
+* protected = bstr .cbor ID_CRED_I 
 
-* payload = CRED_U
+* payload = CRED_I
 
 And from {{tv-rpk-3}}:
 
 * external_aad = TH_3
 
-The Sig_structure M_U to be signed is: \[ "Signature1", << ID_CRED_U >>, TH_3, CRED_U \] , as defined in {{asym-msg3-proc}}:
+The Sig_structure M_I to be signed is: \[ "Signature1", << ID_CRED_I >>, TH_3, CRED_I \] , as defined in {{asym-msg3-proc}}:
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-M_U =
+M_I =
 [
   "Signature1",
   << { 4: h'a2' } >>,
@@ -1905,7 +1907,7 @@ M_U =
 Which encodes to the following byte string ToBeSigned:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-M_U (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
+M_I (message to be signed with Ed25519) (CBOR-encoded) (93 bytes)
 84 6a 53 69 67 6e 61 74 75 72 65 31 44 a1 04 41 a2 58 20 21 cc b6 78 b7
 91 14 96 09 55 88 5b 90 a2 b8 2e 3b 2c a2 7e 8e 37 4a 79 07 f3 e7 85 43
 67 fc 22 58 28 a3 01 01 20 06 21 58 20 42 4c 75 6a b7 7c c6 fd ec f0 b3
@@ -1915,7 +1917,7 @@ ec fc ff b7 53 10 c0 15 bf 5c ba 2e c0 a2 36 e6 65 0c 8a b9 c7
 The message is signed using the private authentication key of U, and produces the following signature:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-U's signature (64 bytes)
+Initiator's signature (64 bytes)
 5c 7d 7d 64 c9 61 c5 f5 2d cf 33 91 25 92 a1 af f0 2c 33 62 b0 e7 55 0e
 4b c5 66 b7 0c 20 61 f3 c5 f6 49 e5 ed 32 3d 30 a2 6c 61 2f bb 5c bd 25
 f3 1c 27 22 8c ea ec 64 29 31 95 41 fe 07 8e 0e 
@@ -2018,9 +2020,9 @@ COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitt
 
 * external_aad = TH_3
 
-* plaintext = CBOR Sequence of the items kid_value_U, signature, in this order.
+* plaintext = CBOR Sequence of the items kid_I, signature, in this order.
 
-with kid_value_U taken from {{rpk-tv-input-u}}, and signature as calculated in {{tv-rpk-3-sign}}.
+with kid_I taken from {{rpk-tv-input-u}}, and signature as calculated in {{tv-rpk-3-sign}}.
 
 The plaintext is the following:
 
@@ -2068,7 +2070,7 @@ de 4a 83 3d 48 b6 64 74 14 2c c9 bd ce 87 d9 3a f8 35 57 9c 2d bf 1b 9e
 
 #### message_3
 
-From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3).
+From the parameter computed in {{tv-rpk-3}} and {{tv-rpk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_R, CIPHERTEXT_3).
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -2186,14 +2188,14 @@ OSCORE Master Salt (8 bytes)
 81 02 97 22 a2 30 4a 06 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Client's Sender ID takes the value of C_V:
+The Client's Sender ID takes the value of C_R:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client's OSCORE Sender ID (1 byte)
 c4 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Server's Sender ID takes the value of C_U:
+The Server's Sender ID takes the value of C_I:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Server's OSCORE Sender ID (1 byte)
@@ -2222,37 +2224,37 @@ method (Symmetric Authentication)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-CoaP is used as transport and Party U is CoAP client:
+CoaP is used as transport and the Initiator acts as CoAP client:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-corr (Party U can correlate message_1 and message_2)
+corr (the Initiator can correlate message_1 and message_2)
 1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 No unprotected opaque auxiliary data is sent in the message exchanges.
 
-The pre-defined Cipher Suite 0 is in place both on Party U and Party V, see {{cipher-suites}}.
+The pre-defined Cipher Suite 0 is in place both on the Initiator and the Responder, see {{cipher-suites}}.
 
-### Input for Party U {#psk-tv-input-u}
+### Input for the Initiator {#psk-tv-input-u}
 
-The following are the parameters that are set in Party U before the first message exchange.
+The following are the parameters that are set in the Initiator before the first message exchange.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party U's ephemeral private key (32 bytes)
+Initiator's ephemeral private key (32 bytes)
 f4 0c ea f8 6e 57 76 92 33 32 b8 d8 fd 3b ef 84 9c ad b1 9c 69 96 bc 27
 2a f1 f6 48 d9 56 6a 4c 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party U's ephemeral public key (value of G_X) (32 bytes)
+Initiator's ephemeral public key (value of G_X) (32 bytes)
 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97
 cb 57 49 61 cf a9 80 6f 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Connection identifier chosen by U (value of C_U) (1 byte)
+Connection identifier chosen by the Initiator (value of C_I) (1 byte)
 c1 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2279,7 +2281,7 @@ ID_PSK =
 
 This test vector uses COSE_Key objects to store the pre-shared key.
 
-Note that since the map for ID_PSK contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-overview}}):
+Note that since the map for ID_PSK contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid is used when added to the plaintext (see {{sym-overview}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_PSK (in protected header) (CBOR-encoded) (4 bytes)
@@ -2288,30 +2290,30 @@ a1 04 41 a1
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value (in plaintext) (CBOR-encoded) (2 bytes)
+kid (in plaintext) (CBOR-encoded) (2 bytes)
 41 a1 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-### Input for Party V {#psk-tv-input-v}
+### Input for the Responder {#psk-tv-input-v}
 
-The following are the parameters that are set in Party V before the first message exchange.
+The following are the parameters that are set in the Responder before the first message exchange.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party V's ephemeral private key (32 bytes)
+Responder's ephemeral private key (32 bytes)
 d9 81 80 87 de 72 44 ab c1 b5 fc f2 8e 55 e4 2c 7f f9 c6 78 c0 60 51 81
 f3 7a c5 d7 41 4a 7b 95 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Party V's ephemeral public key (value of G_Y) (32 bytes)
+Responder's ephemeral public key (value of G_Y) (32 bytes)
 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d
 94 6f 6b 09 a9 cb dc 06 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Connection identifier chosen by V (value of C_V) (1 byte)
+Connection identifier chosen by the Responder (value of C_R) (1 byte)
 c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2338,7 +2340,7 @@ ID_PSK =
 
 This test vector uses COSE_Key objects to store the pre-shared key.
 
-Note that since the map for ID_PSK contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid_value is used when added to the plaintext (see {{sym-overview}}):
+Note that since the map for ID_PSK contains a single 'kid' parameter, ID_PSK is used when transported in the protected header of the COSE Object, but only the kid is used when added to the plaintext (see {{sym-overview}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_PSK (in protected header) (CBOR-encoded) (4 bytes)
@@ -2347,7 +2349,7 @@ a1 04 41 a1
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value (in plaintext) (CBOR-encoded) (2 bytes)
+kid (in plaintext) (CBOR-encoded) (2 bytes)
 41 a1 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2368,26 +2370,26 @@ suite
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-SUITES_U : suite
+SUITES_I : suite
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_X (X-coordinate of the ephemeral public key of Party U) (32 bytes)
+G_X (X-coordinate of the ephemeral public key of the Initiator) (32 bytes)
 ab 2f ca 32 89 83 22 c2 08 fb 2d ab 50 48 bd 43 c3 55 c6 43 0f 58 88 97
 cb 57 49 61 cf a9 80 6f 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_U (Connection identifier chosen by U) (CBOR encoded) (2 bytes)
+C_I (Connection identifier chosen by the Initiator) (CBOR encoded) (2 bytes)
 41 c1 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value of ID_PSK (CBOR encoded) (2 bytes)
+kid of ID_PSK (CBOR encoded) (2 bytes)
 41 a1 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2415,17 +2417,17 @@ message_1 (CBOR Sequence) (40 bytes)
 
 ### Message 2 {#tv-psk-2}
 
-Since TYPE mod 4 equals 1, C_U is omitted from data_2.
+Since TYPE mod 4 equals 1, C_I is omitted from data_2.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-G_Y (X-coordinate of the ephemeral public key of Party V) (32 bytes)
+G_Y (X-coordinate of the ephemeral public key of the Responder) (32 bytes)
 fc 3b 33 93 67 a5 22 5d 53 a9 2d 38 03 23 af d0 35 d7 81 7b 6d 1b e4 7d
 94 6f 6b 09 a9 cb dc 06 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_V (Connection identifier chosen by V) (1 byte)
+C_R (Connection identifier chosen by the Responder) (1 byte)
 c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2614,7 +2616,7 @@ ba 38 b9 a3 fc 1a 58 e9
 
 #### message_2
 
-From the parameter computed in {{tv-psk-2}} and {{tv-psk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_V, CIPHERTEXT_2).
+From the parameter computed in {{tv-psk-2}} and {{tv-psk-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_R, CIPHERTEXT_2).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_2 =
@@ -2635,10 +2637,10 @@ e4 7d 94 6f 6b 09 a9 cb dc 06 41 c2 48 ba 38 b9 a3 fc 1a 58 e9
 
 ### Message 3 {#tv-psk-3}
 
-Since TYPE mod 4 equals 1, C_V is not omitted from data_3.
+Since TYPE mod 4 equals 1, C_R is not omitted from data_3.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-C_V (1 byte)
+C_R (1 byte)
 c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2822,7 +2824,7 @@ CIPHERTEXT_3 (8 bytes)
 
 #### message_3
 
-From the parameter computed in {{tv-psk-3}} and {{tv-psk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_V, CIPHERTEXT_3).
+From the parameter computed in {{tv-psk-3}} and {{tv-psk-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_R, CIPHERTEXT_3).
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 =
@@ -2931,14 +2933,14 @@ OSCORE Master Salt (8 bytes)
 4d b7 06 58 c5 e9 9f b6 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Client's Sender ID takes the value of C_V:
+The Client's Sender ID takes the value of C_R:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Client's OSCORE Sender ID (1 byte)
 c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Server's Sender ID takes the value of C_U:
+The Server's Sender ID takes the value of C_I:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Server's OSCORE Sender ID (1 byte)
@@ -3101,7 +3103,7 @@ ID_CRED_R (in protected header) (CBOR-encoded) (5 bytes)
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-kid_value_R (in plaintext) (CBOR-encoded) (2 bytes)
+kid_R (in plaintext) (CBOR-encoded) (2 bytes)
 41 a8 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3122,7 +3124,7 @@ suite
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-SUITES_U : suite
+SUITES_I : suite
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3951,6 +3953,7 @@ Which encodes to the following byte string:
 message_3 (CBOR Sequence) (23 bytes)
 41 c8 54 d2 85 38 ee f7 ae 1b 9d 7d 89 57 18 48 a9 08 86 e0 69 43 2b 
 ~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 # Acknowledgments
