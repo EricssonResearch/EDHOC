@@ -509,11 +509,11 @@ An application using EDHOC may want to derive new PSKs to use for authentication
    ID_PSK = EDHOC-Exporter( "EDHOC Chaining ID_PSK", 4 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-# EDHOC Authenticated with Signature and Static Diffie-Hellman Keys {#asym}
+# EDHOC Authenticated with \asymmetric Keys {#asym}
 
 ## Overview {#asym-overview}
 
-This section specifies authentication method = 0, 1, 2, and 3, see {{method-types}}. EDHOC supports authentication with raw public keys (RPK) and public key certificates with the requirements that:
+This section specifies authentication method = 0, 1, 2, and 3, see {{method-types}}. EDHOC supports authentication with signature or static Diffie-Hellman keys in the form of raw public keys (RPK) and public key certificates with the requirements that:
 
 * Only the Responder SHALL have access to the Responder's private authentication key,
 
