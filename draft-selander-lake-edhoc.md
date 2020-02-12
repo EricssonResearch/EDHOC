@@ -201,17 +201,17 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a lightweight key exchange protocol providing perfect forward secrecy and identity protection. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface. A main use case for EDHOC is to establish an OSCORE security context. EDHOC uses COSE for cryptography, CBOR for encoding, and CoAP for transport. By reusing existing libraries, the additional code footprint can be kept very low. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC + CoAP is around 1/4 when PSK authentication is used and less than 1/5 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys with static Diffie-Hellman keyss, and two different way to identify X.509 certificates with signature keys are shown in {{fig-sizes}}. 
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC + CoAP is around 1/4 when PSK authentication is used and around 1/6 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys with static Diffie-Hellman keyss, and two different way to identify X.509 certificates with signature keys are shown in {{fig-sizes}}. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
 message_1       40        38        38        38                     
-message_2       45        56       126       116 + Certificate chain 
+message_2       45        48       118       108 + Certificate chain 
 message_3       11        22        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total           96       116       255       235 + Certificate chains
+Total           96       108       247       227 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-sizes title="Typical message sizes in bytes" artwork-align="center"}
@@ -560,7 +560,7 @@ Initiator                                                   Responder
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|   C_I, G_Y, C_R, AEAD(K_2; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
+|    C_I, G_Y, C_R, Enc(K_2; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
@@ -661,7 +661,7 @@ The Responder SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Depending on method, Signature_or_MAC_2 is the 'signature' of a COSE_Sign1 or the 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
+* Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite and the following parameters:
 
    * protected =  << ID_CRED_R >>
 
@@ -671,26 +671,34 @@ The Responder SHALL compose message_2 as follows:
 
       * CRED_R - bstr containing the credential of the Responder, see {{asym-overview}}. 
 
-   * payload or plaintext = h''
+   * plaintext = h''
 
-   If method equals 0 or 2, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the private authentication key of the Responder. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
+If method equals 0 or 2 (the authentication key is a signature key), then K_2, and IV_2 are used. If method equals 1 or 3 (the authentication key is a static Diffie-Hellman key), then K_R, and IV_R are used. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+
+   * Key K = K_2 or K_R
+   * Nonce N = IV_2 or IV_R
+   * Plaintext P = 0x (the empty string)
+   * Associated data A =
+
+     \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R >> \]
+
+* If method equals 1 or 3, then Signature_or_MAC_2 is the 'ciphertext' (CIPHERTEXT_2i) of the inner COSE_Encrypt0. If method equals 0 or 2, then Signature_or_MAC_2 is the 'signature' of a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}} using the signature algorithm in the selected cipher suite, the private authentication key of the Responder, and the following parameters:
+
+   * protected =  << ID_CRED_R >>
+
+   * external_aad = << TH_2, CRED_R >>
+
+   * payload = CIPHERTEXT_2i
+
+   COSE constructs the input to the Signature Algorithm as:
 
    * The key is the private authentication key of the Responder.
 
    * The message M to be signed =
 
-     \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R >>, h'' \]
+     \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R >>, CIPHERTEXT_2i \]
 
-   If method equals 1 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_R, and IV_R. The public key MUST be a static Diffie-Hellman key. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
-
-   * Key K = K_R
-   * Nonce N = IV_R
-   * Plaintext P = 0x (the empty string)
-   * Associated data A =
-
-     \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R >> \]
-     
-* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_2, see next bullet. The protected header SHALL be empty. 
+* CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters:
 
    * plaintext = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 )
 
@@ -698,16 +706,11 @@ The Responder SHALL compose message_2 as follows:
 
       * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only kid_R is conveyed in the plaintext, see {{asym-overview}}.
 
-   * external_aad = TH_2
+   * CIPHERTEXT_2 = plaintext XOR K_2o
 
-   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
-
-   * Key K = K_2
-   * Nonce N = IV_2
-   * Plaintext P = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 ) 
-   * Associated data A = \[ "Encrypt0", h'', TH_2 \]
-
-* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}. CIPHERTEXT_2 is the outer COSE_Encrypt0 ciphertext. 
+      * The key K_2o SHALL be derived using the pseudorandom key PRK_2, the transcript hash TH_2, AlgorithmID = "XOR-ENCRYPTION", and keyDataLength equal to the length of the plaintext.
+      
+* Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
 ### Initiator Processing of Message 2
 
@@ -717,7 +720,7 @@ The Initiator SHALL process message_2 as follows:
 
 * Retrieve the protocol state using the connection identifier C_I and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, and IV_2.
+* Decrypt CIPHERTEXT_2. The decryption process depends on the method, see {{asym-msg2-proc}}.
 
 * Verify that the identity of the Responder is among the allowed identities for this connection.
 
@@ -754,7 +757,7 @@ The Initiator  SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Depending on method, Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 or the 'ciphertext' of a COSE_Encrypt0 with the following common parameters:
+* Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite and the following parameters:
 
    * protected =  << ID_CRED_I >>
 
@@ -764,26 +767,34 @@ The Initiator  SHALL compose message_3 as follows:
 
       * CRED_I - bstr containing the credential of the Initiator, see {{asym-overview}}. 
 
-   * payload or plaintext = h''
+   * plaintext = h''
 
-   If method equals 0 or 1, compute a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}}, using the signature algorithm in the selected cipher suite and the private authentication key of the Initiator. The public authentication key MUST be a signature key. COSE constructs the input to the Signature Algorithm as:
+If method equals 0 or 1 (the authentication key is a signature key), then K_3, and IV_3 are used. If method equals 2 or 3 (the authentication key is a static Diffie-Hellman key), then K_I, and IV_U are used. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * The key is the private authentication key of the Initiator.
-
-   * The message M to be signed =
-
-     \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I >>, h'' \]
-
-   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, and IV_I. The public key MUST be a static Diffie-Hellman key. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
-
-   * Key K = K_I
-   * Nonce N = IV_I
+   * Key K = K_3 or K_I
+   * Nonce N = IV_3 or IV_I
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
      \[ "Encrypt0", << ID_CRED_I >>, << TH_3, CRED_I >> \]
-          
-* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, and IV_3 and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
+
+* If method equals 2 or 3, then Signature_or_MAC_3 is the 'ciphertext' (CIPHERTEXT_3i) of the inner COSE_Encrypt0. If method equals 0 or 1, then Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}} using the signature algorithm in the selected cipher suite, the private authentication key of the Initiator, and the following parameters:
+
+   * protected =  << ID_CRED_I >>
+
+   * external_aad = << TH_3, CRED_I >>
+
+   * payload = CIPHERTEXT_3i
+
+   COSE constructs the input to the Signature Algorithm as:
+
+   * The key is the private authentication key of the Responder.
+
+   * The message M to be signed =
+
+     \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I >>, CIPHERTEXT_3i \]
+
+* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3o, and IV_3o (TBD) and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
 
    * external_aad = TH_3
 
@@ -795,8 +806,8 @@ The Initiator  SHALL compose message_3 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3
-   * Nonce N = IV_2
+   * Key K = K_3o
+   * Nonce N = IV_3o
    * Plaintext P = ( ID_CRED_I / kid_I, Signature_or_MAC_3, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
