@@ -1225,7 +1225,7 @@ void rpk_vectors( void )
 
     cout << "The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}." << endl << endl;
 
-    cout << "HKDF SHA-256 is the HKDF used (as defined by cipher suite " << suite << " )." << endl << endl;
+    cout << "HKDF SHA-256 is the HKDF used (as defined by cipher suite " << to_string(suite) << " )." << endl << endl;
 
     cout << "PRK = HMAC-SHA-256(salt, G_XY)" << endl << endl;
 
