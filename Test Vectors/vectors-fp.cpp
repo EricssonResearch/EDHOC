@@ -1886,7 +1886,7 @@ void static_vectors ( void )
 
     // Print //////////////////////////////////////////////
 
-    cout << "### Message 3 {#tv-rpk-3}" << endl << endl;
+    cout << "### Message 3 {#tv-ss-3}" << endl << endl;
 
     cout << "Since TYPE mod 4 equals " + to_string(corr) + ", C_R is not omitted from data_3." << endl << endl;
 
@@ -2037,7 +2037,7 @@ void static_vectors ( void )
 
     // Print //////////////////////////////////////////////
 
-    cout << "#### Key and Nonce Computation {#tv-ss-2-key}" << endl << endl;
+    cout << "#### Key and Nonce Computation {#tv-ss-3-key}" << endl << endl;
 
     cout << "The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}." << endl << endl;
     cout << "HKDF SHA-256 is the HKDF used (as defined by cipher suite 0)." << endl << endl;
