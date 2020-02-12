@@ -633,7 +633,7 @@ message_2 and data_2 SHALL be CBOR Sequences (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_2 = (
   data_2,
-  CIPHERTEXT_2 : bstr,
+  CIPHERTEXT_2e : bstr,
 )
 ~~~~~~~~~~~
 
@@ -699,7 +699,7 @@ The Responder SHALL compose message_2 as follows:
 
      \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R >>, CIPHERTEXT_2i \]
 
-* CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters:
+* CIPHERTEXT_2e is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters:
 
    * plaintext = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 )
 
@@ -707,7 +707,7 @@ The Responder SHALL compose message_2 as follows:
 
       * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only kid_R is conveyed in the plaintext, see {{asym-overview}}.
 
-   * CIPHERTEXT_2 = plaintext XOR K_2x
+   * CIPHERTEXT_2e = plaintext XOR K_2x
 
       * The key K_2x SHALL be derived using the pseudorandom key PRK_2e, the transcript hash TH_2, AlgorithmID = "XOR-ENCRYPTION", and keyDataLength equal to the length of the plaintext.
       
@@ -740,7 +740,7 @@ message_3 and data_3 SHALL be CBOR Sequences (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_3 = (
   data_3,
-  CIPHERTEXT_3 : bstr,
+  CIPHERTEXT_3e : bstr,
 )
 ~~~~~~~~~~~
 
@@ -812,7 +812,7 @@ The Initiator  SHALL compose message_3 as follows:
    * Plaintext P = ( ID_CRED_I / kid_I, Signature_or_MAC_3, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
-* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the outer COSE_Encrypt0 ciphertext.
+* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3e is the outer COSE_Encrypt0 ciphertext.
 
 Pass the connection identifiers (C_I, C_R) and the application algorithms in the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
