@@ -674,7 +674,7 @@ The Responder SHALL compose message_2 as follows:
 
    * plaintext = h''
 
-COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
    * Key K = K_2e
    * Nonce N = IV_2e
@@ -770,7 +770,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * plaintext = h''
 
-COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
    * Key K = K_3e
    * Nonce N = IV_3e
