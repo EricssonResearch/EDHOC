@@ -774,7 +774,7 @@ The Initiator  SHALL compose message_3 as follows:
 
      \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I >>, h'' \]
 
-   If method equals 0 or 1, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, and IV_I. The public key MUST be a static Diffie-Hellman key. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   If method equals 2 or 3, compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_I, and IV_I. The public key MUST be a static Diffie-Hellman key. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
    * Key K = K_I
    * Nonce N = IV_I
