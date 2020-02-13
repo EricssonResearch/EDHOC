@@ -166,7 +166,7 @@ informative:
 
   Perez18:
     target: http://www.anastacia-h2020.eu/publications/Architecture_of_security_association_establishment_based_on_bootstrapping_technologies_for_enabling_critical_IoT_infrastructures.pdf
-    title: Architecture of security association establishment based on bootstrapping technologies for enabling critical IoT infrastructures
+    title: Architecture of security association establishment based on bootstrapping technologies for enabling critical IoT K
     author:
       -
         ins: S. Pérez
@@ -406,25 +406,27 @@ Derivation of key and IV used with the AEAD functions SHALL be performed with HK
    PRK = HKDF-Extract( salt, IKM )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-PRK_2 is derived with the following input:
+PRK_2e is used to derive key and IV to encrypt message_2. PRK_2m3e is used to derive keys and IVs produce a MAC in message_2 and to encrypt message_3. PRK_3mEx is used to derive keys and IVs produce a MAC in message_3 and to derive application specific data.
+
+PRK_2e is derived with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
 
 * The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}.
 
-Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK_2 as follows:
+Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK_2e as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   PRK_2 = HMAC-SHA-256( salt, G_XY )
+   PRK_2e = HMAC-SHA-256( salt, G_XY )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case.
 
-The pseudorandom keys PRK_3 and PRK_4 are defined as follow:
+The pseudorandom keys PRK_2m3e and PRK_3mEx are defined as follow:
 
-* If the Reponder authenticates with a static Diffie-Hellman key, then PRK_3 = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R, else PRK_3 = PRK_2.
+* If the Reponder authenticates with a static Diffie-Hellman key, then PRK_2m3e = HKDF-Extract( PRK_2e, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R, else PRK_2m3e = PRK_2e.
 
-* If the Initiator authenticates with a static Diffie-Hellman key, then PRK_4 = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I, else PRK_4 = PRK_3.
+* If the Initiator authenticates with a static Diffie-Hellman key, then PRK_3mEx = HKDF-Extract( PRK_2m3e, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I, else PRK_3mEx = PRK_2m3e.
 
 Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and G_IY are the outputs of the X25519 function {{RFC7748}}:
 
@@ -459,7 +461,7 @@ where
 
   + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4. Keys are derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD. IVs are derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD. IVs are only used if the EDHOC AEAD algorithm uses IVs.
+K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_2m3e. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_2m3e. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_3mEx. Keys are derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD. IVs are derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD. IVs are only used if the EDHOC AEAD algorithm uses IVs.
 
 Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
@@ -482,7 +484,7 @@ calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDa
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_4, info, length) 
+   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_3mEx, info, length) 
 ~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = label, keyDataLength = 8 * length, and other = TH_4 where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
@@ -553,11 +555,11 @@ Initiator                                                   Responder
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|    C_I, G_Y, C_R, Enc(K_2; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
+|   C_I, G_Y, C_R, Enc(K_2e; ID_CRED_R, Signature_or_MAC_2, AD_2)   |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|        C_R, AEAD(K_3; ID_CRED_I, Signature_or_MAC_3, AD_3)        |
+|       C_R, AEAD(K_3ae; ID_CRED_I, Signature_or_MAC_3, AD_3)       |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -703,7 +705,7 @@ The Responder SHALL compose message_2 as follows:
 
    * CIPHERTEXT_2 = plaintext XOR K_2e
 
-      * The key K_2e is derived using the pseudorandom key PRK_2, AlgorithmID = "XOR-ENCRYPTION", keyDataLength equal to the length of the plaintext, protected = h'', and other = TH_2.
+      * The key K_2e is derived using the pseudorandom key PRK_2e, AlgorithmID = "XOR-ENCRYPTION", keyDataLength equal to the length of the plaintext, protected = h'', and other = TH_2.
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
@@ -856,11 +858,11 @@ Initiator                                                   Responder
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
-|               C_I, G_Y, C_R, AEAD(K_2; TH_2, AD_2)                |
+|               C_I, G_Y, C_R, AEAD(K_2ae; TH_2, AD_2)              |
 |<------------------------------------------------------------------+
 |                             message_2                             |
 |                                                                   |
-|                    C_R, AEAD(K_3; TH_3, AD_3)                     |
+|                    C_R, AEAD(K_ae3; TH_3, AD_3)                   |
 +------------------------------------------------------------------>|
 |                             message_3                             |
 ~~~~~~~~~~~
@@ -897,7 +899,7 @@ where:
 
 *  Signature_or_MAC_2 is not used.
 
-* The outer COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2, IV_2, and the following parameters. The protected header SHALL be empty.
+* The outer COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2ae, IV_2ae, and the following parameters. The protected header SHALL be empty.
 
    * plaintext = ? AD_2
 
@@ -907,8 +909,8 @@ where:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_2
-   * Nonce N = IV_2
+   * Key K = K_2ae
+   * Nonce N = IV_2ae
    * Plaintext P = ? AD_2
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
       
@@ -918,7 +920,7 @@ where:
 
 *  Signature_or_MAC_3 is not used.
 
-* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, IV_3, and the following parameters. The protected header SHALL be empty.
+* COSE_Encrypt0 is computed as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3ae, IV_3ae, and the following parameters. The protected header SHALL be empty.
 
    * plaintext = ? AD_3
 
@@ -928,8 +930,8 @@ where:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3
-   * Nonce N = IV_3
+   * Key K = K_3ae
+   * Nonce N = IV_3ae
    * Plaintext P = ? AD_3
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
@@ -1124,7 +1126,7 @@ EDHOC itself does not provide countermeasures against Denial-of-Service attacks.
 
 The availability of a secure pseudorandom number generator and truly random seeds are essential for the security of EDHOC. If no true random number generator is available, a truly random seed must be provided from an external source. As each pseudorandom number must only be used once, an implementation need to get a new truly random seed after reboot, or continuously store state in nonvolatile memory, see ({{RFC8613}}, Appendix B.1.1) for issues and solution approaches for writing to nonvolatile memory. If ECDSA is supported, "deterministic ECDSA" as specified in {{RFC6979}} is RECOMMENDED.
 
-The referenced processing instructions in {{SP-800-56A}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys (K_2, K_3), and IVs (IV_2, IV_3) MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks. Depending on the selected curve, the parties should perform various validations of each other's public keys, see e.g. Section 5 of {{SP-800-56A}}.
+The referenced processing instructions in {{SP-800-56A}} must be complied with, including deleting the intermediate computed values along with any ephemeral ECDH secrets after the key derivation is completed. The ECDH shared secret, keys, and IVs MUST be secret. Implementations should provide countermeasures to side-channel attacks such as timing attacks. Depending on the selected curve, the parties should perform various validations of each other's public keys, see e.g. Section 5 of {{SP-800-56A}}.
 
 The Initiator and the Responder are responsible for verifying the integrity of certificates. The selection of trusted CAs should be done very carefully and certificate revocation should be supported. The private authentication keys and the PSK (even though it is used as salt) MUST be kept secret.
 
