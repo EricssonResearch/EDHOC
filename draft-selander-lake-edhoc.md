@@ -406,8 +406,6 @@ Derivation of key and IV used with the AEAD functions SHALL be performed with HK
    PRK = HKDF-Extract( salt, IKM )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-PRK_2 and PRK_3 are used to derive keys and IVs for message_2 and message_3 respectively. PRK_4 is used to derive application specific data. PRK_I and PRK_R are used to derive additional keys and IVs in case of static Diffie-Hellmann authentication of Initator and Responder respectively.
-
 PRK_2 is derived with the following input:
 
 * The salt SHALL be the PSK when EDHOC is authenticated with symmetric keys, and the empty byte string when EDHOC is authenticated with asymmetric keys (signature or static DH). The PSK is used as 'salt' to simplify implementation. Note that {{RFC5869}} specifies that if the salt is not provided, it is set to a string of zeros (see Section 2.2 of {{RFC5869}}). For implementation purposes, not providing the salt is the same as setting the salt to the empty byte string. 
@@ -422,17 +420,11 @@ Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK
 
 where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case.
 
-The pseudorandom keys PRK_R, PRK_3, PRK_I, and PRK_4 are defined as follow:
+The pseudorandom keys PRK_3 and PRK_4 are defined as follow:
 
-* PRK_R is derived as PRK_R = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R.
+* If the Reponder authenticates with a static Diffie-Hellman key, then PRK_3 = HKDF-Extract( PRK_2, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R, else PRK_3 = PRK_2.
 
-* If PRK_R has been derived, i.e. static DH authentication of the Responder, then PRK_3 = PRK_R, else PRK_3 = PRK_2
-
-* PRK_I is derived as PRK_I = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I.
-
-* If PRK_I has been derived, i.e. static DH authentication of the Responder, then PRK_4 = PRK_I, else PRK_4 = PRK_3
-
-This construction allows a common definition of PRKs also in the case of static DH methods, which requires additional keys and IVs.
+* If the Initiator authenticates with a static Diffie-Hellman key, then PRK_4 = HKDF-Extract( PRK_3, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I, else PRK_4 = PRK_3.
 
 Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and G_IY are the outputs of the X25519 function {{RFC7748}}:
 
@@ -453,7 +445,7 @@ info = [
   AlgorithmID,
   [ null, null, null ],
   [ null, null, null ],
-  [ keyDataLength, h'', other ]
+  [ keyDataLength, protected, other ]
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -463,11 +455,11 @@ where
   
   + keyDataLength is a uint set to the length of output keying material in bits, see below
 
+  + protected contains the protected field of the COSE_Encrypt0.
+
   + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-The keys K_2 and K_R SHALL be derived using the transcript hash TH_2 and the pseudorandom keys PRK_2 and PRK_R respectively. The keys K_3 and K_I SHALL be derived using the transcript hash TH_3 and the pseudorandom keys PRK_3 and PRK_I respectively. The keys SHALL be derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD.
-
-If the EDHOC AEAD algorithm uses an IV, then IV_2 and IV_R SHALL be derived using the transcript hash TH_2 and pseudorandom keys PRK_2 and PRK_R respectively. IV_3 and IV_I SHALL be derived using the transcript hash TH_3 and pseudorandom keys PRK_3 and PRK_I respectively. The IVs SHALL be derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD.
+K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4. Keys are derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD. IVs are derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD. IVs are only used if the EDHOC AEAD algorithm uses IVs.
 
 Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
@@ -662,34 +654,38 @@ The Responder SHALL compose message_2 as follows:
 
 * Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite and the following parameters:
+* Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2m, IV_2m, and the following parameters:
 
    * protected =  << ID_CRED_R >>
 
       * ID_CRED_R - identifier to facilitate retrieval of CRED_R, see {{asym-overview}}
 
-   * external_aad = << TH_2, CRED_R >>
+   * external_aad = << TH_2, CRED_R, ? AD_2 >>
 
       * CRED_R - bstr containing the credential of the Responder, see {{asym-overview}}. 
 
+      * AD_2 = bstr containing opaque unprotected auxiliary data
+
    * plaintext = h''
 
-If method equals 0 or 2 (the authentication key is a signature key), then K_2, and IV_2 are used. If method equals 1 or 3 (the authentication key is a static Diffie-Hellman key), then K_R, and IV_R are used. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_2 or K_R
-   * Nonce N = IV_2 or IV_R
+   * Key K = K_2m
+   * Nonce N = IV_2m
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
-     \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R >> \]
+     \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R, ? AD_2 >> \]
 
-* If method equals 1 or 3, then Signature_or_MAC_2 is the 'ciphertext' (CIPHERTEXT_2i) of the inner COSE_Encrypt0. If method equals 0 or 2, then Signature_or_MAC_2 is the 'signature' of a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}} using the signature algorithm in the selected cipher suite, the private authentication key of the Responder, and the following parameters:
+   MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0.
+
+* If the Reponder authenticates with a static Diffie-Hellman key (method equals 1 or 3), then Signature_or_MAC_2 is MAC_2. If the Reponder authenticates with a signature key (method equals 0 or 2), then Signature_or_MAC_2 is the 'signature' of a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}} using the signature algorithm in the selected cipher suite, the private authentication key of the Responder, and the following parameters:
 
    * protected =  << ID_CRED_R >>
 
-   * external_aad = << TH_2, CRED_R >>
+   * external_aad = << TH_2, CRED_R, ? AD_2 >>
 
-   * payload = CIPHERTEXT_2i
+   * payload = MAC_2
 
    COSE constructs the input to the Signature Algorithm as:
 
@@ -697,20 +693,18 @@ If method equals 0 or 2 (the authentication key is a signature key), then K_2, a
 
    * The message M to be signed =
 
-     \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R >>, CIPHERTEXT_2i \]
+     \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R, ? AD_2 >>, MAC_2 \]
 
 * CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters:
 
    * plaintext = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 )
 
-      * AD_2 = bstr containing opaque unprotected auxiliary data
-
       * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only kid_R is conveyed in the plaintext, see {{asym-overview}}.
 
-   * CIPHERTEXT_2 = plaintext XOR K_2o
+   * CIPHERTEXT_2 = plaintext XOR K_2e
 
-      * The key K_2o SHALL be derived using the pseudorandom key PRK_2, the transcript hash TH_2, AlgorithmID = "XOR-ENCRYPTION", and keyDataLength equal to the length of the plaintext.
-      
+      * The key K_2e is derived using the pseudorandom key PRK_2, AlgorithmID = "XOR-ENCRYPTION", keyDataLength equal to the length of the plaintext, protected = h'', and other = TH_2.
+
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
 ### Initiator Processing of Message 2
@@ -758,61 +752,65 @@ The Initiator  SHALL compose message_3 as follows:
 
 * Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
-* Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite and the following parameters:
+* Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3m, IV_3m, and the following parameters:
 
    * protected =  << ID_CRED_I >>
 
       * ID_CRED_I - identifier to facilitate retrieval of CRED_I, see {{asym-overview}}
 
-   * external_aad = << TH_3, CRED_I >>
+   * external_aad = << TH_3, CRED_I, ? AD_3 >>
 
       * CRED_I - bstr containing the credential of the Initiator, see {{asym-overview}}. 
 
+      * AD_3 = bstr containing opaque protected auxiliary data
+
    * plaintext = h''
 
-If method equals 0 or 1 (the authentication key is a signature key), then K_3, and IV_3 are used. If method equals 2 or 3 (the authentication key is a static Diffie-Hellman key), then K_I, and IV_U are used. COSE constructs the input to the AEAD {{RFC5116}} as follows: 
+   COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3 or K_I
-   * Nonce N = IV_3 or IV_I
+   * Key K = K_3m
+   * Nonce N = IV_3m
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
-     \[ "Encrypt0", << ID_CRED_I >>, << TH_3, CRED_I >> \]
+     \[ "Encrypt0", << ID_CRED_I >>, << TH_3, CRED_I, ? AD_3 >> \]
 
-* If method equals 2 or 3, then Signature_or_MAC_3 is the 'ciphertext' (CIPHERTEXT_3i) of the inner COSE_Encrypt0. If method equals 0 or 1, then Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}} using the signature algorithm in the selected cipher suite, the private authentication key of the Initiator, and the following parameters:
+   MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0.
+
+* If the Initiator authenticates with a static Diffie-Hellman key (method equals 2 or 3), then Signature_or_MAC_3 is MAC_3. If the Initiator authenticates with a signature key (method equals 0 or 1), then Signature_or_MAC_3 is the 'signature' of a COSE_Sign1 object as defined in Section 4.4 of {{RFC8152}} using the signature algorithm in the selected cipher suite, the private authentication key of the Initiator, and the following parameters:
 
    * protected =  << ID_CRED_I >>
 
-   * external_aad = << TH_3, CRED_I >>
+   * external_aad = << TH_3, CRED_I, ? AD_3 >>
 
-   * payload = CIPHERTEXT_3i
+   * payload = MAC_3
 
    COSE constructs the input to the Signature Algorithm as:
 
-   * The key is the private authentication key of the Responder.
+   * The key is the private authentication key of the Initiator.
 
    * The message M to be signed =
 
-     \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I >>, CIPHERTEXT_3i \]
+     \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I, ? AD_3 >>, MAC_3 \]
 
-* Compute the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3o, and IV_3o (TBD) and the parameters below. Note that only 'ciphertext' of the outer COSE_Encrypt0 object is used to create message_3, see next bullet. The protected header SHALL be empty. 
+* Compute an outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3ae, IV_3ae, and the following parameters. The protected header SHALL be empty.
 
    * external_aad = TH_3
 
    * plaintext = ( ID_CRED_I / kid_I, Signature_or_MAC_3, ? AD_3 )
 
-      * AD_3 = bstr containing opaque protected auxiliary data
-
       * Note that if ID_CRED_I contains a single 'kid' parameter, i.e., ID_CRED_I = { 4 : kid_I }, only kid_I is conveyed in the plaintext, see {{asym-overview}}.
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3o
-   * Nonce N = IV_3o
+   * Key K = K_3ae
+   * Nonce N = IV_3ae
    * Plaintext P = ( ID_CRED_I / kid_I, Signature_or_MAC_3, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
-* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}. CIPHERTEXT_3 is the outer COSE_Encrypt0 ciphertext.
+   CIPHERTEXT_3 is the 'ciphertext' of the outer COSE_Encrypt0.
+
+* Encode message_3 as a sequence of CBOR encoded data items as specified in {{asym-msg3-form}}.
 
 Pass the connection identifiers (C_I, C_R) and the application algorithms in the selected cipher suite to the application. The application can now derive application keys using the EDHOC-Exporter interface.
 
@@ -824,7 +822,7 @@ The Responder SHALL process message_3 as follows:
 
 * Retrieve the protocol state using the connection identifier C_R and/or other external information such as the CoAP Token and the 5-tuple.
 
-* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3, and IV_3.
+* Decrypt and verify the outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3ae, and IV_3ae.
 
 * Verify that the identity of the Initiator is among the allowed identities for this connection.
 
