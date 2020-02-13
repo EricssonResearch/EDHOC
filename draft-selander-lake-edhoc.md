@@ -407,7 +407,7 @@ Derivation of key and IV used with the AEAD functions SHALL be performed with HK
    PRK = HKDF-Extract( salt, IKM )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-PRK_2e is used to derive key and IV to encrypt message_2. PRK_2m3e is used to derive keys and IVs produce a MAC in message_2 and to encrypt message_3. PRK_3mEx is used to derive keys and IVs produce a MAC in message_3 and to derive application specific data.
+PRK_2e is used to derive key and IV to encrypt message_2. PRK_3e2m is used to derive keys and IVs produce a MAC in message_2 and to encrypt message_3. PRK_4x3m is used to derive keys and IVs produce a MAC in message_3 and to derive application specific data.
 
 PRK_2e is derived with the following input:
 
@@ -423,11 +423,11 @@ Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK
 
 where salt = 0x (the empty byte string) in the asymmetric case and salt = PSK in the symmetric case.
 
-The pseudorandom keys PRK_2m3e and PRK_3mEx are defined as follow:
+The pseudorandom keys PRK_3e2m and PRK_4x3m are defined as follow:
 
-* If the Reponder authenticates with a static Diffie-Hellman key, then PRK_2m3e = HKDF-Extract( PRK_2e, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R, else PRK_2m3e = PRK_2e.
+* If the Reponder authenticates with a static Diffie-Hellman key, then PRK_3e2m = HKDF-Extract( PRK_2e, G_RX ), where G_RX is the ECDH shared secret calculated from G_R and X, or G_X and R, else PRK_3e2m = PRK_2e.
 
-* If the Initiator authenticates with a static Diffie-Hellman key, then PRK_3mEx = HKDF-Extract( PRK_2m3e, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I, else PRK_3mEx = PRK_2m3e.
+* If the Initiator authenticates with a static Diffie-Hellman key, then PRK_4x3m = HKDF-Extract( PRK_3e2m, G_IY ), where G_IY is the ECDH shared secret calculated from G_I and Y, or G_Y and I, else PRK_4x3m = PRK_3e2m.
 
 Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and G_IY are the outputs of the X25519 function {{RFC7748}}:
 
@@ -462,7 +462,7 @@ where
 
   + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_2m3e. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_2m3e. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_3mEx. Keys are derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD. IVs are derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD. IVs are only used if the EDHOC AEAD algorithm uses IVs.
+K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3e2m. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3e2m. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4x3m. Keys are derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD. IVs are derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD. IVs are only used if the EDHOC AEAD algorithm uses IVs.
 
 Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
@@ -485,7 +485,7 @@ calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDa
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_3mEx, info, length) 
+   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_4x3m, info, length) 
 ~~~~~~~~~~~
 
 The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = label, keyDataLength = 8 * length, and other = TH_4 where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
