@@ -202,17 +202,17 @@ Security at the application layer provides an attractive option for protecting I
 
 In order for a communication session to provide forward secrecy, the communicating parties can run an Elliptic Curve Diffie-Hellman (ECDH) key exchange protocol with ephemeral keys, from which shared key material can be derived. This document specifies Ephemeral Diffie-Hellman Over COSE (EDHOC), a lightweight key exchange protocol providing perfect forward secrecy and identity protection. Authentication is based on credentials established out of band, e.g. from a trusted third party, such as an Authorization Server as specified by {{I-D.ietf-ace-oauth-authz}}. EDHOC supports authentication using pre-shared keys (PSK), raw public keys (RPK), and public key certificates. After successful completion of the EDHOC protocol, application keys and other application specific data can be derived using the EDHOC-Exporter interface. A main use case for EDHOC is to establish an OSCORE security context. EDHOC uses COSE for cryptography, CBOR for encoding, and CoAP for transport. By reusing existing libraries, the additional code footprint can be kept very low. Note that this document focuses on authentication and key establishment: for integration with authorization of resource access, refer to {{I-D.ietf-ace-oscore-profile}}.
 
-EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC + CoAP is around 1/4 when PSK authentication is used and around 1/6 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys with static Diffie-Hellman keyss, and two different way to identify X.509 certificates with signature keys are shown in {{fig-sizes}}. 
+EDHOC is designed to work in highly constrained scenarios making it especially suitable for network technologies such as Cellular IoT, 6TiSCH {{I-D.ietf-6tisch-dtsecurity-zerotouch-join}}, and LoRaWAN {{LoRa1}}{{LoRa2}}. These network technologies are characterized by their low throughput, low power consumption, and small frame sizes. Compared to the DTLS 1.3 handshake {{I-D.ietf-tls-dtls13}} with ECDH and connection ID, the number of bytes in EDHOC + CoAP is less than 1/4 when PSK authentication is used and less than 1/6 when RPK authentication is used, see {{I-D.ietf-lwig-security-protocol-comparison}}. Typical message sizes for EDHOC with pre-shared keys, raw public keys with static Diffie-Hellman keyss, and two different way to identify X.509 certificates with signature keys are shown in {{fig-sizes}}. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 =====================================================================
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
-message_1       40        38        38        38                     
-message_2       45        48       118       108 + Certificate chain 
-message_3       11        22        91        81 + Certificate chain 
+message_1       38        37        37        37                     
+message_2       44        46       117       107 + Certificate chain 
+message_3       10        20        90        80 + Certificate chain 
 ---------------------------------------------------------------------
-Total           96       108       247       227 + Certificate chains
+Total           92       103       244       224 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-sizes title="Typical message sizes in bytes" artwork-align="center"}
@@ -587,11 +587,12 @@ message_1 = (
   METHOD_CORR : int,
   SUITES_I : suite / [ index : uint, 2* suite ],
   G_X : bstr,
-  C_I : bstr,  
+  C_I : bstr_identifier,  
   ? AD_1 : bstr,
 )
 
 suite = int
+bstr_identifier = bsrt / int
 ~~~~~~~~~~~
 
 where:
@@ -599,7 +600,7 @@ where:
 * METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 (see {{method-types}}) and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
 * SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
 * G_X - the ephemeral public key of the Initiator
-* C_I - variable length connection identifier
+* C_I - variable length connection identifier. An bstr_identifier is a byte string with special encoding. Byte strings of length one is encoded as the corresponding integer - 24, i.e. h'2a' is encoded as 18.
 * AD_1 - bstr containing unprotected opaque auxiliary data
 
 ### Initiator Processing of Message 1
@@ -643,9 +644,9 @@ message_2 = (
 
 ~~~~~~~~~~~ CDDL
 data_2 = (
-  ? C_I : bstr,
+  ? C_I : bstr_identifier,
   G_Y : bstr,
-  C_R : bstr,
+  C_R : bstr_identifier,
 )
 ~~~~~~~~~~~
 
@@ -709,9 +710,9 @@ The Responder SHALL compose message_2 as follows:
 
 * CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters:
 
-   * plaintext = ( ID_CRED_R / kid_R, Signature_or_MAC_2, ? AD_2 )
+   * plaintext = ( ID_CRED_R / bstr_identifier, Signature_or_MAC_2, ? AD_2 )
 
-      * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only kid_R is conveyed in the plaintext, see {{asym-overview}}.
+      * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only the byte sting kid_R is conveyed in the plaintext encoded as an bstr_identifier, see {{asym-overview}}.
 
    * CIPHERTEXT_2 = plaintext XOR K_2e
 
@@ -752,7 +753,7 @@ message_3 = (
 
 ~~~~~~~~~~~ CDDL
 data_3 = (
-  ? C_R : bstr,
+  ? C_R : bstr_identifier,
 )
 ~~~~~~~~~~~
 
@@ -809,15 +810,15 @@ The Initiator  SHALL compose message_3 as follows:
 
    * external_aad = TH_3
 
-   * plaintext = ( ID_CRED_I / kid_I, Signature_or_MAC_3, ? AD_3 )
+   * plaintext = ( ID_CRED_I / bstr_identifier, Signature_or_MAC_3, ? AD_3 )
 
-      * Note that if ID_CRED_I contains a single 'kid' parameter, i.e., ID_CRED_I = { 4 : kid_I }, only kid_I is conveyed in the plaintext, see {{asym-overview}}.
+      * Note that if ID_CRED_I contains a single 'kid' parameter, i.e., ID_CRED_I = { 4 : kid_I }, only the byte sting kid_I is conveyed in the plaintext encoded as an bstr_identifier, see {{asym-overview}}.
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
    * Key K = K_3ae
    * Nonce N = IV_3ae
-   * Plaintext P = ( ID_CRED_I / kid_I, Signature_or_MAC_3, ? AD_3 )
+   * Plaintext P = ( ID_CRED_I / bstr_identifier, Signature_or_MAC_3, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
    CIPHERTEXT_3 is the 'ciphertext' of the outer COSE_Encrypt0.
@@ -892,8 +893,8 @@ message_1 = (
   METHOD_CORR : int,
   SUITES_I : suite / [ index : uint, 2* suite ],
   G_X : bstr,
-  C_I : bstr,
-  ID_PSK : header_map // kid_psk : bstr,
+  C_I :  bstr_identifier,
+  ID_PSK : header_map / bstr_identifier,
   ? AD_1 : bstr,
 )
 ~~~~~~~~~~~
@@ -901,7 +902,7 @@ message_1 = (
 where:
 
 * METHOD_CORR = 4 * method + corr, where method = 4 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
-* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_psk }, with kid_psk: bstr, only kid_psk is conveyed.
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_psk }, only the byte sting kid_psk is conveyed encoded as an bstr_identifier.
 
 ## EDHOC Message 2
 
@@ -955,7 +956,7 @@ error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 
 ~~~~~~~~~~~ CDDL
 error = (
-  ? C_x : bstr,
+  ? C_x : bstr_identifier,
   ERR_MSG : tstr,
   ? SUITES_R : suite / [ 2* suite ],
 )
