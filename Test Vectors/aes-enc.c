@@ -96,7 +96,8 @@ void * aes_encrypt_init(const u8 *key, size_t len)
 {
 	u32 *rk;
 	int res;
-	rk = (u32 *)malloc(AES_PRIV_SIZE);
+	//rk = malloc(AES_PRIV_SIZE); Changed by Francesca "Comic Sans" Palombini
+	rk = (u32 *) malloc(AES_PRIV_SIZE);
 	if (rk == NULL)
 		return NULL;
 	res = rijndaelKeySetupEnc(rk, key, len * 8);
@@ -111,7 +112,9 @@ void * aes_encrypt_init(const u8 *key, size_t len)
 
 void aes_encrypt(void *ctx, const u8 *plain, u8 *crypt)
 {
-	u32 *rk = (u32 *)ctx;
+	//u32 *rk = ctx; Changed by Francesca "Comic Sans" Palombini
+	u32 *rk = (u32*)ctx;
+	//rijndaelEncrypt(ctx, rk[AES_PRIV_NR_POS], plain, crypt); Changed by Francesca "Comic Sans" Palombini
 	rijndaelEncrypt((u32 *)ctx, rk[AES_PRIV_NR_POS], plain, crypt);
 }
 

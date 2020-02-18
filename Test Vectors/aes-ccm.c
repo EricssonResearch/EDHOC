@@ -7,7 +7,7 @@
  * See README for more details.
  */
 
-// Modified by John Mattsson to allow aad_len <= 46
+// Modified by John Mattsson to allow aad_len <= 42 * 16 - 2
 
 #include <string.h>
 
@@ -37,7 +37,7 @@ static void aes_ccm_auth_start(void *aes, size_t M, size_t L, const u8 *nonce,
 {
 //  John Modified
 //  u8 aad_buf[2 * AES_BLOCK_SIZE];
-    u8 aad_buf[3 * AES_BLOCK_SIZE];
+    u8 aad_buf[42 * AES_BLOCK_SIZE];
     u8 b[AES_BLOCK_SIZE];
 
     /* Authentication */
@@ -57,23 +57,24 @@ static void aes_ccm_auth_start(void *aes, size_t M, size_t L, const u8 *nonce,
     memcpy(aad_buf + 2, aad, aad_len);
     memset(aad_buf + 2 + aad_len, 0, sizeof(aad_buf) - 2 - aad_len);
 
-    xor_aes_block(aad_buf, x);
-    aes_encrypt(aes, aad_buf, x); /* X_2 = E(K, X_1 XOR B_1) */
+//    John Modified
 
-    if (aad_len > AES_BLOCK_SIZE - 2) {
-        xor_aes_block(&aad_buf[AES_BLOCK_SIZE], x);
-        /* X_3 = E(K, X_2 XOR B_2) */
-        aes_encrypt(aes, &aad_buf[AES_BLOCK_SIZE], x);
-    }
+//    xor_aes_block(aad_buf, x);
+//    aes_encrypt(aes, aad_buf, x); /* X_2 = E(K, X_1 XOR B_1) */
 
-    //  John Added
-    if (aad_len > 2 * AES_BLOCK_SIZE - 2) {
-        xor_aes_block(&aad_buf[2 * AES_BLOCK_SIZE], x);
-        /* X_4 = E(K, X_4 XOR B_3) */
-        aes_encrypt(aes, &aad_buf[2 * AES_BLOCK_SIZE], x);
+//    if (aad_len > AES_BLOCK_SIZE - 2) {
+//        xor_aes_block(&aad_buf[AES_BLOCK_SIZE], x);
+//        /* X_3 = E(K, X_2 XOR B_2) */
+//        aes_encrypt(aes, &aad_buf[AES_BLOCK_SIZE], x);
+//    }
+
+    for ( int pos = 0; pos < (aad_len + 2); pos += AES_BLOCK_SIZE )
+    {
+        xor_aes_block(&aad_buf[pos], x);
+        aes_encrypt(aes, &aad_buf[pos], x);
+        /* X_(i+1) = E(K, X_i XOR B_i) */
     }
 }
-
 
 static void aes_ccm_auth(void *aes, const u8 *data, size_t len, u8 *x)
 {
@@ -163,10 +164,9 @@ int aes_ccm_ae(const u8 *key, size_t key_len, const u8 *nonce,
     void *aes;
     u8 x[AES_BLOCK_SIZE], a[AES_BLOCK_SIZE];
 
-//  John Modified
+//  John Modified. Increased aad_len assumption to 42 * 16 - 2
 //  if (aad_len > 30 || M > AES_BLOCK_SIZE)
-//      return -1;
-    if (aad_len > 46 || M > AES_BLOCK_SIZE)
+    if (aad_len > (42 * AES_BLOCK_SIZE - 2) || M > AES_BLOCK_SIZE)
         return -1;
 
     aes = aes_encrypt_init(key, key_len);
