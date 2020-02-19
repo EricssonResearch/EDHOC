@@ -1437,11 +1437,11 @@ void static_vectors ( void )
     vector_append( ID_CRED_I_CBOR, cbor_bstr( kid_I ) );
     vector<uint8_t> CRED_I_CBOR { 0xa3, 0x01, 0x01, 0x20, 0x04, 0x21,  }; // CBOR map(3), 1, 1, -1, 4, -2
     vector_append( CRED_I_CBOR, cbor_bstr( I_dh_pk ) );
+    //TODO: subject name is not included in CRED_x
 
     // Generate the Responder's static DH authentication key pair 
     vector<uint8_t> R_dh_pk( crypto_kx_PUBLICKEYBYTES ); //G_R
-    vector<uint8_t> R_dh_sk( crypto_kx_SECRETKEYBYTES );
-    //R
+    vector<uint8_t> R_dh_sk( crypto_kx_SECRETKEYBYTES ); //R
     vector<uint8_t> R_dh_seed( crypto_kx_SEEDBYTES, 9 ); ;
     crypto_kx_seed_keypair( R_dh_pk.data(), R_dh_sk.data(), R_dh_seed.data() );
 
@@ -1450,6 +1450,7 @@ void static_vectors ( void )
     vector_append( ID_CRED_R_CBOR, cbor_bstr( kid_R ) );
     vector<uint8_t> CRED_R_CBOR { 0xa3, 0x01, 0x01, 0x20, 0x04, 0x21,  }; // CBOR map(3), 1, 1, -1, 4, -2
     vector_append( CRED_R_CBOR, cbor_bstr( R_dh_pk ) );
+    //TODO: subject name is not included in CRED_x
 
     // Other parameters
     uint8_t method = 3; // Static Static
@@ -1469,15 +1470,13 @@ void static_vectors ( void )
     
     print_fig( "corr (Initiator can correlate message_1 and message_2)", to_string(corr) );
     
-    cout << "No unprotected opaque auxiliary data is sent in the message exchanges." << endl;
-    cout << endl;
-    cout << "The pre-defined Cipher Suite 0 is in place both on Initiator and Responder, see {{cipher-suites}}." << endl;
-    cout << endl;
+    cout << "No unprotected opaque auxiliary data is sent in the message exchanges." << endl << endl;
+
+    cout << "The pre-defined Cipher Suite 0 is in place both on Initiator and Responder, see {{cipher-suites}}." << endl << endl;
 
     // Input for the Initiator //////////////////////////////////////////////
-    cout << "### Input for the Initiator {#ss-tv-input-u}" << endl;
+    cout << "### Input for the Initiator {#ss-tv-input-u}" << endl << endl;
 
-    cout << endl;
     cout << "The following are the parameters that are set in the Initiator before the first message exchange." << endl;
 
     print_fig_with_bytes("Initiator's private static DH authentication key (I)", I_dh_sk);
@@ -1488,20 +1487,21 @@ void static_vectors ( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve X25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    //TODO: if cred_i not serialized, change here
-    string cred_I_str = "<< {\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( I_dh_pk , 8) + "\n} >>";
-    string cred_I_str_tab = "<< {\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( I_dh_pk , 10) + "\n} >>"; // quick fix for when the same string is tabbed
+    //NOTE: CRED_I is CBOR map, not serialized
+    //TODO: subject name is not included in CRED_x
+    string cred_I_str = "{\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( I_dh_pk , 8) + "\n}";
+    string cred_I_str_tab = "{\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( I_dh_pk , 10) + "\n}"; // quick fix for when the same string is tabbed
 
     print_fig("CRED_I =", cred_I_str);
 
-    print_fig_with_bytes("CRED_I (bstr-wrapped COSE_Key) (CBOR-encoded)" , cbor_bstr(CRED_I_CBOR));
+    print_fig_with_bytes("CRED_I (COSE_Key)" , CRED_I_CBOR);
 
     cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_I , 0) <<":";
 
     string id_cred_I_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_I , 8) + "\n}";
     print_fig("ID_CRED_I =" , id_cred_I_str );
 
-    cout << "Note that since the map for ID_CRED_I contains a single 'kid' parameter, ID_CRED_I is used when transported in the protected header of the COSE Object, but only kid_I is used when added to the plaintext (see {{asym-msg3-proc}}):" << endl;
+    cout << "Note that since the map for ID_CRED_I contains a single 'kid' parameter, ID_CRED_I is used when transported in the protected header of the COSE Object, but only kid_I is used when added to the plaintext (see {{asym-msg2-proc}} and {{asym-msg3-proc}}):" << endl;
 
     print_fig_with_bytes("ID_CRED_I (in protected header) (CBOR-encoded)" , cbor_bstr(ID_CRED_I_CBOR));
     
@@ -1521,12 +1521,14 @@ void static_vectors ( void )
 
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve X25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
-    string cred_R_str = "<< {\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( R_dh_pk , 8) + "\n} >>";
-    string cred_R_str_tab = "<< {\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( R_dh_pk , 10) + "\n} >>"; // quick fix for when the same string is tabbed later
+    //NOTE: CRED_R is CBOR map, not serialized
+    //TODO: subject name is not included in CRED_x
+    string cred_R_str = "{\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( R_dh_pk , 8) + "\n}";
+    string cred_R_str_tab = "{\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( R_dh_pk , 10) + "\n}"; // quick fix for when the same string is tabbed later
 
     print_fig("CRED_R =" , cred_R_str );
 
-    print_fig_with_bytes("CRED_R (bstr-wrapped COSE_Key) (CBOR-encoded)" , cbor_bstr(CRED_R_CBOR));
+    print_fig_with_bytes("CRED_R (COSE_Key)" , CRED_R_CBOR);
 
     cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_R , 0) <<":";
 
