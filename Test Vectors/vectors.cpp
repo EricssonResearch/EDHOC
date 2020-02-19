@@ -175,7 +175,7 @@ void sig_sig_vectors( void )
     vector<uint8_t> I_auth_pk( crypto_sign_PUBLICKEYBYTES );
     vector<uint8_t> I_auth_sk_libsodium( crypto_sign_SECRETKEYBYTES );
     vector<uint8_t> I_auth_sk(crypto_sign_SEEDBYTES );
-    vector<uint8_t> I_auth_seed( randombytes_SEEDBYTES, 4 ); 
+    vector<uint8_t> I_auth_seed( randombytes_SEEDBYTES, 1 ); 
     randombytes_buf_deterministic( I_auth_sk.data(), I_auth_sk.size(), I_auth_seed.data() );
     crypto_sign_seed_keypair( I_auth_pk.data(), I_auth_sk_libsodium.data(), I_auth_sk.data() );
     vector<uint8_t> kid_I { 0x2a };
@@ -184,7 +184,7 @@ void sig_sig_vectors( void )
     vector<uint8_t> R_auth_pk( crypto_sign_PUBLICKEYBYTES );
     vector<uint8_t> R_auth_sk_libsodium( crypto_sign_SECRETKEYBYTES );
     vector<uint8_t> R_auth_sk(crypto_sign_SEEDBYTES );
-    vector<uint8_t> R_auth_seed( randombytes_SEEDBYTES, 5 ); 
+    vector<uint8_t> R_auth_seed( randombytes_SEEDBYTES, 2 ); 
     randombytes_buf_deterministic( R_auth_sk.data(), R_auth_sk.size(), R_auth_seed.data() );
     crypto_sign_seed_keypair( R_auth_pk.data(), R_auth_sk_libsodium.data(), R_auth_sk.data() );
     vector<uint8_t> kid_R { 0x2b };
@@ -196,7 +196,7 @@ void sig_sig_vectors( void )
     // Generate Initiator's ephemeral key pair
     vector<uint8_t> I_kx_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> I_kx_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 6 ); ;
+    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 3 ); ;
     crypto_kx_seed_keypair( I_kx_pk.data(), I_kx_sk.data(), I_kx_seed.data() );
 
     // Other parameters
@@ -219,7 +219,7 @@ void sig_sig_vectors( void )
     // Generate Responder's ephemeral key pair
     vector<uint8_t> R_kx_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> R_kx_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 7 ); ;
+    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 4 ); ;
     crypto_kx_seed_keypair( R_kx_pk.data(), R_kx_sk.data(), R_kx_seed.data() );
 
     // Derive PRK_2e
@@ -444,6 +444,8 @@ void sig_sig_vectors( void )
     print_vector( "data_2 (CBOR Sequence)", data_2 );
     print_vector( "Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence)", TH_2_input );
     print_vector( "TH_2",  TH_2 );
+    print_vector( "ID_CRED_R",  ID_CRED_R );
+    print_vector( "CRED_R",  CRED_R );
     print_vector( "P_2m", P_2m );
     print_vector( "A_2m (CBOR-encoded)", A_2m );   
     print_vector( "info for K_2m (CBOR-encoded)", info_K_2m );   
@@ -466,6 +468,8 @@ void sig_sig_vectors( void )
     print_vector( "data_3 (CBOR Sequence)", data_3 );
     print_vector( "Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence)", TH_3_input );
     print_vector( "TH_3", TH_3);
+    print_vector( "ID_CRED_I",  ID_CRED_I );
+    print_vector( "CRED_I",  CRED_I );
     print_vector( "P_3m", P_3m );   
     print_vector( "A_3m (CBOR-encoded)", A_3m );   
     print_vector( "info for K_3m (CBOR-encoded)", info_K_3m );   
@@ -510,14 +514,14 @@ void sdh_sdh_vectors( void )
     // Generate Party Initiator's COSE_Key
     vector<uint8_t> I_auth_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> I_auth_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> I_auth_seed( crypto_kx_SEEDBYTES, 12 ); ;
+    vector<uint8_t> I_auth_seed( crypto_kx_SEEDBYTES, 31 ); ;
     crypto_kx_seed_keypair( I_auth_pk.data(), I_auth_sk.data(), I_auth_seed.data() );
     vector<uint8_t> kid_I { 0x21 };
 
     // Generate Party Responders's COSE_Key
     vector<uint8_t> R_auth_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> R_auth_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> R_auth_seed( crypto_kx_SEEDBYTES, 12 ); ;
+    vector<uint8_t> R_auth_seed( crypto_kx_SEEDBYTES, 32 ); ;
     crypto_kx_seed_keypair( R_auth_pk.data(), R_auth_sk.data(), R_auth_seed.data() );
     vector<uint8_t> kid_R { 0x22 };
  
@@ -528,7 +532,7 @@ void sdh_sdh_vectors( void )
     // Generate Initiator's ephemeral key pair
     vector<uint8_t> I_kx_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> I_kx_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 6 ); ;
+    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 33 ); ;
     crypto_kx_seed_keypair( I_kx_pk.data(), I_kx_sk.data(), I_kx_seed.data() );
 
     // Other parameters
@@ -551,7 +555,7 @@ void sdh_sdh_vectors( void )
     // Generate Responder's ephemeral key pair
     vector<uint8_t> R_kx_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> R_kx_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 7 ); ;
+    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 34 ); ;
     crypto_kx_seed_keypair( R_kx_pk.data(), R_kx_sk.data(), R_kx_seed.data() );
 
     // Derive PRK_2e
@@ -773,6 +777,8 @@ void sdh_sdh_vectors( void )
     print_vector( "data_2 (CBOR Sequence)", data_2 );
     print_vector( "Input to SHA-256 to calculate TH_2 ( message_1, data_2 ) (CBOR Sequence)", TH_2_input );
     print_vector( "TH_2",  TH_2 );
+    print_vector( "ID_CRED_R",  ID_CRED_R );
+    print_vector( "CRED_R",  CRED_R );
     print_vector( "P_2m", P_2m );
     print_vector( "A_2m (CBOR-encoded)", A_2m );   
     print_vector( "info for K_2m (CBOR-encoded)", info_K_2m );   
@@ -795,6 +801,8 @@ void sdh_sdh_vectors( void )
     print_vector( "data_3 (CBOR Sequence)", data_3 );
     print_vector( "Input to SHA-256 to calculate TH_3 ( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence)", TH_3_input );
     print_vector( "TH_3", TH_3);
+    print_vector( "ID_CRED_I",  ID_CRED_I );
+    print_vector( "CRED_I",  CRED_I );
     print_vector( "P_3m", P_3m );   
     print_vector( "A_3m (CBOR-encoded)", A_3m );   
     print_vector( "info for K_3m (CBOR-encoded)", info_K_3m );   
@@ -837,7 +845,7 @@ void psk_psk_vectors( void )
 
     // Generate Shared COSE_Key
     vector<uint8_t> PSK( 16 );  // 16 bytes = 128 bit security
-    vector<uint8_t> PSK_seed( randombytes_SEEDBYTES, 0 ); 
+    vector<uint8_t> PSK_seed( randombytes_SEEDBYTES, 41 ); 
     randombytes_buf_deterministic( PSK.data(), PSK.size(), PSK_seed.data() );
     vector<uint8_t> kid_psk { 0x2c };
 
@@ -848,7 +856,7 @@ void psk_psk_vectors( void )
     // Generate Initiator's ephemeral key pair
     vector<uint8_t> I_kx_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> I_kx_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 1 ); ;
+    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 43 ); ;
     crypto_kx_seed_keypair( I_kx_pk.data(), I_kx_sk.data(), I_kx_seed.data() );
 
     // Other parameters
@@ -872,7 +880,7 @@ void psk_psk_vectors( void )
     // Generate Responder's ephemeral key pair
     vector<uint8_t> R_kx_pk( crypto_kx_PUBLICKEYBYTES );
     vector<uint8_t> R_kx_sk( crypto_kx_SECRETKEYBYTES );
-    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 2 ); ;
+    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 44 ); ;
     crypto_kx_seed_keypair( R_kx_pk.data(), R_kx_sk.data(), R_kx_seed.data() );
 
     // Derive PRK_2e
