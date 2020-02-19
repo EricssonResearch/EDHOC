@@ -3031,19 +3031,19 @@ This test vector uses COSE_Key objects to store the raw public keys. Moreover, E
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CRED_I =
-<< {
+{
   1:  1,
  -1:  4,
  -2:  h'6e5d6876a178156ca0b81dc80f81060fa1a5d13513d614bcc28537ef98900644
         '
-} >>
+}
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_I (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
-58 28 a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78 15 6c a0 b8 1d c8 0f 81
-06 0f a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90 06 44 
+CRED_I (COSE_Key) (40 bytes)
+a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78 15 6c a0 b8 1d c8 0f 81 06 0f
+a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90 06 44 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a7':
@@ -3054,7 +3054,7 @@ ID_CRED_I =
 }
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that since the map for ID_CRED_I contains a single 'kid' parameter, ID_CRED_I is used when transported in the protected header of the COSE Object, but only kid_I is used when added to the plaintext (see {{asym-msg3-proc}}):
+Note that since the map for ID_CRED_I contains a single 'kid' parameter, ID_CRED_I is used when transported in the protected header of the COSE Object, but only kid_I is used when added to the plaintext (see {{asym-msg2-proc}} and {{asym-msg3-proc}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_CRED_I (in protected header) (CBOR-encoded) (5 bytes)
@@ -3094,19 +3094,19 @@ This test vector uses COSE_Key objects to store the raw public keys. Moreover, E
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CRED_R =
-<< {
+{
   1:  1,
  -1:  4,
  -2:  h'328244f6cdf5f1272250d7cfbba26834fbef25e846db8baf890faa8d7ef6e673
         '
-} >>
+}
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CRED_R (bstr-wrapped COSE_Key) (CBOR-encoded) (42 bytes)
-58 28 a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5 f1 27 22 50 d7 cf bb a2
-68 34 fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73 
+CRED_R (COSE_Key) (40 bytes)
+a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5 f1 27 22 50 d7 cf bb a2 68 34
+fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a8':
@@ -3135,7 +3135,7 @@ kid_R (in plaintext) (CBOR-encoded) (2 bytes)
 From the input parameters (in {{rpk-tv-input-u}}):
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-TYPE (4 * method + corr)
+METHOD_CORR (4 * method + corr)
 13
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3153,7 +3153,7 @@ SUITES_I : suite
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-Initiator's ephemeral private key (I) (32 bytes)
+Initiator's ephemeral private key (32 bytes)
 11 34 9f 62 e8 d8 13 ed 79 d2 7d 57 dd 41 b9 af ec 4d d9 5e c4 d2 88 0e
 72 0d 50 e6 37 fe c9 19 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -3275,7 +3275,7 @@ The key and nonce for calculating the MAC are calculated as follows, as specifie
 
 HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
 
-PRK_2 = HMAC-SHA-256 (salt, G_XY)
+PRK_2e = HMAC-SHA-256 (salt, G_XY)
 
 Since this is the asymmetric case, salt is the empty byte string.
 
@@ -3287,15 +3287,15 @@ G_XY (32 bytes)
 02 0b c2 d7 7c cb 4f 28 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From there, PRK_2 is computed:
+From there, PRK_2e is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK_2 (32 bytes)
+PRK_2e (32 bytes)
 f1 8c ca 1d af 06 1a f1 40 94 19 26 19 a4 dd 5e 9e 41 94 fc 42 fe 5e 20
 d0 27 9d 8d d3 1f ad 8f 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-PRK_R = HKDF-Extract (PRK_2, G_RX)
+PRK_3e2m = HKDF-Extract (PRK_2e, G_RX)
 
 G_RX is the ECDH shared secret calculated from G_X received in {{tv-ss-1}} and R in {{ss-tv-input-v}}, and since the curve25519 is used, the ECDH shared secret is the output of the X25519 function.
 
@@ -3305,78 +3305,78 @@ G_RX (32 bytes)
 dd 8f 23 b6 c4 83 99 2e 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From there, PRK_R is computed:
+From there, PRK_3e2m is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK_R (32 bytes)
+PRK_3e2m (32 bytes)
 08 4a 87 01 49 07 ed 85 12 90 42 55 e1 8a df a8 39 53 92 28 29 48 8f f4
 66 44 87 1e 07 1d 42 80 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Key K_R is the output of HKDF-Expand(PRK_R, info, L).
+Key K_2m is the output of HKDF-Expand(PRK_3e2m, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for K_R =
+info for K_2m =
 [
   10,
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed18
-                26cb21c3']
+  [ 128, h'a10441a8', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c46523
+                        18e0ed1826cb21c3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (K_R) (CBOR-encoded) (48 bytes)
-84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 4f 92 2e 15 50 2c ec fb
-04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3
-
+info (K_2m) (CBOR-encoded) (52 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 44 a1 04 41 a8 58 20 4f 92 2e 15
+50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18
+26 cb 21 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of K_R, so 16 bytes.
+L is the length of K_2m, so 16 bytes.
 
-From these parameters, K_R is computed:
+From these parameters, K_2m is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-K_R (16 bytes)
-54 3b aa 32 53 c2 6e df e8 a7 00 93 62 98 94 ea 
+K_2m (16 bytes)
+55 9d 43 46 34 44 83 e2 05 6b 18 5d 5a 78 b5 1e 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Nonce IV_R is the output of HKDF-Expand(PRK_R, info, L).
+Nonce IV_2m is the output of HKDF-Expand(PRK_3e2m, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for IV_R =
+info for IV_2m =
 [
   "IV-GENERATION",
   [ null, null, null ],
   [ null, null, null ],
-  [ 104, h'', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed18
-                26cb21c3']
+  [ 104, h'a10441a8', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c46523
+                        18e0ed1826cb21c3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (IV_R) (CBOR-encoded) (61 bytes)
+info (IV_2m) (CBOR-encoded) (65 bytes)
 84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83
-18 68 40 58 20 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b
-24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3 
+18 68 44 a1 04 41 a8 58 20 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae
+4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of IV_R, so 13 bytes.
+L is the length of IV_2m, so 13 bytes.
 
-From these parameters, IV_R is computed:
+From these parameters, IV_2m is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-IV_R (13 bytes)
-1d 41 f4 41 cf e6 2f 07 19 84 17 41 14 
+IV_2m (13 bytes)
+a2 8b 02 5a 26 89 6e 38 6d 10 e4 fa 55 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ##### MAC Computation {#tv-ss-2-mac-comp}
@@ -3385,7 +3385,7 @@ COSE_Encrypt0 is computed with the following parameters.
 
 * protected header = CBOR-encoded ID_CRED_R
 
-* external_aad = CBOR Sequence of TH_2 and CRED_R, in this order
+* external_aad = CBOR Sequence of CRED_R and TH_2, in this order
 
 * empty plaintext
 
@@ -3398,189 +3398,131 @@ Protected header: ID_CRED_R (CBOR-encoded) (5 bytes)
 The external_aad is the following:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-(TH_2 , CRED_R ) (CBOR Sequence) (72 bytes)
-4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23
-18 e0 ed 18 26 cb 21 c3 a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5 f1 27
-22 50 d7 cf bb a2 68 34 fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73
+( CRED_R , TH_2 ) (CBOR Sequence) (72 bytes)
+a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5 f1 27 22 50 d7 cf bb a2 68 34
+fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73 4f 92 2e 15 50 2c ec fb
+04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-(TH_2 , CRED_R ) (CBOR Sequence) (CBOR-encoded) (74 bytes)
-58 48 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4
-65 23 18 e0 ed 18 26 cb 21 c3 a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5
-f1 27 22 50 d7 cf bb a2 68 34 fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6
-e6 73 
+ CRED_R , TH_2 ) (CBOR Sequence) (CBOR-encoded) (74 bytes)
+58 48 a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5 f1 27 22 50 d7 cf bb a2
+68 34 fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73 4f 92 2e 15 50 2c
+ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb
+21 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 From the parameters above, the Enc_structure A_2 is computed.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-A_R =
+A_2m =
 [
   "Encrypt0",
   h'a10441a8',
-  h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed1826cb21c3a301
-    012004215820328244f6cdf5f1272250d7cfbba26834fbef25e846db8baf890faa8d
-    7ef6e673'
+  h'a301012004215820328244f6cdf5f1272250d7cfbba26834fbef25e846db8baf890f
+    aa8d7ef6e6734f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed18
+    26cb21c3'
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string to be used as Additional Authenticated Data:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-A_R (CBOR-encoded) (89 bytes)
-83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 a8 58 48 4f 92 2e 15 50 2c ec
-fb 04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21
-c3 a3 01 01 20 04 21 58 20 32 82 44 f6 cd f5 f1 27 22 50 d7 cf bb a2 68
-34 fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73 
+A_2m (CBOR-encoded) (89 bytes)
+83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 a8 58 48 a3 01 01 20 04 21 58
+20 32 82 44 f6 cd f5 f1 27 22 50 d7 cf bb a2 68 34 fb ef 25 e8 46 db 8b
+af 89 0f aa 8d 7e f6 e6 73 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae
+4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The key and nonce used are defined in {{tv-ss-2-key}}:
 
-* key = K_R
+* key = K_2m
 
-* nonce = IV_R
+* nonce = IV_2m
 
-Using the parameters above, the ciphertext CIPHERTEXT_R can be computed:
+Using the parameters above, the ciphertext MAC_2 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CIPHERTEXT_R (9 bytes)
-00 00 00 00 00 00 00 00 00 
+MAC_2 (9 bytes)
+7b cd b0 21 74 bc dc 69 05 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-#### Key and Nonce Computation {#tv-ss-2-key}
+#### Key and Computation {#tv-ss-2-key}
 
 The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}.
 
 HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
 
-PRK_2  = HMAC-SHA-256(salt, G_XY) as defined in {{tv-ss-2-key-mac}}
+PRK_2e  = HMAC-SHA-256(salt, G_XY) as defined in {{tv-ss-2-key-mac}}
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK_2 (32 bytes)
+PRK_2e (32 bytes)
 f1 8c ca 1d af 06 1a f1 40 94 19 26 19 a4 dd 5e 9e 41 94 fc 42 fe 5e 20
 d0 27 9d 8d d3 1f ad 8f 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Key K_2 is the output of HKDF-Expand(PRK_2, info, L).
+Key K_2e is the output of HKDF-Expand(PRK_2e, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for K_2 =
+info for K_2e =
 [
-  10,
+  XOR-ENCRYPTION,
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed18
-                26cb21c3']
+  [ 128, h'', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c46523
+                        18e0ed1826cb21c3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (K_2) (CBOR-encoded) (48 bytes)
-84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 4f 92 2e 15 50 2c ec fb
-04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3
-
+info (K_2e) (CBOR-encoded) (62 bytes)
+84 6e 58 4f 52 2d 45 4e 43 52 59 50 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6
+83 18 80 40 58 20 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5
+6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of K_2, so 16 bytes.
+L is the length of K_2e, so 12 bytes.
 
-From these parameters, K_2 is computed:
-
-~~~~~~~~~~~~~~~~~~~~~~~
-K_2 (16 bytes)
-73 e3 58 ef b5 7b 8f fa 15 c0 a2 ee 3e ed ed e1 
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Nonce IV_2 is the output of HKDF-Expand(PRK, info, L).
-
-info is defined as follows:
+From these parameters, K_2e is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for IV_2 =
-[
-  "IV-GENERATION",
-  [ null, null, null ],
-  [ null, null, null ],
-  [ 104, h'', h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed18
-                26cb21c3']
-]
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Which as a CBOR encoded data item is:
-
-~~~~~~~~~~~~~~~~~~~~~~~
-info (IV_2) (CBOR-encoded) (61 bytes)
-84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83
-18 68 40 58 20 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b
-24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3 
-~~~~~~~~~~~~~~~~~~~~~~~
-
-L is the length of IV_2, so 13 bytes.
-
-From these parameters, IV_2 is computed:
-
-~~~~~~~~~~~~~~~~~~~~~~~
-IV_2 (13 bytes)
-2c 41 5f 98 b2 9a 9c f7 0f 87 8c d0 d3 
+K_2e (12 bytes)
+7f bd 09 bd 68 e9 cc 97 09 48 21 04 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Ciphertext Computation {#tv-ss-2-ciph}
 
-COSE_Encrypt0 is computed with the following parameters. Note that AD_2 is omitted.
+CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters
 
-* empty protected header
+* plaintext = CBOR Sequence of the items kid_R and MAC_2, in this order.
 
-* external_aad = TH_2
-
-* plaintext = CBOR Sequence of the items kid_R, CIPHERTEXT_R, in this order.
-
-with kid_R taken from {{ss-tv-input-v}}, and CIPHERTEXT_R as calculated in {{tv-ss-2-mac-comp}}.
+with kid_R taken from {{ss-tv-input-v}}, and MAC_2 as calculated in {{tv-ss-2-mac-comp}}.
 
 The plaintext is the following:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 P_2  (12 bytes)
-41 a8 49 00 00 00 00 00 00 00 00 00 
+41 a8 49 7b cd b0 21 74 bc dc 69 05 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From the parameters above, the Enc_structure A_2 is computed.
+The key used is defined in {{tv-ss-2-key}}:
 
-~~~~~~~~~~~~~~~~~~~~~~~
-A_2 =
-[
-  "Encrypt0",
-  h'',
-  h'4f922e15502cecfb04b3afd8051fae4f98d56b2451c4652318e0ed1826cb21c3'
-]
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Which encodes to the following byte string to be used as Additional Authenticated Data:
-
-~~~~~~~~~~~~~~~~~~~~~~~
-A_2 (CBOR-encoded) (45 bytes)
-83 68 45 6e 63 72 79 70 74 30 40 58 20 4f 92 2e 15 50 2c ec fb 04 b3 af
-d8 05 1f ae 4f 98 d5 6b 24 51 c4 65 23 18 e0 ed 18 26 cb 21 c3 
-~~~~~~~~~~~~~~~~~~~~~~~
-
-The key and nonce used are defined in {{tv-ss-2-key}}:
-
-* key = K_2
-
-* nonce = IV_2
+* key = K_2e
 
 Using the parameters above, the ciphertext CIPHERTEXT_2 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CIPHERTEXT_2 (20 bytes)
-21 31 6c 24 04 22 65 0f 93 98 75 17 97 be 3e c2 98 d1 3e bd 
+CIPHERTEXT_2 (12 bytes)
+3e 15 40 c6 a5 59 ed e3 b5 94 48 01 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### message_2
@@ -3593,22 +3535,22 @@ message_2 =
 (
   h'4acd374173cc6f2b55c759ef6e782ca307e79821f4da89a678077f8b796a3f65',
   h'c8',
-  h'21316c240422650f9398751797be3ec298d13ebd'
+  h'3e1540c6a559ede3b5944801'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-message_2 (CBOR Sequence) (57 bytes)
+message_2 (CBOR Sequence) (49 bytes)
 58 20 4a cd 37 41 73 cc 6f 2b 55 c7 59 ef 6e 78 2c a3 07 e7 98 21 f4 da
-89 a6 78 07 7f 8b 79 6a 3f 65 41 c8 54 21 31 6c 24 04 22 65 0f 93 98 75
-17 97 be 3e c2 98 d1 3e bd 
+89 a6 78 07 7f 8b 79 6a 3f 65 41 c8 4c 3e 15 40 c6 a5 59 ed e3 b5 94 48
+01 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Message 3 {#tv-ss-3}
 
-Since TYPE mod 4 equals 1, C_R is not omitted from data_3.
+Since corr equals 1, C_R is not omitted from data_3.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -3634,18 +3576,18 @@ data_3 (CBOR Sequence) (2 bytes)
 From data_3, CIPHERTEXT_2 ({{tv-rpk-2-ciph}}), and TH_2 ({{tv-rpk-2}}), compute the input to the transcript hash TH_2 = H(TH_2 , CIPHERTEXT_2, data_3), as a CBOR Sequence of these 3 data items.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (57 bytes)
+( TH_2, CIPHERTEXT_2, data_3 ) (CBOR Sequence) (49 bytes)
 58 20 4f 92 2e 15 50 2c ec fb 04 b3 af d8 05 1f ae 4f 98 d5 6b 24 51 c4
-65 23 18 e0 ed 18 26 cb 21 c3 54 21 31 6c 24 04 22 65 0f 93 98 75 17 97
-be 3e c2 98 d1 3e bd 41 c8 
+65 23 18 e0 ed 18 26 cb 21 c3 4c 3e 15 40 c6 a5 59 ed e3 b5 94 48 01 41
+c8 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 And from there, compute the transcript hash TH_3 = SHA-256(TH_2 , CIPHERTEXT_2, data_3)
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_3 value (32 bytes)
-4d 2d 24 a8 fc 09 04 02 8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15 1c 74
-c0 c4 bf 6c ce dd b0 3e 
+b0 06 6f 45 98 29 14 95 82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0 2c bb
+f9 8d 4c df 70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 When encoded as a CBOR bstr, that gives:
@@ -3653,8 +3595,8 @@ When encoded as a CBOR bstr, that gives:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 TH_3 (CBOR-encoded) (34 bytes)
-58 20 4d 2d 24 a8 fc 09 04 02 8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15
-1c 74 c0 c4 bf 6c ce dd b0 3e 
+58 20 b0 06 6f 45 98 29 14 95 82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0
+2c bb f9 8d 4c df 70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### MAC Computation {#tv-ss-3-mac}
@@ -3667,9 +3609,7 @@ The key and nonce for calculating the MAC are calculated as follows, as specifie
 
 HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
 
-PRK_I = HMAC-SHA-256 (PRK_3, G_IY)
-
-with PRK_3 = PRK_R.
+PRK_4x3m = HMAC-SHA-256 (PRK_3e2m, G_IY)
 
 G_IY is the ECDH shared secret, and since the curve25519 is used, the ECDH shared secret is the output of the X25519 function.
 
@@ -3679,78 +3619,78 @@ G_IY (32 bytes)
 c3 c6 5f 0a 5b 6b 7f 20 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From there, PRK_I is computed:
+From there, PRK_4x3m is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-PRK_I (32 bytes)
+PRK_4x3m  (32 bytes)
 f1 df af 80 cb 4b b6 a8 1c 83 ad 2e d7 bb ed d5 ac bc 7b b2 b2 a8 a5 ea
 8d fb 24 b9 45 1f fe 20 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Key K_I is the output of HKDF-Expand(PRK_I, info, L).
+Key K_3m is the output of HKDF-Expand(PRK_I, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for K_I =
+info for K_3m =
 [
   10,
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', h'4d2d24a8fc0904028a9740622bc22f6f534caa573a151c74c0c4bf6c
-                ceddb03e']
+  [ 128, h'a10441a7', h'b0066f4598291495828f0a2e8c0b6f4210f737f317e02cbb
+                        f98d4cdf705dc1b3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (K_I) (CBOR-encoded) (48 bytes)
-84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 4d 2d 24 a8 fc 09 04 02
-8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15 1c 74 c0 c4 bf 6c ce dd b0 3e
-
+info (K_3m) (CBOR-encoded) (52 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 44 a1 04 41 a7 58 20 b0 06 6f 45
+98 29 14 95 82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df
+70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of K_I, so 16 bytes.
+L is the length of K_3m, so 16 bytes.
 
-From these parameters, K_I is computed:
+From these parameters, K_3m is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-K_I (16 bytes)
-78 00 55 60 2a 5a d1 72 eb a4 76 f7 e3 ff 48 c8 
+K_3m (16 bytes)
+ed 5e 7f db e6 86 e5 e9 d8 ad c3 d9 95 e4 16 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Nonce IV_I is the output of HKDF-Expand(PRK_I, info, L).
+Nonce IV_3m is the output of HKDF-Expand(PRK_4x3m, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for IV_I =
+info for IV_3m =
 [
   "IV-GENERATION",
   [ null, null, null ],
   [ null, null, null ],
-  [ 104, h'', h'4d2d24a8fc0904028a9740622bc22f6f534caa573a151c74c0c4bf6c
-                ceddb03e']
+  [ 104, h'a10441a7', h'b0066f4598291495828f0a2e8c0b6f4210f737f317e02cbb
+                        f98d4cdf705dc1b3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (IV_I) (CBOR-encoded) (61 bytes)
+info (IV_3m) (CBOR-encoded) (65 bytes)
 84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83
-18 68 40 58 20 4d 2d 24 a8 fc 09 04 02 8a 97 40 62 2b c2 2f 6f 53 4c aa
-57 3a 15 1c 74 c0 c4 bf 6c ce dd b0 3e 
+18 68 44 a1 04 41 a7 58 20 b0 06 6f 45 98 29 14 95 82 8f 0a 2e 8c 0b 6f
+42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df 70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of IV_I, so 13 bytes.
+L is the length of IV_3m, so 13 bytes.
 
-From these parameters, IV_I is computed:
+From these parameters, IV_3m is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-IV_I (13 bytes)
-e1 1e bc 09 e7 cf 76 10 84 d8 00 56 1e 
+IV_3m (13 bytes)
+90 3d e5 21 1c 09 e6 79 8c ce 30 4c c2 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ##### MAC Computation {#tv-ss-3-mac-comp}
@@ -3759,7 +3699,7 @@ COSE_Encrypt0 is computed with the following parameters.
 
 * protected header = CBOR-encoded ID_CRED_I
 
-* external_aad = CBOR Sequence of TH_3 and CRED_I, in this order
+* external_aad = CBOR Sequence of CRED_I and TH_3, in this order
 
 * empty plaintext
 
@@ -3772,57 +3712,57 @@ Protected header: ID_CRED_I (CBOR-encoded) (5 bytes)
 The external_aad is the following:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-(TH_3 , CRED_I ) (CBOR Sequence) (72 bytes)
-4d 2d 24 a8 fc 09 04 02 8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15 1c 74
-c0 c4 bf 6c ce dd b0 3e a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78 15 6c
-a0 b8 1d c8 0f 81 06 0f a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90 06 44
+( CRED_I , TH_3 ) (CBOR Sequence) (72 bytes)
+a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78 15 6c a0 b8 1d c8 0f 81 06 0f
+a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90 06 44 b0 06 6f 45 98 29 14 95
+82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df 70 5d c1 b3
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-(TH_3 , CRED_I ) (CBOR Sequence) (CBOR-encoded) (74 bytes)
-58 48 4d 2d 24 a8 fc 09 04 02 8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15
-1c 74 c0 c4 bf 6c ce dd b0 3e a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78
-15 6c a0 b8 1d c8 0f 81 06 0f a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90
-06 44 
+( CRED_I , TH_3 ) (CBOR Sequence) (CBOR-encoded) (74 bytes)
+58 48 a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78 15 6c a0 b8 1d c8 0f 81
+06 0f a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90 06 44 b0 06 6f 45 98 29
+14 95 82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df 70 5d
+c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From the parameters above, the Enc_structure A_I is computed.
+From the parameters above, the Enc_structure A_3m is computed.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-A_I =
+A_3m =
 [
   "Encrypt0",
   h'a10441a7',
-  h'4d2d24a8fc0904028a9740622bc22f6f534caa573a151c74c0c4bf6cceddb03ea301
-    0120042158206e5d6876a178156ca0b81dc80f81060fa1a5d13513d614bcc28537ef
-    98900644'
+  h'a3010120042158206e5d6876a178156ca0b81dc80f81060fa1a5d13513d614bcc285
+    37ef98900644b0066f4598291495828f0a2e8c0b6f4210f737f317e02cbbf98d4cdf
+    705dc1b3'
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which encodes to the following byte string to be used as Additional Authenticated Data:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-A_I (CBOR-encoded) (89 bytes)
-83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 a7 58 48 4d 2d 24 a8 fc 09 04
-02 8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15 1c 74 c0 c4 bf 6c ce dd b0
-3e a3 01 01 20 04 21 58 20 6e 5d 68 76 a1 78 15 6c a0 b8 1d c8 0f 81 06
-0f a1 a5 d1 35 13 d6 14 bc c2 85 37 ef 98 90 06 44 
+A_3m (CBOR-encoded) (89 bytes)
+83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 a7 58 48 a3 01 01 20 04 21 58
+20 6e 5d 68 76 a1 78 15 6c a0 b8 1d c8 0f 81 06 0f a1 a5 d1 35 13 d6 14
+bc c2 85 37 ef 98 90 06 44 b0 06 6f 45 98 29 14 95 82 8f 0a 2e 8c 0b 6f
+42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df 70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The key and nonce used are defined in {{tv-ss-3-key}}:
 
-* key = K_I
+* key = K_3m
 
-* nonce = IV_I
+* nonce = IV_3m
 
-Using the parameters above, the ciphertext CIPHERTEXT_I can be computed:
+Using the parameters above, the ciphertext MAC_3 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-CIPHERTEXT_I (9 bytes)
-00 00 00 00 00 00 00 00 00 
+MAC_3 (9 bytes)
+05 82 46 79 2e f2 17 65 99 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Key and Nonce Computation {#tv-ss-3-key}
@@ -3831,79 +3771,70 @@ The key and nonce for calculating the ciphertext are calculated as follows, as s
 
 HKDF SHA-256 is the HKDF used (as defined by cipher suite 0).
 
-PRK_3 = PRK_R = HMAC-SHA-256(PRK_2, G_RX) as defined in {{tv-ss-2-mac}}
-
-
-~~~~~~~~~~~~~~~~~~~~~~~
-PRK_3 (32 bytes)
-08 4a 87 01 49 07 ed 85 12 90 42 55 e1 8a df a8 39 53 92 28 29 48 8f f4
-66 44 87 1e 07 1d 42 80 
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Key K_3 is the output of HKDF-Expand(PRK_3, info, L).
+Key K_3 is the output of HKDF-Expand(PRK_3e2m, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for K_3 =
+info for K_3ae =
 [
   10,
   [ null, null, null ],
   [ null, null, null ],
-  [ 128, h'', h'4d2d24a8fc0904028a9740622bc22f6f534caa573a151c74c0c4bf6c
-                ceddb03e']
+  [ 128, h'', h'b0066f4598291495828f0a2e8c0b6f4210f737f317e02cbb
+                        f98d4cdf705dc1b3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (K_3) (CBOR-encoded) (48 bytes)
-84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 4d 2d 24 a8 fc 09 04 02
-8a 97 40 62 2b c2 2f 6f 53 4c aa 57 3a 15 1c 74 c0 c4 bf 6c ce dd b0 3e
+info (K_3ae) (CBOR-encoded) (48 bytes)
+84 0a 83 f6 f6 f6 83 f6 f6 f6 83 18 80 40 58 20 b0 06 6f 45 98 29 14 95
+82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df 70 5d c1 b3
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of K_3, so 16 bytes.
+L is the length of K_3ae, so 16 bytes.
 
-From these parameters, K_3 is computed:
+From these parameters, K_3ae is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-K_3 (16 bytes)
-70 77 e4 d6 23 66 84 52 88 b7 00 ae 03 f8 a7 aa 
+K_3ae (16 bytes)
+b9 97 30 d0 ca a7 97 25 50 61 50 f1 0c 37 9b 46 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Nonce IV_3 is the output of HKDF-Expand(PRK, info, L).
+Nonce IV_3ae is the output of HKDF-Expand(PRK_3e2m, info, L).
 
 info is defined as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info for IV_3 =
+info for IV_3ae =
 [
   "IV-GENERATION",
   [ null, null, null ],
   [ null, null, null ],
-  [ 104, h'', h'4d2d24a8fc0904028a9740622bc22f6f534caa573a151c74c0c4bf6c
-                ceddb03e']
+  [ 104, h'', h'b0066f4598291495828f0a2e8c0b6f4210f737f317e02cbb
+                        f98d4cdf705dc1b3']
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Which as a CBOR encoded data item is:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-info (IV_3) (CBOR-encoded) (61 bytes)
+info (IV_3ae) (CBOR-encoded) (61 bytes)
 84 6d 49 56 2d 47 45 4e 45 52 41 54 49 4f 4e 83 f6 f6 f6 83 f6 f6 f6 83
-18 68 40 58 20 4d 2d 24 a8 fc 09 04 02 8a 97 40 62 2b c2 2f 6f 53 4c aa
-57 3a 15 1c 74 c0 c4 bf 6c ce dd b0 3e 
+18 68 40 58 20 b0 06 6f 45 98 29 14 95 82 8f 0a 2e 8c 0b 6f 42 10 f7 37
+f3 17 e0 2c bb f9 8d 4c df 70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-L is the length of IV_3, so 13 bytes.
+L is the length of IV_3ae, so 13 bytes.
 
-From these parameters, IV_3 is computed:
+From these parameters, IV_3ae is computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-IV_3 (13 bytes)
-e2 40 36 1e 0b 74 45 c6 d3 64 40 82 0d 
+IV_3ae (13 bytes)
+6a 27 26 3e 34 30 2e df 61 da 74 82 7f 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Ciphertext Computation {#tv-ss-3-ciph}
@@ -3914,15 +3845,15 @@ COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitt
 
 * external_aad = TH_3
 
-* plaintext = CBOR Sequence of the items kid_R, CIPHERTEXT_R, in this order.
+* plaintext = CBOR Sequence of the items kid_R, MAC_3, in this order.
 
-with kid_R taken from {{ss-tv-input-v}}, and CIPHERTEXT_R as calculated in {{tv-ss-2-mac-comp}}.
+with kid_R taken from {{ss-tv-input-v}}, and MAC_3 as calculated in {{tv-ss-2-mac-comp}}.
 
 The plaintext is the following:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 P_3  (12 bytes)
-41 a7 49 00 00 00 00 00 00 00 00 00 
+41 a7 49 05 82 46 79 2e f2 17 65 99 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 From the parameters above, the Enc_structure A_3 is computed.
@@ -3932,7 +3863,7 @@ A_3 =
 [
   "Encrypt0",
   h'',
-  h'4d2d24a8fc0904028a9740622bc22f6f534caa573a151c74c0c4bf6cceddb03e'
+  h'b0066f4598291495828f0a2e8c0b6f4210f737f317e02cbbf98d4cdf705dc1b3'
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3940,21 +3871,21 @@ Which encodes to the following byte string to be used as Additional Authenticate
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 A_3 (CBOR-encoded) (45 bytes)
-83 68 45 6e 63 72 79 70 74 30 40 58 20 4d 2d 24 a8 fc 09 04 02 8a 97 40
-62 2b c2 2f 6f 53 4c aa 57 3a 15 1c 74 c0 c4 bf 6c ce dd b0 3e 
+83 68 45 6e 63 72 79 70 74 30 40 58 20 b0 06 6f 45 98 29 14 95 82 8f 0a
+2e 8c 0b 6f 42 10 f7 37 f3 17 e0 2c bb f9 8d 4c df 70 5d c1 b3 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The key and nonce used are defined in {{tv-ss-3-key}}:
 
-* key = K_3
+* key = K_3ae
 
-* nonce = IV_3
+* nonce = IV_3ae
 
 Using the parameters above, the ciphertext CIPHERTEXT_3 can be computed:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 CIPHERTEXT_3 (20 bytes)
-d2 85 38 ee f7 ae 1b 9d 7d 89 57 18 48 a9 08 86 e0 69 43 2b 
+b4 88 c1 e0 b9 ac 2c 93 15 49 fa 60 98 60 26 30 7f 19 15 72 
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 #### message_3
@@ -3966,7 +3897,7 @@ From the parameter computed in {{tv-ss-3}} and {{tv-ss-3-ciph}}, message_3 is co
 message_3 =
 (
   h'c7',
-  h'd28538eef7ae1b9d7d89571848a90886e069432b'
+  h'b488c1e0b9ac2c931549fa60986026307f191572'
 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3974,7 +3905,127 @@ Which encodes to the following byte string:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_3 (CBOR Sequence) (23 bytes)
-41 c8 54 d2 85 38 ee f7 ae 1b 9d 7d 89 57 18 48 a9 08 86 e0 69 43 2b 
+41 c8 54 b4 88 c1 e0 b9 ac 2c 93 15 49 fa 60 98 60 26 30 7f 19 15 72 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+#### OSCORE Security Context Derivation
+
+From the previous message exchange, the Common Security Context for OSCORE {{RFC8613}} can be derived, as specified in {{exporter}}.
+
+First af all, TH_4 is computed: TH_4 = H( TH_3, CIPHERTEXT_3 ), where the input to the hash function is the CBOR Sequence of TH_3 and CIPHERTEXT_3
+
+~~~~~~~~~~~~~~~~~~~~~~~
+( TH_3, CIPHERTEXT_3 ) (CBOR Sequence) (55 bytes)
+58 20 b0 06 6f 45 98 29 14 95 82 8f 0a 2e 8c 0b 6f 42 10 f7 37 f3 17 e0
+2c bb f9 8d 4c df 70 5d c1 b3 54 b4 88 c1 e0 b9 ac 2c 93 15 49 fa 60 98
+60 26 30 7f 19 15 72 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And from there, compute the transcript hash TH_4 = SHA-256( TH_3, CIPHERTEXT_3 )
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_4 value (32 bytes)
+a2 a8 a2 13 02 91 cb 91 68 02 ab 78 e6 ef 6b e9 de b7 b6 33 da 2c 28 b3
+bf 5f 06 bc 2c d1 12 e5 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+TH_4 (CBOR-encoded) (34 bytes)
+58 20 a2 a8 a2 13 02 91 cb 91 68 02 ab 78 e6 ef 6b e9 de b7 b6 33 da 2c
+28 b3 bf 5f 06 bc 2c d1 12 e5 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To derive the Master Secret and Master Salt the same HKDF-Expand (PRK, info, L) is used, with different info and L.
+
+For Master Secret:
+
+L for Master Secret = 16
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for Master Secret =
+[
+  "OSCORE Master Secret",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 128, h'', h'a2a8a2130291cb916802ab78e6ef6be9deb7b633da2c28b3
+                        bf5f06bc2cd112e5']
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (OSCORE Master Secret) (CBOR-encoded) (68 bytes)
+84 74 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 65 63 72 65 74 83 f6
+f6 f6 83 f6 f6 f6 83 18 80 40 58 20 a2 a8 a2 13 02 91 cb 91 68 02 ab 78
+e6 ef 6b e9 de b7 b6 33 da 2c 28 b3 bf 5f 06 bc 2c d1 12 e5 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, the Master Secret value computed is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+OSCORE Master Secret (16 bytes)
+79 a1 02 48 12 94 1b bf d0 73 46 9b e9 c6 0e c5 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For Master Salt:
+
+L for Master Salt = 8
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info for Master Salt =
+[
+  "OSCORE Master Salt",
+  [ null, null, null ],
+  [ null, null, null ],
+  [ 64, h'', h'a2a8a2130291cb916802ab78e6ef6be9deb7b633da2c28b3
+                        bf5f06bc2cd112e5']
+]
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When encoded as a CBOR bstr, that gives:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+info (OSCORE Master Salt) (CBOR-encoded) (66 bytes)
+84 72 4f 53 43 4f 52 45 20 4d 61 73 74 65 72 20 53 61 6c 74 83 f6 f6 f6
+83 f6 f6 f6 83 18 40 40 58 20 a2 a8 a2 13 02 91 cb 91 68 02 ab 78 e6 ef
+6b e9 de b7 b6 33 da 2c 28 b3 bf 5f 06 bc 2c d1 12 e5 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, the Master Salt value computed is:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+OSCORE Master Salt (8 bytes)
+a2 98 5a 5d 84 e9 6e 15 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Client's Sender ID takes the value of C_R:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Client's OSCORE Sender ID (1 byte)
+c8 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Server's Sender ID takes the value of C_I:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Server's OSCORE Sender ID (1 byte)
+c7 
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The algorithms are those negociated in the cipher suite:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+AEAD Algorithm
+10
+~~~~~~~~~~~~~~~~~~~~~~~
+
+
+~~~~~~~~~~~~~~~~~~~~~~~
+HMAC Algorithm
+5
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
