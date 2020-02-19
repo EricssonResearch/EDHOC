@@ -209,10 +209,10 @@ EDHOC is designed to work in highly constrained scenarios making it especially s
                PSK       RPK       x5t     x5chain                  
 ---------------------------------------------------------------------
 message_1       38        37        37        37                     
-message_2       44        46       117       107 + Certificate chain 
-message_3       10        20        90        80 + Certificate chain 
+message_2       44        46       118       108 + Certificate chain 
+message_3       10        20        91        81 + Certificate chain 
 ---------------------------------------------------------------------
-Total           92       103       244       224 + Certificate chains
+Total           92       103       246       226 + Certificate chains
 =====================================================================
 ~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-sizes title="Typical message sizes in bytes" artwork-align="center"}
