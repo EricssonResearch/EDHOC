@@ -673,7 +673,7 @@ The Responder SHALL compose message_2 as follows:
 
       * ID_CRED_R - identifier to facilitate retrieval of CRED_R, see {{asym-overview}}
 
-   * external_aad = << TH_2, CRED_R, ? AD_2 >>
+   * external_aad = << CRED_R, ? AD_2, TH_2 >>
 
       * CRED_R - bstr containing the credential of the Responder, see {{asym-overview}}. 
 
@@ -688,7 +688,7 @@ The Responder SHALL compose message_2 as follows:
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
-     \[ "Encrypt0", << ID_CRED_R >>, << TH_2, CRED_R, ? AD_2 >> \]
+     \[ "Encrypt0", << ID_CRED_R >>, << CRED_R, ? AD_2, TH_2 >> \]
 
    MAC_2 is the 'ciphertext' of the inner COSE_Encrypt0.
 
@@ -696,7 +696,7 @@ The Responder SHALL compose message_2 as follows:
 
    * protected =  << ID_CRED_R >>
 
-   * external_aad = << TH_2, CRED_R, ? AD_2 >>
+   * external_aad = << CRED_R, ? AD_2, TH_2 >>
 
    * payload = MAC_2
 
@@ -706,7 +706,7 @@ The Responder SHALL compose message_2 as follows:
 
    * The message M to be signed =
 
-     \[ "Signature1", << ID_CRED_R >>, << TH_2, CRED_R, ? AD_2 >>, MAC_2 \]
+     \[ "Signature1", << ID_CRED_R >>, << CRED_R, ? AD_2, TH_2 >>, MAC_2 \]
 
 * CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters:
 
@@ -771,7 +771,7 @@ The Initiator  SHALL compose message_3 as follows:
 
       * ID_CRED_I - identifier to facilitate retrieval of CRED_I, see {{asym-overview}}
 
-   * external_aad = << TH_3, CRED_I, ? AD_3 >>
+   * external_aad = << CRED_I, ? AD_3, TH_3 >>
 
       * CRED_I - bstr containing the credential of the Initiator, see {{asym-overview}}. 
 
@@ -786,7 +786,7 @@ The Initiator  SHALL compose message_3 as follows:
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
-     \[ "Encrypt0", << ID_CRED_I >>, << TH_3, CRED_I, ? AD_3 >> \]
+     \[ "Encrypt0", << ID_CRED_I >>, << CRED_I, ? AD_3, TH_3 >> \]
 
    MAC_3 is the 'ciphertext' of the inner COSE_Encrypt0.
 
@@ -794,7 +794,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * protected =  << ID_CRED_I >>
 
-   * external_aad = << TH_3, CRED_I, ? AD_3 >>
+   * external_aad = << CRED_I, ? AD_3, TH_3 >>
 
    * payload = MAC_3
 
@@ -804,7 +804,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * The message M to be signed =
 
-     \[ "Signature1", << ID_CRED_I >>, << TH_3, CRED_I, ? AD_3 >>, MAC_3 \]
+     \[ "Signature1", << ID_CRED_I >>, << CRED_I, ? AD_3, TH_3 >>, MAC_3 \]
 
 * Compute an outer COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3ae, IV_3ae, and the following parameters. The protected header SHALL be empty.
 
