@@ -712,7 +712,7 @@ The Responder SHALL compose message_2 as follows:
 
    * plaintext = ( ID_CRED_R / bstr_identifier, Signature_or_MAC_2, ? AD_2 )
 
-      * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only the byte sting kid_R is conveyed in the plaintext encoded as an bstr_identifier, see {{asym-overview}}.
+      * Note that if ID_CRED_R contains a single 'kid' parameter, i.e., ID_CRED_R = { 4 : kid_R }, only the byte string kid_R is conveyed in the plaintext encoded as an bstr_identifier, see {{asym-overview}}.
 
    * CIPHERTEXT_2 = plaintext XOR K_2e
 
@@ -812,7 +812,7 @@ The Initiator  SHALL compose message_3 as follows:
 
    * plaintext = ( ID_CRED_I / bstr_identifier, Signature_or_MAC_3, ? AD_3 )
 
-      * Note that if ID_CRED_I contains a single 'kid' parameter, i.e., ID_CRED_I = { 4 : kid_I }, only the byte sting kid_I is conveyed in the plaintext encoded as an bstr_identifier, see {{asym-overview}}.
+      * Note that if ID_CRED_I contains a single 'kid' parameter, i.e., ID_CRED_I = { 4 : kid_I }, only the byte string kid_I is conveyed in the plaintext encoded as an bstr_identifier, see {{asym-overview}}.
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
@@ -902,7 +902,7 @@ message_1 = (
 where:
 
 * METHOD_CORR = 4 * method + corr, where method = 4 and the connection parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
-* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_psk }, only the byte sting kid_psk is conveyed encoded as an bstr_identifier.
+* ID_PSK - identifier to facilitate retrieval of the pre-shared key. If ID_PSK contains a single 'kid' parameter, i.e., ID_PSK = { 4 : kid_psk }, only the byte string kid_psk is conveyed encoded as an bstr_identifier.
 
 ## EDHOC Message 2
 
