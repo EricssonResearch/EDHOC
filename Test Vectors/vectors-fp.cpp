@@ -1412,10 +1412,6 @@ void rpk_vectors( void )
 void static_vectors ( void )
 {
 
-    cout << endl << "## Test Vectors for EDHOC Authenticated with Static Diffie-Hellman Keys" << endl; 
-    cout << endl;
-    cout << "EDHOC with static Diffie-Hellman keys and MAC authentication is used:" << endl;
-
     // Pre-shared stuff ////////////////////////////////////////////////////////////////////////////
 
     // This uses RFC 8032 notation, libsodium uses the notation from the Ed25519 paper by Bernstein
@@ -1461,9 +1457,178 @@ void static_vectors ( void )
     int hmac_algorithm_id = 5;
     vector<uint8_t> C_I { 0xc7 };
     vector<uint8_t> C_R { 0xc8 };
+    // message_1 ////////////////////////////////////////////////////////////////////////////
+
+    // Generate the Initiator's ephemeral key pair
+    vector<uint8_t> I_kx_pk( crypto_kx_PUBLICKEYBYTES ); //G_X
+    vector<uint8_t> I_kx_sk( crypto_kx_SECRETKEYBYTES ); 
+    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 10 ); ;
+    crypto_kx_seed_keypair( I_kx_pk.data(), I_kx_sk.data(), I_kx_seed.data() );
+
+    // Calculate message_1
+    vector<uint8_t> message_1;
+    vector_append( message_1, cbor_uint8( TYPE ) ); 
+    vector_append( message_1, cbor_uint8( suite ) ); 
+    vector_append( message_1, cbor_bstr( I_kx_pk ) ); 
+    vector_append( message_1, cbor_bstr( C_I ) ); 
+    // message_2 ////////////////////////////////////////////////////////////////////////////
+
+    // Generate the Responder's ephemeral key pair 
+    vector<uint8_t> R_kx_pk( crypto_kx_PUBLICKEYBYTES ); //G_Y
+    vector<uint8_t> R_kx_sk( crypto_kx_SECRETKEYBYTES ); 
+    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 11 ); ;
+    crypto_kx_seed_keypair( R_kx_pk.data(), R_kx_sk.data(), R_kx_seed.data() );
+
+    // Calculate ECDH shared secret G_XY from Y and G_X
+    vector<uint8_t> shared_secret( crypto_scalarmult_BYTES );
+    if ( crypto_scalarmult( shared_secret.data(), R_kx_sk.data(), I_kx_pk.data() ) == -1 ) {
+        cout << "crypto_scalarmult error";
+        return;
+    }
+
+    // Calculate data_2
+    vector<uint8_t> data_2;
+    vector_append( data_2, cbor_bstr( R_kx_pk ) ); 
+    vector_append( data_2, cbor_bstr( C_R ) ); 
+
+    // Calculate TH_2
+    vector<uint8_t> TH_2_input;
+    vector_append( TH_2_input, message_1 );
+    vector_append( TH_2_input, data_2 );
+    vector<uint8_t> TH_2 = hash_sha_256( TH_2_input );
+
+    // Calculate ECDH shared secret G_RX - R and G_X
+    vector<uint8_t> shared_secret_es( crypto_scalarmult_BYTES );
+    if ( crypto_scalarmult( shared_secret_es.data(), R_dh_sk.data(), I_kx_pk.data() ) == -1 ) {
+        cout << "crypto_scalarmult error";
+        return;
+    }
+
+    // Derive key and IV for MAC
+    vector<uint8_t> salt; // empty byte string;
+    vector<uint8_t> PRK_2e = hkdf_extract_sha_256( salt, shared_secret ); //PRK_2
+    vector<uint8_t> PRK_3e2m = hkdf_extract_sha_256( PRK_2e, shared_secret_es ); //PRK_R
+    vector<uint8_t> info_K_2m = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_2 , ID_CRED_R_CBOR );
+    vector<uint8_t> K_2m = hkdf_expand_sha_256( PRK_3e2m, info_K_2m, 16 );
+    vector<uint8_t> info_IV_2m = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_2 , ID_CRED_R_CBOR );
+    vector<uint8_t> IV_2m = hkdf_expand_sha_256( PRK_3e2m, info_IV_2m, 13 );
+
+    // Calculate MAC
+    vector<uint8_t> P_2m;
+    vector_append( P_2m, cbor_bstr( { } ) ); // empty bstr
+
+    vector<uint8_t> A_2m = { 0x83 }; // CBOR array of length 3
+    vector_append( A_2m, cbor_tstr( "Encrypt0" ) );
+    vector_append( A_2m, cbor_bstr(ID_CRED_R_CBOR) ); // protected contains the serialized ID_CRED_R
+    vector<uint8_t> ext_aad_2m; // NOTE: the order has changed here. Why is AD_2 in the middle?
+    vector_append( ext_aad_2m , CRED_R_CBOR ); //CRED_R map in this case
+    vector_append( ext_aad_2m , TH_2 );
+    vector_append( A_2m, cbor_bstr( ext_aad_2m ) );
+
+    vector<uint8_t> C_2m = aes_ccm_16_64_128( K_2m, IV_2m, P_2m, A_2m );
+
+    // Derive key and IV
+    vector<uint8_t> info_K_2e = gen_info( cbor_tstr( "XOR-ENCRYPTION" ), 128, TH_2, vector<uint8_t> ());
+
+//    vector<uint8_t> info_IV_2e = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_2, vector<uint8_t> ());
+//    vector<uint8_t> IV_2e = hkdf_expand_sha_256( PRK_2e, info_IV_2e, 13 );
+
+    // Calculate ciphertext
+    vector<uint8_t> P_2;
+    vector_append( P_2, cbor_bstr( kid_R ) ); // ID_CRED_R contains a single 'kid' parameter, so only bstr is used
+    vector_append( P_2, cbor_bstr( C_2m ) );
+
+    vector<uint8_t> K_2e = hkdf_expand_sha_256( PRK_2e, info_K_2e, P_2.size() );
+
+    vector<uint8_t> C_2 = { };
+    for (int i = 0; i < P_2.size(); ++i)
+        vector_append( C_2 , { uint8_t(P_2[i] ^ K_2e[i]) } );
+
+    // Calculate message_2
+    vector<uint8_t> message_2;
+    vector_append( message_2, data_2 );
+    vector_append( message_2, cbor_bstr( C_2 ) ); 
+    // message_3 ////////////////////////////////////////////////////////////////////////////
+
+    // Calculate data_3
+    vector<uint8_t> data_3;
+    vector_append( data_3, cbor_bstr( C_R ) );
+
+    // Calculate TH_3
+    vector<uint8_t> TH_3_input;
+    vector_append( TH_3_input, cbor_bstr( TH_2 ) );
+    vector_append( TH_3_input, cbor_bstr( C_2 ) );
+    vector_append( TH_3_input, data_3 );
+    vector<uint8_t> TH_3 = hash_sha_256( TH_3_input );
+
+    // Calculate ECDH shared secret G_IY - I and G_Y
+    vector<uint8_t> shared_secret_se( crypto_scalarmult_BYTES );
+    if ( crypto_scalarmult( shared_secret_se.data(), R_kx_pk.data(), I_dh_sk.data() ) == -1 ) {
+        cout << "crypto_scalarmult error";
+        return;
+    }
+
+    // Derive key and IV for MAC
+    vector<uint8_t> PRK_4x3m = hkdf_extract_sha_256( PRK_3e2m, shared_secret_se );
+    vector<uint8_t> info_K_3m = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3, ID_CRED_I_CBOR);
+    vector<uint8_t> K_3m = hkdf_expand_sha_256( PRK_4x3m, info_K_3m, 16 );
+    vector<uint8_t> info_IV_3m = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3, ID_CRED_I_CBOR );
+    vector<uint8_t> IV_3m = hkdf_expand_sha_256( PRK_4x3m, info_IV_3m, 13 );
+    // Calculate MAC
+    vector<uint8_t> P_3m;
+    vector_append( P_3m, cbor_bstr( { } ) ); // empty bstr
+
+    vector<uint8_t> A_3m = { 0x83 }; // CBOR array of length 3
+    vector_append( A_3m, cbor_tstr( "Encrypt0" ) );
+    vector_append( A_3m, cbor_bstr(ID_CRED_I_CBOR) ); // protected contains the serialized ID_CRED_I
+    vector<uint8_t> ext_aad_3m;
+    vector_append( ext_aad_3m , CRED_I_CBOR ); //CRED_I map in this case
+    vector_append( ext_aad_3m , TH_3 );
+    vector_append( A_3m, cbor_bstr( ext_aad_3m ) );
+
+    vector<uint8_t> C_3m = aes_ccm_16_64_128( K_3m, IV_3m, P_3m, A_3m );
+
+    // Derive key and IV
+    vector<uint8_t> info_K_3ae = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3, vector<uint8_t>() );
+    vector<uint8_t> K_3ae = hkdf_expand_sha_256( PRK_3e2m, info_K_3ae, 16 );
+    vector<uint8_t> info_IV_3ae = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3, vector<uint8_t>() );
+    vector<uint8_t> IV_3ae = hkdf_expand_sha_256( PRK_3e2m, info_IV_3ae, 13 );
+
+    // Calculate ciphertext
+    vector<uint8_t> P_3;
+    vector_append( P_3, cbor_bstr( kid_I ) ); // ID_CRED_R contains a single 'kid' parameter, so only bstr is used
+    vector_append( P_3, cbor_bstr( C_3m ) );
+    vector<uint8_t> A_3 = { 0x83 }; // CBOR array of length 3
+    vector_append( A_3, cbor_tstr( "Encrypt0" ) );
+    vector_append( A_3, cbor_bstr( { } ) ); // empty bstr 
+    vector_append( A_3, cbor_bstr( TH_3 ) );
+    vector<uint8_t> C_3 = aes_ccm_16_64_128( K_3ae, IV_3ae, P_3, A_3 );
+
+    // Calculate message_3
+    vector<uint8_t> message_3;
+    vector_append( message_3, data_3 );
+    vector_append( message_3, cbor_bstr( C_3 ) ); 
+
+    // OSCORE ////////////////////////////////////////////////////////////////////////////
+
+    // Calculate TH_4
+    vector<uint8_t> TH_4_input;
+    vector_append( TH_4_input, cbor_bstr( TH_3 ) );
+    vector_append( TH_4_input, cbor_bstr( C_3 ) );
+    vector<uint8_t> TH_4 = hash_sha_256( TH_4_input );
+
+    // Derive OSCORE Master Secret and Salt
+    vector<uint8_t> info_OSCORE_secret = gen_info( cbor_tstr( "OSCORE Master Secret" ), 128, TH_4, vector<uint8_t>() );
+    vector<uint8_t> OSCORE_secret = hkdf_expand_sha_256( PRK_4x3m,  info_OSCORE_secret, 16 );
+    vector<uint8_t> info_OSCORE_salt = gen_info( cbor_tstr( "OSCORE Master Salt" ), 64, TH_4, vector<uint8_t>() );
+    vector<uint8_t> OSCORE_salt = hkdf_expand_sha_256( PRK_4x3m, info_OSCORE_salt, 8 );
 
 
-    // Print
+    cout << endl << "## Test Vectors for EDHOC Authenticated with Static Diffie-Hellman Keys" << endl; 
+    cout << endl;
+    cout << "EDHOC with static Diffie-Hellman keys and MAC authentication is used:" << endl;
+
+    // Print ////////////////////////////////////////////////////////////////////////////
     print_fig( "method (MAC Authentication)", to_string(method) );
 
     cout << "CoaP is used as transport and the Initiator acts as CoAP client:" << endl;
@@ -1488,7 +1653,7 @@ void static_vectors ( void )
     cout << "This test vector uses COSE_Key objects to store the raw public keys. Moreover, EC2 keys with curve X25519 are used. That is in agreement with the Cipher Suite " << to_string(suite) << "." << endl;
 
     //NOTE: CRED_I is CBOR map, not serialized
-    //TODO: subject name is not included in CRED_x
+    //NOTE: subject name is not included in CRED_x
     string cred_I_str = "{\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( I_dh_pk , 8) + "\n}";
     string cred_I_str_tab = "{\n  1:  1,\n -1:  4,\n -2:  " + vector_to_cddl_bstr( I_dh_pk , 10) + "\n}"; // quick fix for when the same string is tabbed
 
@@ -1530,7 +1695,7 @@ void static_vectors ( void )
 
     print_fig_with_bytes("CRED_R (COSE_Key)" , CRED_R_CBOR);
 
-    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_R , 0) <<":";
+    cout << "Because COSE_Keys are used, and because kid = " << vector_to_cddl_bstr( kid_R , 0) <<":" << endl << endl;
 
     string id_cred_R_str = "{ \n  4:  " + vector_to_cddl_bstr( kid_R , 8) + "\n}";
     print_fig("ID_CRED_R =" , id_cred_R_str );
@@ -1541,22 +1706,6 @@ void static_vectors ( void )
     
     print_fig_with_bytes("kid_R (in plaintext) (CBOR-encoded)" , cbor_bstr(kid_R));
 
-    // message_1 ////////////////////////////////////////////////////////////////////////////
-
-    // Generate the Initiator's ephemeral key pair
-    vector<uint8_t> I_kx_pk( crypto_kx_PUBLICKEYBYTES ); //G_X
-    vector<uint8_t> I_kx_sk( crypto_kx_SECRETKEYBYTES ); 
-    vector<uint8_t> I_kx_seed( crypto_kx_SEEDBYTES, 10 ); ;
-    crypto_kx_seed_keypair( I_kx_pk.data(), I_kx_sk.data(), I_kx_seed.data() );
-
-    // Calculate message_1
-    vector<uint8_t> message_1;
-    vector_append( message_1, cbor_uint8( TYPE ) ); 
-    vector_append( message_1, cbor_uint8( suite ) ); 
-    vector_append( message_1, cbor_bstr( I_kx_pk ) ); 
-    vector_append( message_1, cbor_bstr( C_I ) ); 
-
-    // Print //////////////////////////////////////////////
     cout << "### Message 1 {#tv-ss-1}" << endl << endl;
     cout << "From the input parameters (in {{rpk-tv-input-u}}):" << endl;
 
@@ -1574,35 +1723,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("message_1 (CBOR Sequence)", message_1);
 
-    // message_2 ////////////////////////////////////////////////////////////////////////////
-
-    // Generate the Responder's ephemeral key pair 
-    vector<uint8_t> R_kx_pk( crypto_kx_PUBLICKEYBYTES ); //G_Y
-    vector<uint8_t> R_kx_sk( crypto_kx_SECRETKEYBYTES ); 
-    vector<uint8_t> R_kx_seed( crypto_kx_SEEDBYTES, 11 ); ;
-    crypto_kx_seed_keypair( R_kx_pk.data(), R_kx_sk.data(), R_kx_seed.data() );
-
-    // Calculate ECDH shared secret G_XY from Y and G_X
-    vector<uint8_t> shared_secret( crypto_scalarmult_BYTES );
-    if ( crypto_scalarmult( shared_secret.data(), R_kx_sk.data(), I_kx_pk.data() ) == -1 ) {
-        cout << "crypto_scalarmult error";
-        return;
-    }
-
-    // Calculate data_2
-    vector<uint8_t> data_2;
-    vector_append( data_2, cbor_bstr( R_kx_pk ) ); 
-    vector_append( data_2, cbor_bstr( C_R ) ); 
-
-    // Calculate TH_2
-    vector<uint8_t> TH_2_input;
-    vector_append( TH_2_input, message_1 );
-    vector_append( TH_2_input, data_2 );
-    vector<uint8_t> TH_2 = hash_sha_256( TH_2_input );
-
-
-
-    // Print //////////////////////////////////////////////
 
     cout << "### Message 2 {#tv-ss-2}" << endl << endl;
 
@@ -1634,23 +1754,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("TH_2 (CBOR-encoded)" , cbor_bstr(TH_2));
 
-    // Calculate ECDH shared secret G_RX - R and G_X
-    vector<uint8_t> shared_secret_es( crypto_scalarmult_BYTES );
-    if ( crypto_scalarmult( shared_secret_es.data(), R_dh_sk.data(), I_kx_pk.data() ) == -1 ) {
-        cout << "crypto_scalarmult error";
-        return;
-    }
-
-    // Derive key and IV for MAC
-    vector<uint8_t> salt; // empty byte string;
-    vector<uint8_t> PRK_2e = hkdf_extract_sha_256( salt, shared_secret ); //PRK_2
-    vector<uint8_t> PRK_3e2m = hkdf_extract_sha_256( PRK_2e, shared_secret_es ); //PRK_R
-    vector<uint8_t> info_K_2m = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_2 , ID_CRED_R_CBOR );
-    vector<uint8_t> K_2m = hkdf_expand_sha_256( PRK_3e2m, info_K_2m, 16 );
-    vector<uint8_t> info_IV_2m = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_2 , ID_CRED_R_CBOR );
-    vector<uint8_t> IV_2m = hkdf_expand_sha_256( PRK_3e2m, info_IV_2m, 13 );
-
-    // Print //////////////////////////////////////////////
 
     cout << "#### MAC Computation {#tv-ss-2-mac}" << endl << endl;
 
@@ -1711,21 +1814,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("IV_2m" , IV_2m);   
 
-    // Calculate MAC
-    vector<uint8_t> P_2m;
-    vector_append( P_2m, cbor_bstr( { } ) ); // empty bstr
-
-    vector<uint8_t> A_2m = { 0x83 }; // CBOR array of length 3
-    vector_append( A_2m, cbor_tstr( "Encrypt0" ) );
-    vector_append( A_2m, cbor_bstr(ID_CRED_R_CBOR) ); // protected contains the serialized ID_CRED_R
-    vector<uint8_t> ext_aad_2m; // NOTE: the order has changed here. Why is AD_2 in the middle?
-    vector_append( ext_aad_2m , CRED_R_CBOR ); //CRED_R map in this case
-    vector_append( ext_aad_2m , TH_2 );
-    vector_append( A_2m, cbor_bstr( ext_aad_2m ) );
-
-    vector<uint8_t> C_2m = aes_ccm_16_64_128( K_2m, IV_2m, P_2m, A_2m );
-    //TODO: Check why this returns 9 bytes of 0s
-
     cout << "##### MAC Computation {#tv-ss-2-mac-comp}" << endl << endl;
 
     cout << "COSE_Encrypt0 is computed with the following parameters." << endl << endl;
@@ -1762,27 +1850,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("MAC_2" , C_2m);
 
-
-    // Derive key and IV
-    vector<uint8_t> info_K_2e = gen_info( cbor_tstr( "XOR-ENCRYPTION" ), 128, TH_2, vector<uint8_t> ());
-
-//    vector<uint8_t> info_IV_2e = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_2, vector<uint8_t> ());
-//    vector<uint8_t> IV_2e = hkdf_expand_sha_256( PRK_2e, info_IV_2e, 13 );
-
-    // Calculate ciphertext
-    vector<uint8_t> P_2;
-    vector_append( P_2, cbor_bstr( kid_R ) ); // ID_CRED_R contains a single 'kid' parameter, so only bstr is used
-    vector_append( P_2, cbor_bstr( C_2m ) );
-
-    vector<uint8_t> K_2e = hkdf_expand_sha_256( PRK_2e, info_K_2e, P_2.size() );
-
-    vector<uint8_t> C_2 = { };
-    for (int i = 0; i < P_2.size(); ++i)
-        vector_append( C_2 , { uint8_t(P_2[i] ^ K_2e[i]) } );
-
-
-    // Print //////////////////////////////////////////////
-
     cout << "#### Key and Computation {#tv-ss-2-key}" << endl << endl;
 
     cout << "The key and nonce for calculating the ciphertext are calculated as follows, as specified in {{key-der}}." << endl << endl;
@@ -1806,8 +1873,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("K_2e" , K_2e);
 
-    // Print //////////////////////////////////////////////
-
     cout << "#### Ciphertext Computation {#tv-ss-2-ciph}" << endl << endl;
 
     cout << "CIPHERTEXT_2 is the ciphertext resulting from XOR encrypting a plaintext with the following common parameters" << endl << endl;
@@ -1825,14 +1890,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("CIPHERTEXT_2" , C_2);
 
-
-    // Calculate message_2
-    vector<uint8_t> message_2;
-    vector_append( message_2, data_2 );
-    vector_append( message_2, cbor_bstr( C_2 ) ); 
-
-    // Print //////////////////////////////////////////////
-
     cout << "#### message_2" << endl << endl;
 
     cout << "From the parameter computed in {{tv-ss-2}} and {{tv-ss-2-ciph}}, message_2 is computed, as the CBOR Sequence of the following items: (G_Y, C_R, CIPHERTEXT_2)." << endl << endl;
@@ -1842,23 +1899,6 @@ void static_vectors ( void )
     cout << "Which encodes to the following byte string:" << endl;
 
     print_fig_with_bytes("message_2 (CBOR Sequence)" , message_2);
-
-
-    // message_3 ////////////////////////////////////////////////////////////////////////////
-
-    // Calculate data_3
-    vector<uint8_t> data_3;
-    vector_append( data_3, cbor_bstr( C_R ) );
-
-    // Calculate TH_3
-    vector<uint8_t> TH_3_input;
-    vector_append( TH_3_input, cbor_bstr( TH_2 ) );
-    vector_append( TH_3_input, cbor_bstr( C_2 ) );
-    vector_append( TH_3_input, data_3 );
-    vector<uint8_t> TH_3 = hash_sha_256( TH_3_input );
-
-
-    // Print //////////////////////////////////////////////
 
     cout << "### Message 3 {#tv-ss-3}" << endl << endl;
 
@@ -1883,23 +1923,6 @@ void static_vectors ( void )
     cout << "When encoded as a CBOR bstr, that gives:" << endl << endl;
 
     print_fig_with_bytes("TH_3 (CBOR-encoded)" , cbor_bstr(TH_3));   
-
-
-    // Calculate ECDH shared secret G_IY - I and G_Y
-    vector<uint8_t> shared_secret_se( crypto_scalarmult_BYTES );
-    if ( crypto_scalarmult( shared_secret_se.data(), R_kx_pk.data(), I_dh_sk.data() ) == -1 ) {
-        cout << "crypto_scalarmult error";
-        return;
-    }
-
-    // Derive key and IV for MAC
-    vector<uint8_t> PRK_4x3m = hkdf_extract_sha_256( PRK_3e2m, shared_secret_se );
-    vector<uint8_t> info_K_3m = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3, ID_CRED_I_CBOR);
-    vector<uint8_t> K_3m = hkdf_expand_sha_256( PRK_4x3m, info_K_3m, 16 );
-    vector<uint8_t> info_IV_3m = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3, ID_CRED_I_CBOR );
-    vector<uint8_t> IV_3m = hkdf_expand_sha_256( PRK_4x3m, info_IV_3m, 13 );
-
-    // Print //////////////////////////////////////////////
 
     cout << "#### MAC Computation {#tv-ss-3-mac}" << endl << endl;
 
@@ -1950,20 +1973,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("IV_3m" , IV_3m);   
 
-    // Calculate MAC
-    vector<uint8_t> P_3m;
-    vector_append( P_3m, cbor_bstr( { } ) ); // empty bstr
-
-    vector<uint8_t> A_3m = { 0x83 }; // CBOR array of length 3
-    vector_append( A_3m, cbor_tstr( "Encrypt0" ) );
-    vector_append( A_3m, cbor_bstr(ID_CRED_I_CBOR) ); // protected contains the serialized ID_CRED_I
-    vector<uint8_t> ext_aad_3m;
-    vector_append( ext_aad_3m , CRED_I_CBOR ); //CRED_I map in this case
-    vector_append( ext_aad_3m , TH_3 );
-    vector_append( A_3m, cbor_bstr( ext_aad_3m ) );
-
-    vector<uint8_t> C_3m = aes_ccm_16_64_128( K_3m, IV_3m, P_3m, A_3m );
-
     cout << "##### MAC Computation {#tv-ss-3-mac-comp}" << endl << endl;
 
     cout << "COSE_Encrypt0 is computed with the following parameters." << endl << endl;
@@ -1989,7 +1998,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("A_3m (CBOR-encoded)" , A_3m );
 
-
     cout << "The key and nonce used are defined in {{tv-ss-3-key}}:" << endl << endl;
 
     cout << "* key = K_3m" << endl << endl;
@@ -1999,15 +2007,6 @@ void static_vectors ( void )
     cout << "Using the parameters above, the ciphertext MAC_3 can be computed:" << endl;
 
     print_fig_with_bytes("MAC_3" , C_3m);
-
-
-    // Derive key and IV
-    vector<uint8_t> info_K_3ae = gen_info( cbor_uint8( aead_algorithm_id ), 128, TH_3, vector<uint8_t>() );
-    vector<uint8_t> K_3ae = hkdf_expand_sha_256( PRK_3e2m, info_K_3ae, 16 );
-    vector<uint8_t> info_IV_3ae = gen_info( cbor_tstr( "IV-GENERATION" ), 104, TH_3, vector<uint8_t>() );
-    vector<uint8_t> IV_3ae = hkdf_expand_sha_256( PRK_3e2m, info_IV_3ae, 13 );
-
-    // Print //////////////////////////////////////////////
 
     cout << "#### Key and Nonce Computation {#tv-ss-3-key}" << endl << endl;
 
@@ -2045,19 +2044,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("IV_3ae" , IV_3ae);
 
-
-    // Calculate ciphertext
-    vector<uint8_t> P_3;
-    vector_append( P_3, cbor_bstr( kid_I ) ); // ID_CRED_R contains a single 'kid' parameter, so only bstr is used
-    vector_append( P_3, cbor_bstr( C_3m ) );
-    vector<uint8_t> A_3 = { 0x83 }; // CBOR array of length 3
-    vector_append( A_3, cbor_tstr( "Encrypt0" ) );
-    vector_append( A_3, cbor_bstr( { } ) ); // empty bstr 
-    vector_append( A_3, cbor_bstr( TH_3 ) );
-    vector<uint8_t> C_3 = aes_ccm_16_64_128( K_3ae, IV_3ae, P_3, A_3 );
-
-    // Print //////////////////////////////////////////////
-
     cout << "#### Ciphertext Computation {#tv-ss-3-ciph}" << endl << endl;
 
     cout << "COSE_Encrypt0 is computed with the following parameters. Note that AD_3 is omitted." << endl << endl;
@@ -2087,13 +2073,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("CIPHERTEXT_3" , C_3);
 
-    // Calculate message_3
-    vector<uint8_t> message_3;
-    vector_append( message_3, data_3 );
-    vector_append( message_3, cbor_bstr( C_3 ) ); 
-
-    // Print //////////////////////////////////////////////
-
     cout << "#### message_3" << endl << endl;
 
     cout << "From the parameter computed in {{tv-ss-3}} and {{tv-ss-3-ciph}}, message_3 is computed, as the CBOR Sequence of the following items: (C_I, CIPHERTEXT_3)." << endl << endl;
@@ -2104,21 +2083,6 @@ void static_vectors ( void )
 
     print_fig_with_bytes("message_3 (CBOR Sequence)" , message_3);
 
-    // OSCORE ////////////////////////////////////////////////////////////////////////////
-
-    // Calculate TH_4
-    vector<uint8_t> TH_4_input;
-    vector_append( TH_4_input, cbor_bstr( TH_3 ) );
-    vector_append( TH_4_input, cbor_bstr( C_3 ) );
-    vector<uint8_t> TH_4 = hash_sha_256( TH_4_input );
-
-    // Derive OSCORE Master Secret and Salt
-    vector<uint8_t> info_OSCORE_secret = gen_info( cbor_tstr( "OSCORE Master Secret" ), 128, TH_4, vector<uint8_t>() );
-    vector<uint8_t> OSCORE_secret = hkdf_expand_sha_256( PRK_4x3m,  info_OSCORE_secret, 16 );
-    vector<uint8_t> info_OSCORE_salt = gen_info( cbor_tstr( "OSCORE Master Salt" ), 64, TH_4, vector<uint8_t>() );
-    vector<uint8_t> OSCORE_salt = hkdf_expand_sha_256( PRK_4x3m, info_OSCORE_salt, 8 );
-
-    // Print //////////////////////////////////////////////
 
     cout << "#### OSCORE Security Context Derivation" << endl << endl;
 

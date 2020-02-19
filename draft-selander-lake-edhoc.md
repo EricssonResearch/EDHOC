@@ -2984,6 +2984,11 @@ HMAC Algorithm
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
+# Test Vectors {#vectors}
+
+This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where the Initiator acts as CoAP client (this means that corr = 1). 
+
 ## Test Vectors for EDHOC Authenticated with Static Diffie-Hellman Keys
 
 EDHOC with static Diffie-Hellman keys and MAC authentication is used:
@@ -3110,6 +3115,8 @@ fb ef 25 e8 46 db 8b af 89 0f aa 8d 7e f6 e6 73
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Because COSE_Keys are used, and because kid = h'a8':
+
+
 ~~~~~~~~~~~~~~~~~~~~~~~
 ID_CRED_R =
 { 
