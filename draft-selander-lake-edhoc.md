@@ -527,23 +527,23 @@ Raw public keys are most optimally stored as COSE_Key objects and identified wit
 
 Public key certificates can be identified in different ways. Several header parameters for identifying X.509 certificates are defined in {{I-D.ietf-cose-x509}} (the exact labels are TBD):
 
-* by a hash value with the 'x5t' parameter;
-
-   * ID_CRED_x = { TBD1 : COSE_CertHash }, for x = I or R,
-
-* by a URL with the 'x5u' parameter;
-
-   * ID_CRED_x = { TBD2 : uri }, for x = I or R,
-
 * by a bag of certificates with the 'x5bag' parameter; or
 
-   * ID_CRED_x = { TBD3 : COSE_X509 }, for x = I or R,
+   * ID_CRED_x = { 32 : COSE_X509 }, for x = I or R,
 
 * by a certificate chain with the 'x5chain' parameter;
 
-   * ID_CRED_x = { TBD4 : COSE_X509 }, for x = I or R,
+   * ID_CRED_x = { 33 : COSE_X509 }, for x = I or R,
 
-In the latter two examples, ID_CRED_I and ID_CRED_R contain the actual credential used for authentication. The purpose of ID_CRED_I and ID_CRED_R is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_I and ID_CRED_R are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
+* by a hash value with the 'x5t' parameter;
+
+   * ID_CRED_x = { 34 : COSE_CertHash }, for x = I or R,
+
+* by a URL with the 'x5u' parameter;
+
+   * ID_CRED_x = { 35 : uri }, for x = I or R,
+
+In the first two examples, ID_CRED_I and ID_CRED_R contain the actual credential used for authentication. The purpose of ID_CRED_I and ID_CRED_R is to facilitate retrieval of a public authentication key and when they do not contain the actual credential, they may be very short. It is RECOMMENDED that they uniquely identify the public authentication key as the recipient may otherwise have to try several keys. ID_CRED_I and ID_CRED_R are transported in the ciphertext, see {{asym-msg2-proc}} and {{asym-msg3-proc}}.
 
 The authentication key MUST be a signature key or static Diffie-Hellman key. The Initiator and the Responder
  MAY use different types of authentication keys, e.g. one uses a signature key and the other uses a static Diffie-Hellman key. When using a signature key, the authentication is provided by a signature. When using a static Diffie-Hellman key the authentication is provided by a Message Authentication Code (MAC) computed from an ephemeral-static ECDH shared secret which enables significant reductions in message sizes. The MAC is implemented with an AEAD algorithm. When using a static Diffie-Hellman keys the Initiator's and Responder's private authentication keys are called I and R, respectively, and the public authentication keys are called G_I and G_R, respectively.
