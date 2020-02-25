@@ -37,6 +37,7 @@ void print( string s, int i ) {
     cout << endl << dec << s << " (int)" << endl << i << endl;    
 }
 
+// print a string to cout
 void print( string s, string s2 ) {
     cout << endl << s << " (text string)" << endl << "\"" << s2 << "\"" << endl;    
 }
@@ -54,45 +55,35 @@ void print( string s, vec v ) {
     cout << endl;
 }
 
-// CBOR encodes an int in the range [-256, 65535]
-vec cbor( int i ) {
-    if ( i < -256 || i > 65535 )
-        syntax_error( "cbor( int i )" );
-    if ( i < 0 )
-        if ( i < -24 )      return { 0x38, (uint8_t) -(i + 1) };
-        else                return { (uint8_t) (31 - i) };
-    else {
-        if ( i < 24 )       return { (uint8_t) i };
-        else if ( i < 256 ) return { 0x18, (uint8_t) i };
-        else                return { 0x19, (uint8_t) (i >> 8), (uint8_t) (i & 0xFF) };
-    }
+// Helper funtion for CBOR encoding
+vec cbor_unsigned_with_type( uint8_t type, int i ) {
+    type = type << 5;
+    if ( i < 0 || i > 0xFFFF )
+        syntax_error( "cbor_unsigned_with_type()" );
+    if ( i < 24 )
+        return { (uint8_t) (type | i) };
+    else if ( i < 0x100 )
+        return { (uint8_t) (type | 0x18), (uint8_t) i };
+    else
+        return { (uint8_t) (type | 0x19), (uint8_t) (i >> 8), (uint8_t) (i & 0xFF) };
 }
 
-// CBOR encodes a bst
- vec cbor( vec v ) {
-    if ( v.size() > 65535 )
-        syntax_error( "cbor( vec v )" );
-    vec out;
-    if ( v.size() < 24 )
-        out = { (uint8_t)( v.size() | 0x40 ) };
-    else if ( v.size() < 256 )
-        out = { 0x58, (uint8_t)v.size() };
+// CBOR encodes an int
+vec cbor( int i ) {
+    if ( i < 0 )
+        return cbor_unsigned_with_type( 1, -(i + 1) ); 
     else
-        out = { 0x59, (uint8_t) (v.size() >> 8), (uint8_t) (v.size() & 0xFF) };
-    return out + v;
+	    return cbor_unsigned_with_type( 0, i ); 
+}
+
+// CBOR encodes a bstr
+ vec cbor( vec v ) {
+    return cbor_unsigned_with_type( 2, v.size() ) + v;
 }
 
 // CBOR encodes a tstr
 vec cbor( string s ) {
-    if ( s.size() > 255 )
-        syntax_error( "cbor( string s )" );
-    vec out;
-    if ( s.size() < 24 )
-        out = { (uint8_t)( s.size() | 0x60 ) };
-    else
-        out = { 0x78, (uint8_t)s.size() };
-    
-    return out + vec( s.begin(), s.end() );
+    return cbor_unsigned_with_type( 3, s.size() ) + vec( s.begin(), s.end() );
 }
 
 // CBOR encodes a bstr_indentifier
