@@ -575,7 +575,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   METHOD_CORR : int,
-  SUITES_I : selected : suite / [ selected : suite, supported : 2* suite ],
+  SUITES_I : [ selected : suite, supported : 2* suite ] / selected : suite,
   G_X : bstr,
   C_I : bstr_identifier,  
   ? AD_1 : bstr,
@@ -948,7 +948,7 @@ error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 error = (
   ? C_x : bstr_identifier,
   ERR_MSG : tstr,
-  ? SUITES_R : supported : suite / [ supported : 2* suite ],
+  ? SUITES_R : [ supported : 2* suite ] / supported : suite,
 )
 ~~~~~~~~~~~
 
