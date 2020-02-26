@@ -17,32 +17,30 @@ enum HeaderAttribute { kid = 4, x5bag = 32, x5chain = 33, x5t = 34, x5u = 35 };
 enum Correlation { corr_none, corr_12, corr_23, corr_123 }; 
 enum Suite { suite_0, suite_1 }; 
 
-enum AuxData { aux_no, aux_yes }; // Only used in this program, not from EDHOC
-enum SubjectName { sub_no, sub_yes }; // Only used in this program, not from EDHOC
-enum Output { full, lite }; // Only used in this program, not from EDHOC
-
+// Concatenates two vectors
 template <typename T> 
 T operator+( T a, T b ) {
     a.insert( a.end(), b.begin(), b.end() );
     return a;
 }
 
+// Fatal error
 void syntax_error( string s ) {
     cout << "Syntax Error: " << s;
     exit(-1);
 }
 
-// print an int to cout
+// Print an int to cout
 void print( string s, int i ) {
     cout << endl << dec << s << " (int)" << endl << i << endl;    
 }
 
-// print a string to cout
+// Print a string to cout
 void print( string s, string s2 ) {
     cout << endl << s << " (text string)" << endl << "\"" << s2 << "\"" << endl;    
 }
 
-// print a vec to cout
+// Print a vec to cout
 void print( string s, vec v ) {
     cout << endl << dec << s << " (" << v.size() << " bytes)";
     if  ( v.size() )
@@ -94,6 +92,14 @@ vec cbor( string s ) {
         return cbor( v );
 }
 
+// CBOR encodes AD
+ vec cbor_AD( vec v ) {
+    if ( v.size() == 0 )
+        return v;
+    else
+        return cbor( v );
+}
+
 // Tries to compress ID_CRED_x
  vec compress_id_cred( vec v ) {
     if ( v[0] == 0xA1 && v[1] == 0x04 )
@@ -102,14 +108,29 @@ vec cbor( string s ) {
         return v;
 }
 
-vec hash_sha_256( vec m, int l = 32 ) {
+// Tries to compress SUTES_I
+// Only supports suites in the range [-24, 23]
+ vec compress_suites( vec v ) {
+    if ( v[1] == v[2] )
+        return cbor( v[1] );
+    else
+        return v;
+}
+
+// Calculates the hash of m
+vec H( int alg, vec m ) {
+    if ( alg != -15 && alg != -16 )
+        syntax_error( "hash()" );
     vec digest( crypto_hash_sha256_BYTES );
     crypto_hash_sha256( digest.data(), m.data(), m.size() );
-    digest.resize( l );
+    if ( alg == -15 )
+        digest.resize( 8 );
     return digest;
 }
 
-vec hmac_sha_256( vec k, vec m ) {
+vec hmac( int alg, vec k, vec m ) {
+    if ( alg != -16 )
+        syntax_error( "hmac()" );
     vec out( crypto_auth_hmacsha256_BYTES ); 
     crypto_auth_hmacsha256_state state;
     crypto_auth_hmacsha256_init( &state, k.data(), k.size() );
@@ -118,16 +139,16 @@ vec hmac_sha_256( vec k, vec m ) {
     return out;
 }
 
-vec hkdf_extract_sha_256( vec salt, vec IKM ) {
-    return hmac_sha_256( salt,  IKM ); // correct that salt is key
+vec hkdf_extract( int alg, vec salt, vec IKM ) {
+    return hmac( alg, salt, IKM ); // correct that salt is key
 }
 
 // TODO: This function should be checked against another implementation
-vec hkdf_expand_sha_256( vec PRK, vec info, int L ) {
+vec hkdf_expand( int alg, vec PRK, vec info, int L ) {
     vec out, T;
     for ( int i = 0; i <= L / 32; i++ ) {
         vec m = T + info + vec{ uint8_t( i + 1 ) };
-        T = hmac_sha_256( PRK, m );
+        T = hmac( alg, PRK, m );
         out = out + T;
     }
     out.resize( L );
@@ -135,11 +156,14 @@ vec hkdf_expand_sha_256( vec PRK, vec info, int L ) {
 }
 
 // TODO: This function should be checked against another implementation
-vec aes_ccm_16_64_128( vec K, vec N, vec P, vec A, int tag_len ) {
+vec AEAD( int alg, vec K, vec N, vec P, vec A ) {
+    if ( alg != 10 && alg != 30 )
+        syntax_error( "AEAD()" );
     if( A.size() > (42 * 16 - 2) )
-        syntax_error( "aes_ccm_16_64_128()" );
-    vec C( P.size() + tag_len );
-    int r = aes_ccm_ae( K.data(), 16, N.data(), tag_len, P.data(), P.size(), A.data(), A.size(), C.data(), C.data() + P.size() );
+        syntax_error( "AEAD()" );
+    int tag_length = ( alg == 10 ) ? 8 : 16;
+    vec C( P.size() + tag_length );
+    int r = aes_ccm_ae( K.data(), 16, N.data(), tag_length, P.data(), P.size(), A.data(), A.size(), C.data(), C.data() + P.size() );
     return C;
 }
 
@@ -166,33 +190,40 @@ vec random_vector( int len ) {
     return out;
 }
 
-std::tuple< vec, vec > X25519_key_pair() {
-    vec G_X( crypto_kx_PUBLICKEYBYTES );
-    vec X( crypto_kx_SECRETKEYBYTES );
-    vec seed = random_vector( crypto_kx_SEEDBYTES );
-    crypto_kx_seed_keypair( G_X.data(), X.data(), seed.data() );
-    return std::make_tuple( X, G_X );
+// Generates a key pair
+std::tuple< vec, vec > gen_key_pair( int curve ) {
+    if ( curve != 4 && curve != 6 )
+        syntax_error( "gen_key_pair()" );
+    if ( curve == 4 ) {
+        vec G_X( crypto_kx_PUBLICKEYBYTES );
+        vec X( crypto_kx_SECRETKEYBYTES );
+        vec seed = random_vector( crypto_kx_SEEDBYTES );
+        crypto_kx_seed_keypair( G_X.data(), X.data(), seed.data() );
+        return std::make_tuple( X, G_X );
+    }
+    else {
+        // EDHOC uses RFC 8032 notation, libsodium uses the notation from the Ed25519 paper by Bernstein
+        // Libsodium seed = RFC 8032 sk, Libsodium sk = pruned SHA-512(sk) in RFC 8032
+        vec PK( crypto_sign_PUBLICKEYBYTES );
+        vec SK_libsodium( crypto_sign_SECRETKEYBYTES );
+        vec SK = random_vector( crypto_sign_SEEDBYTES );
+        crypto_sign_seed_keypair( PK.data(), SK_libsodium.data(), SK.data() );
+        return std::make_tuple( SK, PK );
+    }
 }
 
-// EDHOC uses RFC 8032 notation, libsodium uses the notation from the Ed25519 paper by Bernstein
-// Libsodium seed = RFC 8032 sk
-// Libsodium sk = pruned SHA-512(sk) in RFC 8032
-std::tuple< vec, vec > Ed25519_key_pair() {
-    vec PK( crypto_sign_PUBLICKEYBYTES );
-    vec SK_libsodium( crypto_sign_SECRETKEYBYTES );
-    vec SK = random_vector( crypto_sign_SEEDBYTES );
-    crypto_sign_seed_keypair( PK.data(), SK_libsodium.data(), SK.data() );
-    return std::make_tuple( SK, PK );
-}
-
-vec X25519( vec A, vec G_B ) {
+vec shared_secret( int curve, vec A, vec G_B ) {
+    if ( curve != 4 )
+        syntax_error( "shared_secret()" );
     vec G_AB( crypto_scalarmult_BYTES );
     if ( crypto_scalarmult( G_AB.data(), A.data(), G_B.data() ) == -1 )
         syntax_error( "crypto_scalarmult()" );
     return G_AB;
 }
 
-vec Ed25519( vec SK, vec M ) {
+vec sign( int alg, int curve, vec SK, vec M ) {
+    if ( alg != -8 || curve != 6 )
+        syntax_error( "sign()" );
     vec signature( crypto_sign_BYTES );
     vec PK( crypto_sign_PUBLICKEYBYTES );
     vec SK_libsodium( crypto_sign_SECRETKEYBYTES );
@@ -201,77 +232,91 @@ vec Ed25519( vec SK, vec M ) {
     return signature;
 }
 
-vec bstr_id() {
-    int i = rand() % 49;
-    if ( i == 48 )
-        return vec{};
-    else
-        return { (uint8_t) i };
+vec bstr_id( bool long_id ) {
+    if ( long_id == true )
+        return random_vector( 2 + rand() % 2 );
+    else {
+        int i = rand() % 49;
+        if ( i == 48 )
+            return vec{};
+        else
+            return { (uint8_t) i };
+    }
 }
 
 // TODO PSK
-void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, HeaderAttribute attr_R, Suite suite, Correlation corr,
-                   AuxData auxdata, SubjectName subjectname, Output output ) {
+// TODO error message with SUITES_V
+// TODO real X.509 certificates
+// TODO other COSE algorithms like ECDSA, P-256, SHA-384, P-384, AES-GCM, ChaCha20-Poly1305
+void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, HeaderAttribute attr_R, Suite selected_suite, Correlation corr,
+                   bool auxdata, bool subjectname, bool long_id, bool full_output ) {
 
     // METHOD_CORR and seed random number generation
     int method = 3 * type_I + type_R; // method will likely be replaced by key types in a future version
     int METHOD_CORR = 4 * method + corr;
-    srand( 100 * ( 25 * METHOD_CORR + 5 * attr_I + attr_R ) + suite );
+    srand( 100 * ( 25 * METHOD_CORR + 5 * attr_I + attr_R ) + selected_suite );
 
     // EDHOC and OSCORE algorithms
-    int edhoc_aead_id, edhoc_tag_len;
-    int oscore_aead_id, oscore_hmac_id = 5;
-    if ( suite == suite_0 ) {
-        edhoc_aead_id = 10;
-        edhoc_tag_len = 8;
-        oscore_aead_id = 10;
+    vec preferred_suites = vec{ 0x00, 0x01 };
+    vec SUITES_I = vec{ 0x83 } + vec{ selected_suite } + preferred_suites;
+    int edhoc_aead_alg, edhoc_hash_alg, edhoc_ecdh_curve, edhoc_sign_alg, edhoc_sign_curve, oscore_aead_alg, oscore_hash_alg;
+    if ( selected_suite == suite_0 ) {
+        edhoc_aead_alg = 10;
+        edhoc_hash_alg = -16;
+        edhoc_ecdh_curve = 4;
+        edhoc_sign_alg = -8;
+        edhoc_sign_curve = 6;
+        oscore_aead_alg = 10;
+        oscore_hash_alg = -16;
     }
-    if ( suite == suite_1 ) {
-        edhoc_aead_id = 30;
-        edhoc_tag_len = 16;
-        oscore_aead_id = 10;
+    if ( selected_suite == suite_1 ) {
+        edhoc_aead_alg = 30;
+        edhoc_hash_alg = -16;
+        edhoc_ecdh_curve = 4;
+        edhoc_sign_alg = -8;
+        edhoc_sign_curve = 6;
+        oscore_aead_alg = 10;
+        oscore_hash_alg = -16;
     }
 
     // Ephemeral keys
-    auto [ X, G_X ] = X25519_key_pair();
-    auto [ Y, G_Y ] = X25519_key_pair();
-    vec G_XY = X25519( X, G_Y );
+    auto [ X, G_X ] = gen_key_pair( edhoc_ecdh_curve );
+    auto [ Y, G_Y ] = gen_key_pair( edhoc_ecdh_curve );
+    vec G_XY = shared_secret( edhoc_ecdh_curve, X, G_Y );
 
     // Authentication keys
     // Only some of these keys are used depending on type_I and type_R
-    auto [ R, G_R ] = X25519_key_pair();
-    auto [ I, G_I ] = X25519_key_pair();
-    vec G_RX = X25519( R, G_X );
-    vec G_IY = X25519( I, G_Y );
-
-    auto [ SK_R, PK_R ] = Ed25519_key_pair(); 
-    auto [ SK_I, PK_I ] = Ed25519_key_pair();
+    auto [ R, G_R ] = gen_key_pair( edhoc_ecdh_curve );
+    auto [ I, G_I ] = gen_key_pair( edhoc_ecdh_curve );
+    vec G_RX = shared_secret( edhoc_ecdh_curve, R, G_X );
+    vec G_IY = shared_secret( edhoc_ecdh_curve, I, G_Y );
+    auto [ SK_R, PK_R ] = gen_key_pair( edhoc_sign_curve );
+    auto [ SK_I, PK_I ] = gen_key_pair( edhoc_sign_curve );
     
     // PRKs
     vec salt, PRK_2e, PRK_3e2m, PRK_4x3m;
     salt = vec{};
-    PRK_2e = hkdf_extract_sha_256( salt, G_XY );
+    PRK_2e = hkdf_extract( edhoc_hash_alg, salt, G_XY );
 
     if ( type_R == sdh )
-        PRK_3e2m = hkdf_extract_sha_256( PRK_2e, G_RX );
+        PRK_3e2m = hkdf_extract( edhoc_hash_alg, PRK_2e, G_RX );
     else
         PRK_3e2m = PRK_2e;
 
     if ( type_I == sdh )
-        PRK_4x3m = hkdf_extract_sha_256( PRK_3e2m, G_IY );
+        PRK_4x3m = hkdf_extract( edhoc_hash_alg, PRK_3e2m, G_IY );
     else
         PRK_4x3m = PRK_3e2m;
         
     // Subject names
     string NAME_I, NAME_R;
-    if ( subjectname == sub_yes ) {
+    if ( subjectname == true ) {
         NAME_I = "42-50-31-FF-EF-37-32-39";
-        NAME_R = "54-68-65-FF-EF-6F-31-39";
+        NAME_R = "example.edu";
     }
     else
         NAME_I = NAME_R = "";
 
-    // TODO real X.509 certificates
     // CRED_x and ID_CRED_x
     vec ID_CRED_I, ID_CRED_R, CRED_I, CRED_R;
     if ( attr_I == kid ) {
@@ -279,16 +324,16 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
             CRED_I = vec{ 0xa3, 0x01, 0x01, 0x20, 0x06, 0x21 } + cbor( PK_I ) + cbor( "subject name" ) + cbor( NAME_I );
         if ( type_I == sdh )
             CRED_I = vec{ 0xa3, 0x01, 0x01, 0x20, 0x04, 0x21 } + cbor( G_I )  + cbor( "subject name" ) + cbor( NAME_I );
-        ID_CRED_I = vec{ 0xa1, attr_I } + cbor( bstr_id() );
+        ID_CRED_I = vec{ 0xa1, attr_I } + cbor( bstr_id( long_id ) );
     } else {
         vec X509_R = random_vector( 100 + rand() % 50 );
         CRED_I = cbor( X509_R );
         if ( attr_I == x5bag ||  attr_I == x5chain )
             ID_CRED_I = vec{ 0xa1, 0x18, attr_I } + cbor( CRED_I );
         if ( attr_I == x5t )
-            ID_CRED_I = vec{ 0xa1, 0x18, attr_I } + vec{ 0x82, 0x2e } + cbor( hash_sha_256( X509_R, 8 ) ); // 0x2e = -15 = SHA-256/64
+            ID_CRED_I = vec{ 0xa1, 0x18, attr_I } + vec{ 0x82, 0x2e } + cbor( H( -15, X509_R ) ); // 0x2e = -15 = SHA-256/64
         if ( attr_I == x5u )
-            ID_CRED_I = vec{ 0xa1, 0x18, attr_I } + vec{ 0xD8, 0x20 } + cbor ( "https://www.example.edu/3370318" );
+            ID_CRED_I = vec{ 0xa1, 0x18, attr_I } + vec{ 0xD8, 0x20 } + cbor ( "https://example.edu/3370318" );
     }
 
     if ( attr_R == kid ) {
@@ -296,28 +341,28 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
             CRED_R = vec{ 0xa3, 0x01, 0x01, 0x20, 0x06, 0x21 } + cbor( PK_R ) + cbor( "subject name" ) + cbor( NAME_R );
         if ( type_R == sdh )
             CRED_R = vec{ 0xa3, 0x01, 0x01, 0x20, 0x04, 0x21 } + cbor( G_R )  + cbor( "subject name" ) + cbor( NAME_R );
-        ID_CRED_R = vec{ 0xa1, attr_R } + cbor( bstr_id() );
+        ID_CRED_R = vec{ 0xa1, attr_R } + cbor( bstr_id( long_id ) );
     } else {
         vec X509_I = random_vector( 100 + rand() % 50 );
         CRED_R = cbor( X509_I );
         if ( attr_R == x5bag ||  attr_R == x5chain )
             ID_CRED_R = vec{ 0xa1, 0x18, attr_R } + cbor( CRED_R );
         if ( attr_R == x5t )
-            ID_CRED_R = vec{ 0xa1, 0x18, attr_R } + vec{ 0x82, 0x2e } + cbor( hash_sha_256( X509_I, 8 ) ); // 0x2e = -15 = SHA-256/64
+            ID_CRED_R = vec{ 0xa1, 0x18, attr_R } + vec{ 0x82, 0x2e } + cbor( H( -15, X509_I ) ); // 0x2e = -15 = SHA-256/64
         if ( attr_R == x5u )
-            ID_CRED_R = vec{ 0xa1, 0x18, attr_R } + vec{ 0xD8, 0x20 } + cbor ( "https://www.example.edu/2716057" );
+            ID_CRED_R = vec{ 0xa1, 0x18, attr_R } + vec{ 0xD8, 0x20 } + cbor ( "https://example.edu/2716057" );
     }
  
     // Calculate C_I != C_R
     vec C_I, C_R;
     do {
-        C_I = bstr_id();
-        C_R = bstr_id();
+        C_I = bstr_id( long_id );
+        C_R = bstr_id( long_id );
     } while ( C_I == C_R );
 
     // Auxiliary data
     vec AD_1, AD_2, AD_3;
-    if ( auxdata == aux_yes ) {
+    if ( auxdata == true ) {
         string s1 = "People who don't like Comic Sans don't know anything about design.";
         string s2 = "Lindy Hoppers never die - they just swing out in Herräng.";
         string s3 = "A delayed game is eventually good, but a rushed game is forever bad.";
@@ -327,8 +372,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     }
     else
         AD_1 = AD_2 = AD_3 = vec{};
-
-    vec message_1 = cbor( METHOD_CORR ) + cbor( suite ) + cbor( G_X ) + cbor_id( C_I ) + AD_1;
+ 
+    vec message_1 = cbor( METHOD_CORR ) + compress_suites( SUITES_I ) + cbor( G_X ) + cbor_id( C_I ) + cbor_AD( AD_1 );
 
    // message_2 ////////////////////////////////////////////////////////////////////////////
 
@@ -339,32 +384,32 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     else
         data_2 = cbor( G_Y ) + cbor_id( C_R );
     vec TH_2_input = message_1 + data_2;
-    vec TH_2 = hash_sha_256( TH_2_input ); 
+    vec TH_2 = H( edhoc_hash_alg, TH_2_input ); 
 
     // Calculate MAC_2
     vec P_2m = vec{};
     vec protected_2 = cbor( ID_CRED_R );
-    vec external_aad_2 = cbor( cbor( TH_2 ) + CRED_R ) + AD_2;
+    vec external_aad_2 = cbor( cbor( TH_2 ) + CRED_R ) + cbor_AD( AD_2 );
     vec A_2m = vec{ 0xa3 } + cbor( "Encrypt0" ) + protected_2 + external_aad_2;
-    vec info_K_2m  = gen_info( edhoc_aead_id, 128,  protected_2, TH_2 );
+    vec info_K_2m  = gen_info( edhoc_aead_alg, 128,  protected_2, TH_2 );
     vec info_IV_2m = gen_info( "IV-GENERATION",   104,  protected_2, TH_2 );
-    vec K_2m  = hkdf_expand_sha_256( PRK_3e2m, info_K_2m, 16 );
-    vec IV_2m = hkdf_expand_sha_256( PRK_3e2m, info_IV_2m, 13 );
-    vec MAC_2 = aes_ccm_16_64_128( K_2m, IV_2m, P_2m, A_2m, edhoc_tag_len );
+    vec K_2m  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_2m, 16 );
+    vec IV_2m = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_IV_2m, 13 );
+    vec MAC_2 = AEAD( edhoc_aead_alg, K_2m, IV_2m, P_2m, A_2m );
 
     // Calculate Signature_or_MAC_2
     vec M_2, signature_or_MAC_2;
     if ( type_R == sig ) {
         M_2 = vec{ 0x84 } + cbor( "Signature1" ) +  protected_2 + external_aad_2 + cbor( MAC_2 );
-        signature_or_MAC_2 = Ed25519( SK_R, M_2 );
+        signature_or_MAC_2 = sign( edhoc_sign_alg, edhoc_sign_curve, SK_R, M_2 );
     }
     else
         signature_or_MAC_2 = MAC_2;
 
     // Calculate CIPHERTEXT_2
-    vec P_2e = compress_id_cred( ID_CRED_R ) + cbor( signature_or_MAC_2 ) + AD_2;
+    vec P_2e = compress_id_cred( ID_CRED_R ) + cbor( signature_or_MAC_2 ) + cbor_AD( AD_2 );
     vec info_K_2e   = gen_info( "XOR-ENCRYPTION", 8 * P_2e.size(), vec{}, TH_2 );
-    vec K_2e = hkdf_expand_sha_256( PRK_2e, info_K_2e, P_2e.size() );
+    vec K_2e = hkdf_expand( edhoc_hash_alg, PRK_2e, info_K_2e, P_2e.size() );
     vec CIPHERTEXT_2 = xor_encryption( K_2e, P_2e );
 
     // Calculate message_2
@@ -379,36 +424,36 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     else
         data_3 = vec{};
     vec TH_3_input = cbor( TH_2 ) + cbor( CIPHERTEXT_2 ) + data_3;
-    vec TH_3 = hash_sha_256( TH_3_input ); 
+    vec TH_3 = H( edhoc_hash_alg, TH_3_input ); 
 
     // Calculate MAC_3
     vec P_3m = vec{};
     vec protected_3 = cbor( ID_CRED_I );
-    vec external_aad_3 = cbor( cbor( TH_3 ) + CRED_I ) + AD_3;
+    vec external_aad_3 = cbor( cbor( TH_3 ) + CRED_I ) + cbor_AD( AD_3 );
     vec A_3m = vec{ 0xa3 } + cbor( "Encrypt0" ) + protected_3 + external_aad_3;
-    vec info_K_3m  = gen_info( edhoc_aead_id, 128, protected_3, TH_3 );
+    vec info_K_3m  = gen_info( edhoc_aead_alg, 128, protected_3, TH_3 );
     vec info_IV_3m = gen_info( "IV-GENERATION",   104, protected_3, TH_3 );
-    vec K_3m  = hkdf_expand_sha_256( PRK_4x3m, info_K_3m,  16 );
-    vec IV_3m = hkdf_expand_sha_256( PRK_4x3m, info_IV_3m, 13 );
-    vec MAC_3 = aes_ccm_16_64_128( K_3m, IV_3m, P_3m, A_3m, edhoc_tag_len );
+    vec K_3m  = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_K_3m,  16 );
+    vec IV_3m = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_IV_3m, 13 );
+    vec MAC_3 = AEAD( edhoc_aead_alg, K_3m, IV_3m, P_3m, A_3m );
 
     // Calculate Signature_or_MAC_3
     vec M_3, signature_or_MAC_3;
     if ( type_I == sig ) {
         M_3 = vec{ 0x84 } + cbor( "Signature1" ) + protected_3 + external_aad_3 + cbor( MAC_3 );
-        signature_or_MAC_3 = Ed25519( SK_I, M_3 );
+        signature_or_MAC_3 = sign( edhoc_sign_alg, edhoc_sign_curve, SK_I, M_3 );
     }
     else
         signature_or_MAC_3 = MAC_3;
 
     // Calculate CIPHERTEXT_3
-    vec P_3ae = compress_id_cred( ID_CRED_I ) + cbor( signature_or_MAC_3 ) + AD_3;
+    vec P_3ae = compress_id_cred( ID_CRED_I ) + cbor( signature_or_MAC_3 ) + cbor_AD( AD_3 );
     vec A_3ae = vec{ 0xa3 } + cbor( "Encrypt0" ) + cbor( vec{} ) + cbor( TH_3 );
-    vec info_K_3ae  = gen_info( edhoc_aead_id, 128, vec{}, TH_3 );
+    vec info_K_3ae  = gen_info( edhoc_aead_alg, 128, vec{}, TH_3 );
     vec info_IV_3ae = gen_info( "IV-GENERATION",   104, vec{}, TH_3 );
-    vec K_3ae  = hkdf_expand_sha_256( PRK_3e2m, info_K_3ae,  16 );
-    vec IV_3ae = hkdf_expand_sha_256( PRK_3e2m, info_IV_3ae, 13 );
-    vec CIPHERTEXT_3 = aes_ccm_16_64_128( K_3ae, IV_3ae, P_3ae, A_3ae, edhoc_tag_len );
+    vec K_3ae  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_3ae,  16 );
+    vec IV_3ae = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_IV_3ae, 13 );
+    vec CIPHERTEXT_3 = AEAD( edhoc_aead_alg, K_3ae, IV_3ae, P_3ae, A_3ae );
 
     // Calculate message_3
     vec message_3 = data_3 + cbor( CIPHERTEXT_3 );
@@ -417,13 +462,13 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
 
     // Calculate TH_4
     vec TH_4_input = cbor( TH_3 ) + cbor( CIPHERTEXT_3 );
-    vec TH_4 = hash_sha_256( TH_4_input ); 
+    vec TH_4 = H( edhoc_hash_alg, TH_4_input ); 
 
     // Derive OSCORE Master Secret and Salt
     vec info_OSCORE_secret = gen_info( "OSCORE Master Secret", 128, vec{}, TH_4 );
     vec info_OSCORE_salt   = gen_info( "OSCORE Master Salt",    64, vec{}, TH_4 );
-    vec OSCORE_secret = hkdf_expand_sha_256( PRK_4x3m, info_OSCORE_secret, 16 );
-    vec OSCORE_salt   = hkdf_expand_sha_256( PRK_4x3m, info_OSCORE_salt,    8 );
+    vec OSCORE_secret = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_OSCORE_secret, 16 );
+    vec OSCORE_salt   = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_OSCORE_salt,    8 );
 
     // Print stuff ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -434,16 +479,18 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
 
     // message_1 ////////////////////////////////////////////////////////////////////////////
 
-    if ( output == full ) {
+    if ( full_output == true ) {
         print( "Initiator's Key Type", type_I );
         print( "Responder's Key Type", type_R );
         print( "method", method );
         print( "corr", corr );
         print( "METHOD_CORR (4 * method + corr)", METHOD_CORR );   
-        print( "suite", suite );
+        print( "Selected Cipher Suite", selected_suite );
+        print( "Preferred Cipher Suites", preferred_suites );
+        print( "Uncompressed SUITES_I", SUITES_I );
     }
     print( "X (Initiator's ephemeral private key)", X );
-    if ( output == full ) {
+    if ( full_output == true ) {
         print( "G_X (Initiator's ephemeral public key)", G_X );
         print( "Connection identifier chosen by Initiator", C_I );
         print( "AD_1", AD_1 );   
@@ -453,7 +500,7 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     // message_2 ////////////////////////////////////////////////////////////////////////////
 
     print( "Y (Responder's ephemeral private key)", Y );
-    if ( output == full ) {
+    if ( full_output == true ) {
         print( "G_Y (Responder's ephemeral public key)", G_Y );
         print( "G_XY (ECDH shared secret)", G_XY );
         print( "salt", salt );
@@ -463,12 +510,12 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
         print( "SK_R (Responders's private authentication key)", SK_R );
     if ( type_R == sdh ) {
         print( "R (Responder's private authentication key)", R );
-        if ( output == full ) {
+        if ( full_output == true ) {
             print( "G_R (Responder's public authentication key)", G_R );
             print( "G_RX (ECDH shared secret)", G_RX );    
         }
     }
-    if ( output == full ) {
+    if ( full_output == true ) {
         print( "PRK_3e2m", PRK_3e2m );   
         print( "Connection identifier chosen by Responder", C_R );
         print( "data_2 (CBOR Sequence)", data_2 );
@@ -499,12 +546,12 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
         print( "SK_I (Initiator's private authentication key)", SK_I );
     if ( type_I == sdh ) {
             print( "I (Initiator's private authentication key)", I );
-        if ( output == full ) {
+        if ( full_output == true ) {
             print( "G_I (Initiator's public authentication key)", G_I );
             print( "G_IY (ECDH shared secret)", G_IY );
         }
     }
-    if ( output == full ) {
+    if ( full_output == true ) {
         print( "PRK_4x3m", PRK_4x3m );   
         print( "data_3 (CBOR Sequence)", data_3 );
         print( "Input to calculate TH_3 (CBOR Sequence)", TH_3_input );
@@ -533,7 +580,7 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
 
     // OSCORE ////////////////////////////////////////////////////////////////////////////
 
-    if ( output == full ) {
+    if ( full_output == true ) {
         print( "Input to calculate TH_4 (CBOR Sequence)", TH_4_input );
         print( "TH_4", TH_4 );
         print( "info for OSCORE Master Secret (CBOR-encoded)", info_OSCORE_secret );   
@@ -542,8 +589,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
         print( "OSCORE Master Salt", OSCORE_salt );
         print( "Client's OSCORE Sender ID", C_R );
         print( "Server's OSCORE Sender ID", C_I );
-        print( "OSCORE AEAD Algorithm", oscore_aead_id );
-        print( "OSCORE HMAC Algorithm", oscore_hmac_id );
+        print( "OSCORE AEAD Algorithm", oscore_aead_alg );
+        print( "OSCORE Hash Algorithm", oscore_hash_alg );
     }
 }
 
@@ -551,30 +598,35 @@ int main( void ) {
     if ( sodium_init() == -1 )
         syntax_error( "sodium_init()" );
 
-    // Four methods
-    test_vectors( sig, sig, x5t,     x5t,   suite_0, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sig, sdh, x5t,     kid,   suite_0, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sdh, sig, kid,     x5t,   suite_0, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sdh, sdh, kid,     kid,   suite_0, corr_12,    aux_no, sub_no, lite );
+    // Full output
+    test_vectors( sig, sig, x5t,     x5t,   suite_0, corr_12,    false, false, false, true );
+    test_vectors( sdh, sdh, kid,     kid,   suite_0, corr_12,    false, false, false, true );
+
+    // Different key types
+    test_vectors( sig, sdh, x5t,     kid,   suite_0, corr_12,    false, false, false, false );
+    test_vectors( sdh, sig, kid,     x5t,   suite_0, corr_12,    false, false, false, false );
 
     // All header attributes for sig and sdh
-    test_vectors( sig, sig, x5u,     x5bag, suite_0, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sig, sig, x5chain, kid,   suite_0, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sdh, sdh, x5u,     x5bag, suite_0, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sdh, sdh, x5chain, x5t,   suite_0, corr_12,    aux_no, sub_no, lite );
+    test_vectors( sig, sig, x5u,     x5bag, suite_0, corr_12,    false, false, false, false );
+    test_vectors( sig, sig, x5chain, kid,   suite_0, corr_12,    false, false, false, false );
+    test_vectors( sdh, sdh, x5u,     x5bag, suite_0, corr_12,    false, false, false, false );
+    test_vectors( sdh, sdh, x5chain, x5t,   suite_0, corr_12,    false, false, false, false );
 
-    // Cipher suite 1
-    test_vectors( sig, sig, x5t,     x5t,   suite_1, corr_12,    aux_no, sub_no, lite );
-    test_vectors( sdh, sdh, kid,     kid,   suite_1, corr_12,    aux_no, sub_no, lite );
+    // Cipher suite nr. 1 and non-compressed SUITES_I
+    test_vectors( sig, sig, x5t,     x5t,   suite_1, corr_12,    false, false, false, false );
+    test_vectors( sdh, sdh, kid,     kid,   suite_1, corr_12,    false, false, false, false );
 
-    // All correlation
-    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_none, aux_no, sub_no, lite );
-    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_23,   aux_no, sub_no, lite );
-    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_123,  aux_no, sub_no, lite );
+    // All other correlations
+    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_none, false, false, false, false );
+    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_23,   false, false, false, false );
+    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_123,  false, false, false, false );
 
     // Auxileary data
-    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_12,   aux_yes, sub_no, lite );
+    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_12,   true, false, false, false );
 
-    // Subject name
-    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_12,   aux_yes, sub_yes, lite );
+    // Subject names
+    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_12,   false, true, false, false );
+
+    // Long non-compressed bstr_identifiers
+    test_vectors( sdh, sdh, kid,     kid,    suite_0, corr_12,   false, false, true, false );
 }
