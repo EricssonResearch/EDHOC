@@ -92,16 +92,6 @@ informative:
   RFC7296:
   RFC8446:
 
-  OPTLS:
-    target: https://eprint.iacr.org/2015/978.pdf
-    title: The OPTLS Protocol and TLS 1.3
-    author:
-      -
-        ins: H. Krawczyk
-      -
-        ins: H. Wee
-    date: October 2015
-
   LoRa1:
     target: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6021899/pdf/sensors-18-01833.pdf
     title: Enhancing LoRaWAN Security through a Lightweight and Authenticated Key Management Approach
