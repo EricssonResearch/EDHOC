@@ -585,7 +585,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   METHOD_CORR : int,
-  SUITES_I : selected : suite / [ selected : suite, preferred : 2* suite ],
+  SUITES_I : selected : suite / [ selected : suite, supported : 2* suite ],
   G_X : bstr,
   C_I : bstr_identifier,  
   ? AD_1 : bstr,
@@ -598,7 +598,7 @@ bstr_identifier = bsrt / int
 where:
 
 * METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 (see {{method-types}}) and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
-* SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. One cipher suite is selected. If a single cipher suite is conveyed then that cipher suite is selected. If multiple cipher suites are conveyed then zero-based index (i.e. 0 for the first suite, 1 for the second suite, etc.) identifies the selected cipher suite out of the array elements listing the cipher suites (see {{error}}).
+* SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. One of the supported cipher suites is selected. If a single supported cipher suite is conveyed then that cipher suite is selected and the selected cipher suite is encoded as an int instead of an array.
 * G_X - the ephemeral public key of the Initiator
 * C_I - variable length connection identifier. An bstr_identifier is a byte string with special encoding. Byte strings of length one is encoded as the corresponding integer - 24, i.e. h'2a' is encoded as 18.
 * AD_1 - bstr containing unprotected opaque auxiliary data
@@ -609,7 +609,7 @@ The Initiator SHALL compose message_1 as follows:
 
 * The supported cipher suites and the order of preference MUST NOT be changed based on previous error messages. However, the list SUITES_I sent to the Responder MAY be truncated such that cipher suites which are the least preferred are omitted. The amount of truncation MAY be changed between sessions, e.g. based on previous error messages (see next bullet), but all cipher suites which are more preferred than the least preferred cipher suite in the list MUST be included in the list.
 
-* Determine the cipher suite to use with the Responder in message_1. If the Initiator previously received from the Responder an error message to a message_1 with diagnostic payload identifying a cipher suite that the Initiator supports, then the Initiator SHALL use that cipher suite. Otherwise the first cipher suite in SUITES_I MUST be used.
+* Determine the cipher suite to use with the Responder in message_1. If the Initiator previously received from the Responder an error message to a message_1 with diagnostic payload identifying a cipher suite that the Initiator supports, then the Initiator SHALL use that cipher suite. Otherwise the first supported (i.e. the most preferred) cipher suite in SUITES_I MUST be used.
 
 * Generate an ephemeral ECDH key pair as specified in Section 5 of {{SP-800-56A}} using the curve in the selected cipher suite and format it as a COSE_Key. Let G_X be the 'x' parameter of the COSE_Key.
    
@@ -958,7 +958,7 @@ error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 error = (
   ? C_x : bstr_identifier,
   ERR_MSG : tstr,
-  ? SUITES_R : suite / [ 2* suite ],
+  ? SUITES_R : supported : suite / [ supported : 2* suite ],
 )
 ~~~~~~~~~~~
 
@@ -966,7 +966,7 @@ where:
 
 * C_x - if error is sent by the Responder and corr (METHOD_CORR mod 4) equals 0 or 2 then C_x is set to C_I, else if error is sent by the Initiator and corr (METHOD_CORR mod 4) equals 0 or 1 then C_x is set to C_R, else C_x is omitted.
 * ERR_MSG - text string containing the diagnostic payload, defined in the same way as in Section 5.5.2 of {{RFC7252}}. ERR_MSG MAY be a 0-length text string.
-* SUITES_R - cipher suites from SUITES_I or the EDHOC cipher suites registry that the Responder supports. Note that SUITES_R only contains the values from the EDHOC cipher suites registry and no index. SUITES_R MUST only be included in replies to message_1.
+* SUITES_R - cipher suites from SUITES_I or the EDHOC cipher suites registry that the Responder supports. SUITES_R MUST only be included in replies to message_1. If a single supported cipher suite is conveyed then the supported cipher suite is encoded as an int instead of an array.
 
 ### Example Use of EDHOC Error Message with SUITES_R
 
@@ -974,7 +974,7 @@ Assuming that the Initiator supports the five cipher suites \{5, 6, 7, 8, 9\} in
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
-|         METHOD_CORR, SUITES_I {0, 5, 6, 7}, G_X, C_I, AD_1        |
+|         METHOD_CORR, SUITES_I {5, 5, 6, 7}, G_X, C_I, AD_1        |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -982,7 +982,7 @@ Initiator                                                   Responder
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|          METHOD_CORR, SUITES_I {1, 5, 6}, G_X, C_I, AD_1          |
+|          METHOD_CORR, SUITES_I {6, 5, 6}, G_X, C_I, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -993,7 +993,7 @@ In {{fig-error2}}, the Responder supports cipher suite 7 but not cipher suites 5
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
-|          METHOD_CORR, SUITES_I {0, 5, 6}, G_X, C_I, AD_1          |
+|          METHOD_CORR, SUITES_I {5, 5, 6}, G_X, C_I, AD_1          |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -1001,7 +1001,7 @@ Initiator                                                   Responder
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|        METHOD_CORR, SUITES_I {2, 5, 6, 7}, G_X, C_I, AD_1         |
+|        METHOD_CORR, SUITES_I {7, 5, 6, 7}, G_X, C_I, AD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
