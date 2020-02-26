@@ -294,7 +294,7 @@ To simplify for implementors, the use of CBOR in EDHOC is summarized in {{CBORan
 
 EDHOC consists of three messages (message_1, message_2, message_3) that maps directly to the three messages in SIGMA-I, plus an EDHOC error message. EDHOC messages are CBOR Sequences {{I-D.ietf-cbor-sequence}}, where the first data item (METHOD_CORR) of message_1 is an int specifying the method and the correlation properties of the transport used, see {{transport}}. The method specifies the authentication methods used (signature, static DH, symmetric), see {{method-types}}. An implementation may support only Initiator or Responder. An implementation may support only a single method. The Initiator and the Responder need to have agreed on a single method to be used for EDHOC.
 
-While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, HMAC, etc.) in the selected cipher suite  and the connection identifiers (C_I, C_R). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
+While EDHOC uses the COSE_Key, COSE_Sign1, and COSE_Encrypt0 structures, only a subset of the parameters is included in the EDHOC messages. The unprotected COSE header in COSE_Sign1, and COSE_Encrypt0 (not included in the EDHOC message) MAY contain parameters (e.g. 'alg'). After creating EDHOC message_3, the Initiator can derive symmetric application keys, and application protected data can therefore be sent in parallel with EDHOC message_3. The application may protect data using the algorithms (AEAD, hash, etc.) in the selected cipher suite  and the connection identifiers (C_I, C_R). EDHOC may be used with the media type application/edhoc defined in {{iana}}.
 
 ~~~~~~~~~~~
 Initiator                                             Responder
@@ -347,24 +347,24 @@ One byte connection and credential identifiers are realistic in many scenarios a
 
 ## Cipher Suites {#cs}
 
-EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC HMAC algorithm, an EDHOC ECDH curve, an EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application HMAC algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label. This document specifies four pre-defined cipher suites.
+EDHOC cipher suites consist of an ordered set of COSE algorithms: an EDHOC AEAD algorithm, an EDHOC hash algorithm, an EDHOC ECDH curve, an EDHOC signature algorithm, an EDHOC signature algorithm curve, an application AEAD algorithm, and an application hash algorithm from the COSE Algorithms and Elliptic Curves registries. Each cipher suite is identified with a pre-defined int label. This document specifies four pre-defined cipher suites.
 
 ~~~~~~~~~~~
-   0. ( 10, 5, 4, -8, 6, 10, 5 )
-      (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519,
-       AES-CCM-16-64-128, HMAC 256/256)
+   0. ( 10, -16, 4, -8, 6, 10, -16 )
+      (AES-CCM-16-64-128, SHA-256, X25519, EdDSA, Ed25519,
+       AES-CCM-16-64-128, SHA-256)
 
-   1. ( 30, 5, 4, -8, 6, 10, 5 )
-      (AES-CCM-16-128-128, HMAC 256/256, X25519, EdDSA, Ed25519,
-       AES-CCM-16-64-128, HMAC 256/256)
+   1. ( 30, -16, 4, -8, 6, 10, -16 )
+      (AES-CCM-16-128-128, SHA-256, X25519, EdDSA, Ed25519,
+       AES-CCM-16-64-128, SHA-256)
 
-   2. ( 10, 5, 1, -7, 1, 10, 5 )
-      (AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256,
-       AES-CCM-16-64-128, HMAC 256/256)
+   2. ( 10, -16, 1, -7, 1, 10, -16 )
+      (AES-CCM-16-64-128, SHA-256, P-256, ES256, P-256,
+       AES-CCM-16-64-128, SHA-256)
 
-   3. ( 30, 5, 1, -7, 1, 10, 5 )
-      (AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
-       AES-CCM-16-64-128, HMAC 256/256)
+   3. ( 30, -16, 1, -7, 1, 10, -16 )
+      (AES-CCM-16-128-128, SHA-256, P-256, ES256, P-256,
+       AES-CCM-16-64-128, SHA-256)
 ~~~~~~~~~~~
 
 The different methods use the same cipher suites, but some algorithms are not used in some methods. The EDHOC signature algorithm and the EDHOC signature algorithm curve are not used is methods without signature authentication.
@@ -401,7 +401,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Derivation of key and IV used with the AEAD functions SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using a pseudorandom key (PRK) and the HMAC algorithm in the selected cipher suite. The PRKs are derived using HKDF-Extract {{RFC5869}}.
+Derivation of key and IV used with the AEAD functions SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using a pseudorandom key (PRK) and the hash algorithm in the selected cipher suite. The PRKs are derived using HKDF-Extract {{RFC5869}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
@@ -415,7 +415,7 @@ PRK_2e is derived with the following input:
 
 * The input keying material (IKM) SHALL be the ECDH shared secret G_XY (calculated from G_X and Y or G_Y and X) as defined in Section 12.4.1 of {{RFC8152}}.
 
-Example: Assuming the use of HMAC 256/256 the extract phase of HKDF produces PRK_2e as follows:
+Example: Assuming the use of SHA-256 the extract phase of HKDF produces PRK_2e as follows:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK_2e = HMAC-SHA-256( salt, G_XY )
@@ -472,7 +472,7 @@ Assuming the output OKM length L is smaller than the hash function output size, 
 
 where \|\| means byte string concatenation.
 
-Example: Assume the use of the algorithm AES-CCM-16-64-128 and HMAC 256/256, K_j and IV_j are therefore the first 16 and 13 bytes, respectively, of
+Example: Assume the use of the algorithm AES-CCM-16-64-128 and HSHA-256, K_j and IV_j are therefore the first 16 and 13 bytes, respectively, of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    HMAC-SHA-256( PRK_j, info || 0x01 )
@@ -494,7 +494,7 @@ The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = l
    TH_4 = H( TH_3, CIPHERTEXT_3 )
 ~~~~~~~~~~~
 
-where H() is the hash function in the HMAC algorithm. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
+where H() is the hash function in the selected cipher suite. Example use of the EDHOC-Exporter is given in Sections {{chain}}{: format="counter"} and {{oscore}}{: format="counter"}.
 
 ### EDHOC PSK Chaining {#chain}
 
@@ -585,7 +585,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   METHOD_CORR : int,
-  SUITES_I : suite / [ index : uint, 2* suite ],
+  SUITES_I : selected : suite / [ selected : suite, preferred : 2* suite ],
   G_X : bstr,
   C_I : bstr_identifier,  
   ? AD_1 : bstr,
@@ -665,7 +665,7 @@ The Responder SHALL compose message_2 as follows:
 
 * Choose a connection identifier C_R and store it for the length of the protocol.
 
-* Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the HMAC algorithm. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+* Compute the transcript hash TH_2 = H(message_1, data_2) where H() is the hash function in the selected cipher suite. The transcript hash TH_2 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 * Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_2m, IV_2m, and the following parameters:
 
@@ -763,7 +763,7 @@ The Initiator  SHALL compose message_3 as follows:
 
 * If corr (METHOD_CORR mod 4) equals 2 or 3, C_R is omitted, otherwise C_R is not omitted.
 
-* Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the HMAC algorithm. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+* Compute the transcript hash TH_3 = H(TH_2 , CIPHERTEXT_2, data_3) where H() is the hash function in the the selected cipher suite. The transcript hash TH_3 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 * Compute an inner COSE_Encrypt0 as defined in Section 5.3 of {{RFC8152}}, with the EDHOC AEAD algorithm in the selected cipher suite, K_3m, IV_3m, and the following parameters:
 
@@ -1079,7 +1079,7 @@ When EDHOC is used to derive parameters for OSCORE {{RFC8613}}, the parties  mak
 
 * The client's OSCORE Sender ID is C_R and the server's OSCORE Sender ID is C_I, as defined in this document
 
-* The AEAD Algorithm and the HMAC algorithms are the application AEAD and HMAC algorithms in the selected cipher suite.
+* The AEAD Algorithm and the hash algorithm are the application AEAD and hash algorithms in the selected cipher suite.
 
 * The Master Secret and Master Salt are derived as follows where length is the key length (in bytes) of the application AEAD Algorithm.
 
@@ -1119,7 +1119,7 @@ The data rates in many IoT deployments are very limited. Given that the applicat
 
 ## Cipher Suites
 
-Cipher suite number 0 (AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519, AES-CCM-16-64-128, HMAC 256/256) is mandatory to implement. Implementations only need to implement the algorithms needed for their supported methods. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
+Cipher suite number 0 (AES-CCM-16-64-128, SHA-256, X25519, EdDSA, Ed25519, AES-CCM-16-64-128, SHA-256) is mandatory to implement. Implementations only need to implement the algorithms needed for their supported methods. For many constrained IoT devices it is problematic to support more than one cipher suites, so some deployments with P-256 may not support the mandatory cipher suite. This is not a problem for local deployments.
 
 The HMAC algorithm HMAC 256/64 (HMAC w/ SHA-256 truncated to 64 bits) SHALL NOT be supported for use in EDHOC.
 
@@ -1174,32 +1174,32 @@ Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 Value: 0
 Array: 10, 5, 4, -8, 6, 10, 5
-Desc: AES-CCM-16-64-128, HMAC 256/256, X25519, EdDSA, Ed25519,
-      AES-CCM-16-64-128, HMAC 256/256
+Desc: AES-CCM-16-64-128, SHA-256, X25519, EdDSA, Ed25519,
+      AES-CCM-16-64-128, SHA-256
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Value: 1
 Array: 30, 5, 4, -8, 6, 10, 5
-Desc: AES-CCM-16-128-128, HMAC 256/256, X25519, EdDSA, Ed25519,
-      AES-CCM-16-64-128, HMAC 256/256
+Desc: AES-CCM-16-128-128, SHA-256, X25519, EdDSA, Ed25519,
+      AES-CCM-16-64-128, SHA-256
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Value: 2
 Array: 10, 5, 1, -7, 1, 10, 5
-Desc: AES-CCM-16-64-128, HMAC 256/256, P-256, ES256, P-256,
-      AES-CCM-16-64-128, HMAC 256/256
+Desc: AES-CCM-16-64-128, SHA-256, P-256, ES256, P-256,
+      AES-CCM-16-64-128, SHA-256
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Value: 3
 Array: 30, 5, 1, -7, 1, 10, 5
-Desc: AES-CCM-16-128-128, HMAC 256/256, P-256, ES256, P-256,
-      AES-CCM-16-64-128, HMAC 256/256
+Desc: AES-CCM-16-128-128, SHA-256, P-256, ES256, P-256,
+      AES-CCM-16-64-128, SHA-256
 Reference: [[this document]]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
