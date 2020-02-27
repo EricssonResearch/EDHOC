@@ -322,9 +322,9 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec ID_CRED_I, ID_CRED_R, CRED_I, CRED_R;
     if ( attr_I == kid ) {
         if ( type_I == sig )
-            CRED_I = vec{ 0xa3, 0x01, 0x01, 0x20, 0x06, 0x21 } + cbor( PK_I ) + cbor( "subject name" ) + cbor( NAME_I );
+            CRED_I = vec{ 0xa4, 0x01, 0x01, 0x20, 0x06, 0x21 } + cbor( PK_I ) + cbor( "subject name" ) + cbor( NAME_I );
         if ( type_I == sdh )
-            CRED_I = vec{ 0xa3, 0x01, 0x01, 0x20, 0x04, 0x21 } + cbor( G_I )  + cbor( "subject name" ) + cbor( NAME_I );
+            CRED_I = vec{ 0xa4, 0x01, 0x01, 0x20, 0x04, 0x21 } + cbor( G_I )  + cbor( "subject name" ) + cbor( NAME_I );
         ID_CRED_I = vec{ 0xa1, attr_I } + cbor( bstr_id( long_id ) );
     } else {
         vec X509_R = random_vector( 100 + rand() % 50 );
@@ -339,9 +339,9 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
 
     if ( attr_R == kid ) {
         if ( type_R == sig )
-            CRED_R = vec{ 0xa3, 0x01, 0x01, 0x20, 0x06, 0x21 } + cbor( PK_R ) + cbor( "subject name" ) + cbor( NAME_R );
+            CRED_R = vec{ 0xa4, 0x01, 0x01, 0x20, 0x06, 0x21 } + cbor( PK_R ) + cbor( "subject name" ) + cbor( NAME_R );
         if ( type_R == sdh )
-            CRED_R = vec{ 0xa3, 0x01, 0x01, 0x20, 0x04, 0x21 } + cbor( G_R )  + cbor( "subject name" ) + cbor( NAME_R );
+            CRED_R = vec{ 0xa4, 0x01, 0x01, 0x20, 0x04, 0x21 } + cbor( G_R )  + cbor( "subject name" ) + cbor( NAME_R );
         ID_CRED_R = vec{ 0xa1, attr_R } + cbor( bstr_id( long_id ) );
     } else {
         vec X509_I = random_vector( 100 + rand() % 50 );
