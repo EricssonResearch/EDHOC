@@ -111,7 +111,7 @@ vec cbor( string s ) {
 // Tries to compress SUTES_I
 // Only supports suites in the range [-24, 23]
  vec compress_suites( vec v ) {
-    if ( v[1] == v[2] )
+    if ( v.size() == 3 && v[1] == v[2] )
         return cbor( v[1] );
     else
         return v;
@@ -257,10 +257,10 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     srand( 100 * ( 25 * METHOD_CORR + 5 * attr_I + attr_R ) + selected_suite );
 
     // EDHOC and OSCORE algorithms
-    vec preferred_suites = vec{ 0x00, 0x01 };
-    vec SUITES_I = vec{ 0x83 } + vec{ selected_suite } + preferred_suites;
+    vec SUITES_I, supported_suites = vec{ 0x00, 0x01, 0x02, 0x03 };
     int edhoc_aead_alg, edhoc_hash_alg, edhoc_ecdh_curve, edhoc_sign_alg, edhoc_sign_curve, oscore_aead_alg, oscore_hash_alg;
     if ( selected_suite == suite_0 ) {
+        vec SUITES_I = vec{ 0x83 } + vec{ selected_suite } + vec{ supported_suites[0] };
         edhoc_aead_alg = 10;
         edhoc_hash_alg = -16;
         edhoc_ecdh_curve = 4;
@@ -270,6 +270,7 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
         oscore_hash_alg = -16;
     }
     if ( selected_suite == suite_1 ) {
+        vec SUITES_I = vec{ 0x83 } + vec{ selected_suite } + vec{ supported_suites[0], supported_suites[1], supported_suites[2] };
         edhoc_aead_alg = 30;
         edhoc_hash_alg = -16;
         edhoc_ecdh_curve = 4;
@@ -363,12 +364,9 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     // Auxiliary data
     vec AD_1, AD_2, AD_3;
     if ( auxdata == true ) {
-        string s1 = "People who don't like Comic Sans don't know anything about design.";
-        string s2 = "Lindy Hoppers never die - they just swing out in Herräng.";
-        string s3 = "A delayed game is eventually good, but a rushed game is forever bad.";
-        AD_1 = cbor( vec( s1.begin(), s1.end() ) );
-        AD_2 = cbor( vec( s2.begin(), s2.end() ) );
-        AD_3 = cbor( vec( s3.begin(), s3.end() ) );
+        AD_1 = random_vector( 10 + rand() % 10 );
+        AD_2 = random_vector( 10 + rand() % 10 );
+        AD_3 = random_vector( 10 + rand() % 10 );
     }
     else
         AD_1 = AD_2 = AD_3 = vec{};
@@ -391,16 +389,16 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec protected_2 = cbor( ID_CRED_R );
     vec external_aad_2 = cbor( cbor( TH_2 ) + CRED_R ) + cbor_AD( AD_2 );
     vec A_2m = vec{ 0xa3 } + cbor( "Encrypt0" ) + protected_2 + external_aad_2;
-    vec info_K_2m  = gen_info( edhoc_aead_alg, 128,  protected_2, TH_2 );
-    vec info_IV_2m = gen_info( "IV-GENERATION",   104,  protected_2, TH_2 );
-    vec K_2m  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_2m, 16 );
+    vec info_K_2m  = gen_info( edhoc_aead_alg,  128, protected_2, TH_2 );
+    vec info_IV_2m = gen_info( "IV-GENERATION", 104, protected_2, TH_2 );
+    vec K_2m  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_2m,  16 );
     vec IV_2m = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_IV_2m, 13 );
     vec MAC_2 = AEAD( edhoc_aead_alg, K_2m, IV_2m, P_2m, A_2m );
 
     // Calculate Signature_or_MAC_2
     vec M_2, signature_or_MAC_2;
     if ( type_R == sig ) {
-        M_2 = vec{ 0x84 } + cbor( "Signature1" ) +  protected_2 + external_aad_2 + cbor( MAC_2 );
+        M_2 = vec{ 0x84 } + cbor( "Signature1" ) + protected_2 + external_aad_2 + cbor( MAC_2 );
         signature_or_MAC_2 = sign( edhoc_sign_alg, edhoc_sign_curve, SK_R, M_2 );
     }
     else
@@ -408,7 +406,7 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
 
     // Calculate CIPHERTEXT_2
     vec P_2e = compress_id_cred( ID_CRED_R ) + cbor( signature_or_MAC_2 ) + cbor_AD( AD_2 );
-    vec info_K_2e   = gen_info( "XOR-ENCRYPTION", 8 * P_2e.size(), vec{}, TH_2 );
+    vec info_K_2e = gen_info( "XOR-ENCRYPTION", 8 * P_2e.size(), vec{}, TH_2 );
     vec K_2e = hkdf_expand( edhoc_hash_alg, PRK_2e, info_K_2e, P_2e.size() );
     vec CIPHERTEXT_2 = xor_encryption( K_2e, P_2e );
 
@@ -431,8 +429,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec protected_3 = cbor( ID_CRED_I );
     vec external_aad_3 = cbor( cbor( TH_3 ) + CRED_I ) + cbor_AD( AD_3 );
     vec A_3m = vec{ 0xa3 } + cbor( "Encrypt0" ) + protected_3 + external_aad_3;
-    vec info_K_3m  = gen_info( edhoc_aead_alg, 128, protected_3, TH_3 );
-    vec info_IV_3m = gen_info( "IV-GENERATION",   104, protected_3, TH_3 );
+    vec info_K_3m  = gen_info( edhoc_aead_alg,  128, protected_3, TH_3 );
+    vec info_IV_3m = gen_info( "IV-GENERATION", 104, protected_3, TH_3 );
     vec K_3m  = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_K_3m,  16 );
     vec IV_3m = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_IV_3m, 13 );
     vec MAC_3 = AEAD( edhoc_aead_alg, K_3m, IV_3m, P_3m, A_3m );
@@ -449,8 +447,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     // Calculate CIPHERTEXT_3
     vec P_3ae = compress_id_cred( ID_CRED_I ) + cbor( signature_or_MAC_3 ) + cbor_AD( AD_3 );
     vec A_3ae = vec{ 0xa3 } + cbor( "Encrypt0" ) + cbor( vec{} ) + cbor( TH_3 );
-    vec info_K_3ae  = gen_info( edhoc_aead_alg, 128, vec{}, TH_3 );
-    vec info_IV_3ae = gen_info( "IV-GENERATION",   104, vec{}, TH_3 );
+    vec info_K_3ae  = gen_info( edhoc_aead_alg,  128, vec{}, TH_3 );
+    vec info_IV_3ae = gen_info( "IV-GENERATION", 104, vec{}, TH_3 );
     vec K_3ae  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_3ae,  16 );
     vec IV_3ae = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_IV_3ae, 13 );
     vec CIPHERTEXT_3 = AEAD( edhoc_aead_alg, K_3ae, IV_3ae, P_3ae, A_3ae );
@@ -486,7 +484,7 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
         print( "corr", corr );
         print( "METHOD_CORR (4 * method + corr)", METHOD_CORR );   
         print( "Selected Cipher Suite", selected_suite );
-        print( "Preferred Cipher Suites", preferred_suites );
+        print( "Supported Cipher Suites", supported_suites );
         print( "Uncompressed SUITES_I", SUITES_I );
     }
     print( "X (Initiator's ephemeral private key)", X );
