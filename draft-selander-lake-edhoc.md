@@ -2975,7 +2975,7 @@ HMAC Algorithm
 
 
 
-# Test Vectors {#vectors}
+# Test Vectors {#vectors-2}
 
 This appendix provides detailed test vectors to ease implementation and ensure interoperability. In addition to hexadecimal, all CBOR data items and sequences are given in CBOR diagnostic notation. The test vectors use 1 byte key identifiers, 1 byte connection IDs, and the default mapping to CoAP where the Initiator acts as CoAP client (this means that corr = 1). 
 
