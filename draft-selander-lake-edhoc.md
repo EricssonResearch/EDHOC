@@ -431,28 +431,28 @@ The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}
    OKM = HKDF-Expand( PRK, info, L )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where L is the length of output keying material (OKM) in bytes and info is the CBOR encoding of a COSE_KDF_Context
+where L is the length of output keying material (OKM) in bytes and info is the CBOR encoding of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info = [
-  AlgorithmID,
-  [ null, null, null ],
-  [ null, null, null ],
-  [ keyDataLength, protected, other ]
+   aead_id : int / tstr,
+   transcript_hash : bstr,
+   label : tstr,
+   length : uint
 ]
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where 
+where
 
-  + AlgorithmID is an int or tstr, see below
+  + aead_id is an int or tstr containing the algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite encoded as defined in {{RFC8152}}.
   
-  + keyDataLength is a uint set to the length of output keying material in bits, see below
+  + transcript_hash is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
-  + protected contains the protected field of the COSE_Encrypt0.
+  + label is a tstr set to the name of the derived key or IV, i.e. "K_2m", "IV_2m", "K_2e", "K_2ae", "IV_2ae", "K_3m", "IV_3m", "K_3ae", or "IV_2ae".
 
-  + other is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
+  + length is the length of output keying material in bytes
 
-K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3e2m. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3e2m. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4x3m. Keys are derived using AlgorithmID set to the integer value of the EDHOC AEAD in the selected cipher suite, and keyDataLength equal to the key length of the EDHOC AEAD. IVs are derived using AlgorithmID = "IV-GENERATION" as specified in Section 12.1.2. of {{RFC8152}}, and keyDataLength equal to the IV length of the EDHOC AEAD. IVs are only used if the EDHOC AEAD algorithm uses IVs.
+K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3e2m. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3e2m. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4x3m. IVs are only used if the EDHOC AEAD algorithm uses IVs.
 
 Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
@@ -462,13 +462,13 @@ Assuming the output OKM length L is smaller than the hash function output size, 
 
 where \|\| means byte string concatenation.
 
-Example: Assume the use of the algorithm AES-CCM-16-64-128 and HSHA-256, K_j and IV_j are therefore the first 16 and 13 bytes, respectively, of
+Example: Assume the use of the algorithm AES-CCM-16-64-128 and SHA-256, K_j and IV_j are therefore the first 16 and 13 bytes, respectively, of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    HMAC-SHA-256( PRK_j, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-calculated with (AlgorithmID, keyDataLength) = (10, 128) and (AlgorithmID, keyDataLength) = ("IV-GENERATION", 104), respectively.
+calculated with (aead_id, length) = (10, 16) and (aead_id, length) = (10, 13), respectively.
 
 ### EDHOC-Exporter Interface {#exporter}
 
@@ -478,7 +478,7 @@ Application keys and other application specific data can be derived using the ED
    EDHOC-Exporter(label, length) = HKDF-Expand(PRK_4x3m, info, length) 
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived using AlgorithmID = label, keyDataLength = 8 * length, and other = TH_4 where label is a tstr defined by the application and length is a uint defined by the application.  The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+The output of the EDHOC-Exporter function SHALL be derived with aead_id algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite, transcript_hash = TH_4, label = label, and length = length, where label is a tstr defined by the application and length is an uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 ~~~~~~~~~~~
    TH_4 = H( TH_3, CIPHERTEXT_3 )
