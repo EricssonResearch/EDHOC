@@ -175,12 +175,8 @@ vec xor_encryption( vec K, vec P ) {
 
 // Creates the info parameter for HKDF
 template <typename T> 
-vec gen_info( T AlgorithmID, int keyDataLength, vec protect, vec other ) {
-    return vec{ 0x84 }
-        + cbor( AlgorithmID )
-        + vec{ 0x83, 0xf6, 0xf6, 0xf6 }
-        + vec{ 0x83, 0xf6, 0xf6, 0xf6 }
-        + vec{ 0x83 } + cbor( keyDataLength ) + cbor( protect ) + cbor( other );
+vec gen_info( T AlgorithmID, vec transcriptHash, string label, int length ) {
+    return vec{ 0x84 } + cbor( AlgorithmID ) + cbor( transcriptHash ) + cbor( label ) + cbor( length );
 }
 
 vec random_vector( int len ) {
@@ -293,10 +289,14 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec G_IY = shared_secret( edhoc_ecdh_curve, I, G_Y );
     auto [ SK_R, PK_R ] = gen_key_pair( edhoc_sign_curve );
     auto [ SK_I, PK_I ] = gen_key_pair( edhoc_sign_curve );
-    
+    vec PSK = random_vector( 16 + (rand() % 2) * 16 );
+
     // PRKs
     vec salt, PRK_2e, PRK_3e2m, PRK_4x3m;
-    salt = vec{};
+    if ( type_I == psk || type_R == psk )
+        salt = PSK;
+    else
+        salt = vec{};
     PRK_2e = hkdf_extract( edhoc_hash_alg, salt, G_XY );
 
     if ( type_R == sdh )
@@ -389,8 +389,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec protected_2 = cbor( ID_CRED_R );
     vec external_aad_2 = cbor( cbor( TH_2 ) + CRED_R ) + cbor_AD( AD_2 );
     vec A_2m = vec{ 0xa3 } + cbor( "Encrypt0" ) + protected_2 + external_aad_2;
-    vec info_K_2m  = gen_info( edhoc_aead_alg,  128, protected_2, TH_2 );
-    vec info_IV_2m = gen_info( "IV-GENERATION", 104, protected_2, TH_2 );
+    vec info_K_2m  = gen_info( edhoc_aead_alg, TH_2, "K_2m",  16 );
+    vec info_IV_2m = gen_info( edhoc_aead_alg, TH_2, "IV_2m", 13 );
     vec K_2m  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_2m,  16 );
     vec IV_2m = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_IV_2m, 13 );
     vec MAC_2 = AEAD( edhoc_aead_alg, K_2m, IV_2m, P_2m, A_2m );
@@ -406,7 +406,7 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
 
     // Calculate CIPHERTEXT_2
     vec P_2e = compress_id_cred( ID_CRED_R ) + cbor( signature_or_MAC_2 ) + cbor_AD( AD_2 );
-    vec info_K_2e = gen_info( "XOR-ENCRYPTION", 8 * P_2e.size(), vec{}, TH_2 );
+    vec info_K_2e = gen_info( edhoc_aead_alg, TH_2, "K_2e", P_2e.size() );
     vec K_2e = hkdf_expand( edhoc_hash_alg, PRK_2e, info_K_2e, P_2e.size() );
     vec CIPHERTEXT_2 = xor_encryption( K_2e, P_2e );
 
@@ -429,8 +429,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec protected_3 = cbor( ID_CRED_I );
     vec external_aad_3 = cbor( cbor( TH_3 ) + CRED_I ) + cbor_AD( AD_3 );
     vec A_3m = vec{ 0xa3 } + cbor( "Encrypt0" ) + protected_3 + external_aad_3;
-    vec info_K_3m  = gen_info( edhoc_aead_alg,  128, protected_3, TH_3 );
-    vec info_IV_3m = gen_info( "IV-GENERATION", 104, protected_3, TH_3 );
+    vec info_K_3m  = gen_info( edhoc_aead_alg, TH_3, "K_3m",  16 );
+    vec info_IV_3m = gen_info( edhoc_aead_alg, TH_3, "IV_3m", 13 );
     vec K_3m  = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_K_3m,  16 );
     vec IV_3m = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_IV_3m, 13 );
     vec MAC_3 = AEAD( edhoc_aead_alg, K_3m, IV_3m, P_3m, A_3m );
@@ -447,8 +447,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     // Calculate CIPHERTEXT_3
     vec P_3ae = compress_id_cred( ID_CRED_I ) + cbor( signature_or_MAC_3 ) + cbor_AD( AD_3 );
     vec A_3ae = vec{ 0xa3 } + cbor( "Encrypt0" ) + cbor( vec{} ) + cbor( TH_3 );
-    vec info_K_3ae  = gen_info( edhoc_aead_alg,  128, vec{}, TH_3 );
-    vec info_IV_3ae = gen_info( "IV-GENERATION", 104, vec{}, TH_3 );
+    vec info_K_3ae  = gen_info( edhoc_aead_alg, TH_3, "K_3ae",  16 );
+    vec info_IV_3ae = gen_info( edhoc_aead_alg, TH_3, "IV_3ae", 13 );
     vec K_3ae  = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_K_3ae,  16 );
     vec IV_3ae = hkdf_expand( edhoc_hash_alg, PRK_3e2m, info_IV_3ae, 13 );
     vec CIPHERTEXT_3 = AEAD( edhoc_aead_alg, K_3ae, IV_3ae, P_3ae, A_3ae );
@@ -463,8 +463,8 @@ void test_vectors( KeyType type_I, KeyType type_R, HeaderAttribute attr_I, Heade
     vec TH_4 = H( edhoc_hash_alg, TH_4_input ); 
 
     // Derive OSCORE Master Secret and Salt
-    vec info_OSCORE_secret = gen_info( "OSCORE Master Secret", 128, vec{}, TH_4 );
-    vec info_OSCORE_salt   = gen_info( "OSCORE Master Salt",    64, vec{}, TH_4 );
+    vec info_OSCORE_secret = gen_info( edhoc_aead_alg, TH_4, "OSCORE Master Secret", 16 );
+    vec info_OSCORE_salt   = gen_info( edhoc_aead_alg, TH_4, "OSCORE Master Salt",    8 );
     vec OSCORE_secret = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_OSCORE_secret, 16 );
     vec OSCORE_salt   = hkdf_expand( edhoc_hash_alg, PRK_4x3m, info_OSCORE_salt,    8 );
 
