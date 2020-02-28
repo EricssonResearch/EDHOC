@@ -130,6 +130,16 @@ b4 2b ed f7 5c fa 62 a2 ca 3a 61 90 5c
 MAC_2 (8 bytes)
 c8 2a c2 3b 91 8c 82 f6 
 
+M_2 (180 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 4e a1 18 22 82 2e 48 8d 19 6b 24 29 
+5f c3 02 58 8e 58 20 d5 7d 97 05 4a 35 47 43 42 6e 61 de 0f 35 7d 5c e3 
+f6 94 c5 15 5a 10 6c b5 e2 45 7b 79 94 39 ef 58 6a 45 b7 0a 47 62 4d c9 
+cd c6 82 4b 2a 4c 52 e9 5e c9 d6 b0 53 4b 71 c2 b4 9e 4b f9 03 15 00 ce 
+e6 86 99 79 c2 97 bb 5a 8b 38 1e 98 db 71 41 08 41 5e 5c 50 db 78 97 4c 
+27 15 79 b0 16 33 a3 ef 62 71 be 5c 22 5e b2 8f 9c f6 18 0b 5a 6a f3 1e 
+80 20 9a 08 5c fb f9 5f 3f dc f9 b1 8b 69 3d 6c 0e 0d 0f fb 8e 3f 9a 32 
+a5 08 59 48 c8 2a c2 3b 91 8c 82 f6 
+
 Signature_or_MAC_2 (64 bytes)
 e3 08 ee 6a 06 58 73 5c 4c da ee 49 ed e4 7d 31 27 e0 0d da 34 80 bd e5 
 27 c1 fc 02 75 c8 a6 3e 75 2c 37 44 55 56 83 fe b7 cb 40 48 4d 1b b3 62 
@@ -229,6 +239,16 @@ IV_3m (13 bytes)
 MAC_3 (8 bytes)
 0a 43 7e ef 57 0d 7d 8e 
 
+M_3 (174 bytes)
+84 6a 53 69 67 6e 61 74 75 72 65 31 4e a1 18 22 82 2e 48 a9 0f ac 5f 98 
+57 02 d5 58 88 58 20 fb 2c 68 9d 64 69 aa 98 a7 db bd 7d b8 0a 25 43 9b 
+87 2e 04 3d 07 92 00 a4 c1 08 70 21 38 f0 22 58 64 71 f1 fa 34 b2 2a 9c 
+a4 a1 e1 29 24 ea e1 d1 76 60 88 09 84 49 cb 84 8f fc 79 5f 88 af c4 9c 
+be 8a fd d1 ba 00 9f 21 67 5e 8f 6c 77 a4 a2 c3 01 95 60 1f 6f 0a 08 52 
+97 8b d4 3d 28 20 7d 44 48 65 02 ff 7b dd a6 32 c7 88 37 00 16 b8 96 5b 
+db 20 74 bf f8 2e 5a 20 e0 9b ec 21 f8 40 6e 86 44 2b 87 ec 3f 48 0a 43 
+7e ef 57 0d 7d 8e 
+
 Signature_or_MAC_3 (64 bytes)
 b0 e4 c8 ec 8c 89 b9 ae a4 83 61 ad a8 7e 0a 4c 92 4f d3 80 59 96 72 b9 
 6d 3c 56 4a 81 64 e9 82 48 5a 36 bb 79 d9 fc a7 be da df 94 a1 0f 07 bb 
@@ -321,6 +341,293 @@ Responder's Key Type (int)
 1
 
 method (int)
+3
+
+corr (int)
+1
+
+METHOD_CORR (4 * method + corr) (int)
+13
+
+Selected Cipher Suite (int)
+0
+
+Supported Cipher Suites (4 bytes)
+00 01 02 03 
+
+Uncompressed SUITES_I (3 bytes)
+82 00 00 
+
+X (Initiator's ephemeral private key) (32 bytes)
+ae 11 a0 db 86 3c 02 27 e5 39 92 fe b8 f5 92 4c 50 d0 a7 ba 6e ea b4 ad 
+1f f2 45 72 f4 f5 7c fa 
+
+G_X (Initiator's ephemeral public key) (32 bytes)
+8d 3e f5 6d 1b 75 0a 43 51 d6 8a c2 50 a0 e8 83 79 0e fc 80 a5 38 a4 44 
+ee 9e 2b 57 e2 44 1a 7c 
+
+Connection identifier chosen by Initiator (1 bytes)
+24 
+
+AD_1 (0 bytes)
+
+message_1 (CBOR Sequence) (37 bytes)
+0d 00 58 20 8d 3e f5 6d 1b 75 0a 43 51 d6 8a c2 50 a0 e8 83 79 0e fc 80 
+a5 38 a4 44 ee 9e 2b 57 e2 44 1a 7c 0c 
+
+Y (Responder's ephemeral private key) (32 bytes)
+c6 46 cd dc 58 12 6e 18 10 5f 01 ce 35 05 6e 5e bc 35 f4 d4 cc 51 07 49 
+a3 a5 e0 69 c1 16 16 9a 
+
+G_Y (Responder's ephemeral public key) (32 bytes)
+52 fb a0 bd c8 d9 53 dd 86 ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db fc 33 
+01 04 70 69 45 1b af 35 
+
+G_XY (ECDH shared secret) (32 bytes)
+de fc 2f 35 69 10 9b 3d 1f a4 a7 3d c5 e2 fe b9 e1 15 0d 90 c2 5e e2 f0 
+66 c2 d8 85 f4 f8 ac 4e 
+
+salt (0 bytes)
+
+PRK_2e (32 bytes)
+93 9f cb 05 6d 2e 41 4f 1b ec 61 04 61 99 c2 c7 63 d2 7f 0c 3d 15 fa 16 
+71 fa 13 4e 0d c5 a0 4d 
+
+R (Responder's private authentication key) (32 bytes)
+bb 50 1a ac 67 b9 a9 5f 97 e0 ed ed 6b 82 a6 62 93 4f bb fc 7a d1 b7 4c 
+1f ca d6 6a 07 94 22 d0 
+
+G_R (Responder's public authentication key) (32 bytes)
+a3 ff 26 35 95 be b3 77 d1 a0 ce 1d 04 da d2 d4 09 66 ac 6b cb 62 20 51 
+b8 46 59 18 4d 5d 9a 32 
+
+G_RX (ECDH shared secret) (32 bytes)
+21 c7 ef f4 fb 69 fa 4b 67 97 d0 58 84 31 5d 84 11 a3 fd a5 4f 6d ad a6 
+1d 4f cd 85 e7 90 66 68 
+
+PRK_3e2m (32 bytes)
+75 07 7c 69 1e 35 01 2d 48 bc 24 c8 4f 2b ab 89 f5 2f ac 03 fe dd 81 3e 
+43 8c 93 b1 0b 39 93 07 
+
+Connection identifier chosen by Responder (1 bytes)
+07 
+
+data_2 (CBOR Sequence) (35 bytes)
+58 20 52 fb a0 bd c8 d9 53 dd 86 ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db 
+fc 33 01 04 70 69 45 1b af 35 30 
+
+Input to calculate TH_2 (CBOR Sequence) (72 bytes)
+0d 00 58 20 8d 3e f5 6d 1b 75 0a 43 51 d6 8a c2 50 a0 e8 83 79 0e fc 80 
+a5 38 a4 44 ee 9e 2b 57 e2 44 1a 7c 0c 58 20 52 fb a0 bd c8 d9 53 dd 86 
+ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db fc 33 01 04 70 69 45 1b af 35 30 
+
+TH_2 (32 bytes)
+d0 ce 6c 38 63 26 74 8b 89 65 77 86 fa 96 e0 d3 9c 47 34 dc 2c 8b 4b c2 
+fb 8f 63 a8 87 cc 03 68 
+
+Responders's subject name (text string)
+""
+
+ID_CRED_R (4 bytes)
+a1 04 41 20 
+
+CRED_R (54 bytes)
+a4 01 01 20 04 21 58 20 a3 ff 26 35 95 be b3 77 d1 a0 ce 1d 04 da d2 d4 
+09 66 ac 6b cb 62 20 51 b8 46 59 18 4d 5d 9a 32 6c 73 75 62 6a 65 63 74 
+20 6e 61 6d 65 60 
+
+AD_2  (0 bytes)
+
+P_2m (0 bytes)
+
+A_2m (CBOR-encoded) (105 bytes)
+83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 20 58 58 58 20 d0 ce 6c 38 63 
+26 74 8b 89 65 77 86 fa 96 e0 d3 9c 47 34 dc 2c 8b 4b c2 fb 8f 63 a8 87 
+cc 03 68 a4 01 01 20 04 21 58 20 a3 ff 26 35 95 be b3 77 d1 a0 ce 1d 04 
+da d2 d4 09 66 ac 6b cb 62 20 51 b8 46 59 18 4d 5d 9a 32 6c 73 75 62 6a 
+65 63 74 20 6e 61 6d 65 60 
+
+info for K_2m (CBOR-encoded) (42 bytes)
+84 0a 58 20 d0 ce 6c 38 63 26 74 8b 89 65 77 86 fa 96 e0 d3 9c 47 34 dc 
+2c 8b 4b c2 fb 8f 63 a8 87 cc 03 68 64 4b 5f 32 6d 10 
+
+K_2m (16 bytes)
+f6 5b 6c bc 35 ed 95 74 9d f2 07 19 c2 0d 37 b0 
+
+info for IV_2m (CBOR-encoded) (43 bytes)
+84 0a 58 20 d0 ce 6c 38 63 26 74 8b 89 65 77 86 fa 96 e0 d3 9c 47 34 dc 
+2c 8b 4b c2 fb 8f 63 a8 87 cc 03 68 65 49 56 5f 32 6d 0d 
+
+IV_2m (13 bytes)
+e2 49 e3 b6 0a 2c b0 43 a8 a2 99 0c 57 
+
+MAC_2 (8 bytes)
+1a 1b 67 1a 18 0f a6 e3 
+
+Signature_or_MAC_2 (8 bytes)
+1a 1b 67 1a 18 0f a6 e3 
+
+P_2e (CBOR Sequence) (10 bytes)
+08 48 1a 1b 67 1a 18 0f a6 e3 
+
+info for K_2e (CBOR-encoded) (42 bytes)
+84 0a 58 20 d0 ce 6c 38 63 26 74 8b 89 65 77 86 fa 96 e0 d3 9c 47 34 dc 
+2c 8b 4b c2 fb 8f 63 a8 87 cc 03 68 64 4b 5f 32 65 0a 
+
+K_2e (10 bytes)
+31 49 c8 ff 6c 02 a3 80 aa 95 
+
+CIPHERTEXT_2 (10 bytes)
+39 01 d2 e4 0b 18 bb 8f 0c 76 
+
+message_2 (CBOR Sequence) (46 bytes)
+58 20 52 fb a0 bd c8 d9 53 dd 86 ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db 
+fc 33 01 04 70 69 45 1b af 35 30 4a 39 01 d2 e4 0b 18 bb 8f 0c 76 
+
+I (Initiator's private authentication key) (32 bytes)
+2b be a6 55 c2 33 71 c3 29 cf bd 3b 1f 02 c6 c0 62 03 38 37 b8 b5 90 99 
+a4 43 6f 66 60 81 b0 8e 
+
+G_I (Initiator's public authentication key) (32 bytes)
+2c 44 0c c1 21 f8 d7 f2 4c 3b 0e 41 ae da fe 9c aa 4f 4e 7a bb 83 5e c3 
+0f 1d e8 8a db 96 ff 71 
+
+G_IY (ECDH shared secret) (32 bytes)
+cb ff 8c d3 4a 81 df ec 4c b6 5d 9a 57 2e bd 09 64 45 0c 78 56 3d a4 98 
+1d 80 d3 6c 8b 1a 75 2a 
+
+PRK_4x3m (32 bytes)
+02 56 2f 1f 01 78 5c 0a a5 f5 94 64 0c 49 cb f6 9f 72 2e 9e 6c 57 83 7d 
+8e 15 79 ec 45 fe 64 7a 
+
+data_3 (CBOR Sequence) (1 bytes)
+30 
+
+Input to calculate TH_3 (CBOR Sequence) (46 bytes)
+58 20 d0 ce 6c 38 63 26 74 8b 89 65 77 86 fa 96 e0 d3 9c 47 34 dc 2c 8b 
+4b c2 fb 8f 63 a8 87 cc 03 68 4a 39 01 d2 e4 0b 18 bb 8f 0c 76 30 
+
+TH_3 (32 bytes)
+f5 01 f0 8b 08 25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 65 09 b3 3e 
+98 57 2e b8 b3 6d f6 5e 
+
+Initiator's subject name (text string)
+""
+
+ID_CRED_I (4 bytes)
+a1 04 41 16 
+
+CRED_I (54 bytes)
+a4 01 01 20 04 21 58 20 2c 44 0c c1 21 f8 d7 f2 4c 3b 0e 41 ae da fe 9c 
+aa 4f 4e 7a bb 83 5e c3 0f 1d e8 8a db 96 ff 71 6c 73 75 62 6a 65 63 74 
+20 6e 61 6d 65 60 
+
+AD_3 (0 bytes)
+
+P_3m (0 bytes)
+
+A_3m (CBOR-encoded) (105 bytes)
+83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 16 58 58 58 20 f5 01 f0 8b 08 
+25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 65 09 b3 3e 98 57 2e b8 b3 
+6d f6 5e a4 01 01 20 04 21 58 20 2c 44 0c c1 21 f8 d7 f2 4c 3b 0e 41 ae 
+da fe 9c aa 4f 4e 7a bb 83 5e c3 0f 1d e8 8a db 96 ff 71 6c 73 75 62 6a 
+65 63 74 20 6e 61 6d 65 60 
+
+info for K_3m (CBOR-encoded) (42 bytes)
+84 0a 58 20 f5 01 f0 8b 08 25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 
+65 09 b3 3e 98 57 2e b8 b3 6d f6 5e 64 4b 5f 33 6d 10 
+
+K_3m (16 bytes)
+34 7c cb b4 4e ce 37 03 2b 99 00 92 73 2e e5 46 
+
+info for IV_3m (CBOR-encoded) (43 bytes)
+84 0a 58 20 f5 01 f0 8b 08 25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 
+65 09 b3 3e 98 57 2e b8 b3 6d f6 5e 65 49 56 5f 33 6d 0d 
+
+IV_3m (13 bytes)
+ed 72 d8 09 1c b3 a2 93 41 ec 90 cd fb 
+
+MAC_3 (8 bytes)
+26 ae 45 38 0c ca d4 82 
+
+Signature_or_MAC_3 (8 bytes)
+26 ae 45 38 0c ca d4 82 
+
+P_3ae (CBOR Sequence) (10 bytes)
+21 48 26 ae 45 38 0c ca d4 82 
+
+A_3ae (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 f5 01 f0 8b 08 25 ee 73 34 80 ab 
+f9 66 2e 68 21 8a e8 05 db 65 09 b3 3e 98 57 2e b8 b3 6d f6 5e 
+
+info for K_3ae (CBOR-encoded) (43 bytes)
+84 0a 58 20 f5 01 f0 8b 08 25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 
+65 09 b3 3e 98 57 2e b8 b3 6d f6 5e 65 4b 5f 33 61 65 10 
+
+K_3ae (16 bytes)
+73 3c 95 92 81 2a 7f 37 94 e6 7a 34 eb ed a0 24 
+
+info for IV_3ae (CBOR-encoded) (44 bytes)
+84 0a 58 20 f5 01 f0 8b 08 25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 
+65 09 b3 3e 98 57 2e b8 b3 6d f6 5e 66 49 56 5f 33 61 65 0d 
+
+IV_3ae (13 bytes)
+e2 99 2b f5 6b ca 6d 0e ac d4 60 e1 a6 
+
+CIPHERTEXT_3 (18 bytes)
+9d 21 40 11 79 e7 b0 55 9c cf 2f cc 57 c0 b0 63 82 70 
+
+message_3 (CBOR Sequence) (20 bytes)
+30 52 9d 21 40 11 79 e7 b0 55 9c cf 2f cc 57 c0 b0 63 82 70 
+
+Input to calculate TH_4 (CBOR Sequence) (53 bytes)
+58 20 f5 01 f0 8b 08 25 ee 73 34 80 ab f9 66 2e 68 21 8a e8 05 db 65 09 
+b3 3e 98 57 2e b8 b3 6d f6 5e 52 9d 21 40 11 79 e7 b0 55 9c cf 2f cc 57 
+c0 b0 63 82 70 
+
+TH_4 (32 bytes)
+28 d1 22 de f5 e6 a1 3f 93 09 37 3f ce d5 b8 7f 97 09 47 29 fd df 53 5e 
+5f f2 2b 1b 24 f5 2d e0 
+
+info for OSCORE Master Secret (CBOR-encoded) (58 bytes)
+84 0a 58 20 28 d1 22 de f5 e6 a1 3f 93 09 37 3f ce d5 b8 7f 97 09 47 29 
+fd df 53 5e 5f f2 2b 1b 24 f5 2d e0 74 4f 53 43 4f 52 45 20 4d 61 73 74 
+65 72 20 53 65 63 72 65 74 10 
+
+OSCORE Master Secret (16 bytes)
+65 ed 97 4e 5a 26 d2 50 0f 4d 03 f1 10 80 a8 c9 
+
+info for OSCORE Master Salt (CBOR-encoded) (56 bytes)
+84 0a 58 20 28 d1 22 de f5 e6 a1 3f 93 09 37 3f ce d5 b8 7f 97 09 47 29 
+fd df 53 5e 5f f2 2b 1b 24 f5 2d e0 72 4f 53 43 4f 52 45 20 4d 61 73 74 
+65 72 20 53 61 6c 74 08 
+
+OSCORE Master Salt (8 bytes)
+d2 52 1d 5c 70 ce 3c b1 
+
+Client's OSCORE Sender ID (1 bytes)
+07 
+
+Server's OSCORE Sender ID (1 bytes)
+24 
+
+OSCORE AEAD Algorithm (int)
+10
+
+OSCORE Hash Algorithm (int)
+-16
+
+---------------------------------------------------------------
+Test Vectors for EHDOC
+---------------------------------------------------------------
+
+Initiator's Key Type (int)
+2
+
+Responder's Key Type (int)
+2
+
+method (int)
 4
 
 corr (int)
@@ -351,9 +658,12 @@ Connection identifier chosen by Initiator (1 bytes)
 
 AD_1 (0 bytes)
 
-message_1 (CBOR Sequence) (37 bytes)
+ID_PSK (4 bytes)
+a1 04 41 26 
+
+message_1 (CBOR Sequence) (38 bytes)
 11 00 58 20 36 62 c4 a7 1d 62 4e 8a 4d 9d ff 87 9a bc 6e 2a 0e 74 5f 82 
-f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 
+f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 0e 
 
 Y (Responder's ephemeral private key) (32 bytes)
 ac 18 6d 8f aa 91 3b 7c 2b 33 4d 49 95 1a 30 0f ef 24 3e 16 5b d8 12 f4 
@@ -367,27 +677,19 @@ G_XY (ECDH shared secret) (32 bytes)
 11 f1 b2 ed f8 91 12 45 f0 45 16 2d 40 95 6b af 21 c9 3f 9b 2d bd 64 4d 
 62 1d 04 80 93 1d a9 39 
 
-salt (0 bytes)
+PSK (16 bytes)
+58 8e 7e a5 3a 8d cf 04 67 69 55 68 96 09 25 26 
+
+salt (16 bytes)
+58 8e 7e a5 3a 8d cf 04 67 69 55 68 96 09 25 26 
 
 PRK_2e (32 bytes)
-df 0c f8 78 a4 66 01 36 bd 5c 80 12 86 a0 f7 f5 36 9c 3d 75 56 e7 62 96 
-f7 1c b7 14 be e3 5e 92 
-
-R (Responder's private authentication key) (32 bytes)
-cd e5 30 e6 0b c3 9f 9f 52 e0 d3 ec 72 a9 05 ba 58 4a e3 36 cb 48 5b 8b 
-fc 28 d7 29 68 16 79 8c 
-
-G_R (Responder's public authentication key) (32 bytes)
-7a 45 d8 e9 93 87 4c f0 9d cc 9f 33 f0 5b 42 7e e0 04 84 07 a7 3f 3b e9 
-d4 45 2b f5 0a 0f 7c 26 
-
-G_RX (ECDH shared secret) (32 bytes)
-0b 51 f2 1b 2e 1b 20 8e 93 81 9d f9 08 37 1a 2f 98 37 4a 0c b7 ff f0 f4 
-2d b3 a3 52 67 bc 54 7b 
+19 ac 85 94 67 e7 50 85 5d fd c1 b5 9a c7 b7 80 17 e8 42 f6 ec 0c f5 63 
+e2 b1 16 a6 21 ca 87 49 
 
 PRK_3e2m (32 bytes)
-c1 30 dd 21 19 5a c0 26 2a d4 aa e9 d7 1e 57 a9 8a 32 4c bb aa 57 26 42 
-cf e7 27 36 2e 2d 8e bb 
+19 ac 85 94 67 e7 50 85 5d fd c1 b5 9a c7 b7 80 17 e8 42 f6 ec 0c f5 63 
+e2 b1 16 a6 21 ca 87 49 
 
 Connection identifier chosen by Responder (1 bytes)
 14 
@@ -396,194 +698,109 @@ data_2 (CBOR Sequence) (35 bytes)
 58 20 a3 96 7f 6c f9 9b 6d dc 7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 
 51 59 71 ec 6c 84 25 53 b7 76 23 
 
-Input to calculate TH_2 (CBOR Sequence) (72 bytes)
+Input to calculate TH_2 (CBOR Sequence) (73 bytes)
 11 00 58 20 36 62 c4 a7 1d 62 4e 8a 4d 9d ff 87 9a bc 6e 2a 0e 74 5f 82 
-f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 58 20 a3 96 7f 6c f9 9b 6d dc 7e 
-7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 51 59 71 ec 6c 84 25 53 b7 76 23 
+f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 0e 58 20 a3 96 7f 6c f9 9b 6d dc 
+7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 51 59 71 ec 6c 84 25 53 b7 76 
+23 
 
 TH_2 (32 bytes)
-02 40 db 5e 79 97 5b e7 6b 4d e5 5a 58 4d 06 46 55 56 ae 90 67 79 5a 5c 
-1b 4a 85 a5 6c bb 8c d7 
-
-Responders's subject name (text string)
-""
-
-ID_CRED_R (4 bytes)
-a1 04 41 00 
-
-CRED_R (54 bytes)
-a4 01 01 20 04 21 58 20 7a 45 d8 e9 93 87 4c f0 9d cc 9f 33 f0 5b 42 7e 
-e0 04 84 07 a7 3f 3b e9 d4 45 2b f5 0a 0f 7c 26 6c 73 75 62 6a 65 63 74 
-20 6e 61 6d 65 60 
+e4 69 e3 c9 51 ea 55 ea 2f a5 f8 cb da 0a 2f 7a 02 af f7 6f 69 4d da 2c 
+fa bf f9 c9 56 af 67 14 
 
 AD_2  (0 bytes)
 
-P_2m (0 bytes)
+P_2ae (CBOR Sequence) (0 bytes)
 
-A_2m (CBOR-encoded) (105 bytes)
-83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 00 58 58 58 20 02 40 db 5e 79 
-97 5b e7 6b 4d e5 5a 58 4d 06 46 55 56 ae 90 67 79 5a 5c 1b 4a 85 a5 6c 
-bb 8c d7 a4 01 01 20 04 21 58 20 7a 45 d8 e9 93 87 4c f0 9d cc 9f 33 f0 
-5b 42 7e e0 04 84 07 a7 3f 3b e9 d4 45 2b f5 0a 0f 7c 26 6c 73 75 62 6a 
-65 63 74 20 6e 61 6d 65 60 
+A_2ae (CBOR-encoded) (45 bytes)
+83 68 45 6e 63 72 79 70 74 30 40 58 20 e4 69 e3 c9 51 ea 55 ea 2f a5 f8 
+cb da 0a 2f 7a 02 af f7 6f 69 4d da 2c fa bf f9 c9 56 af 67 14 
 
-info for K_2m (CBOR-encoded) (42 bytes)
-84 0a 58 20 02 40 db 5e 79 97 5b e7 6b 4d e5 5a 58 4d 06 46 55 56 ae 90 
-67 79 5a 5c 1b 4a 85 a5 6c bb 8c d7 64 4b 5f 32 6d 10 
+info for K_2ae (CBOR-encoded) (43 bytes)
+84 0a 58 20 e4 69 e3 c9 51 ea 55 ea 2f a5 f8 cb da 0a 2f 7a 02 af f7 6f 
+69 4d da 2c fa bf f9 c9 56 af 67 14 65 4b 5f 32 61 65 10 
 
-K_2m (16 bytes)
-dc e5 91 04 72 c1 ad 05 de 90 09 be 87 9f dc 6c 
+K_2ae (16 bytes)
+56 cf a3 c8 bf 16 eb 92 14 14 12 f2 83 7f 55 50 
 
-info for IV_2m (CBOR-encoded) (43 bytes)
-84 0a 58 20 02 40 db 5e 79 97 5b e7 6b 4d e5 5a 58 4d 06 46 55 56 ae 90 
-67 79 5a 5c 1b 4a 85 a5 6c bb 8c d7 65 49 56 5f 32 6d 0d 
+info for IV_2ae (CBOR-encoded) (44 bytes)
+84 0a 58 20 e4 69 e3 c9 51 ea 55 ea 2f a5 f8 cb da 0a 2f 7a 02 af f7 6f 
+69 4d da 2c fa bf f9 c9 56 af 67 14 66 49 56 5f 32 61 65 0d 
 
-IV_2m (13 bytes)
-aa c2 f0 35 f1 a8 ec dd 17 38 f8 8d a8 
+IV_2ae (13 bytes)
+23 b4 c2 9e 40 bd 83 54 7d 14 e2 16 04 
 
-MAC_2 (8 bytes)
-59 7b 56 66 25 d5 f5 5f 
+CIPHERTEXT_2 (8 bytes)
+aa 98 fd 54 79 8f 7f 2e 
 
-Signature_or_MAC_2 (8 bytes)
-59 7b 56 66 25 d5 f5 5f 
-
-P_2e (CBOR Sequence) (10 bytes)
-37 48 59 7b 56 66 25 d5 f5 5f 
-
-info for K_2e (CBOR-encoded) (42 bytes)
-84 0a 58 20 02 40 db 5e 79 97 5b e7 6b 4d e5 5a 58 4d 06 46 55 56 ae 90 
-67 79 5a 5c 1b 4a 85 a5 6c bb 8c d7 64 4b 5f 32 65 0a 
-
-K_2e (10 bytes)
-5c 93 6a a7 cf cd ef 79 24 18 
-
-CIPHERTEXT_2 (10 bytes)
-6b db 33 dc 99 ab ca ac d1 47 
-
-message_2 (CBOR Sequence) (46 bytes)
+message_2 (CBOR Sequence) (44 bytes)
 58 20 a3 96 7f 6c f9 9b 6d dc 7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 
-51 59 71 ec 6c 84 25 53 b7 76 23 4a 6b db 33 dc 99 ab ca ac d1 47 
-
-I (Initiator's private authentication key) (32 bytes)
-1d a3 77 05 ee 3b ac 31 68 2e c4 93 6c 46 25 c5 c8 fa b5 d4 df c4 e5 8b 
-66 fd 3d 32 87 03 41 a1 
-
-G_I (Initiator's public authentication key) (32 bytes)
-0a 30 70 b4 bf 4a 5a bb 88 c7 09 18 f3 b7 77 4a 98 8c fc 98 ff c5 6f f3 
-1e b8 1f 18 02 5c 28 32 
-
-G_IY (ECDH shared secret) (32 bytes)
-81 e9 63 f6 dc 89 48 42 d4 c0 30 d3 c3 2d 4c a9 0d f2 84 1e 2b 49 6f 42 
-70 3c 48 62 d9 78 8a 4c 
+51 59 71 ec 6c 84 25 53 b7 76 23 48 aa 98 fd 54 79 8f 7f 2e 
 
 PRK_4x3m (32 bytes)
-e5 01 78 7c f3 e4 0b 7a 69 89 5a 6a 06 a0 ed 27 cf 9f 60 e3 a7 6e 07 80 
-4b db 8d da 22 7d ba 48 
+19 ac 85 94 67 e7 50 85 5d fd c1 b5 9a c7 b7 80 17 e8 42 f6 ec 0c f5 63 
+e2 b1 16 a6 21 ca 87 49 
 
 data_3 (CBOR Sequence) (1 bytes)
 23 
 
-Input to calculate TH_3 (CBOR Sequence) (46 bytes)
-58 20 02 40 db 5e 79 97 5b e7 6b 4d e5 5a 58 4d 06 46 55 56 ae 90 67 79 
-5a 5c 1b 4a 85 a5 6c bb 8c d7 4a 6b db 33 dc 99 ab ca ac d1 47 23 
+Input to calculate TH_3 (CBOR Sequence) (44 bytes)
+58 20 e4 69 e3 c9 51 ea 55 ea 2f a5 f8 cb da 0a 2f 7a 02 af f7 6f 69 4d 
+da 2c fa bf f9 c9 56 af 67 14 48 aa 98 fd 54 79 8f 7f 2e 23 
 
 TH_3 (32 bytes)
-7d b5 cf 71 89 69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a ad bf 1e b9 
-a1 46 04 9d eb bc 73 a2 
+fb 42 fd ee 0a ee 31 c4 65 cf 3a b2 c9 bd 6f fb 40 43 81 57 9a 11 a4 2b 
+c2 20 a7 d2 f5 d9 89 40 
 
-Initiator's subject name (text string)
-""
-
-ID_CRED_I (4 bytes)
-a1 04 41 26 
-
-CRED_I (54 bytes)
-a4 01 01 20 04 21 58 20 0a 30 70 b4 bf 4a 5a bb 88 c7 09 18 f3 b7 77 4a 
-98 8c fc 98 ff c5 6f f3 1e b8 1f 18 02 5c 28 32 6c 73 75 62 6a 65 63 74 
-20 6e 61 6d 65 60 
-
-AD_3 (0 bytes)
-
-P_3m (0 bytes)
-
-A_3m (CBOR-encoded) (105 bytes)
-83 68 45 6e 63 72 79 70 74 30 44 a1 04 41 26 58 58 58 20 7d b5 cf 71 89 
-69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a ad bf 1e b9 a1 46 04 9d eb 
-bc 73 a2 a4 01 01 20 04 21 58 20 0a 30 70 b4 bf 4a 5a bb 88 c7 09 18 f3 
-b7 77 4a 98 8c fc 98 ff c5 6f f3 1e b8 1f 18 02 5c 28 32 6c 73 75 62 6a 
-65 63 74 20 6e 61 6d 65 60 
-
-info for K_3m (CBOR-encoded) (42 bytes)
-84 0a 58 20 7d b5 cf 71 89 69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a 
-ad bf 1e b9 a1 46 04 9d eb bc 73 a2 64 4b 5f 33 6d 10 
-
-K_3m (16 bytes)
-84 5d 1d 04 44 90 fe 58 45 19 6a 5b 14 98 47 d0 
-
-info for IV_3m (CBOR-encoded) (43 bytes)
-84 0a 58 20 7d b5 cf 71 89 69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a 
-ad bf 1e b9 a1 46 04 9d eb bc 73 a2 65 49 56 5f 33 6d 0d 
-
-IV_3m (13 bytes)
-2a c4 21 16 b2 9e 7e ab d0 92 c8 d3 5b 
-
-MAC_3 (8 bytes)
-02 84 34 00 79 b8 08 b4 
-
-Signature_or_MAC_3 (8 bytes)
-02 84 34 00 79 b8 08 b4 
-
-P_3ae (CBOR Sequence) (10 bytes)
-0e 48 02 84 34 00 79 b8 08 b4 
+P_3ae (CBOR Sequence) (0 bytes)
 
 A_3ae (CBOR-encoded) (45 bytes)
-83 68 45 6e 63 72 79 70 74 30 40 58 20 7d b5 cf 71 89 69 96 2b f8 11 ef 
-d1 a5 c3 ba f3 4f 5e dc 5a ad bf 1e b9 a1 46 04 9d eb bc 73 a2 
+83 68 45 6e 63 72 79 70 74 30 40 58 20 fb 42 fd ee 0a ee 31 c4 65 cf 3a 
+b2 c9 bd 6f fb 40 43 81 57 9a 11 a4 2b c2 20 a7 d2 f5 d9 89 40 
 
 info for K_3ae (CBOR-encoded) (43 bytes)
-84 0a 58 20 7d b5 cf 71 89 69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a 
-ad bf 1e b9 a1 46 04 9d eb bc 73 a2 65 4b 5f 33 61 65 10 
+84 0a 58 20 fb 42 fd ee 0a ee 31 c4 65 cf 3a b2 c9 bd 6f fb 40 43 81 57 
+9a 11 a4 2b c2 20 a7 d2 f5 d9 89 40 65 4b 5f 33 61 65 10 
 
 K_3ae (16 bytes)
-44 0d df 6d 90 37 4b 4e b0 5d fc fe 53 53 b3 9f 
+bf 1e 4a 9d 8c 91 ae 1c 89 18 e7 d3 ba 26 43 19 
 
 info for IV_3ae (CBOR-encoded) (44 bytes)
-84 0a 58 20 7d b5 cf 71 89 69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a 
-ad bf 1e b9 a1 46 04 9d eb bc 73 a2 66 49 56 5f 33 61 65 0d 
+84 0a 58 20 fb 42 fd ee 0a ee 31 c4 65 cf 3a b2 c9 bd 6f fb 40 43 81 57 
+9a 11 a4 2b c2 20 a7 d2 f5 d9 89 40 66 49 56 5f 33 61 65 0d 
 
 IV_3ae (13 bytes)
-b2 8b c4 d2 9f 9a f2 d0 a7 b7 ea 93 07 
+bd 36 71 02 71 5e 0d c4 12 96 ed b6 e1 
 
-CIPHERTEXT_3 (18 bytes)
-de 52 d5 9e 9f 2a 36 d0 34 d2 94 a2 cf 6e 55 ac 2b 5e 
+CIPHERTEXT_3 (8 bytes)
+67 96 4e 8f 41 cc 53 5e 
 
-message_3 (CBOR Sequence) (20 bytes)
-23 52 de 52 d5 9e 9f 2a 36 d0 34 d2 94 a2 cf 6e 55 ac 2b 5e 
+message_3 (CBOR Sequence) (10 bytes)
+23 48 67 96 4e 8f 41 cc 53 5e 
 
-Input to calculate TH_4 (CBOR Sequence) (53 bytes)
-58 20 7d b5 cf 71 89 69 96 2b f8 11 ef d1 a5 c3 ba f3 4f 5e dc 5a ad bf 
-1e b9 a1 46 04 9d eb bc 73 a2 52 de 52 d5 9e 9f 2a 36 d0 34 d2 94 a2 cf 
-6e 55 ac 2b 5e 
+Input to calculate TH_4 (CBOR Sequence) (43 bytes)
+58 20 fb 42 fd ee 0a ee 31 c4 65 cf 3a b2 c9 bd 6f fb 40 43 81 57 9a 11 
+a4 2b c2 20 a7 d2 f5 d9 89 40 48 67 96 4e 8f 41 cc 53 5e 
 
 TH_4 (32 bytes)
-1b 36 74 b4 19 c1 40 c0 ac df 1a dc a1 3a ac 7f fe e1 e9 a7 22 1a 96 be 
-1e 81 7c 27 51 29 ab 40 
+d5 da 09 d7 7c 12 ad f0 aa 1a d4 a3 15 a8 40 f4 29 8f 21 d8 75 ce af 41 
+d5 78 c5 8b 9d 31 b8 24 
 
 info for OSCORE Master Secret (CBOR-encoded) (58 bytes)
-84 0a 58 20 1b 36 74 b4 19 c1 40 c0 ac df 1a dc a1 3a ac 7f fe e1 e9 a7 
-22 1a 96 be 1e 81 7c 27 51 29 ab 40 74 4f 53 43 4f 52 45 20 4d 61 73 74 
+84 0a 58 20 d5 da 09 d7 7c 12 ad f0 aa 1a d4 a3 15 a8 40 f4 29 8f 21 d8 
+75 ce af 41 d5 78 c5 8b 9d 31 b8 24 74 4f 53 43 4f 52 45 20 4d 61 73 74 
 65 72 20 53 65 63 72 65 74 10 
 
 OSCORE Master Secret (16 bytes)
-dd d5 3d a9 fb 10 28 08 d0 e1 57 32 5d 61 bb c4 
+08 df 59 2c c5 97 93 9a 20 25 1f 65 a2 75 16 f5 
 
 info for OSCORE Master Salt (CBOR-encoded) (56 bytes)
-84 0a 58 20 1b 36 74 b4 19 c1 40 c0 ac df 1a dc a1 3a ac 7f fe e1 e9 a7 
-22 1a 96 be 1e 81 7c 27 51 29 ab 40 72 4f 53 43 4f 52 45 20 4d 61 73 74 
+84 0a 58 20 d5 da 09 d7 7c 12 ad f0 aa 1a d4 a3 15 a8 40 f4 29 8f 21 d8 
+75 ce af 41 d5 78 c5 8b 9d 31 b8 24 72 4f 53 43 4f 52 45 20 4d 61 73 74 
 65 72 20 53 61 6c 74 08 
 
 OSCORE Master Salt (8 bytes)
-79 c2 03 3d c1 d5 03 f4 
+78 7d 48 c1 46 0f 72 a8 
 
 Client's OSCORE Sender ID (1 bytes)
 14 
@@ -640,193 +857,193 @@ Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-77 27 5d cc a1 26 71 ec 97 6c 48 b5 d8 ea 95 bd e1 18 bc a7 fe ec ad e5 
-34 19 23 41 bb be 2e ed 
+fd 98 fd 4e 19 b8 e5 1b d3 8b c6 b0 01 be 45 32 52 5c 11 7d ae a8 46 1d 
+6f a1 e5 b0 62 fa 6e fc 
 
 message_1 (CBOR Sequence) (37 bytes)
-0d 00 58 20 b8 d2 97 52 51 54 07 96 c1 72 f0 b1 d7 88 b1 80 11 23 d2 fb 
-20 21 eb 49 d7 df 5d e0 97 40 b4 7e 35 
+09 00 58 20 ef 5e f8 e8 33 13 68 9e d8 04 c6 24 05 f6 a4 5b fe 5e 46 ea 
+f4 bd 38 2f c8 9a 3f e6 88 ab fa 54 08 
 
 Y (Responder's ephemeral private key) (32 bytes)
-9f 6f ff c6 6e e9 c3 f8 cc 87 28 da 7e 94 d8 85 d6 fc a0 bd 8d 28 a8 8e 
-cc 28 d6 12 8a 1f 22 1c 
+13 9c 68 36 66 f0 a2 06 2a e1 f7 40 c1 37 88 2c 8a d4 07 27 ab e4 ff 95 
+c0 2b fe 87 e9 c4 b3 d6 
 
 message_2 (CBOR Sequence) (117 bytes)
-58 20 fe c0 b2 f7 d0 a7 cf 9d 51 95 fb 5d 45 9d ff 7b 05 39 8e 77 e6 98 
-4d dd ab ae 67 8b 23 cd 4a 5c 13 58 50 ca 1c 23 83 b5 c0 15 0d 5f 55 c5 
-12 39 f6 6e 25 74 5b e5 3f e9 a2 99 44 ad b4 97 36 8c 6c 81 bf 3e e8 54 
-4d 94 39 e6 14 90 b4 42 e3 42 38 b0 ee e0 9e e0 8b 8d 19 78 42 eb 02 d4 
-81 27 1c 21 8c 35 d9 71 c8 a1 cd 5c a1 de be 6b 99 4d 63 9a 50 
+58 20 2c b0 91 62 8f d8 8c 16 8b 34 4d ee ea 20 e9 5c 1f 7a fe 50 e9 70 
+b2 4e 5c 2e 90 fd 1f b7 ed 68 06 58 50 b0 78 e1 a4 a8 8f b6 f7 fd 6f 95 
+1b 3d 97 7d 8a be b3 41 b3 d6 94 74 0a ef d0 10 30 00 bc dd e1 a1 72 f8 
+8d bb c3 a6 1e 2f 36 d1 29 28 23 b0 13 3e 75 70 b0 73 e9 8e be 7c bd e7 
+c8 56 7e 5d 04 61 81 a9 61 ba ee 9f 72 bb 04 08 a8 a5 28 a2 10 
 
 I (Initiator's private authentication key) (32 bytes)
-b6 15 a0 6d b8 b7 29 1d a9 49 3e ae e8 8d 16 16 2b c4 2e 4b 18 99 57 56 
-42 8f e6 e2 f9 a3 9b 28 
+b8 ac 7d e8 2b b7 6c d6 d0 a1 88 27 50 27 6e e7 41 63 4d a2 e9 15 66 ab 
+be c1 df 71 c8 64 07 ca 
 
 message_3 (CBOR Sequence) (20 bytes)
-13 52 63 7f 95 de 1d e2 af 56 46 c1 4e 04 5e 64 e4 0c 05 af 
+06 52 c3 2a d1 7e 4a 2b 72 db ae 6b f3 6a 5f 4a d4 84 5d e2 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-5c 72 fd da cd b3 01 95 43 3f 9f 2b 7d 06 89 6b 71 65 b0 08 d6 48 2d 21 
-17 8e 1a 52 d0 60 28 50 
+48 7f 53 9b 79 79 10 f2 94 34 83 bc 32 e2 4b a9 a8 40 d2 bd 84 e4 03 a4 
+52 8d d5 00 ba 9b 8f 1a 
 
 message_1 (CBOR Sequence) (37 bytes)
-01 00 58 20 24 07 32 5f 03 00 fa 72 09 a4 f4 4f 12 78 8d fd 89 6d a7 61 
-59 c4 77 5a a6 a7 0d 47 6d 55 73 49 28 
+01 00 58 20 19 d2 4e 5d 08 0e e0 e6 b5 0e 90 c9 ce 9b 9b 83 ec 6b d1 f7 
+fc b5 7c 22 98 ef 1d e0 77 40 c7 11 0a 
 
 Y (Responder's ephemeral private key) (32 bytes)
-0d 2e d3 2b 00 76 a0 d1 d3 0c a2 7b 80 6c 23 1f ac 67 70 cb b2 5c 78 2d 
-52 36 41 0b 16 2b 09 1e 
+4f de 54 4f 26 b1 3f da 89 1f 94 68 1d 19 19 02 2d 4a 01 d3 53 29 0f 7e 
+8d a1 98 68 84 72 86 84 
 
 SK_R (Responders's private authentication key) (32 bytes)
-a6 ba 06 fb 40 f5 7c 5e 05 1d da 03 18 20 65 eb 06 a1 42 76 40 9d 8a 27 
-cf 4e a1 a8 43 4f c3 0e 
+6d 0b e5 aa 0e b8 63 d9 c4 0a 51 a0 f8 15 84 54 3d 6c 4b d2 84 8c 48 0a 
+93 78 7e bf b3 a0 aa 88 
 
-message_2 (CBOR Sequence) (257 bytes)
-58 20 ed 3e f4 9f 6b 6c 62 5f b1 cd 6b f4 0f e6 08 05 c4 af 8d 70 54 43 
-a4 ff 9f 6c 29 af 2d 94 19 3a 13 58 dc d8 f6 97 c9 39 8c 6f 9e 08 f0 b3 
-b2 5a 8e 5b 9a cf 46 96 4e 00 44 70 e7 1a 97 ba 17 81 96 0a f3 d0 7e 1a 
-1d e6 b0 ab 5a ba 60 5b d4 15 1a a9 52 14 67 e5 23 62 ef f4 5a 59 6b ab 
-40 d2 2f f8 06 ce 23 2c 18 bc d7 d7 5d 52 90 14 71 da 61 d2 f5 53 e1 9b 
-bb 4d a5 28 dc 05 48 34 2b 32 c5 95 d2 a9 1d 09 74 89 db 31 13 14 f3 b7 
-3d 94 d7 c7 c9 f3 26 90 bf 41 06 1b 8a 4c 62 81 ae aa ac 8b 34 c1 7c c6 
-b1 d8 a9 b5 fb 38 a8 d6 e4 23 6b d7 98 b9 cb 6a 1b a5 67 44 22 6e 9d c8 
-31 bb ac 91 ac 19 20 74 42 5f 80 d9 57 5f 70 a1 fa 05 2f 04 df 22 3d c8 
-8f dd 0a 8e 80 75 8b dc 6f 57 c2 ef 48 6c 90 53 88 a9 3f d8 1a 43 ec f0 
-ea bb 97 15 b8 30 5c 57 39 79 c4 86 42 2b ac 5b 92 
+message_2 (CBOR Sequence) (137 bytes)
+58 20 03 81 79 a2 50 05 ab b5 ce 59 fe 43 0f 24 99 3c 83 a2 44 99 9a 30 
+b2 1a 47 e7 f0 d9 f1 4a 89 5b 02 58 64 99 4a 0f c2 3e 25 74 3b 5e 3c f7 
+6f 85 b4 97 c6 c4 98 5a 83 00 d0 81 49 1d 05 03 f5 fd 78 e8 bf 17 2e 7b 
+ef 5b 13 3d a2 06 bd a9 37 2d 89 bf 46 98 2f 1c d7 66 69 94 64 ad e9 73 
+e1 ae 5d 90 b4 4b b6 c5 68 ce 53 0f 76 ac f6 3a 61 09 2d 5c fe 42 46 63 
+98 4a 13 65 43 ee ff c6 e2 34 5e a5 85 f1 33 32 45 
 
 SK_I (Initiator's private authentication key) (32 bytes)
-ec 02 df 5d 4d 2f a9 4f ce ed eb 51 b1 c6 1b cf 47 16 33 b1 64 b4 bd 26 
-10 d4 2d a0 7f 2c 74 20 
+a9 07 d7 1b e8 a5 2d ca 05 0b 0a 4e 6b 45 54 c4 50 04 0d f5 e8 fd 27 da 
+d8 8c 9a 60 ed 9d b5 68 
 
 message_3 (CBOR Sequence) (111 bytes)
-13 58 6c c2 5e 59 1f 34 44 f7 76 cd 65 81 a2 c5 a0 60 3d 4c 05 d6 7c 30 
-04 74 16 91 74 7d 8a 8b c8 b9 98 19 8b 06 10 19 88 c3 52 c1 53 3b e4 86 
-fb a2 8c bb ea a8 88 0a f9 9a 4b fb 90 be f3 e6 d8 13 b5 1e 2b 07 33 c8 
-21 7f 03 b7 fa 76 cb e1 82 7a 1b d9 77 8b d4 21 ea fe 40 66 02 19 e2 c8 
-e5 c9 f2 0d 85 d0 bf d7 2c 97 42 e6 c3 fe da 
+02 58 6c 8b 23 21 c1 5d b5 b8 32 36 3e 2f 60 1e 3d c6 3e 2f 2e b8 11 00 
+c4 09 fd 0b 23 4b 7f f4 6d 5e be d2 85 e8 90 5d b2 15 66 7b ad 83 a1 e6 
+b7 25 e3 76 f4 17 44 32 ff 7c 17 d4 34 59 3d 6d b0 39 87 52 2e f4 bc e2 
+34 56 3f 21 1b 02 3c 20 4f 8c 58 d3 9d 7f 22 2b d6 98 46 f0 72 f0 99 43 
+7a c1 18 f7 00 63 e4 f7 a9 88 82 c0 e1 35 00 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-91 34 60 24 f1 bc e2 2d 04 0b 88 0c 9c 55 87 36 1b 1f 5b e7 d5 b6 e6 0b 
-37 7c 8d 0b bd 82 9d 01 
+cc c1 a8 8c 18 5f 3d 28 b2 04 af 31 14 53 c5 b8 4d c0 83 4d 9c c2 6e db 
+47 2a 0f 80 89 9b 4c db 
 
 message_1 (CBOR Sequence) (37 bytes)
-01 00 58 20 c9 bc 68 eb 4a c8 21 83 b8 3a 8b 35 25 dd f0 c7 e7 0e d2 c0 
-28 71 8b af ad 19 90 f7 8a db c6 51 24 
+01 00 58 20 4f b6 8f b8 91 02 1d 3f 56 fd 37 84 52 3b a3 ec 9c 4e ad 21 
+29 21 dd 29 e1 ee ff 40 e9 b5 4f 09 28 
 
 Y (Responder's ephemeral private key) (32 bytes)
-06 0c 9d d8 fe f4 04 8c 41 8a cc bd 1c 23 e3 e7 96 30 fc 54 23 ba 70 2b 
-e3 e3 6a 3a 31 c7 36 1d 
+8d b7 46 7b 40 79 a5 b1 de 2a 44 2a 0b 72 bd 88 3d 2c 93 dd 92 85 e5 d7 
+0d 3b bd 60 64 49 55 95 
 
 SK_R (Responders's private authentication key) (32 bytes)
-26 67 fa ad 03 a2 13 41 e5 5e f7 8e 54 55 86 c3 4c e0 c8 9a 37 17 80 95 
-18 3a 04 87 09 50 4b 57 
+ba 02 1e 60 8e 15 7c c2 33 06 4e a1 d7 9a 53 90 4e a4 22 9b 08 29 be 88 
+40 c2 6a 5c 77 42 be 21 
 
-message_2 (CBOR Sequence) (104 bytes)
-58 20 35 c5 46 e8 d8 51 4f d0 cc 90 b8 17 0b 8d b1 14 18 9f 0f 2b 38 da 
-9d e8 32 ca 22 df d5 d6 f1 5f 28 58 43 79 46 15 df 70 a2 bc b6 34 08 78 
-3e 8d 20 8f d7 7d ad 31 97 29 ac e7 c1 c6 85 06 27 97 33 d6 13 3a 7d 76 
-f5 d8 b1 05 a0 70 4a 01 24 25 8f 80 e8 f9 82 b6 7e ae b9 46 46 a6 6e 08 
-2b 89 3b b4 31 97 cb 1b 
+message_2 (CBOR Sequence) (231 bytes)
+58 20 89 c7 b4 ed ee e4 be 39 1d e5 42 f6 e7 0c 53 56 f1 53 40 9e b0 c7 
+e9 35 c8 e7 77 98 37 ca 63 36 0c 58 c2 34 29 3d d1 27 ac d9 ff 94 3a af 
+c4 36 a6 cd 2f a6 8d 40 18 50 f3 fe c0 60 c2 aa 61 d5 5c 46 d0 07 b0 0b 
+3f 5a 1a 8c 10 ab d4 9a bf d9 5f 56 ba ac b7 58 33 83 be aa f2 82 ed c4 
+17 13 bf a7 1e 73 b4 5e b6 ca 35 0f 3e 47 bc 7b 6a dd 41 76 01 52 16 f5 
+a4 a8 a2 ff 32 6d 22 e6 ca ad 31 89 92 3b a1 2e e8 ee 73 9a e7 f3 a5 e2 
+cf 80 ac 61 d5 5d bf 48 3e b9 26 c9 d9 cc 7f 14 8f 9e c3 31 9c 0a 80 0b 
+7d 09 22 ae b3 2c cb a2 38 71 03 a9 c8 b5 f4 55 4d eb e0 b3 24 4c 6f 3c 
+16 d1 06 e7 84 89 ce 48 7c 89 34 06 66 3d 7e 34 97 55 43 b1 60 2a 22 e2 
+44 83 e0 6b af 1a e7 f7 0a cb ed 8d 63 14 ea 
 
 SK_I (Initiator's private authentication key) (32 bytes)
-e7 0d 48 01 4c f9 76 dd bd cf b5 24 25 23 54 b0 82 48 6f 03 df 71 7b 8b 
-82 16 1f 25 66 9a 45 df 
+21 99 fb e7 9e f8 9c 09 6b 36 2d b1 9a 73 60 9e 7f fb 5e 25 ad 6c 5b 76 
+21 1c 6d 21 bc b5 9e d9 
 
-message_3 (CBOR Sequence) (230 bytes)
-28 58 e3 4f 82 50 fc 9e 99 df 05 58 07 36 d0 60 fa c8 4c 7e 1e 72 6a a1 
-92 d8 a2 2a 24 52 07 3c d3 f0 81 85 15 be 7d 90 a6 20 fc 32 dd a0 1b e2 
-f8 fa 5a cd 37 28 d0 f8 91 84 dc 65 d4 4d 5b 41 0f ca d0 16 7b 55 c3 f3 
-f3 0c b5 ea df 2a eb f0 90 bb 9d e9 b4 99 11 26 e0 7a b3 a4 87 95 31 5d 
-57 a3 fe 78 93 7b 88 42 c0 16 cb 80 d2 15 d9 22 b4 1a 66 f2 de 94 55 bb 
-13 1f 34 67 7d 80 41 0f 5d 9e c1 21 9c ad 4f b1 44 1c c6 eb ba 50 c9 e9 
-1b 91 3f 72 6c ea 98 d1 eb 8c db 21 b4 49 ca c8 f1 cf 81 32 77 7f 82 14 
-26 30 0f a2 7d ee c3 a7 87 c2 4a 7a 86 0f 28 70 8c 81 f7 bb 4b ca ff 26 
-5e f3 53 11 30 db 90 37 b4 55 47 06 dc c8 91 4b aa f6 27 fc 24 84 2f 92 
-9f f6 66 87 fb 4d d0 57 f3 2c 85 fc 2a df 
-
----------------------------------------------------------------
-Test Vectors for EHDOC
----------------------------------------------------------------
-
-X (Initiator's ephemeral private key) (32 bytes)
-ff 12 9a e8 97 af 04 08 0c 64 e4 c2 06 a6 32 f4 ec 5f 63 aa 66 75 f3 2e 
-ac 34 ed 77 92 78 65 a7 
-
-message_1 (CBOR Sequence) (37 bytes)
-11 00 58 20 b6 a8 39 0c de 43 ae fd 0b ed dd d9 f7 07 61 67 49 69 0f c5 
-ff c1 36 58 db 40 7b 02 ca fb a2 58 14 
-
-Y (Responder's ephemeral private key) (32 bytes)
-9a ab 66 9b 7f dc dd a7 c5 43 30 6e ca 6f b1 53 88 13 5e e4 11 e4 be 8f 
-54 0e 22 65 f4 cd 14 6b 
-
-R (Responder's private authentication key) (32 bytes)
-30 d1 82 45 f1 4c ce e9 ef 9e e4 ca b8 20 cf a0 97 70 78 f8 52 0d 65 f7 
-35 1b fe 75 f0 d5 53 c7 
-
-message_2 (CBOR Sequence) (182 bytes)
-58 20 fe fb 23 3c 8b df 58 cd 66 32 a8 c8 84 af 3d 27 78 db 50 b8 c2 ef 
-3e 94 de c0 0c dc 84 55 25 0f 36 58 91 a3 12 dd dc 2b a6 b1 d9 e4 40 68 
-9e ac 43 ab 67 0e a1 72 77 fb 3f 96 6b ef 39 7e ff 05 d0 d3 0e 7a 92 4a 
-f4 22 76 29 c1 38 c0 dd 7f 6b 71 62 3c bf 58 a9 c9 31 01 4e 10 6f db 6f 
-43 ab e6 50 e2 d7 20 d1 fb 7b af c5 9b de 4e 6c 92 c7 e5 1a 77 12 43 b5 
-a5 c8 1e af 5f 37 cb 60 ab 43 4f 3e 72 77 bd dc 7e b0 f9 ab e3 fc 14 1e 
-cb ee cf 2a 3c 0b 1b a9 2c c5 fa 6c 76 4d 52 53 91 56 40 a2 d2 dd 70 56 
-4a 63 fd 33 22 56 28 80 9d 69 b4 26 e5 d6 
-
-I (Initiator's private authentication key) (32 bytes)
-1e b1 2f c6 f3 9e 8d d9 5e 24 ed 9b a1 6b c3 80 35 bd 71 d3 31 89 34 b2 
-e1 8e c6 8e f9 76 4d ec 
-
-message_3 (CBOR Sequence) (54 bytes)
-36 58 33 9a fd 51 1f 44 f8 64 c3 4c a7 97 fd b2 a4 2c e1 ee b0 42 f1 4b 
-53 96 83 3f 27 47 3d 95 f5 12 32 12 b9 e9 00 05 6f e3 95 d5 13 96 fd 65 
-88 f5 3b 81 7d 88 
+message_3 (CBOR Sequence) (206 bytes)
+0c 58 cb 96 f1 99 e0 42 72 28 aa e4 68 c9 46 b7 5a 0e fd 26 d4 6d 95 d6 
+78 7b a6 02 ca 21 25 50 a9 15 40 6b c3 bb 6b 4c 96 f6 b2 08 84 fa e1 21 
+a3 37 cb 04 d4 3a 80 ab f3 e9 58 f2 0d 65 a6 e2 f9 7e b4 e5 35 1e 8f ac 
+59 67 25 3b a5 d3 4c 3b f1 68 90 a8 ed 9e ab ba 98 fb 4e f2 64 cc ca c5 
+27 58 3a 32 51 a6 45 ff 3b 70 76 32 c1 ca 2d f9 b2 ff 50 11 8c 11 5c d8 
+cf a1 80 6f 90 92 8a 18 d3 33 98 f0 c2 23 4d f8 6a 0d c8 5b 8b 56 19 00 
+49 8f bc 57 16 f9 64 1c 80 eb c8 ff 39 e5 e4 9c 7b 5a da d3 9c b0 35 26 
+26 84 ea 61 bc 85 b5 bb e4 2e c0 0e 77 47 db 67 c3 41 b1 7f f8 38 37 d6 
+b1 de ce 9b 5b ac f7 a5 ec 87 8e a6 52 71 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-2c f2 94 90 34 38 aa 8a ad 01 ab 8c f3 91 27 fc 6d 2e 11 04 71 0e 73 c6 
-62 47 f8 24 17 90 5b f1 
+ae 7f a4 d1 55 dc 4c d6 cd 42 6d d0 42 98 3a d3 46 d0 2b 7b a3 e5 eb 58 
+c6 2f 09 a9 fd ed 07 90 
 
 message_1 (CBOR Sequence) (37 bytes)
-11 00 58 20 2e 6a 1a 20 4d 45 33 cd bb 38 80 0f f8 2a 71 64 80 95 86 19 
-92 0f 44 b5 1d 64 05 24 16 f8 4b 49 40 
+0d 00 58 20 79 1a 12 2c 95 07 ea 84 6c c5 59 ae ce a7 b8 38 81 24 80 8d 
+b2 b3 23 b9 0e b9 e4 8a 05 e8 de 5b 29 
 
 Y (Responder's ephemeral private key) (32 bytes)
-2f b0 f0 e2 c1 2f bb b3 46 35 4f 5b d7 21 43 64 ba 40 93 70 c2 12 d2 6e 
-16 27 b6 cb a3 7c 48 07 
+89 75 20 27 5a cb d8 10 9f af 57 74 af 40 71 7d 79 e1 f8 8e 79 43 44 30 
+c1 6e 8a 7b cb 95 78 88 
 
 R (Responder's private authentication key) (32 bytes)
-68 74 53 27 69 32 67 37 fe f1 0f a1 1e d7 00 e1 27 c0 06 c1 12 c7 be 77 
-59 cb 3f 99 21 0b 32 a1 
+18 98 5e b4 86 39 61 e9 6d 7c 06 33 43 13 ff 16 c8 03 10 a5 e0 3c 48 68 
+19 c5 81 98 a7 e7 64 ee 
 
-message_2 (CBOR Sequence) (59 bytes)
-58 20 77 be c2 4a a2 ce b3 dd 6a c4 5e 58 1f 6c 7b 6d ab 73 49 49 65 8a 
-f6 d8 2c b1 82 dc f2 3a 7c 4e 20 57 85 36 d9 6b 3f fd ca 4a de 99 81 b6 
-23 97 61 23 b8 ec 72 10 8e 79 d6 
+message_2 (CBOR Sequence) (80 bytes)
+58 20 8e d7 36 ba 4b 5b 8b b9 e1 f0 7d bd e9 82 f5 3e 5a 22 cd 91 d6 09 
+b8 62 2c f8 8d fc b4 19 3b 66 16 58 2b 4c 90 95 dc fb 3c db 0b 27 1c 1d 
+81 62 99 a9 aa 62 cf 5e 92 43 84 c4 d2 1d 11 f2 a5 e8 23 70 21 d6 82 e7 
+e4 38 9c 73 1b ee 85 0e 
 
 I (Initiator's private authentication key) (32 bytes)
-1b 05 3d f6 7c 9c a0 0a 87 54 63 ea 7d f4 4f 11 8b ee 24 0a 3f 01 85 64 
-44 db e8 2e 92 e0 69 8f 
+d6 6b 6f b7 5a 0a 47 4f 7f 2a d6 41 93 5a 4d 8b 27 93 46 b0 0e 64 19 c3 
+96 ad 1b 7a 88 9a 7c e8 
 
-message_3 (CBOR Sequence) (138 bytes)
-20 58 87 90 65 76 c0 82 bb 59 79 2b e4 de 2a 09 48 e3 86 af aa 14 26 ff 
-4c 07 ac fb 72 4f d3 37 8e 89 12 b4 6e 15 18 f0 85 f1 b9 84 3e 95 d4 72 
-ee 6d c0 0c 91 d4 87 1a c6 7f bd 14 8c 48 5a a7 97 1d ae 44 a5 7c 65 ec 
-d5 12 34 05 6e 82 b4 88 41 5e ed fc 02 c9 12 0c d5 b1 74 b5 9d 89 ec 1f 
-a5 c2 89 16 af 9b ba 7f f7 84 9b 60 0f 37 6d b5 47 94 75 9c bd 58 5e 30 
-69 39 cf de 9d fa 5e 7c e2 79 4f a7 bd 37 20 89 c6 ae 
+message_3 (CBOR Sequence) (160 bytes)
+16 58 9d 9e 0f 31 d2 bb f5 ba b9 22 fa 32 8f ff 37 c1 21 78 c0 51 84 14 
+e8 6d 65 81 cd 8d d8 6c bb 88 a9 b6 d7 b7 55 dd 46 dc 46 93 e7 d5 26 22 
+9d 33 a8 98 f0 64 ed a1 a3 77 0a c9 84 88 3a cb ef 5e d2 68 1b ce d1 80 
+f6 25 f7 b9 6c 56 ea 27 f2 d1 dd 47 48 9b 9a c8 8b 17 cd 74 9f dc 30 e6 
+0c d8 5b ad a4 f4 01 36 83 76 03 4f 80 cd ef e2 a8 02 a0 f9 9c 50 dc bf 
+d4 96 22 32 d1 6f 68 89 46 a0 10 b2 71 24 61 66 cf ae 4b 78 e4 a7 ff 84 
+43 44 db 15 c0 4a aa e5 3f b1 37 18 40 f2 8e fb 
+
+---------------------------------------------------------------
+Test Vectors for EHDOC
+---------------------------------------------------------------
+
+X (Initiator's ephemeral private key) (32 bytes)
+12 fa cd 78 9d 07 ec 46 bb 9e ec 6d 9e a9 6e fe 21 7b e9 04 70 41 02 19 
+7e 78 47 6c 69 71 98 28 
+
+message_1 (CBOR Sequence) (37 bytes)
+0d 00 58 20 94 33 b2 ec de 74 57 41 79 0a 98 c3 69 6f 8f 3b bb fa 27 7e 
+a2 be 00 02 11 25 30 1d ec 3e b9 24 2e 
+
+Y (Responder's ephemeral private key) (32 bytes)
+2e aa f0 d1 84 2d 6b 50 c7 07 ef 46 82 92 25 93 0d ca f2 f1 28 0c ac e4 
+95 3e 18 26 f7 bd 31 13 
+
+R (Responder's private authentication key) (32 bytes)
+e3 c6 e4 1b 49 7a 75 b6 b1 8a ff f9 35 4e 48 71 79 98 32 b5 f6 cb 9b 97 
+07 1c 8d ea c3 2c 26 71 
+
+message_2 (CBOR Sequence) (174 bytes)
+58 20 d3 15 3c ef 2a ab 82 a0 38 a5 8f 73 9e cf 0c 1c 41 03 fa 69 d8 38 
+7f a7 ac 7b 6f 76 18 f1 ae 04 34 58 89 d0 c8 4c 9d 37 a8 6f 4b d3 76 5c 
+39 30 21 3e 08 3d 33 63 68 da d3 33 3b 00 dc 61 fa 8c 5f ba ab 38 52 35 
+13 b2 15 08 34 c0 64 e6 eb ca cc d1 c3 fd ff 99 16 d1 39 b5 52 f0 43 cf 
+5c 0c 31 96 d8 a0 8a d3 fb d1 89 99 4e f4 3c a5 bc f0 5d fb aa f5 88 aa 
+29 08 11 a4 ec 46 ed 88 4c ac 17 96 5a 78 fd 96 e7 cd ab 01 2d 62 c6 c4 
+c6 6c 9d de 8d f9 91 aa ee 21 f8 b6 d9 91 ab f4 ad 6a fa 0b 0b c7 65 85 
+0a 1b 7c 91 cf 67 
+
+I (Initiator's private authentication key) (32 bytes)
+26 a8 39 4f 9f a6 8b 69 d1 58 ca e9 fa 3c 8f 72 50 87 bd fb f6 62 a5 3d 
+eb 21 b7 65 1f 54 cb 99 
+
+message_3 (CBOR Sequence) (34 bytes)
+34 58 1f ba bc b5 0f 77 03 8f b4 1b 23 06 68 9c 38 f9 a3 7f 1d e4 92 08 
+ba 83 ac de ee 19 7d 84 bc 41 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
@@ -871,160 +1088,187 @@ Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
+d9 1c fd cf b6 84 89 a8 6a 5a de 31 80 c8 05 f8 71 96 d1 41 fe f4 7e e3 
+23 69 46 38 57 36 10 63 
+
+message_1 (CBOR Sequence) (41 bytes)
+0d 84 01 00 01 02 58 20 59 17 da 1d dd 3d eb e0 17 75 98 93 71 2d 2d e3 
+95 4a 18 87 85 48 23 6c d8 8a 89 f2 7e c3 54 0e 24 
+
+Y (Responder's ephemeral private key) (32 bytes)
+b6 7b 70 f8 f8 83 63 5b 18 39 01 06 ef 66 f3 2f 55 a5 2c 3a 0b 32 2b 5c 
+dc 3a 35 51 74 07 1b ad 
+
+R (Responder's private authentication key) (32 bytes)
+89 84 ba 4d b1 45 d1 60 91 30 a0 0f 9d 48 82 e0 b8 95 f3 d1 aa 04 0f bd 
+d3 82 6f 0e 66 10 66 7a 
+
+message_2 (CBOR Sequence) (54 bytes)
+58 20 e1 03 75 31 c9 bd 9d 6b 8d b3 49 01 33 b1 dc 8c 42 94 79 c7 02 ef 
+be 84 6b 1e 01 98 c8 ad 34 07 2f 52 68 c9 d0 b8 32 ec 2d 63 0b 18 49 88 
+ba d8 83 eb 65 a1 
+
+I (Initiator's private authentication key) (32 bytes)
+9b 15 2c 2e b2 a6 aa 3d 41 2d cd 44 c4 c9 90 91 20 37 36 e7 ba 4c 48 f7 
+67 1c 98 56 a0 22 bd 5b 
+
+message_3 (CBOR Sequence) (37 bytes)
+2f 58 22 ea 3d 22 66 f8 74 36 03 34 5e 1e ed ca ae f2 24 73 b2 3f 99 03 
+56 b1 38 71 e3 b1 62 ea c7 5f 3b ee ba 
+
+---------------------------------------------------------------
+Test Vectors for EHDOC
+---------------------------------------------------------------
+
+X (Initiator's ephemeral private key) (32 bytes)
 0d 3b f2 b8 c5 32 48 54 87 94 59 83 1c 0e 40 17 9d 35 6f 2d 59 b2 f2 6c 
 fa 34 d9 7f 60 a9 33 26 
 
-message_1 (CBOR Sequence) (41 bytes)
+ID_PSK (4 bytes)
+a1 04 41 0a 
+
+message_1 (CBOR Sequence) (42 bytes)
 11 84 01 00 01 02 58 20 ca 65 7c 23 2a 50 9f 2e da 33 d7 a3 14 1c 5a 6f 
-99 f1 26 ae 7f a8 03 1e aa d9 de 07 a4 91 32 23 2b 
+99 f1 26 ae 7f a8 03 1e aa d9 de 07 a4 91 32 23 2b 2d 
 
 Y (Responder's ephemeral private key) (32 bytes)
 65 34 0e 2e eb f4 ac fd 35 9c 41 53 57 88 6e 68 9c 68 97 38 61 e9 39 46 
 ef 9f 44 3d 59 dd 37 41 
 
-R (Responder's private authentication key) (32 bytes)
-28 7b a6 4b f1 36 bb 1b 14 71 ff 0d 03 c6 3c 3d e6 78 31 52 1d 5e 57 cb 
-0f 49 ee c7 eb 8b aa d1 
-
-message_2 (CBOR Sequence) (54 bytes)
+message_2 (CBOR Sequence) (52 bytes)
 58 20 cd c3 0c 0e 20 b3 1c f7 6c 7d fb 6d 57 97 3a fa 53 2d 39 66 5c 69 
-b3 e9 00 4e 70 d2 99 2a 41 12 0e 52 c2 7b 7f b9 65 23 40 3f 41 30 d6 e4 
-11 72 8d b7 3d 3f 
+b3 e9 00 4e 70 d2 99 2a 41 12 0e 50 95 2f 9f 60 ec d7 4b 1d 44 f5 17 27 
+f6 70 73 d3 
 
-I (Initiator's private authentication key) (32 bytes)
-04 ba 9a f5 e4 87 c1 77 9e 36 ac ed db 73 c1 80 b1 33 75 ea 8b 2b 07 5e 
-6b 2e 8e d1 d4 0a 73 fc 
-
-message_3 (CBOR Sequence) (37 bytes)
-0e 58 22 76 00 c1 a7 2e a4 bf b2 ac be 3a 55 a0 f3 71 f9 b0 45 6c a5 38 
-8a 72 15 04 30 22 4c 0d 54 7a c4 26 b1 
+message_3 (CBOR Sequence) (18 bytes)
+0e 50 38 10 2d 86 60 74 f4 97 73 cd f3 29 46 89 71 c7 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-d3 51 47 b6 14 e8 33 d0 c7 7a 89 da 57 dd cc 4b 68 26 b7 ee 6b e1 f9 51 
-ff 65 17 b0 1e a6 c6 0c 
+53 b7 56 04 d1 02 9e 08 a5 c1 02 18 39 4d c7 54 81 0a 5e 9d a6 1c c0 fc 
+b2 d3 70 02 a0 97 76 8c 
 
 message_1 (CBOR Sequence) (37 bytes)
-10 00 58 20 38 44 5c d4 ec 63 c5 0a 5b 51 ed 43 ac 35 cb 69 5e 5f fd f1 
-16 fe c2 f7 88 d3 39 ab 06 d2 41 08 40 
+0c 00 58 20 58 a4 34 14 d6 6a ea b7 1e ed de 0a 0b 8a c9 dd 43 30 02 f1 
+1d d9 0d e4 c7 73 8e 52 94 2a 2b 69 20 
 
 Y (Responder's ephemeral private key) (32 bytes)
-03 a7 70 9c 3c b6 ec e4 3e b0 a6 20 54 91 d6 42 56 d7 ea 1a ac b4 11 90 
-bf 91 0d fa ae 49 35 d3 
+5d 89 6c a5 85 29 4d 92 f3 fa 7b ac 52 3c 31 43 60 c8 9f f1 be d5 db b9 
+e5 fd 97 f5 cc 24 85 ed 
 
 R (Responder's private authentication key) (32 bytes)
-3e 73 dd 32 0a 6c 1f c6 e9 fc b5 55 d7 da c1 c5 d8 60 5d 0e 49 8d ef 68 
-3d 11 fc 2e 87 c6 07 4f 
+1a 7a d3 c7 89 f0 8a 70 56 5b 3e 30 cb 69 8e 6f c6 6d 33 82 2a 4f df d5 
+3c 4d b1 3a 82 09 bc 7c 
 
 message_2 (CBOR Sequence) (47 bytes)
-40 58 20 fa 1f d8 8a a9 97 2f f6 63 86 89 b6 b3 74 d0 48 e4 7c d0 06 64 
-06 a0 c4 d0 0c 9b 11 3f cb 5c 0e 2c 4a 14 41 0a 0e 0e 71 ea 83 02 6c 
+20 58 20 eb 41 34 70 57 bb 35 6d a0 62 59 7d 1f 89 e6 b7 8f 75 ee ba dd 
+96 c8 22 88 f2 a0 6e 16 69 d3 30 0b 4a 54 fe 4c 74 f1 15 a7 c4 fa 9a 
 
 I (Initiator's private authentication key) (32 bytes)
-98 2e 60 c7 c5 eb 90 82 23 c0 96 d8 d0 ab c4 2e 06 92 09 c6 80 a4 1f 7a 
-d5 f9 5d 66 f3 4e 0f 90 
+c4 e9 f9 b4 3f e5 f4 1e 07 1c 3b e7 92 c4 fd f9 12 d7 75 03 db 3f 8b 18 
+37 16 8e eb c5 87 b5 8b 
 
 message_3 (CBOR Sequence) (20 bytes)
-2c 52 58 3d b2 40 80 2f 16 a8 75 91 30 9f fb fb 7d 1e 1c 4f 
+0b 52 4f f4 5b c7 ca ee 05 ed 58 b3 80 22 0b 17 f0 61 7b 1a 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-90 21 28 01 0a 13 55 58 94 ff ee 87 4d b4 93 72 b1 5b 1c 64 0d 55 9d 13 
-59 90 0a ba 1b 49 d0 56 
+b0 26 b1 68 42 9b 21 3d 6b 42 1d f6 ab d0 64 1c d6 6d ca 2e e7 fd 59 77 
+10 4b b2 38 18 2e 5e a6 
 
 message_1 (CBOR Sequence) (37 bytes)
-12 00 58 20 8f 65 bf 92 08 0f 10 9e a9 da 04 b3 af 45 ae ed b3 1c 64 00 
-e0 ed 72 b7 e8 d6 d6 60 9e e7 02 2d 26 
+0e 00 58 20 e3 1e c1 5e e8 03 94 27 df c4 72 7e f1 7e 2e 0e 69 c5 44 37 
+f3 c5 82 80 19 ef 0a 63 88 c1 25 52 07 
 
 Y (Responder's ephemeral private key) (32 bytes)
-9d e1 1a ce 75 ee 5f 1c e8 e0 c2 65 34 c8 8c b9 c4 7f b6 2e 48 64 5c 9f 
-96 69 10 7d 69 ca dd 8d 
+db 06 84 a8 12 54 66 41 3e 59 8d c2 67 73 7f 5f ef 0c 5a a2 29 fa a1 55 
+43 9f 60 08 5f d2 53 6d 
 
 R (Responder's private authentication key) (32 bytes)
-3d 48 c2 ea d2 20 77 14 11 40 57 db c1 cc 65 45 65 54 66 6e 85 ce b1 9e 
-66 0f 49 88 0c 9f c7 41 
+89 9c 9e 06 ad 04 41 20 92 2b b2 ca 43 8e 9e 8c d5 d2 b6 5f 62 02 9d 32 
+e0 d9 3f 83 f6 ff 9d b4 
 
 message_2 (CBOR Sequence) (47 bytes)
-26 58 20 a4 b5 2e f1 e0 5a 74 f3 46 b1 da ec 3a 3c cc 64 98 1e a4 05 65 
-3a 7e f2 1b 8d 88 e3 7b 92 cf 6e 25 4a 22 94 29 bf f6 9b 81 c7 19 29 
+07 58 20 e1 73 90 96 c5 c9 58 2c 12 98 91 81 66 d6 95 48 c7 8f 74 97 b2 
+58 c0 85 6a a2 01 98 93 a3 94 25 05 4a ba d4 ee 71 80 d0 1a 9e 08 46 
 
 I (Initiator's private authentication key) (32 bytes)
-c7 6b a8 3e 5f b8 87 95 e6 39 84 4d 27 24 ba aa cb 8a 5a f7 91 f2 d2 4a 
-08 3b f2 ef 0a bd d2 cc 
+07 7a da 56 e9 5b 22 d5 a0 43 e9 79 e8 68 02 16 93 69 fb df 67 22 66 2c 
+1e 36 80 fc df 05 ba c7 
 
 message_3 (CBOR Sequence) (19 bytes)
-52 c9 45 14 71 42 df 65 2e 96 a7 78 f0 e8 02 82 52 b6 c8 
+52 98 2f a3 2c 51 03 4d fb 47 d4 27 75 d8 c0 54 6e 7b 6e 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-90 6d 6c f8 50 6c c8 bc 07 9c a6 51 fa 84 8e 24 30 dd e7 f3 60 bc 96 e4 
-92 d3 f0 6f 85 29 5c 75 
+21 ed a8 20 2c c1 cb 6f e6 7f 27 f5 ba e0 b9 c3 5c 36 d1 d0 f1 09 82 f0 
+97 12 d1 97 83 66 2c 2e 
 
 message_1 (CBOR Sequence) (37 bytes)
-13 00 58 20 88 80 06 a0 f8 ba a3 4f 5b 28 ff ae 3f c8 e0 af b4 10 be 73 
-21 60 91 ab f6 3d cc 7f 9b 31 d9 0f 00 
+0f 00 58 20 d6 9d 8e e8 d4 47 05 e9 7e 55 fd c7 42 5b f0 f7 d5 55 9d 5f 
+19 c0 f3 4d dd e2 91 f6 69 82 f4 69 15 
 
 Y (Responder's ephemeral private key) (32 bytes)
-57 6b 0c c9 21 fc ef 83 67 72 3e 6c f3 ca 57 39 1c ec 0e 71 a8 e4 94 82 
-d3 c8 24 5d b8 9d ef 5d 
+77 b6 04 26 03 6b d2 7a 8d fc fd dd 42 8b d0 1e 07 39 b2 ea bb 22 42 00 
+39 eb 4a 54 57 91 b4 92 
 
 R (Responder's private authentication key) (32 bytes)
-af ce 06 82 54 2c c8 28 1c b9 1a 82 7e b5 5a ba 06 cd d0 9c dd e5 aa ee 
-52 d4 73 51 e2 93 e0 1c 
+91 b6 7e 19 dd 89 1a 74 8c fe 61 1d 1d 21 66 e1 03 d0 f9 47 31 42 e3 30 
+4a 99 a1 5a be 53 f6 8e 
 
 message_2 (CBOR Sequence) (46 bytes)
-58 20 92 dd 30 54 80 89 7e 30 08 00 d9 05 df ab c1 67 b1 0c 3d 26 2d ab 
-4d 92 1f b4 b5 a4 d5 7f 87 63 27 4a 1a 50 6f c8 11 a0 d0 1a 41 84 
+58 20 62 b4 3a a9 38 5b d8 7e ed dd 80 97 e9 55 80 39 ef 9d 84 74 42 d5 
+a8 f7 24 22 5b 08 ff 81 a7 41 35 4a 91 e1 6c a1 3b 0c aa 45 db 70 
 
 I (Initiator's private authentication key) (32 bytes)
-01 d6 4f 6e e3 70 3c 2a 54 b2 16 b5 93 25 24 44 bc 05 5b 47 50 7f 6b 28 
-bc b7 99 1a 22 02 bf 6c 
+92 0f 11 a3 87 d7 3b 21 84 6a 6f c7 b3 fc 30 d2 55 d8 41 ac bf ce 63 c9 
+8e ea ca 10 22 04 b6 60 
 
 message_3 (CBOR Sequence) (19 bytes)
-52 40 f1 cd 08 c2 56 72 70 2e ba 63 fe 41 db 88 31 14 7a 
+52 35 1e 72 b3 45 9a fc 57 c2 19 ac 85 91 9c 68 f4 4d 3f 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
 ---------------------------------------------------------------
 
 X (Initiator's ephemeral private key) (32 bytes)
-65 7d 38 79 5e 23 5e e8 20 57 c7 61 ee 8f 08 cc de 3b 9c 1f b5 ed 93 f3 
-ef 91 56 dc 6e a0 0c 13 
+ae 11 a0 db 86 3c 02 27 e5 39 92 fe b8 f5 92 4c 50 d0 a7 ba 6e ea b4 ad 
+1f f2 45 72 f4 f5 7c fa 
 
-message_1 (CBOR Sequence) (50 bytes)
-11 00 58 20 36 62 c4 a7 1d 62 4e 8a 4d 9d ff 87 9a bc 6e 2a 0e 74 5f 82 
-f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 4c 9a e2 26 f3 f1 37 52 2d 47 6c 
-53 8a 
+message_1 (CBOR Sequence) (52 bytes)
+0d 00 58 20 8d 3e f5 6d 1b 75 0a 43 51 d6 8a c2 50 a0 e8 83 79 0e fc 80 
+a5 38 a4 44 ee 9e 2b 57 e2 44 1a 7c 0c 4e b9 08 2d 78 98 a2 f5 9b ff 3e 
+ed 8d d4 fa 
 
 Y (Responder's ephemeral private key) (32 bytes)
-ac 18 6d 8f aa 91 3b 7c 2b 33 4d 49 95 1a 30 0f ef 24 3e 16 5b d8 12 f4 
-98 40 e7 9c b7 f7 5c 47 
+c6 46 cd dc 58 12 6e 18 10 5f 01 ce 35 05 6e 5e bc 35 f4 d4 cc 51 07 49 
+a3 a5 e0 69 c1 16 16 9a 
 
 R (Responder's private authentication key) (32 bytes)
-cd e5 30 e6 0b c3 9f 9f 52 e0 d3 ec 72 a9 05 ba 58 4a e3 36 cb 48 5b 8b 
-fc 28 d7 29 68 16 79 8c 
+bb 50 1a ac 67 b9 a9 5f 97 e0 ed ed 6b 82 a6 62 93 4f bb fc 7a d1 b7 4c 
+1f ca d6 6a 07 94 22 d0 
 
 message_2 (CBOR Sequence) (65 bytes)
-58 20 a3 96 7f 6c f9 9b 6d dc 7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 
-51 59 71 ec 6c 84 25 53 b7 76 23 58 1c 72 36 32 21 b5 7f 67 c5 dd f2 53 
-53 91 1f 1a d9 b4 b8 fb 56 de d2 5e 1e 3d f0 9d 48 
+58 20 52 fb a0 bd c8 d9 53 dd 86 ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db 
+fc 33 01 04 70 69 45 1b af 35 30 58 1c 17 90 50 6e 6f 60 04 c5 ac ec 45 
+d4 42 86 b7 9c 86 5d 63 f5 b4 ee 87 2d 8c 7d 71 ab 
 
 I (Initiator's private authentication key) (32 bytes)
-1d a3 77 05 ee 3b ac 31 68 2e c4 93 6c 46 25 c5 c8 fa b5 d4 df c4 e5 8b 
-66 fd 3d 32 87 03 41 a1 
+2b be a6 55 c2 33 71 c3 29 cf bd 3b 1f 02 c6 c0 62 03 38 37 b8 b5 90 99 
+a4 43 6f 66 60 81 b0 8e 
 
-message_3 (CBOR Sequence) (37 bytes)
-23 58 22 6b c6 1e aa f6 32 c4 e0 80 77 e2 7d 52 7d 14 eb d7 6b f2 63 9f 
-77 c5 92 a6 65 00 d7 18 8b 70 1d 20 e8 
+message_3 (CBOR Sequence) (35 bytes)
+30 58 20 52 68 a0 c6 90 a3 5a 33 32 6d 61 a9 2a 1a c7 b2 8f 05 68 55 4a 
+35 37 30 f3 67 08 cd 0b ff a6 bf 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
@@ -1033,29 +1277,90 @@ Test Vectors for EHDOC
 X (Initiator's ephemeral private key) (32 bytes)
 65 7d 38 79 5e 23 5e e8 20 57 c7 61 ee 8f 08 cc de 3b 9c 1f b5 ed 93 f3 
 ef 91 56 dc 6e a0 0c 13 
+
+ID_PSK (4 bytes)
+a1 04 41 26 
+
+message_1 (CBOR Sequence) (51 bytes)
+11 00 58 20 36 62 c4 a7 1d 62 4e 8a 4d 9d ff 87 9a bc 6e 2a 0e 74 5f 82 
+f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 4c 9a e2 26 f3 f1 37 52 2d 47 6c 
+53 8a 0e 
+
+Y (Responder's ephemeral private key) (32 bytes)
+ac 18 6d 8f aa 91 3b 7c 2b 33 4d 49 95 1a 30 0f ef 24 3e 16 5b d8 12 f4 
+98 40 e7 9c b7 f7 5c 47 
+
+message_2 (CBOR Sequence) (63 bytes)
+58 20 a3 96 7f 6c f9 9b 6d dc 7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 
+51 59 71 ec 6c 84 25 53 b7 76 23 58 1a df e7 90 b8 08 ee f2 63 6c 09 21 
+a4 ac 0a 5f 89 ea fe 67 7d 83 d5 15 4a 0a 5a 
+
+message_3 (CBOR Sequence) (27 bytes)
+23 58 18 ff a8 c3 97 1d 72 95 55 4c d1 74 99 86 1d 73 4e a2 d9 83 e4 ed 
+d0 14 80 
+
+---------------------------------------------------------------
+Test Vectors for EHDOC
+---------------------------------------------------------------
+
+X (Initiator's ephemeral private key) (32 bytes)
+ae 11 a0 db 86 3c 02 27 e5 39 92 fe b8 f5 92 4c 50 d0 a7 ba 6e ea b4 ad 
+1f f2 45 72 f4 f5 7c fa 
 
 message_1 (CBOR Sequence) (37 bytes)
-11 00 58 20 36 62 c4 a7 1d 62 4e 8a 4d 9d ff 87 9a bc 6e 2a 0e 74 5f 82 
-f4 97 f7 af be bf f3 b0 1a 8f ab 57 30 
+0d 00 58 20 8d 3e f5 6d 1b 75 0a 43 51 d6 8a c2 50 a0 e8 83 79 0e fc 80 
+a5 38 a4 44 ee 9e 2b 57 e2 44 1a 7c 0c 
 
 Y (Responder's ephemeral private key) (32 bytes)
-ac 18 6d 8f aa 91 3b 7c 2b 33 4d 49 95 1a 30 0f ef 24 3e 16 5b d8 12 f4 
-98 40 e7 9c b7 f7 5c 47 
+c6 46 cd dc 58 12 6e 18 10 5f 01 ce 35 05 6e 5e bc 35 f4 d4 cc 51 07 49 
+a3 a5 e0 69 c1 16 16 9a 
 
 R (Responder's private authentication key) (32 bytes)
-cd e5 30 e6 0b c3 9f 9f 52 e0 d3 ec 72 a9 05 ba 58 4a e3 36 cb 48 5b 8b 
-fc 28 d7 29 68 16 79 8c 
+bb 50 1a ac 67 b9 a9 5f 97 e0 ed ed 6b 82 a6 62 93 4f bb fc 7a d1 b7 4c 
+1f ca d6 6a 07 94 22 d0 
 
 message_2 (CBOR Sequence) (46 bytes)
-58 20 a3 96 7f 6c f9 9b 6d dc 7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 
-51 59 71 ec 6c 84 25 53 b7 76 23 4a 6b db 74 6b 2e 76 d8 9d 9d 6a 
+58 20 52 fb a0 bd c8 d9 53 dd 86 ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db 
+fc 33 01 04 70 69 45 1b af 35 30 4a 39 01 42 22 30 1d 61 54 0d 49 
 
 I (Initiator's private authentication key) (32 bytes)
-1d a3 77 05 ee 3b ac 31 68 2e c4 93 6c 46 25 c5 c8 fa b5 d4 df c4 e5 8b 
-66 fd 3d 32 87 03 41 a1 
+2b be a6 55 c2 33 71 c3 29 cf bd 3b 1f 02 c6 c0 62 03 38 37 b8 b5 90 99 
+a4 43 6f 66 60 81 b0 8e 
 
 message_3 (CBOR Sequence) (20 bytes)
-23 52 8f 70 83 bb d9 15 6b 3e 5d 4a ba 23 6b 7e 8c e3 7d 71 
+30 52 50 d9 40 cb 6c e2 a1 e3 6b 97 c1 8e 57 10 32 93 f8 78 
+
+---------------------------------------------------------------
+Test Vectors for EHDOC
+---------------------------------------------------------------
+
+X (Initiator's ephemeral private key) (32 bytes)
+ae 11 a0 db 86 3c 02 27 e5 39 92 fe b8 f5 92 4c 50 d0 a7 ba 6e ea b4 ad 
+1f f2 45 72 f4 f5 7c fa 
+
+message_1 (CBOR Sequence) (39 bytes)
+0d 00 58 20 8d 3e f5 6d 1b 75 0a 43 51 d6 8a c2 50 a0 e8 83 79 0e fc 80 
+a5 38 a4 44 ee 9e 2b 57 e2 44 1a 7c 42 2d 78 
+
+Y (Responder's ephemeral private key) (32 bytes)
+c6 46 cd dc 58 12 6e 18 10 5f 01 ce 35 05 6e 5e bc 35 f4 d4 cc 51 07 49 
+a3 a5 e0 69 c1 16 16 9a 
+
+R (Responder's private authentication key) (32 bytes)
+bb 50 1a ac 67 b9 a9 5f 97 e0 ed ed 6b 82 a6 62 93 4f bb fc 7a d1 b7 4c 
+1f ca d6 6a 07 94 22 d0 
+
+message_2 (CBOR Sequence) (50 bytes)
+58 20 52 fb a0 bd c8 d9 53 dd 86 ce 1a b2 fd 7c 05 a4 65 8c 7c 30 af db 
+fc 33 01 04 70 69 45 1b af 35 42 a2 f5 4c ee fb 9b 66 1f 8c 2e 48 d5 59 
+8e b6 
+
+I (Initiator's private authentication key) (32 bytes)
+2b be a6 55 c2 33 71 c3 29 cf bd 3b 1f 02 c6 c0 62 03 38 37 b8 b5 90 99 
+a4 43 6f 66 60 81 b0 8e 
+
+message_3 (CBOR Sequence) (24 bytes)
+42 a2 f5 54 4c 46 f1 f1 06 57 43 b0 3d 89 18 08 b0 81 38 92 fe 07 e3 0f 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
@@ -1065,27 +1370,20 @@ X (Initiator's ephemeral private key) (32 bytes)
 65 7d 38 79 5e 23 5e e8 20 57 c7 61 ee 8f 08 cc de 3b 9c 1f b5 ed 93 f3 
 ef 91 56 dc 6e a0 0c 13 
 
-message_1 (CBOR Sequence) (39 bytes)
+ID_PSK (6 bytes)
+a1 04 43 8d b4 68 
+
+message_1 (CBOR Sequence) (43 bytes)
 11 00 58 20 36 62 c4 a7 1d 62 4e 8a 4d 9d ff 87 9a bc 6e 2a 0e 74 5f 82 
-f4 97 f7 af be bf f3 b0 1a 8f ab 57 42 f3 f1 
+f4 97 f7 af be bf f3 b0 1a 8f ab 57 42 f3 f1 43 8d b4 68 
 
 Y (Responder's ephemeral private key) (32 bytes)
 ac 18 6d 8f aa 91 3b 7c 2b 33 4d 49 95 1a 30 0f ef 24 3e 16 5b d8 12 f4 
 98 40 e7 9c b7 f7 5c 47 
 
-R (Responder's private authentication key) (32 bytes)
-cd e5 30 e6 0b c3 9f 9f 52 e0 d3 ec 72 a9 05 ba 58 4a e3 36 cb 48 5b 8b 
-fc 28 d7 29 68 16 79 8c 
-
-message_2 (CBOR Sequence) (51 bytes)
+message_2 (CBOR Sequence) (47 bytes)
 58 20 a3 96 7f 6c f9 9b 6d dc 7e 7c 21 9d 0d 11 9a 38 3f 75 40 01 df 33 
-51 59 71 ec 6c 84 25 53 b7 76 43 52 2d 47 4c 63 c5 e8 a9 e5 1a fc 28 ac 
-da a5 9d 
+51 59 71 ec 6c 84 25 53 b7 76 43 52 2d 47 48 41 e7 99 31 72 ec 2c 2b 
 
-I (Initiator's private authentication key) (32 bytes)
-1d a3 77 05 ee 3b ac 31 68 2e c4 93 6c 46 25 c5 c8 fa b5 d4 df c4 e5 8b 
-66 fd 3d 32 87 03 41 a1 
-
-message_3 (CBOR Sequence) (26 bytes)
-43 52 2d 47 55 dc ad 8b f1 6a 1d 4e 81 0b 43 c3 7e c5 7a 5c 68 ed 42 7e 
-5c 34 
+message_3 (CBOR Sequence) (13 bytes)
+43 52 2d 47 48 2f 78 ec 8a ab b3 4e 4b 

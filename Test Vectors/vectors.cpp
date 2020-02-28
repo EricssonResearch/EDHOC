@@ -188,8 +188,12 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
                    COSEHeader attr_I, COSEHeader attr_R,
                    bool auxdata, bool subjectname, bool long_id, bool full_output ) {
 
+    // TODO method will likely be replaced by key types in a future version
+    int method = 2 * type_I + type_R;
+    if ( type_I == psk || type_R == psk )
+        method = 4;
+
     // METHOD_CORR and seed random number generation
-    int method = 3 * type_I + type_R; // method will likely be replaced by key types in a future version
     int METHOD_CORR = 4 * method + corr;
     srand( 100 * ( 25 * METHOD_CORR + 5 * attr_I + attr_R ) + selected_suite );
 
@@ -355,6 +359,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
 
     auto [ ID_CRED_I, CRED_I ] = gen_CRED( type_I, attr_I, PK_I, G_I, NAME_I, "https://example.edu/2716057" );
     auto [ ID_CRED_R, CRED_R ] = gen_CRED( type_R, attr_R, PK_R, G_R, NAME_R, "https://example.edu/3370318" );
+    vec ID_PSK = ID_CRED_I; // works for test vectors
 
     // Calculate C_I != C_R
     vec C_I, C_R;
@@ -372,6 +377,8 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     }
  
     vec message_1 = cbor( METHOD_CORR ) + compress_suites( SUITES_I ) + cbor( G_X ) + cbor_id( C_I ) + cbor_AD( AD_1 );
+    if ( type_I == psk || type_R == psk )
+        message_1 = message_1 + compress_id_cred( ID_PSK );
 
     // message_2 ////////////////////////////////////////////////////////////////////////////
 
@@ -393,16 +400,23 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     vec MAC_2 = AEAD( K_2m, IV_2m, P_2m, A_2m );
 
     // Calculate Signature_or_MAC_2
-    vec M_2, signature_or_MAC_2 = MAC_2;
-    if ( type_R == sig ) {
-        M_2 = M( protected_2, external_aad_2, cbor( MAC_2 ) );
+    vec M_2 = M( protected_2, external_aad_2, cbor( MAC_2 ) );
+    vec signature_or_MAC_2 = MAC_2;
+    if ( type_R == sig )
         signature_or_MAC_2 = sign( SK_R, M_2 );
-    }
 
     // Calculate CIPHERTEXT_2
     vec P_2e = compress_id_cred( ID_CRED_R ) + cbor( signature_or_MAC_2 ) + cbor_AD( AD_2 );
     auto [ info_K_2e, K_2e ] = KDF( PRK_2e, TH_2, "K_2e", P_2e.size() );
+
+    vec P_2ae = cbor_AD( AD_2 );
+    vec A_2ae = A( cbor( vec{} ), cbor( TH_2 ) );
+    auto [ info_K_2ae,   K_2ae ] = KDF( PRK_2e, TH_2,  "K_2ae", 16 );
+    auto [ info_IV_2ae, IV_2ae ] = KDF( PRK_2e, TH_2, "IV_2ae", 13 );
+
     vec CIPHERTEXT_2 = xor_encryption( K_2e, P_2e );
+    if ( type_R == psk )
+        CIPHERTEXT_2 = AEAD( K_2ae, IV_2ae, P_2ae, A_2ae );
 
     // Calculate message_2
     vec message_2 = data_2 + cbor( CIPHERTEXT_2 );
@@ -427,14 +441,16 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     vec MAC_3 = AEAD( K_3m, IV_3m, P_3m, A_3m );
 
     // Calculate Signature_or_MAC_3
-    vec M_3, signature_or_MAC_3 = MAC_3;
-    if ( type_I == sig ) {
-        M_3 = M( protected_3, external_aad_3, cbor( MAC_3 ) );
+    vec M_3 = M( protected_3, external_aad_3, cbor( MAC_3 ) );
+    vec signature_or_MAC_3 = MAC_3;
+    if ( type_I == sig )
         signature_or_MAC_3 = sign( SK_I, M_3 );
-    }
 
     // Calculate CIPHERTEXT_3
-    vec P_3ae = compress_id_cred( ID_CRED_I ) + cbor( signature_or_MAC_3 ) + cbor_AD( AD_3 );
+    vec P_3ae;
+    if ( type_I != psk )
+        P_3ae = compress_id_cred( ID_CRED_I ) + cbor( signature_or_MAC_3 );
+    P_3ae = P_3ae + cbor_AD( AD_3 );
     vec A_3ae = A( cbor( vec{} ), cbor( TH_3 ) );
     auto [ info_K_3ae,   K_3ae ] = KDF( PRK_3e2m, TH_3,  "K_3ae", 16 );
     auto [ info_IV_3ae, IV_3ae ] = KDF( PRK_3e2m, TH_3, "IV_3ae", 13 );
@@ -476,6 +492,8 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         print( "Connection identifier chosen by Initiator", C_I );
         print( "AD_1", AD_1 );   
     }
+    if ( type_I == psk || type_R == psk )
+        print( "ID_PSK", ID_PSK );   
     print( "message_1 (CBOR Sequence)", message_1 );
 
     // message_2 ////////////////////////////////////////////////////////////////////////////
@@ -484,6 +502,8 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     if ( full_output == true ) {
         print( "G_Y (Responder's ephemeral public key)", G_Y );
         print( "G_XY (ECDH shared secret)", G_XY );
+        if ( type_I == psk || type_R == psk )
+            print( "PSK", PSK );   
         print( "salt", salt );
         print( "PRK_2e", PRK_2e );   
     }
@@ -502,21 +522,34 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         print( "data_2 (CBOR Sequence)", data_2 );
         print( "Input to calculate TH_2 (CBOR Sequence)", TH_2_input );
         print( "TH_2", TH_2 );
-        print( "Responders's subject name", NAME_R );
-        print( "ID_CRED_R", ID_CRED_R );
-        print( "CRED_R", CRED_R );
+        if ( type_R != psk ) {
+            print( "Responders's subject name", NAME_R );
+            print( "ID_CRED_R", ID_CRED_R );
+            print( "CRED_R", CRED_R );
+        }
         print( "AD_2 ", AD_2 );   
-        print( "P_2m", P_2m );
-        print( "A_2m (CBOR-encoded)", A_2m );   
-        print( "info for K_2m (CBOR-encoded)", info_K_2m );   
-        print( "K_2m", K_2m );   
-        print( "info for IV_2m (CBOR-encoded)", info_IV_2m );   
-        print( "IV_2m", IV_2m );   
-        print( "MAC_2", MAC_2 );   
-        print( "Signature_or_MAC_2", signature_or_MAC_2 );
-        print( "P_2e (CBOR Sequence)", P_2e );   
-        print( "info for K_2e (CBOR-encoded)", info_K_2e );   
-        print( "K_2e", K_2e );   
+        if ( type_R != psk ) {
+            print( "P_2m", P_2m );
+            print( "A_2m (CBOR-encoded)", A_2m );   
+            print( "info for K_2m (CBOR-encoded)", info_K_2m );   
+            print( "K_2m", K_2m );   
+            print( "info for IV_2m (CBOR-encoded)", info_IV_2m );   
+            print( "IV_2m", IV_2m );   
+            print( "MAC_2", MAC_2 );   
+            if ( type_R == sig )
+                print( "M_2", M_2 );   
+            print( "Signature_or_MAC_2", signature_or_MAC_2 );
+            print( "P_2e (CBOR Sequence)", P_2e );   
+            print( "info for K_2e (CBOR-encoded)", info_K_2e );   
+            print( "K_2e", K_2e );
+        } else {
+            print( "P_2ae (CBOR Sequence)", P_2ae );   
+            print( "A_2ae (CBOR-encoded)", A_2ae );   
+            print( "info for K_2ae (CBOR-encoded)", info_K_2ae );   
+            print( "K_2ae", K_2ae );   
+            print( "info for IV_2ae (CBOR-encoded)", info_IV_2ae );   
+            print( "IV_2ae", IV_2ae );   
+        }
         print( "CIPHERTEXT_2", CIPHERTEXT_2 );   
     }
     print( "message_2 (CBOR Sequence)", message_2 );
@@ -537,18 +570,22 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         print( "data_3 (CBOR Sequence)", data_3 );
         print( "Input to calculate TH_3 (CBOR Sequence)", TH_3_input );
         print( "TH_3", TH_3);
-        print( "Initiator's subject name", NAME_I );
-        print( "ID_CRED_I", ID_CRED_I );
-        print( "CRED_I", CRED_I );
-        print( "AD_3", AD_3 );   
-        print( "P_3m", P_3m );   
-        print( "A_3m (CBOR-encoded)", A_3m );   
-        print( "info for K_3m (CBOR-encoded)", info_K_3m );   
-        print( "K_3m", K_3m );   
-        print( "info for IV_3m (CBOR-encoded)", info_IV_3m );   
-        print( "IV_3m", IV_3m );   
-        print( "MAC_3", MAC_3 );   
-        print( "Signature_or_MAC_3", signature_or_MAC_3 );
+        if ( type_I != psk ) {
+            print( "Initiator's subject name", NAME_I );
+            print( "ID_CRED_I", ID_CRED_I );
+            print( "CRED_I", CRED_I );
+            print( "AD_3", AD_3 );   
+            print( "P_3m", P_3m );   
+            print( "A_3m (CBOR-encoded)", A_3m );   
+            print( "info for K_3m (CBOR-encoded)", info_K_3m );   
+            print( "K_3m", K_3m );   
+            print( "info for IV_3m (CBOR-encoded)", info_IV_3m );   
+            print( "IV_3m", IV_3m );   
+            print( "MAC_3", MAC_3 );   
+            if ( type_I == sig )
+                print( "M_3", M_3 );   
+            print( "Signature_or_MAC_3", signature_or_MAC_3 );
+        }
         print( "P_3ae (CBOR Sequence)", P_3ae );   
         print( "A_3ae (CBOR-encoded)", A_3ae );   
         print( "info for K_3ae (CBOR-encoded)", info_K_3ae );   
@@ -582,20 +619,22 @@ int main( void ) {
     // Full output
     test_vectors( sig, sig, corr_12,   suite_0, x5t,     x5t,   false, false, false, true );
     test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, false, true );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, false, true );
 
-    // Different key types
+    // Mixed key types
     test_vectors( sig, sdh, corr_12,   suite_0, x5t,     kid,   false, false, false, false );
     test_vectors( sdh, sig, corr_12,   suite_0, kid,     x5t,   false, false, false, false );
 
-    // All header attributes for sig and sdh
-    test_vectors( sig, sig, corr_12,   suite_0, x5u,     x5bag, false, false, false, false );
-    test_vectors( sig, sig, corr_12,   suite_0, x5chain, kid,   false, false, false, false );
-    test_vectors( sdh, sdh, corr_12,   suite_0, x5u,     x5bag, false, false, false, false );
-    test_vectors( sdh, sdh, corr_12,   suite_0, x5chain, x5t,   false, false, false, false );
+    // Other header attributes for sig and sdh
+    test_vectors( sig, sig, corr_12,   suite_0, x5u,     x5u,   false, false, false, false );
+    test_vectors( sig, sig, corr_12,   suite_0, x5chain, x5bag, false, false, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, x5chain, x5u,   false, false, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, x5t,     x5bag, false, false, false, false );
 
     // Cipher suite nr. 1 and non-compressed SUITES_I
     test_vectors( sig, sig, corr_12,   suite_1, x5t,     x5t,   false, false, false, false );
     test_vectors( sdh, sdh, corr_12,   suite_1, kid,     kid,   false, false, false, false );
+    test_vectors( psk, psk, corr_12,   suite_1, kid,     kid,   false, false, false, false );
 
     // All other correlations
     test_vectors( sdh, sdh, corr_none, suite_0, kid,     kid,   false, false, false, false );
@@ -604,10 +643,12 @@ int main( void ) {
 
     // Auxileary data
     test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   true, false, false, false );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   true, false, false, false );
 
     // Subject names
     test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, true, false, false );
 
     // Long non-compressed bstr_identifiers
     test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, true, false );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, true, false );
 }
