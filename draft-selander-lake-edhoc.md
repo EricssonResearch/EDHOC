@@ -881,7 +881,7 @@ message_1 SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 ~~~~~~~~~~~ CDDL
 message_1 = (
   METHOD_CORR : int,
-  SUITES_I : suite / [ index : uint, 2* suite ],
+  SUITES_I : [ index : uint, 2* suite ] / suite,
   G_X : bstr,
   C_I :  bstr_identifier,
   ID_PSK : header_map / bstr_identifier,
