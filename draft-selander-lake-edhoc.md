@@ -960,11 +960,11 @@ where:
 
 ### Example Use of EDHOC Error Message with SUITES_R
 
-Assuming that the Initiator supports the five cipher suites \{5, 6, 7, 8, 9\} in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how the Responder can truncate SUITES_I and how SUITES_R is used by the Responder to give the Initiator information about the cipher suites that the Responder supports. In {{fig-error1}}, the Responder supports cipher suite 6 but not the selected cipher suite 5. 
+Assuming that the Initiator supports the five cipher suites 5, 6, 7, 8, and 9 in decreasing order of preference, Figures {{fig-error1}}{: format="counter"} and {{fig-error2}}{: format="counter"} show examples of how the Responder can truncate SUITES_I and how SUITES_R is used by the Responder to give the Initiator information about the cipher suites that the Responder supports. In {{fig-error1}}, the Responder supports cipher suite 6 but not the selected cipher suite 5. 
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
-|         METHOD_CORR, SUITES_I {5, 5, 6, 7}, G_X, C_I, AD_1        |
+|        METHOD_CORR, SUITES_I = [5, 5, 6, 7], G_X, C_I, AD_1       |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -972,7 +972,7 @@ Initiator                                                   Responder
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|          METHOD_CORR, SUITES_I {6, 5, 6}, G_X, C_I, AD_1          |
+|         METHOD_CORR, SUITES_I = [6, 5, 6], G_X, C_I, AD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
@@ -983,7 +983,7 @@ In {{fig-error2}}, the Responder supports cipher suite 7 but not cipher suites 5
 
 ~~~~~~~~~~~
 Initiator                                                   Responder
-|          METHOD_CORR, SUITES_I {5, 5, 6}, G_X, C_I, AD_1          |
+|         METHOD_CORR, SUITES_I = [5, 5, 6], G_X, C_I, AD_1         |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 |                                                                   |
@@ -991,7 +991,7 @@ Initiator                                                   Responder
 |<------------------------------------------------------------------+
 |                               error                               |
 |                                                                   |
-|        METHOD_CORR, SUITES_I {7, 5, 6, 7}, G_X, C_I, AD_1         |
+|        METHOD_CORR, SUITES_I = [7, 5, 6, 7], G_X, C_I, AD_1       |
 +------------------------------------------------------------------>|
 |                             message_1                             |
 ~~~~~~~~~~~
