@@ -435,7 +435,7 @@ where L is the length of output keying material (OKM) in bytes and info is the C
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info = [
-   aead_id : int / tstr,
+   edhoc_aead_id : int / tstr,
    transcript_hash : bstr,
    label : tstr,
    length : uint
@@ -444,7 +444,7 @@ info = [
 
 where
 
-  + aead_id is an int or tstr containing the algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite encoded as defined in {{RFC8152}}.
+  + edhoc_aead_id is an int or tstr containing the algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite encoded as defined in {{RFC8152}}.
   
   + transcript_hash is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
@@ -673,8 +673,8 @@ The Responder SHALL compose message_2 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_2m
-   * Nonce N = IV_2m
+   * Key K = KDF( PRK_3e2m, TH_2, "K_2m", length ) 
+   * Nonce N = KDF( PRK_3e2m, TH_2, "IV_2m", length )
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
@@ -706,7 +706,7 @@ The Responder SHALL compose message_2 as follows:
 
    * CIPHERTEXT_2 = plaintext XOR K_2e
 
-      * The key K_2e is derived using the pseudorandom key PRK_2e, AlgorithmID = "XOR-ENCRYPTION", keyDataLength equal to the length of the plaintext, protected = h'', and other = TH_2.
+   * Key K = KDF( PRK_2e, TH_2, "K_2e", length ), where length is the length of the plaintext. 
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
@@ -771,8 +771,8 @@ The Initiator  SHALL compose message_3 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3m
-   * Nonce N = IV_3m
+   * Key K = KDF( PRK_4x3m, TH_3, "K_3m", length ) 
+   * Nonce N = KDF( PRK_4x3m, TH_3, "IV_3m", length )
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
@@ -806,8 +806,8 @@ The Initiator  SHALL compose message_3 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3ae
-   * Nonce N = IV_3ae
+   * Key K = KDF( PRK_3e2m, TH_3, "K_3ae", length ) 
+   * Nonce N = KDF( PRK_3e2m, TH_3, "IV_3ae", length )
    * Plaintext P = ( ID_CRED_I / bstr_identifier, Signature_or_MAC_3, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
@@ -910,8 +910,8 @@ where:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_2ae
-   * Nonce N = IV_2ae
+   * Key K = KDF( PRK_2e, TH_2, "K_2ae", length ) 
+   * Nonce N = KDF( PRK_2e, TH_2, "IV_2ae", length )
    * Plaintext P = ? AD_2
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
       
@@ -931,8 +931,8 @@ where:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = K_3ae
-   * Nonce N = IV_3ae
+   * Key K = KDF( PRK_3e2m, TH_3, "K_3ae", length ) 
+   * Nonce N = KDF( PRK_3e2m, TH_3, "IV_3ae", length )
    * Plaintext P = ? AD_3
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
