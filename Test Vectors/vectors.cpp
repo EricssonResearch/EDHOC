@@ -221,13 +221,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         oscore_hash_alg = -SHA_256;
     }
 
-    // Creates the info parameter and derives output key matrial with HKDF-Expand
-    auto KDF = [=] ( vec PRK, vec transcript_hash, string label, int length ) {
-        vec info = cbor_arr( 4 ) + cbor( edhoc_aead_alg ) + cbor( transcript_hash ) + cbor( label ) + cbor( length );
-        vec OKM = hkdf_expand( edhoc_hash_alg, PRK, info, length );
-        return make_tuple( info, OKM );
-    };
-
+    // Calculate Ephemeral keys
     auto ecdh_key_pair = [=] () {
         vec G_Z( crypto_kx_PUBLICKEYBYTES );
         vec Z( crypto_kx_SECRETKEYBYTES );
@@ -236,6 +230,18 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         return make_tuple( Z, G_Z );
     };
 
+    auto shared_secret = [=] ( vec A, vec G_B ) {
+        vec G_AB( crypto_scalarmult_BYTES );
+        if ( crypto_scalarmult( G_AB.data(), A.data(), G_B.data() ) == -1 )
+            syntax_error( "crypto_scalarmult()" );
+        return G_AB;
+    };
+    
+    auto [ X, G_X ] = ecdh_key_pair();
+    auto [ Y, G_Y ] = ecdh_key_pair();
+    vec G_XY = shared_secret( X, G_Y );
+
+    // Authentication keys, Only some of these keys are used depending on type_I and type_R
     auto sign_key_pair = [=] () {
         // EDHOC uses RFC 8032 notation, libsodium uses the notation from the Ed25519 paper by Bernstein
         // Libsodium seed = RFC 8032 sk, Libsodium sk = pruned SHA-512(sk) in RFC 8032
@@ -246,66 +252,6 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         return make_tuple( SK, PK );
     };
 
-    auto shared_secret = [=] ( vec A, vec G_B ) {
-        vec G_AB( crypto_scalarmult_BYTES );
-        if ( crypto_scalarmult( G_AB.data(), A.data(), G_B.data() ) == -1 )
-            syntax_error( "crypto_scalarmult()" );
-        return G_AB;
-    };
-
-    auto hkdf_extract = [=] ( vec salt, vec IKM ) {
-        return hmac( edhoc_hash_alg, salt, IKM ); // correct that salt is key
-    };
-
-    auto AEAD = [=] ( vec K, vec N, vec P, vec A ) {
-        if( A.size() > (42 * 16 - 2) )
-            syntax_error( "AEAD()" );
-        int tag_length = ( edhoc_aead_alg == AES_CCM_16_64_128 ) ? 8 : 16;
-        vec C( P.size() + tag_length );
-        int r = aes_ccm_ae( K.data(), 16, N.data(), tag_length, P.data(), P.size(), A.data(), A.size(), C.data(), C.data() + P.size() );
-        return C;
-    };
-
-    auto sign = [=] ( vec SK, vec M ) {
-        vec signature( crypto_sign_BYTES );
-        vec PK( crypto_sign_PUBLICKEYBYTES );
-        vec SK_libsodium( crypto_sign_SECRETKEYBYTES );
-        crypto_sign_seed_keypair( PK.data(), SK_libsodium.data(), SK.data() );
-        crypto_sign_detached( signature.data(), nullptr, M.data(), M.size(), SK_libsodium.data() );
-        return signature;
-    };
-
-    auto bstr_id = [=] () {
-        if ( long_id == true )
-            return random_vector( 2 + rand() % 2 );
-        else {
-            int i = rand() % 49;
-            if ( i == 48 )
-                return vec{};
-            else
-                return vec{ (uint8_t) i };
-        }
-    };
-
-    auto H = [=] ( vec input ) {
-        return HASH( edhoc_hash_alg, input );
-    };
-
-    auto A = [] ( vec protect, vec external_aad ) {
-        return cbor_arr( 3 ) + cbor( "Encrypt0" ) + protect + external_aad;
-    };
-
-    auto M = [] ( vec protect, vec external_aad, vec payload ) {
-        return cbor_arr( 4 ) + cbor( "Signature1" ) + protect + external_aad + payload;
-    };
-
-    // Ephemeral keys
-    auto [ X, G_X ] = ecdh_key_pair();
-    auto [ Y, G_Y ] = ecdh_key_pair();
-    vec G_XY = shared_secret( X, G_Y );
-
-    // Authentication keys
-    // Only some of these keys are used depending on type_I and type_R
     auto [ R, G_R ] = ecdh_key_pair();
     auto [ I, G_I ] = ecdh_key_pair();
     vec G_RX = shared_secret( R, G_X );
@@ -315,6 +261,8 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     vec PSK = random_vector( 16 + (rand() % 2) * 16 );
 
     // PRKs
+    auto hkdf_extract = [=] ( vec salt, vec IKM ) { return hmac( edhoc_hash_alg, salt, IKM ); };
+
     vec salt, PRK_2e;
     if ( type_I == psk || type_R == psk )
         salt = PSK;
@@ -335,38 +283,53 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         NAME_R = "example.edu";
     }
 
-    auto gen_CRED = [&] ( EDHOCKeyType type, COSEHeader attr, vec PK_sig, vec PK_sdh, string name, string uri ) {
+    // Calculate C_I != C_R
+    auto bstr_id = [=] () {
+        if ( long_id == true )
+            return random_vector( 2 + rand() % 2 );
+        else {
+            int i = rand() % 49;
+            if ( i == 48 )
+                return vec{};
+            else
+                return vec{ (uint8_t) i };
+        }
+    };
+
+    vec C_I, C_R;
+    do {
+        C_I = bstr_id();
+        C_R = bstr_id();
+    } while ( C_I == C_R );
+
+    // Calculate ID_CRED_x and CRED_x
+    auto gen_CRED = [=] ( EDHOCKeyType type, COSEHeader attr, vec PK_sig, vec PK_sdh, string name, string uri ) {
         vec ID_CRED, CRED;
         if ( attr == kid ) {
+            CRED = cbor_map( 4 ) + cbor( kty ) + cbor( OKP ) + cbor( crv );
             if ( type == sig )
-                CRED = cbor_map( 4 ) + cbor( kty ) + cbor( OKP ) + cbor( crv ) + cbor( edhoc_sign_curve ) + cbor( x ) + cbor( PK_sig );
+                CRED = CRED + cbor( edhoc_sign_curve ) + cbor( x ) + cbor( PK_sig );
             if ( type == sdh )
-                CRED = cbor_map( 4 ) + cbor( kty ) + cbor( OKP ) + cbor( crv ) + cbor( edhoc_ecdh_curve ) + cbor( x ) + cbor( PK_sdh );
+                CRED = CRED + cbor( edhoc_ecdh_curve ) + cbor( x ) + cbor( PK_sdh );
             CRED = CRED + cbor( "subject name" ) + cbor( name );
             ID_CRED = cbor_map( 1 ) + cbor( attr ) + cbor( bstr_id() );
         } else {
             vec X509 = random_vector( 100 + rand() % 50 );
             CRED = cbor( X509 );
+            ID_CRED = cbor_map( 1 ) + cbor( attr );
             if ( attr == x5bag ||  attr == x5chain )
-                ID_CRED = cbor_map( 1 ) + cbor( attr ) + cbor( CRED );
+                ID_CRED = ID_CRED + cbor( CRED );
             if ( attr == x5t )
-                ID_CRED = cbor_map( 1 ) + cbor( attr ) + cbor_arr( 2 ) + cbor( SHA_256_64 ) + cbor( HASH( SHA_256_64, X509 ) );
+                ID_CRED = ID_CRED + cbor_arr( 2 ) + cbor( SHA_256_64 ) + cbor( HASH( SHA_256_64, X509 ) );
             if ( attr == x5u )
-                ID_CRED = cbor_map( 1 ) + cbor( attr ) + cbor_tag( 32 ) + cbor( uri );
+                ID_CRED = ID_CRED + cbor_tag( 32 ) + cbor( uri );
         }
         return make_tuple( ID_CRED, CRED );
     };
 
     auto [ ID_CRED_I, CRED_I ] = gen_CRED( type_I, attr_I, PK_I, G_I, NAME_I, "https://example.edu/2716057" );
     auto [ ID_CRED_R, CRED_R ] = gen_CRED( type_R, attr_R, PK_R, G_R, NAME_R, "https://example.edu/3370318" );
-    vec ID_PSK = ID_CRED_I; // works for test vectors
-
-    // Calculate C_I != C_R
-    vec C_I, C_R;
-    do {
-        C_I = bstr_id();
-        C_R = bstr_id();
-    } while ( C_I == C_R );
+    vec ID_PSK = ID_CRED_I; // hack that works for test vectors
 
     // Auxiliary data
     vec AD_1, AD_2, AD_3;
@@ -380,9 +343,40 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     if ( type_I == psk || type_R == psk )
         message_1 = message_1 + compress_id_cred( ID_PSK );
 
+    // Helper funtions using local variables ////////////////////////////////////////////////////////////////////////////
+
+    auto H = [=] ( vec input ) { return HASH( edhoc_hash_alg, input ); };
+    auto A = [] ( vec protect, vec external_aad ) { return cbor_arr( 3 ) + cbor( "Encrypt0" ) + protect + external_aad; };
+    auto M = [] ( vec protect, vec external_aad, vec payload ) { return cbor_arr( 4 ) + cbor( "Signature1" ) + protect + external_aad + payload; };
+
+    // Creates the info parameter and derives output key matrial with HKDF-Expand
+    auto KDF = [=] ( vec PRK, vec transcript_hash, string label, int length ) {
+        vec info = cbor_arr( 4 ) + cbor( edhoc_aead_alg ) + cbor( transcript_hash ) + cbor( label ) + cbor( length );
+        vec OKM = hkdf_expand( edhoc_hash_alg, PRK, info, length );
+        return make_tuple( info, OKM );
+    };
+
+    auto AEAD = [=] ( vec K, vec N, vec P, vec A ) {
+        if( A.size() > (42 * 16 - 2) )
+            syntax_error( "AEAD()" );
+        int tag_length = ( edhoc_aead_alg == AES_CCM_16_64_128 ) ? 8 : 16;
+        vec C( P.size() + tag_length );
+        int r = aes_ccm_ae( K.data(), 16, N.data(), tag_length, P.data(), P.size(), A.data(), A.size(), C.data(), C.data() + P.size() );
+        return C;
+    };
+
+    auto sign = [=] ( vec SK, vec M ) {
+        vec signature( crypto_sign_BYTES );
+        vec PK( crypto_sign_PUBLICKEYBYTES );
+        vec SK_libsodium( crypto_sign_SECRETKEYBYTES );
+        crypto_sign_seed_keypair( PK.data(), SK_libsodium.data(), SK.data() );
+        crypto_sign_detached( signature.data(), nullptr, M.data(), M.size(), SK_libsodium.data() );
+        return signature;
+    };
+
     // message_2 ////////////////////////////////////////////////////////////////////////////
 
-    // Calculate data_2, and TH_2
+    // Calculate data_2 and TH_2
     vec data_2 = cbor_id( C_I ) + cbor( G_Y ) + cbor_id( C_R );
     if ( corr == corr_12 || corr == corr_123 )
         data_2 = cbor( G_Y ) + cbor_id( C_R );
@@ -423,7 +417,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
 
    // message_3 ////////////////////////////////////////////////////////////////////////////
 
-    // Calculate data_3, and TH_3
+    // Calculate data_3 and TH_3
     vec data_3 = cbor_id( C_R );
     if ( corr == corr_23 || corr == corr_123 )
         data_3 = vec{};
@@ -461,8 +455,11 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
 
     // Exporter ////////////////////////////////////////////////////////////////////////////
 
+    // Calculate TH_3
     vec TH_4_input = cbor( TH_3 ) + cbor( CIPHERTEXT_3 );
     vec TH_4 = H( TH_4_input );
+
+    // Export funtion
     auto Export = [=] ( string label, int length ) { return KDF( PRK_4x3m, TH_4, label, length ); };
 
     // Derive OSCORE Master Secret and Salt
