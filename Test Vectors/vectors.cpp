@@ -180,13 +180,13 @@ vec random_vector( int len ) {
     return out;
 }
 
-// TODO PSK
+// TODO resumption
 // TODO error message with SUITES_V
 // TODO real X.509 certificates
 // TODO other COSE algorithms like ECDSA, P-256, SHA-384, P-384, AES-GCM, ChaCha20-Poly1305
 void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation corr, EDHOCSuite selected_suite,
                    COSEHeader attr_I, COSEHeader attr_R,
-                   bool auxdata, bool subjectname, bool long_id, bool full_output ) {
+                   bool auxdata, bool subjectname, bool exporter, bool long_id, bool full_output ) {
 
     // TODO method will likely be replaced by key types in a future version
     int method = 2 * type_I + type_R;
@@ -222,13 +222,13 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     }
 
     // Creates the info parameter and derives output key matrial with HKDF-Expand
-    auto KDF = [&] ( vec PRK, vec transcript_hash, string label, int length ) {
+    auto KDF = [=] ( vec PRK, vec transcript_hash, string label, int length ) {
         vec info = cbor_arr( 4 ) + cbor( edhoc_aead_alg ) + cbor( transcript_hash ) + cbor( label ) + cbor( length );
         vec OKM = hkdf_expand( edhoc_hash_alg, PRK, info, length );
         return make_tuple( info, OKM );
     };
 
-    auto ecdh_key_pair = [&] () {
+    auto ecdh_key_pair = [=] () {
         vec G_Z( crypto_kx_PUBLICKEYBYTES );
         vec Z( crypto_kx_SECRETKEYBYTES );
         vec seed = random_vector( crypto_kx_SEEDBYTES );
@@ -236,7 +236,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         return make_tuple( Z, G_Z );
     };
 
-    auto sign_key_pair = [&] () {
+    auto sign_key_pair = [=] () {
         // EDHOC uses RFC 8032 notation, libsodium uses the notation from the Ed25519 paper by Bernstein
         // Libsodium seed = RFC 8032 sk, Libsodium sk = pruned SHA-512(sk) in RFC 8032
         vec PK( crypto_sign_PUBLICKEYBYTES );
@@ -246,18 +246,18 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         return make_tuple( SK, PK );
     };
 
-    auto shared_secret = [&] ( vec A, vec G_B ) {
+    auto shared_secret = [=] ( vec A, vec G_B ) {
         vec G_AB( crypto_scalarmult_BYTES );
         if ( crypto_scalarmult( G_AB.data(), A.data(), G_B.data() ) == -1 )
             syntax_error( "crypto_scalarmult()" );
         return G_AB;
     };
 
-    auto hkdf_extract = [&] ( vec salt, vec IKM ) {
+    auto hkdf_extract = [=] ( vec salt, vec IKM ) {
         return hmac( edhoc_hash_alg, salt, IKM ); // correct that salt is key
     };
 
-    auto AEAD = [&] ( vec K, vec N, vec P, vec A ) {
+    auto AEAD = [=] ( vec K, vec N, vec P, vec A ) {
         if( A.size() > (42 * 16 - 2) )
             syntax_error( "AEAD()" );
         int tag_length = ( edhoc_aead_alg == AES_CCM_16_64_128 ) ? 8 : 16;
@@ -266,7 +266,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         return C;
     };
 
-    auto sign = [&] ( vec SK, vec M ) {
+    auto sign = [=] ( vec SK, vec M ) {
         vec signature( crypto_sign_BYTES );
         vec PK( crypto_sign_PUBLICKEYBYTES );
         vec SK_libsodium( crypto_sign_SECRETKEYBYTES );
@@ -275,7 +275,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         return signature;
     };
 
-    auto bstr_id = [&] () {
+    auto bstr_id = [=] () {
         if ( long_id == true )
             return random_vector( 2 + rand() % 2 );
         else {
@@ -287,7 +287,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
         }
     };
 
-    auto H = [&] ( vec input ) {
+    auto H = [=] ( vec input ) {
         return HASH( edhoc_hash_alg, input );
     };
 
@@ -459,13 +459,19 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     // Calculate message_3
     vec message_3 = data_3 + cbor( CIPHERTEXT_3 );
 
-    // OSCORE ////////////////////////////////////////////////////////////////////////////
+    // Exporter ////////////////////////////////////////////////////////////////////////////
 
-    // Derive OSCORE Master Secret and Salt
     vec TH_4_input = cbor( TH_3 ) + cbor( CIPHERTEXT_3 );
     vec TH_4 = H( TH_4_input );
-    auto [ info_OSCORE_secret, OSCORE_secret ] = KDF( PRK_4x3m, TH_4, "OSCORE Master Secret", 16 );
-    auto [ info_OSCORE_salt,   OSCORE_salt ]   = KDF( PRK_4x3m, TH_4, "OSCORE Master Salt",    8 );
+    auto Export = [=] ( string label, int length ) { return KDF( PRK_4x3m, TH_4, label, length ); };
+
+    // Derive OSCORE Master Secret and Salt
+    auto [ info_OSCORE_secret, OSCORE_secret ] = Export( "OSCORE Master Secret", 16 );
+    auto [ info_OSCORE_salt,   OSCORE_salt ]   = Export( "OSCORE Master Salt",    8 );
+
+    // Derive PSK for resumption
+    auto [ info_PSK, chain_PSK ] = Export( "EDHOC Chaining PSK", 16 );
+    auto [ info_kid, kid_psk ]   = Export( "EDHOC Chaining kid",  4 );
 
     // Print stuff ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -596,19 +602,28 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
     }
     print( "message_3 (CBOR Sequence)", message_3 );
 
-    // OSCORE ////////////////////////////////////////////////////////////////////////////
+    // Exporter ////////////////////////////////////////////////////////////////////////////
 
-    if ( full_output == true ) {
-        print( "Input to calculate TH_4 (CBOR Sequence)", TH_4_input );
-        print( "TH_4", TH_4 );
-        print( "info for OSCORE Master Secret (CBOR-encoded)", info_OSCORE_secret );   
+    if ( exporter == true ) {
+        if ( full_output == true ) {
+            print( "Input to calculate TH_4 (CBOR Sequence)", TH_4_input );
+            print( "TH_4", TH_4 );
+            print( "info for OSCORE Master Secret (CBOR-encoded)", info_OSCORE_secret );
+            print( "info for OSCORE Master Salt (CBOR-encoded)", info_OSCORE_salt );   
+        }   
         print( "OSCORE Master Secret", OSCORE_secret );
-        print( "info for OSCORE Master Salt (CBOR-encoded)", info_OSCORE_salt );   
         print( "OSCORE Master Salt", OSCORE_salt );
         print( "Client's OSCORE Sender ID", C_R );
         print( "Server's OSCORE Sender ID", C_I );
         print( "OSCORE AEAD Algorithm", oscore_aead_alg );
         print( "OSCORE Hash Algorithm", oscore_hash_alg );
+
+        if ( full_output == true ) {
+            print( "info for chaining PSK (CBOR-encoded)", info_PSK );
+            print( "info for chaining kid (CBOR-encoded)", info_kid );   
+        }
+        print( "Chaining PSK", chain_PSK );
+        print( "Chaining kid", kid_psk );
     }
 }
 
@@ -617,38 +632,43 @@ int main( void ) {
         syntax_error( "sodium_init()" );
 
     // Full output
-    test_vectors( sig, sig, corr_12,   suite_0, x5t,     x5t,   false, false, false, true );
-    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, false, true );
-    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, false, true );
+    test_vectors( sig, sig, corr_12,   suite_0, x5t,     x5t,   false, false, false, false, true );
+    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, false, false, true );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, false, false, true );
 
     // Mixed key types
-    test_vectors( sig, sdh, corr_12,   suite_0, x5t,     kid,   false, false, false, false );
-    test_vectors( sdh, sig, corr_12,   suite_0, kid,     x5t,   false, false, false, false );
+    test_vectors( sig, sdh, corr_12,   suite_0, x5t,     kid,   false, false, false, false, false );
+    test_vectors( sdh, sig, corr_12,   suite_0, kid,     x5t,   false, false, false, false, false );
 
     // Other header attributes for sig and sdh
-    test_vectors( sig, sig, corr_12,   suite_0, x5u,     x5u,   false, false, false, false );
-    test_vectors( sig, sig, corr_12,   suite_0, x5chain, x5bag, false, false, false, false );
-    test_vectors( sdh, sdh, corr_12,   suite_0, x5chain, x5u,   false, false, false, false );
-    test_vectors( sdh, sdh, corr_12,   suite_0, x5t,     x5bag, false, false, false, false );
+    test_vectors( sig, sig, corr_12,   suite_0, x5u,     x5u,   false, false, false, false, false );
+    test_vectors( sig, sig, corr_12,   suite_0, x5chain, x5bag, false, false, false, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, x5chain, x5u,   false, false, false, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, x5t,     x5bag, false, false, false, false, false );
 
     // Cipher suite nr. 1 and non-compressed SUITES_I
-    test_vectors( sig, sig, corr_12,   suite_1, x5t,     x5t,   false, false, false, false );
-    test_vectors( sdh, sdh, corr_12,   suite_1, kid,     kid,   false, false, false, false );
-    test_vectors( psk, psk, corr_12,   suite_1, kid,     kid,   false, false, false, false );
+    test_vectors( sig, sig, corr_12,   suite_1, x5t,     x5t,   false, false, false, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_1, kid,     kid,   false, false, false, false, false );
+    test_vectors( psk, psk, corr_12,   suite_1, kid,     kid,   false, false, false, false, false );
 
     // All other correlations
-    test_vectors( sdh, sdh, corr_none, suite_0, kid,     kid,   false, false, false, false );
-    test_vectors( sdh, sdh, corr_23,   suite_0, kid,     kid,   false, false, false, false );
-    test_vectors( sdh, sdh, corr_123,  suite_0, kid,     kid,   false, false, false, false );
+    test_vectors( sdh, sdh, corr_none, suite_0, kid,     kid,   false, false, false, false, false );
+    test_vectors( sdh, sdh, corr_23,   suite_0, kid,     kid,   false, false, false, false, false );
+    test_vectors( sdh, sdh, corr_123,  suite_0, kid,     kid,   false, false, false, false, false );
 
     // Auxileary data
-    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   true, false, false, false );
-    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   true, false, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   true, false, false, false, false );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   true, false, false, false, false );
 
     // Subject names
-    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, true, false, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, true, false, false, false );
 
     // Long non-compressed bstr_identifiers
-    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, true, false );
-    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, true, false );
+    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, false, true, false );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, false, true, false );
+
+    // Exporter
+    test_vectors( sig, sig, corr_12,   suite_0, x5t,     x5t,   false, false, true, false, true );
+    test_vectors( sdh, sdh, corr_12,   suite_0, kid,     kid,   false, false, true, false, false );
+    test_vectors( psk, psk, corr_12,   suite_0, kid,     kid,   false, false, true, false, false );
 }
