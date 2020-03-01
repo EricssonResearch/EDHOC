@@ -475,10 +475,10 @@ calculated with (aead_id, length) = (10, 16) and (aead_id, length) = (10, 13), r
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = HKDF-Expand(PRK_4x3m, info, length) 
+   EDHOC-Exporter(label, length) = KDF(PRK_4x3m, TH_4, info, length) 
 ~~~~~~~~~~~
 
-The output of the EDHOC-Exporter function SHALL be derived with aead_id algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite, transcript_hash = TH_4, label = label, and length = length, where label is a tstr defined by the application and length is an uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
+where label is a tstr defined by the application and length is an uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
 
 ~~~~~~~~~~~
    TH_4 = H( TH_3, CIPHERTEXT_3 )
