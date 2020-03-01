@@ -706,7 +706,7 @@ The Responder SHALL compose message_2 as follows:
 
    * CIPHERTEXT_2 = plaintext XOR K_2e
 
-   * Key K = KDF( PRK_2e, TH_2, "K_2e", length ), where length is the length of the plaintext. 
+   * K_2e = KDF( PRK_2e, TH_2, "K_2e", length ), where length is the length of the plaintext. 
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
