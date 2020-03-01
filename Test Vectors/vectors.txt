@@ -5419,16 +5419,16 @@ info for chaining PSK (CBOR-encoded) (56 bytes)
 73 79 f0 dc ca 1e 9b 3a af 34 2e 43 72 45 44 48 4f 43 20 43 68 61 69 6e 
 69 6e 67 20 50 53 4b 10 
 
-info for chaining kid (CBOR-encoded) (56 bytes)
+info for chaining kid (CBOR-encoded) (60 bytes)
 84 0a 58 20 36 45 7c 25 90 0b 01 26 36 77 90 2d 34 02 e6 dc 96 d3 8c 45 
-73 79 f0 dc ca 1e 9b 3a af 34 2e 43 72 45 44 48 4f 43 20 43 68 61 69 6e 
-69 6e 67 20 6b 69 64 04 
+73 79 f0 dc ca 1e 9b 3a af 34 2e 43 76 45 44 48 4f 43 20 43 68 61 69 6e 
+69 6e 67 20 6b 69 64 5f 70 73 6b 04 
 
 Chaining PSK (16 bytes)
 de 5f c4 a0 7b 22 88 d2 3a 64 fd 44 f2 20 35 9e 
 
 Chaining kid (4 bytes)
-7d 80 b5 01 
+ba 00 27 7b 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
@@ -5722,16 +5722,16 @@ info for chaining PSK (CBOR-encoded) (56 bytes)
 03 ad dc 6b aa ef 9f c6 bf 47 38 6a 72 45 44 48 4f 43 20 43 68 61 69 6e 
 69 6e 67 20 50 53 4b 10 
 
-info for chaining kid (CBOR-encoded) (56 bytes)
+info for chaining kid (CBOR-encoded) (60 bytes)
 84 0a 58 20 b2 56 ac 0d 51 ad d3 eb d5 4a 2d 8d 91 56 d3 e3 a7 c6 89 ae 
-03 ad dc 6b aa ef 9f c6 bf 47 38 6a 72 45 44 48 4f 43 20 43 68 61 69 6e 
-69 6e 67 20 6b 69 64 04 
+03 ad dc 6b aa ef 9f c6 bf 47 38 6a 76 45 44 48 4f 43 20 43 68 61 69 6e 
+69 6e 67 20 6b 69 64 5f 70 73 6b 04 
 
 Chaining PSK (16 bytes)
 c2 b3 99 9c 92 71 f1 c0 c8 50 56 6f ee cf cf 6c 
 
 Chaining kid (4 bytes)
-e5 8d f4 98 
+37 64 2a 06 
 
 ---------------------------------------------------------------
 Test Vectors for EHDOC
@@ -5935,13 +5935,13 @@ info for chaining PSK (CBOR-encoded) (56 bytes)
 9f ee a3 df b5 12 6e 7c 47 89 c9 14 72 45 44 48 4f 43 20 43 68 61 69 6e 
 69 6e 67 20 50 53 4b 10 
 
-info for chaining kid (CBOR-encoded) (56 bytes)
+info for chaining kid (CBOR-encoded) (60 bytes)
 84 0a 58 20 d7 13 30 2d 98 f8 86 ff 8e da 27 bf 1c 1c 01 52 9e 38 d2 7f 
-9f ee a3 df b5 12 6e 7c 47 89 c9 14 72 45 44 48 4f 43 20 43 68 61 69 6e 
-69 6e 67 20 6b 69 64 04 
+9f ee a3 df b5 12 6e 7c 47 89 c9 14 76 45 44 48 4f 43 20 43 68 61 69 6e 
+69 6e 67 20 6b 69 64 5f 70 73 6b 04 
 
 Chaining PSK (16 bytes)
 b2 5d 44 0b 6a 1d d4 8c 8e 6b 51 af 17 31 3e ac 
 
 Chaining kid (4 bytes)
-24 dc 4d 18 
+18 94 cd 51 

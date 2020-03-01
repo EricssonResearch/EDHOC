@@ -468,7 +468,7 @@ void test_vectors( EDHOCKeyType type_I, EDHOCKeyType type_R, EDHOCCorrelation co
 
     // Derive PSK for resumption
     auto [ info_PSK, chain_PSK ] = Export( "EDHOC Chaining PSK", 16 );
-    auto [ info_kid, kid_psk ]   = Export( "EDHOC Chaining kid",  4 );
+    auto [ info_kid, kid_psk ]   = Export( "EDHOC Chaining kid_psk",  4 );
 
     // Print stuff ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
