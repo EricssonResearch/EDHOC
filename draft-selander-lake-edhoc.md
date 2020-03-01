@@ -493,8 +493,8 @@ where H() is the hash function in the selected cipher suite. Example use of the 
 An application using EDHOC may want to derive new PSKs to use for authentication in future EDHOC exchanges.  In this case, the new PSK and the ID_PSK 'kid_value' parameter SHOULD be derived as follows where length is the key length (in bytes) of the EDHOC AEAD Algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   PSK    = EDHOC-Exporter( "EDHOC Chaining PSK", length )
-   ID_PSK = EDHOC-Exporter( "EDHOC Chaining kid", 4 )
+   PSK     = EDHOC-Exporter( "EDHOC Chaining PSK", length )
+   kid_psk = EDHOC-Exporter( "EDHOC Chaining kid_psk", 4 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 # EDHOC Authenticated with Asymmetric Keys {#asym}
