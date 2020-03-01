@@ -477,7 +477,7 @@ Example: Assume the use of the algorithm AES-CCM-16-64-128 and SHA-256, K_j and 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = KDF(PRK_4x3m, TH_4, info, length) 
+   EDHOC-Exporter(label, length) = KDF(PRK_4x3m, TH_4, label, length) 
 ~~~~~~~~~~~
 
 where label is a tstr defined by the application and length is an uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
