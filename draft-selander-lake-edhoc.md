@@ -389,9 +389,10 @@ Since data carried in AD1 and AD2 may not be protected, and the content of AD3 i
    
 The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the 'x' parameter is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an 'y' parameter, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
+
 ## Key Derivation {#key-der}
 
-Derivation of key and IV used with the AEAD functions SHALL be performed with HKDF {{RFC5869}} following the specification in Section 11 of {{RFC8152}} using a pseudorandom key (PRK) and the hash algorithm in the selected cipher suite. The PRKs are derived using HKDF-Extract {{RFC5869}}.
+Keys and IVs in EDHOC is derived with HKDF {{RFC5869}} using a pseudorandom key (PRK) and the EDHOC hash algorithm in the selected cipher suite. The PRKs are derived using HKDF-Extract {{RFC5869}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
@@ -428,10 +429,11 @@ Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and
 The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   OKM = HKDF-Expand( PRK, info, L )
+   OKM = KDF( PRK, transcript_hash, label, length )
+       = HKDF-Expand( PRK, info, length )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-where L is the length of output keying material (OKM) in bytes and info is the CBOR encoding of
+where info is the CBOR encoding of
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 info = [
@@ -450,14 +452,14 @@ where
 
   + label is a tstr set to the name of the derived key or IV, i.e. "K_2m", "IV_2m", "K_2e", "K_2ae", "IV_2ae", "K_3m", "IV_3m", "K_3ae", or "IV_2ae".
 
-  + length is the length of output keying material in bytes
+  + length is the length of output keying material (OKM) in bytes
 
 K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3e2m. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3e2m. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4x3m. IVs are only used if the EDHOC AEAD algorithm uses IVs.
 
-Assuming the output OKM length L is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
+Assuming that length is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   OKM = first L bytes of HMAC( PRK, info || 0x01 )
+   OKM = first "length" bytes of HMAC( PRK, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 where \|\| means byte string concatenation.
@@ -468,7 +470,7 @@ Example: Assume the use of the algorithm AES-CCM-16-64-128 and SHA-256, K_j and 
    HMAC-SHA-256( PRK_j, info || 0x01 )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-calculated with (aead_id, length) = (10, 16) and (aead_id, length) = (10, 13), respectively.
+\calculated with (edhoc_aead_id, length) = (10, 16) and (edhoc_aead_id, length) = (10, 13), respectively.
 
 ### EDHOC-Exporter Interface {#exporter}
 
