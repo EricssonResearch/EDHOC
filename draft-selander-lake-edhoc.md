@@ -950,7 +950,7 @@ error SHALL be a CBOR Sequence (see {{CBOR}}) as defined below
 error = (
   ? C_x : bstr_identifier,
   ERR_MSG : tstr,
-  ? SUITES_R : [ supported : 2* suite ] / supported : suite,
+  ? SUITES_R : [ supported : 2* suite ] / suite,
 )
 ~~~~~~~~~~~
 
