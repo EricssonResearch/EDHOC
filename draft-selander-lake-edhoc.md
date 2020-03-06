@@ -373,11 +373,7 @@ EDHOC allows the communication or negotiation of various protocol features durin
 
 * The Initiator decides on the method parameter, see {{method-types}}. The Responder either accepts or rejects.
 
-TODO: Do we want to enable parties negotiating public key method?
-
 * The Initiator and the Responder decide on the representation of the identifier of their respective credentials, ID_CRED_I and ID_CRED_R. The decision is reflected by the label used in the CBOR map, see for example {{asym-overview}}.
-
-TODO: Do we want to enable parties to communicate that they already have or have not access to key or certificate of the other? 
 
 ## Auxiliary Data
 
