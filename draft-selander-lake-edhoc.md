@@ -330,8 +330,7 @@ The EDHOC message exchange may be authenticated using pre-shared keys (PSK), raw
 
 * When public keys are used but not with a PKI (RPK, self-signed certificate), the trust anchor is the public authentication key of the other party. In this case, the identity is typically directly associated to the public authentication key of the other party. For example, the name of the subject may be a canonical representation of the public key. Alternatively, if identities can be expressed in the form of unique subject names assigned to public keys, then a binding to identity can be achieved by including both public key and associated subject name in the protocol message computation: CRED_I or CRED_R may be a self-signed certificate or COSE_Key containing the public authentication key and the subject name, see {{fig-sigma}}. Before running EDHOC, each party need a set of public authentication keys/unique associated subject names it is allowed to communicate with.  EDHOC provides proof that the other party possesses the private authentication key corresponding to the public authentication key. 
 
-
-* TODO: PSK
+* When pre-shared keys are used the information about the other party is carried in the PSK identifier field of the protocol, ID_PSK. The purpose of ID_PSK is to facilitate retrieval of the pre-shared key, which is used to authenticate and assert trust. In this case no other identities or trust anchors are used.
 
 ## Identifiers
 
