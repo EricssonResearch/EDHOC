@@ -386,7 +386,6 @@ Since data carried in AD1 and AD2 may not be protected, and the content of AD3 i
    
 The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP according to Sections 13.1 and 13.2 of {{RFC8152}}, but only the 'x' parameter is included in the EDHOC messages. For Elliptic Curve Keys of type EC2, compact representation as per {{RFC6090}} MAY be used also in the COSE_Key. If the COSE implementation requires an 'y' parameter, any of the possible values of the y-coordinate can be used, see Appendix C of {{RFC6090}}. COSE {{RFC8152}} always use compact output for Elliptic Curve Keys of type EC2.
 
-
 ## Key Derivation {#key-der}
 
 EDHOC uses HKDF {{RFC5869}} with the EDHOC hash algorithm in the selected cipher suite to derive keys. HKDF-Extract is used to derive fixed-length uniformly pseudorandom keys (PRK) from ECDH shared secrets. HKDF-Expand is used to derive additional output keying material (OKM) from the PRKs. The PRKs are derived using HKDF-Extract {{RFC5869}}.
@@ -423,7 +422,7 @@ Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and
    G_XY = X25519( Y, G_X ) = X25519( X, G_Y )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}} where the EDHOC-KDF is instantiated with the EDHOC AEAD algorithm in the selected cipher suite
+The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}} where the EDHOC-KDF is instantiated with the EDHOC AEAD algorithm in the selected cipher suite.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    OKM = EDHOC-KDF( PRK, transcript_hash, label, length )
@@ -443,7 +442,7 @@ info = [
 
 where
 
-  + edhoc_aead_id is an int or tstr containing the algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite encoded as defined in {{RFC8152}}.
+  + edhoc_aead_id is an int or tstr containing the algorithm identifier of the EDHOC AEAD algorithm in the selected cipher suite encoded as defined in {{RFC8152}}. Note that a single fixed edhoc_aead_id is used in all invocations of EDHOC-KDF, including the derivation of K_2e and invocations of the EDHOC-Exporter.
   
   + transcript_hash is a bstr set to one of the transcript hashes TH_2, TH_3, or TH_4 as defined in Sections {{asym-msg2-form}}{: format="counter"}, {{asym-msg3-form}}{: format="counter"}, and {{exporter}}{: format="counter"}.
 
