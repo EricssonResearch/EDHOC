@@ -389,7 +389,7 @@ The ECDH ephemeral public keys are formatted as a COSE_Key of type EC2 or OKP ac
 
 ## Key Derivation {#key-der}
 
-Keys and IVs in EDHOC is derived with HKDF {{RFC5869}} using a pseudorandom key (PRK) and the EDHOC hash algorithm in the selected cipher suite. The PRKs are derived using HKDF-Extract {{RFC5869}}.
+EDHOC uses HKDF {{RFC5869}} with the EDHOC hash algorithm in the selected cipher suite to derive keys. HKDF-Extract is used to derive fixed-length uniformly pseudorandom keys (PRK) from ECDH shared secrets. HKDF-Expand is used to derive additional output keying material (OKM) from the PRKs. The PRKs are derived using HKDF-Extract {{RFC5869}}.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
    PRK = HKDF-Extract( salt, IKM )
@@ -423,10 +423,10 @@ Example: Assuming the use of curve25519, the ECDH shared secrets G_XY, G_RX, and
    G_XY = X25519( Y, G_X ) = X25519( X, G_Y )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}}
+The keys and IVs used in EDHOC are derived from PRK using HKDF-Expand {{RFC5869}} where the EDHOC-KDF is instantiated with the EDHOC AEAD algorithm in the selected cipher suite
 
 ~~~~~~~~~~~~~~~~~~~~~~~
-   OKM = KDF( PRK, transcript_hash, label, length )
+   OKM = EDHOC-KDF( PRK, transcript_hash, label, length )
        = HKDF-Expand( PRK, info, length )
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -453,28 +453,12 @@ where
 
 K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom key PRK_2e. K_2m and IV_2m are derived using the transcript hash TH_2 and the pseudorandom key PRK_3e2m. K_3ae and IV_3ae are derived using the transcript hash TH_3 and the pseudorandom key PRK_3e2m. K_3m and IV_3m are derived using the transcript hash TH_3 and the pseudorandom key PRK_4x3m. IVs are only used if the EDHOC AEAD algorithm uses IVs.
 
-Assuming that length is smaller than the hash function output size, the expand phase of HKDF consists of a single HMAC invocation
-
-~~~~~~~~~~~~~~~~~~~~~~~
-   OKM = first "length" bytes of HMAC( PRK, info || 0x01 )
-~~~~~~~~~~~~~~~~~~~~~~~
-
-where \|\| means byte string concatenation.
-
-Example: Assume the use of the algorithm AES-CCM-16-64-128 and SHA-256, K_j and IV_j are therefore the first 16 and 13 bytes, respectively, of
-
-~~~~~~~~~~~~~~~~~~~~~~~
-   HMAC-SHA-256( PRK_j, info || 0x01 )
-~~~~~~~~~~~~~~~~~~~~~~~
-
-\calculated with (edhoc_aead_id, length) = (10, 16) and (edhoc_aead_id, length) = (10, 13), respectively.
-
 ### EDHOC-Exporter Interface {#exporter}
 
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = KDF(PRK_4x3m, TH_4, label, length) 
+   EDHOC-Exporter(label, length) = EDHOC-KDF(PRK_4x3m, TH_4, label, length) 
 ~~~~~~~~~~~
 
 where label is a tstr defined by the application and length is an uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
@@ -543,7 +527,8 @@ The actual credentials CRED_I and CRED_R are signed or MAC:ed by the Initiator a
 CRED_x = {
   1:  1,
  -1:  4,
- -2:  h'b1a3e89460e88d3a8d54211dc95f0b903ff205eb71912d6db8f4af980d2db83a',
+ -2:  h'b1a3e89460e88d3a8d54211dc95f0b90
+        3ff205eb71912d6db8f4af980d2db83a',
  "subject name" : "42-50-31-FF-EF-37-32-39"
 }
 ~~~~~~~~~~~
@@ -672,8 +657,8 @@ The Responder SHALL compose message_2 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = KDF( PRK_3e2m, TH_2, "K_2m", length ) 
-   * Nonce N = KDF( PRK_3e2m, TH_2, "IV_2m", length )
+   * Key K = EDHOC-KDF( PRK_3e2m, TH_2, "K_2m", length ) 
+   * Nonce N = EDHOC-KDF( PRK_3e2m, TH_2, "IV_2m", length )
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
@@ -705,7 +690,7 @@ The Responder SHALL compose message_2 as follows:
 
    * CIPHERTEXT_2 = plaintext XOR K_2e
 
-   * K_2e = KDF( PRK_2e, TH_2, "K_2e", length ), where length is the length of the plaintext. 
+   * K_2e = EDHOC-KDF( PRK_2e, TH_2, "K_2e", length ), where length is the length of the plaintext. 
 
 * Encode message_2 as a sequence of CBOR encoded data items as specified in {{asym-msg2-form}}.
 
@@ -770,8 +755,8 @@ The Initiator  SHALL compose message_3 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = KDF( PRK_4x3m, TH_3, "K_3m", length ) 
-   * Nonce N = KDF( PRK_4x3m, TH_3, "IV_3m", length )
+   * Key K = EDHOC-KDF( PRK_4x3m, TH_3, "K_3m", length ) 
+   * Nonce N = EDHOC-KDF( PRK_4x3m, TH_3, "IV_3m", length )
    * Plaintext P = 0x (the empty string)
    * Associated data A =
 
@@ -805,8 +790,8 @@ The Initiator  SHALL compose message_3 as follows:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = KDF( PRK_3e2m, TH_3, "K_3ae", length ) 
-   * Nonce N = KDF( PRK_3e2m, TH_3, "IV_3ae", length )
+   * Key K = EDHOC-KDF( PRK_3e2m, TH_3, "K_3ae", length ) 
+   * Nonce N = EDHOC-KDF( PRK_3e2m, TH_3, "IV_3ae", length )
    * Plaintext P = ( ID_CRED_I / bstr_identifier, Signature_or_MAC_3, ? AD_3 )
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
@@ -909,8 +894,8 @@ where:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = KDF( PRK_2e, TH_2, "K_2ae", length ) 
-   * Nonce N = KDF( PRK_2e, TH_2, "IV_2ae", length )
+   * Key K = EDHOC-KDF( PRK_2e, TH_2, "K_2ae", length ) 
+   * Nonce N = EDHOC-KDF( PRK_2e, TH_2, "IV_2ae", length )
    * Plaintext P = ? AD_2
    * Associated data A = \[ "Encrypt0", h'', TH_2 \]
       
@@ -930,8 +915,8 @@ where:
 
    COSE constructs the input to the AEAD {{RFC5116}} as follows: 
 
-   * Key K = KDF( PRK_3e2m, TH_3, "K_3ae", length ) 
-   * Nonce N = KDF( PRK_3e2m, TH_3, "IV_3ae", length )
+   * Key K = EDHOC-KDF( PRK_3e2m, TH_3, "K_3ae", length ) 
+   * Nonce N = EDHOC-KDF( PRK_3e2m, TH_3, "IV_3ae", length )
    * Plaintext P = ? AD_3
    * Associated data A = \[ "Encrypt0", h'', TH_3 \]
 
