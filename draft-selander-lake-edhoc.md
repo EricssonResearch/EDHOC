@@ -457,7 +457,8 @@ K_2ae and IV_2ae are derived using the transcript hash TH_2 and the pseudorandom
 Application keys and other application specific data can be derived using the EDHOC-Exporter interface defined as:
 
 ~~~~~~~~~~~
-   EDHOC-Exporter(label, length) = EDHOC-KDF(PRK_4x3m, TH_4, label, length) 
+   EDHOC-Exporter(label, length)
+     = EDHOC-KDF(PRK_4x3m, TH_4, label, length) 
 ~~~~~~~~~~~
 
 where label is a tstr defined by the application and length is an uint defined by the application. The label SHALL be different for each different exporter value. The transcript hash TH_4 is a CBOR encoded bstr and the input to the hash function is a CBOR Sequence.
