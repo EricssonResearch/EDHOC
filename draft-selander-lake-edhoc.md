@@ -572,7 +572,7 @@ bstr_identifier = bsrt / int
 where:
 
 * METHOD_CORR = 4 * method + corr, where method = 0, 1, 2, or 3 (see {{method-types}}) and the correlation parameter corr is chosen based on the transport and determines which connection identifiers that are omitted (see {{transport}}).
-* SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. One of the supported cipher suites is selected. If a single supported cipher suite is conveyed then that cipher suite is selected and the selected cipher suite is encoded as an int instead of an array.
+* SUITES_I - cipher suites which the Initiator supports in order of decreasing preference. The list of supported cipher suites can be truncated, so that only a subset of those is conveyed in the message. One of the supported cipher suites is selected. If a single supported cipher suite is conveyed then that cipher suite is selected and the selected cipher suite is encoded as an int instead of an array.
 * G_X - the ephemeral public key of the Initiator
 * C_I - variable length connection identifier. An bstr_identifier is a byte string with special encoding. Byte strings of length one is encoded as the corresponding integer - 24, i.e. h'2a' is encoded as 18.
 * AD_1 - bstr containing unprotected opaque auxiliary data
@@ -1338,12 +1338,21 @@ METHOD_CORR (4 * method + corr) (int)
 
 No unprotected opaque auxiliary data is sent in the message exchanges.
 
-The pre-defined Cipher Suite 0 is in place both on the Initiator and the Responder, see {{cipher-suites}}.
+The list of supported Cipher Suites in the Initiator is the followin:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+Supported Cipher Suites (4 bytes)
+00 01 02 03
+~~~~~~~~~~~~~~~~~~~~~~~
+
+And the selected Cipher Suite is the most preferred:
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Selected Cipher Suite (int)
 0
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+The mandatory-to-implement Cipher Suite 0 is supported by both the Initiator and the Responder, see {{cipher-suites}}.
 
 ### Message_1
 
@@ -1372,7 +1381,16 @@ Since no unprotected opaque auxiliary data is sent in the message exchanges:
 AD_1 (0 bytes)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-With SUITES_I = suite = 0, message_1 is constructed, as the CBOR Sequence of the CBOR data items above.
+The initiator truncates the list of supported Cipher Suites to one cipher suite only, 00. 
+
+Because one single cipher suite is conveyed, that ciphersuite is selected and it is encoded as an int instead of an array:
+
+~~~~~~~~~~~~~~~~~~~~~~~
+SUITES_I (int)
+0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+With SUITES_I = 0, message_1 is constructed, as the CBOR Sequence of the CBOR data items above.
 
 ~~~~~~~~~~~~~~~~~~~~~~~
 message_1 =
