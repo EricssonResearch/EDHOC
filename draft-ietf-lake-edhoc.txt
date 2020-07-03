@@ -2777,14 +2777,14 @@ Internet-Draft Ephemeral Diffie-Hellman Over COSE (EDHOC)      July 2020
    The Responder chooses a connection identifier C_R.
 
    Connection identifier chosen by Responder (1 bytes)
-   2b
+   13
 
    Data_2 is constructed, as the CBOR Sequence of G_Y and C_R.
 
   data_2 =
   (
     h'71a3d599c21da18902a1aea810b2b6382ccd8d5f9bf0195281754c5ebcaf301e',
-    h'2b'
+    h'13'
   )
 
  data_2 (CBOR Sequence) (35 bytes)
@@ -3060,13 +3060,13 @@ Internet-Draft Ephemeral Diffie-Hellman Over COSE (EDHOC)      July 2020
    message_2 is the CBOR sequence of data_2 and CIPHERTEXT_2, in this
    order:
 
-  message_2 =
-  (
-   h'582071a3d599c21da18902a1aea810b2b6382ccd8d5f9bf0195281754c5ebcaf301
-   e135850'
+ message_2 =
+ (
+  data_2,
   h'99d53801a725bfd6a4e71d0484b755ec383df77a916ec0dbc02bba7c21a200807b4f
-  585f728b671ad678a43aacd33b78ebd566cd004fc6f1d406f01d9704e705b21552a9eb
-  28ea316ab65037d717862e'
+ 585f728b671ad678a43aacd33b78ebd566cd004fc6f1d406f01d9704e705b21552a9eb
+ 28ea316ab65037d717862e'
+ )
 
    Which as a CBOR encoded data item is:
 
@@ -3397,7 +3397,7 @@ Internet-Draft Ephemeral Diffie-Hellman Over COSE (EDHOC)      July 2020
 
    message_3 =
    (
-     h'2b',
+     h'13',
      h''
    )
 
